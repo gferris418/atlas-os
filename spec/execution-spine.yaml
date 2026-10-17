@@ -23,6 +23,7 @@ contract:
   visibility: One canonical plan and execution spine must govern user-visible state.
   progress: Every prompt exposes a compact event-driven dashboard with plan, task, method, timing, safe processing summary, output, quality, and persistence state; plans activate and finish one atomic work unit at a time.
   planning_gate: PLANNING creates a concrete plan identifier before EXECUTION. Material questions are resolved before dependent work, while safe independent work may continue.
+  domain_handoff: When ROUTING delegates substantive domain work to a specialist method, ATLAS emits and validates the governed domain-context handoff from spec/domain-handoff.yaml before dependent EXECUTION; return correlation is verified before accepting the specialist result.
   output: Output-profile selection is integrated into planning and delivery without adding another user-visible stage.
   resume: Reconcile persisted state against actual external state before continuing.
 invariants:
@@ -36,6 +37,6 @@ references:
   - spec/planning.yaml
   - spec/classification.yaml
   - spec/domain-practices.yaml
+  - spec/domain-handoff.yaml
   - spec/output.yaml
   - spec/verification.yaml
-
