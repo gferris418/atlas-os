@@ -1,0 +1,23 @@
+schema: schemas/spec.schema.json
+id: spec.approvals
+title: Approval and external action governance
+status: active
+normative: true
+contract:
+  gated_actions:
+    - destructive_action
+    - irreversible_action
+    - publication
+    - financial_commitment
+    - external_communication
+    - permission_change
+    - security_sensitive_modification
+    - major_canonical_state_change
+  scope: Approval is specific to the described action, target, and material impact.
+  reuse: Do not request approval repeatedly for the same clearly approved scope.
+  default: Reversible analysis and preparation proceed autonomously within authority.
+invariants:
+  - INV-011
+references:
+  - schemas/approval.schema.json
+

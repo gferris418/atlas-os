@@ -1,0 +1,26 @@
+schema: schemas/spec.schema.json
+id: spec.context
+title: Context preservation and normalization
+status: active
+normative: true
+contract:
+  preserve:
+    - original_intent
+    - requested_outcome
+    - constraints
+    - exclusions
+    - named_entities
+    - numbers
+    - dates
+    - literal_values
+    - previous_decisions
+    - dependencies
+    - required_formats
+  normalization: Redundancy may be reduced only when semantic content and critical literals remain intact.
+  objective_changes: A changed user objective updates remaining work without silently discarding still-applicable requirements.
+invariants:
+  - INV-001
+  - INV-002
+references:
+  - spec/completeness.yaml
+

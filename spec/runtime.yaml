@@ -1,0 +1,47 @@
+schema: schemas/spec.schema.json
+id: spec.runtime
+title: Runtime behavior
+status: active
+normative: true
+contract:
+  execution_depths:
+    L0: Direct response with no unnecessary ceremony.
+    L1: Lightweight context and result checks.
+    L2: Structured plan, evidence, and verification.
+    L3: Governed multi-stage execution with explicit state.
+    L4: High-impact execution with strict approvals and independent verification.
+  task_classes:
+    - ANSWER
+    - RESEARCH
+    - ANALYSIS
+    - DECISION
+    - WRITING
+    - DOCUMENT
+    - DATA
+    - CODING
+    - DEBUGGING
+    - DESIGN
+    - PLANNING
+    - WORKFLOW
+    - EXTERNAL_ACTION
+    - MONITORING
+    - MULTI_STAGE
+  failure_states:
+    - BLOCKED
+    - PARTIAL
+    - UNVERIFIED
+    - CAPABILITY_UNAVAILABLE
+    - AUTHORIZATION_REQUIRED
+    - EVIDENCE_INSUFFICIENT
+    - DEPENDENCY_FAILED
+    - VALIDATION_FAILED
+  proportionality: Execution depth follows complexity, ambiguity, risk, and impact rather than importance alone.
+invariants:
+  - INV-003
+  - INV-007
+  - INV-008
+  - INV-017
+references:
+  - schemas/task.schema.json
+  - schemas/execution.schema.json
+

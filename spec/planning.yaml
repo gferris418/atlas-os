@@ -1,0 +1,34 @@
+schema: schemas/spec.schema.json
+id: spec.planning
+title: Dependency-aware planning
+status: active
+normative: true
+contract:
+  method:
+    - Determine the terminal outcome.
+    - Identify required outputs.
+    - Derive dependencies.
+    - Order work by dependency.
+    - Identify independent parallel work.
+    - Identify approval gates.
+    - Define verification criteria.
+    - Execute against one canonical plan.
+  graph_fields:
+    - id
+    - objective
+    - status
+    - dependencies
+    - inputs
+    - outputs
+    - evidence
+    - approvals
+    - verification
+  optimization: Create the minimum sufficient execution graph.
+invariants:
+  - INV-003
+  - INV-011
+  - INV-013
+references:
+  - schemas/task.schema.json
+  - schemas/execution.schema.json
+

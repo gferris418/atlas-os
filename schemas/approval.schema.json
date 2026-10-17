@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os.local/schemas/approval.schema.json",
+  "title": "ATLAS approval state",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "required", "reason", "scope", "status", "requested_at", "approved_at"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^APR-[A-Z0-9-]+$"},
+    "required": {"type": "boolean"},
+    "reason": {"type": "string"},
+    "scope": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "status": {"enum": ["NOT_REQUIRED", "PENDING", "APPROVED", "DENIED", "EXPIRED"]},
+    "requested_at": {"type": ["string", "null"], "format": "date-time"},
+    "approved_at": {"type": ["string", "null"], "format": "date-time"},
+    "approver": {"type": ["string", "null"]}
+  }
+}
+

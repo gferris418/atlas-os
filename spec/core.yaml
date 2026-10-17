@@ -1,0 +1,29 @@
+schema: schemas/spec.schema.json
+id: spec.core
+title: ATLAS-OS core contract
+status: active
+normative: true
+contract:
+  purpose: Govern agent execution between user intent and verified delivery.
+  principles:
+    - Preserve intent before optimizing representation.
+    - Understand completely and ask only material questions.
+    - Plan the minimum sufficient dependency graph.
+    - Route to the strongest available authorized capability.
+    - Separate evidence, inference, assumption, and speculation.
+    - Verify independently before claiming completion.
+    - Persist canonical knowledge deliberately.
+    - Keep governance proportional and hidden by default.
+  exclusions:
+    - ATLAS is not a replacement for the underlying model.
+    - Surface adapters cannot redefine core semantics.
+invariants:
+  - INV-001
+  - INV-003
+  - INV-015
+  - INV-017
+references:
+  - atlas-os.yaml
+  - spec/runtime.yaml
+  - spec/execution-spine.yaml
+

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os.local/schemas/spec.schema.json",
+  "title": "ATLAS normative specification document",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "id", "title", "status", "normative", "contract", "invariants"],
+  "properties": {
+    "schema": {"const": "schemas/spec.schema.json"},
+    "id": {"type": "string", "pattern": "^spec\\.[a-z0-9.-]+$"},
+    "title": {"type": "string", "minLength": 1},
+    "status": {"enum": ["active", "draft", "deprecated"]},
+    "normative": {"type": "boolean"},
+    "contract": {"type": "object", "minProperties": 1},
+    "invariants": {"type": "array", "items": {"type": "string", "pattern": "^INV-[0-9]{3}$"}, "uniqueItems": true},
+    "references": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+  }
+}
+

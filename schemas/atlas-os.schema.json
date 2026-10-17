@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os.local/schemas/atlas-os.schema.json",
+  "title": "ATLAS-OS product manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "product", "authority", "execution", "release", "artifacts"],
+  "properties": {
+    "schema": {"const": "schemas/atlas-os.schema.json"},
+    "product": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "version", "release_channel", "schema_version", "status", "classification"],
+      "properties": {
+        "id": {"const": "atlas-os"},
+        "name": {"const": "ATLAS OS"},
+        "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"},
+        "release_channel": {"enum": ["draft", "candidate", "stable"]},
+        "schema_version": {"const": 2},
+        "status": {"enum": ["DRAFT", "CANDIDATE", "VERIFIED", "RELEASED", "SUPERSEDED", "ARCHIVED"]},
+        "classification": {"type": "string", "minLength": 1}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest", "core_spec", "version_pointer"],
+      "properties": {
+        "manifest": {"const": "atlas-os.yaml"},
+        "core_spec": {"type": "string"},
+        "version_pointer": {"const": "atlas-os.yaml#/product/version"}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["spine", "runtime", "default_depth"],
+      "properties": {
+        "spine": {"type": "string"},
+        "runtime": {"type": "string"},
+        "default_depth": {"enum": ["L0", "L1", "L2", "L3", "L4"]}
+      }
+    },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_version", "blocking_controls", "package_command", "validation_command"],
+      "properties": {
+        "target_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "blocking_controls": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "package_command": {"type": "string"},
+        "validation_command": {"type": "string"}
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": {"type": "string"},
+      "required": ["specifications", "schemas", "registries", "integrations", "migrations", "tests"]
+    }
+  }
+}
+

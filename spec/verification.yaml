@@ -1,0 +1,33 @@
+schema: schemas/spec.schema.json
+id: spec.verification
+title: Verification and completion states
+status: active
+normative: true
+contract:
+  states:
+    generated: Output exists but has not necessarily run.
+    executed: The relevant operation ran but may not be correct.
+    verified: Proportional checks demonstrate required behavior.
+    accepted: The authorized party accepted the verified result.
+    released: Release gates passed and publication completed.
+  methods:
+    - tests
+    - schema_validation
+    - source_reconciliation
+    - calculations
+    - file_existence
+    - output_comparison
+    - requirement_coverage
+    - command_status
+    - integration_checks
+    - regression_tests
+  rule: Verification must be proportional and must exercise the intended behavior.
+invariants:
+  - INV-006
+  - INV-007
+  - INV-008
+  - INV-009
+  - INV-016
+references:
+  - schemas/execution.schema.json
+

@@ -1,0 +1,32 @@
+schema: schemas/spec.schema.json
+id: spec.execution-spine
+title: Canonical execution spine
+status: active
+normative: true
+contract:
+  stages:
+    - INTAKE
+    - CONTEXT_PRESERVATION
+    - NORMALIZATION
+    - COMPLETENESS_CHECK
+    - TASK_CLASSIFICATION
+    - PLANNING
+    - ROUTING
+    - EVIDENCE_ACQUISITION
+    - EXECUTION
+    - VERIFICATION
+    - PERSISTENCE
+    - DELIVERY
+  optimization: Implementations may combine internal operations but must preserve every stage responsibility.
+  visibility: One canonical plan and execution spine must govern user-visible state.
+  resume: Reconcile persisted state against actual external state before continuing.
+invariants:
+  - INV-003
+  - INV-007
+  - INV-008
+  - INV-009
+references:
+  - spec/context.yaml
+  - spec/planning.yaml
+  - spec/verification.yaml
+

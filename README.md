@@ -1,32 +1,76 @@
 # ATLAS OS
 
-**Candidate:** `v2.0.0-rc.1`  
+**Current candidate:** `v2.0.0-rc.1`
 **Classification:** Internal  
-**Release readiness:** **HOLD** pending independent cross-surface proof.
+**Release status:** **CANDIDATE / HOLD** pending independent cross-surface proof.
 
-ATLAS OS v2 consolidates the v1.12 Library release into one Git-oriented source tree. `atlas-os.yaml` is the product-level authority. Component revisions remain visible for compatibility and lineage, but they no longer act as competing product releases.
+ATLAS-OS is a model-agnostic execution-governance specification for AI agents. It turns user intent into a controlled execution spine that preserves context, plans dependencies, routes capabilities, tracks evidence and uncertainty, enforces approval boundaries, verifies results, separates task state from canonical knowledge, and produces reproducible outputs.
+
+ATLAS is not an autonomous model or a collection of prompts. The repository is the canonical machine-readable contract; ChatGPT, Codex, Work, and future surfaces implement adapters around the same core semantics.
+
+## Execution spine
+
+```text
+INTAKE -> CONTEXT PRESERVATION -> NORMALIZATION -> COMPLETENESS CHECK
+       -> TASK CLASSIFICATION -> DEPENDENCY-AWARE PLANNING
+       -> CAPABILITY ROUTING -> EVIDENCE ACQUISITION -> EXECUTION
+       -> VERIFICATION -> PERSISTENCE -> DELIVERY
+```
+
+Execution depth is proportional: trivial work remains direct, while complex or high-impact work activates stronger planning, evidence, approval, and verification controls.
 
 ## Authority model
 
-1. `atlas-os.yaml` — single product/release authority.
-2. `spec/`, `schemas/`, and `registries/` — active component sources.
-3. `integrations/` — governed external-framework contracts.
-4. `tests/` — conformance and release evidence.
-5. `migration/` — open migration controls and transition records.
-6. `legacy/` — historical authority snapshots; never active runtime authority.
+1. [`atlas-os.yaml`](atlas-os.yaml) is the only product/release authority.
+2. [`spec/`](spec/) defines normative core behavior.
+3. [`schemas/`](schemas/) validates machine-readable state.
+4. [`registries/`](registries/) declares capabilities, surfaces, controls, and migrations.
+5. [`integrations/`](integrations/) adapts the core contract to execution surfaces.
+6. [`migration/`](migration/) records open transition controls and evidence.
+7. [`legacy/`](legacy/) contains historical references and is never active authority.
 
-## Current blockers
+Component revisions may describe compatibility and lineage, but cannot declare a competing product release.
 
-- `MIG-029`: independent New Chat and ChatGPT Work bootstrap proof is pending.
-- `MIG-037`: independent cross-surface latest-control propagation proof is pending.
-- DTIF data reconciliation remains open before archive-only disposition.
+## Startup dashboard
 
-These blockers are intentionally carried forward. This candidate does **not** convert missing proof into a pass.
+Substantive tasks expose compact operational state without private reasoning:
+
+```text
+ATLAS
+Progress: 0%
+Active: Understand and structure task
+Blocker / Approval: None
+Library: Loaded / Not required
+```
+
+The machine-readable dashboard contract is in [`spec/dashboard.yaml`](spec/dashboard.yaml) and [`schemas/dashboard.schema.json`](schemas/dashboard.schema.json).
+
+## Evidence and routing
+
+ATLAS distinguishes `VERIFIED`, `SUPPORTED`, `INFERRED`, `ASSUMED`, `SPECULATIVE`, and `UNKNOWN`. Source quality, completeness, confidence, and inference remain separate. Routing selects the best available capability using task fit, authority, permissions, risk, and fallback behavior; the presence of a tool alone is not a reason to call it.
+
+## Persistence
+
+Task execution state and durable canonical library state are separate namespaces. Canonical revisions carry identifiers, versions, timestamps, provenance, status, dependencies, and replacement lineage. A revision with active dependents cannot be archived or removed.
+
+## Repository map
+
+- `atlas_runtime/` — reference implementation of core invariants.
+- `spec/` — normative declarative specifications.
+- `schemas/` — JSON Schemas for state and governance artifacts.
+- `registries/` — governed capabilities and control indexes.
+- `tests/` — unit, conformance, and scenario regression evidence.
+- `tools/validate/` — repository-wide validation.
+- `tools/package/` — deterministic candidate packaging.
+- `docs/` — architecture, operation, and release guidance.
 
 ## Validate
 
 ```bash
+python -m pip install -r requirements.txt
 python -m unittest discover -s tests/unit -v
+python -m unittest discover -s tests/conformance -v
+python -m unittest discover -s tests/regression -v
 python tools/validate/validate_repository.py .
 ```
 
@@ -36,9 +80,14 @@ python tools/validate/validate_repository.py .
 python tools/package/build_release.py . dist
 ```
 
-## GitHub status
+The package uses the candidate identifier from `atlas-os.yaml`, records the source commit, emits a manifest, and produces SHA-256 checksums.
 
-Canonical repository: `https://github.com/gferris418/atlas-os` (private). The repository is the Git source of truth for the v2 line. Final `v2.0.0` publication remains blocked until MIG-029 and MIG-037 are closed.
+## Current blockers
 
-## Repository management
-See `docs/repository-management.md` and `GOVERNANCE.md` for the Gate-B repository ruleset and release policy.
+- `MIG-029`: independent New Chat and ChatGPT Work bootstrap proof is pending.
+- `MIG-037`: independent cross-surface latest-control propagation proof is pending.
+- `DTIF-RECONCILIATION`: data reconciliation remains open before archive-only disposition.
+
+Missing proof remains missing proof. These controls prevent a stable `v2.0.0` release but do not prevent a truthful release-candidate package.
+
+See [`GOVERNANCE.md`](GOVERNANCE.md), [`docs/architecture.md`](docs/architecture.md), and [`docs/release-process.md`](docs/release-process.md) for the normative change and release model.

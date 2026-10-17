@@ -1,0 +1,33 @@
+schema: schemas/atlas-os.schema.json
+product:
+  id: atlas-os
+  name: ATLAS OS
+  version: 2.0.0-rc.1
+  release_channel: candidate
+  schema_version: 2
+  status: CANDIDATE
+  classification: internal
+authority:
+  manifest: atlas-os.yaml
+  core_spec: spec/core.yaml
+  version_pointer: atlas-os.yaml#/product/version
+execution:
+  spine: spec/execution-spine.yaml
+  runtime: spec/runtime.yaml
+  default_depth: L1
+release:
+  target_version: 2.0.0
+  blocking_controls:
+    - MIG-029
+    - MIG-037
+    - DTIF-RECONCILIATION
+  package_command: python tools/package/build_release.py . dist
+  validation_command: python tools/validate/validate_repository.py .
+artifacts:
+  specifications: spec
+  schemas: schemas
+  registries: registries
+  integrations: integrations
+  migrations: migration
+  tests: tests
+

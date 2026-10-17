@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os.local/schemas/evidence.schema.json",
+  "title": "ATLAS evidence record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "claim", "class", "source_quality", "completeness", "confidence", "provenance", "collected_at"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^EVD-[A-Z0-9-]+$"},
+    "claim": {"type": "string", "minLength": 1},
+    "class": {"enum": ["VERIFIED", "SUPPORTED", "INFERRED", "ASSUMED", "SPECULATIVE", "UNKNOWN"]},
+    "source_quality": {"enum": ["USER_AUTHORITATIVE", "CONNECTED_AUTHORITATIVE", "OFFICIAL_PRIMARY", "CANONICAL_PROJECT", "HIGH_QUALITY_SECONDARY", "COMMUNITY", "MODEL_PRIOR", "UNKNOWN"]},
+    "completeness": {"type": "number", "minimum": 0, "maximum": 1},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "provenance": {"type": "object", "minProperties": 1},
+    "collected_at": {"type": "string", "format": "date-time"},
+    "inference": {"type": ["string", "null"]}
+  }
+}
+

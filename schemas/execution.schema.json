@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os.local/schemas/execution.schema.json",
+  "title": "ATLAS execution state",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "stage", "state", "graph", "generated", "executed", "verified", "accepted", "released"],
+  "properties": {
+    "task_id": {"type": "string", "pattern": "^TASK-"},
+    "stage": {"enum": ["INTAKE", "CONTEXT_PRESERVATION", "NORMALIZATION", "COMPLETENESS_CHECK", "TASK_CLASSIFICATION", "PLANNING", "ROUTING", "EVIDENCE_ACQUISITION", "EXECUTION", "VERIFICATION", "PERSISTENCE", "DELIVERY"]},
+    "state": {"enum": ["PENDING", "ACTIVE", "BLOCKED", "PARTIAL", "UNVERIFIED", "CAPABILITY_UNAVAILABLE", "AUTHORIZATION_REQUIRED", "EVIDENCE_INSUFFICIENT", "DEPENDENCY_FAILED", "VALIDATION_FAILED", "COMPLETED"]},
+    "graph": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "dependencies", "status"],
+        "properties": {
+          "id": {"type": "string"},
+          "dependencies": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "status": {"enum": ["PENDING", "ACTIVE", "BLOCKED", "COMPLETED", "FAILED"]},
+          "parallelizable": {"type": "boolean"}
+        }
+      }
+    },
+    "generated": {"type": "boolean"},
+    "executed": {"type": "boolean"},
+    "verified": {"type": "boolean"},
+    "accepted": {"type": "boolean"},
+    "released": {"type": "boolean"},
+    "next_action": {"type": ["string", "null"]}
+  }
+}
+

@@ -1,0 +1,27 @@
+schema: schemas/spec.schema.json
+id: spec.evidence
+title: Evidence architecture
+status: active
+normative: true
+contract:
+  classes:
+    VERIFIED: Directly checked against adequate provenance.
+    SUPPORTED: Evidence supports the claim but is incomplete.
+    INFERRED: Derived logically from evidence.
+    ASSUMED: Temporarily accepted to permit execution.
+    SPECULATIVE: Possible but inadequately evidenced.
+    UNKNOWN: Evidence state is not known.
+  health:
+    GREEN: Required evidence is verified and no material conflict remains.
+    AMBER: Evidence is usable but incomplete or contains managed uncertainty.
+    RED: Required evidence conflicts, fails, or is materially insufficient.
+    UNKNOWN: Evidence health cannot yet be evaluated.
+  separation: Source quality, completeness, confidence, and inference are independent attributes.
+  absence_rule: Absence of evidence is not evidence of absence.
+invariants:
+  - INV-005
+  - INV-006
+  - INV-016
+references:
+  - schemas/evidence.schema.json
+

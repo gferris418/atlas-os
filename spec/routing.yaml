@@ -1,0 +1,38 @@
+schema: schemas/spec.schema.json
+id: spec.routing
+title: Capability, tool, plugin, and skill routing
+status: active
+normative: true
+contract:
+  decision_order:
+    - task_requirement
+    - capability_needed
+    - available_capabilities
+    - authority_and_source_quality
+    - permissions
+    - material_cost_and_latency
+    - best_fit
+    - fallback
+  source_precedence:
+    - user_authoritative
+    - connected_authoritative
+    - official_primary
+    - canonical_project
+    - high_quality_secondary
+    - community
+    - model_prior
+  rules:
+    - Prefer structured native capabilities over manual emulation.
+    - Prefer connected private sources for private user information.
+    - Do not invoke overlapping capabilities without material benefit.
+    - Never claim an unavailable or unexecuted action occurred.
+    - Skill triggers, prerequisites, conflicts, priority, authority, and version are governed registry data.
+invariants:
+  - INV-007
+  - INV-011
+  - INV-015
+references:
+  - registries/capabilities.yaml
+  - registries/tools.yaml
+  - registries/skills.yaml
+

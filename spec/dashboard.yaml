@@ -1,0 +1,30 @@
+schema: schemas/spec.schema.json
+id: spec.dashboard
+title: User-facing execution dashboard
+status: active
+normative: true
+contract:
+  minimum_fields:
+    - system
+    - progress
+    - active_stage
+    - blocker_or_approval
+    - library
+  expanded_fields:
+    - objective
+    - execution_layer
+    - evidence_health
+    - highest_risk
+    - pending_decision
+    - outputs
+    - next_milestone
+    - next_action
+  trigger: Initialize before substantive execution; L0 direct tasks may omit it.
+  update_rule: Update only when operational state materially changes.
+  privacy: Expose useful state but never private chain-of-thought or hidden reasoning tokens.
+invariants:
+  - INV-003
+  - INV-004
+  - INV-017
+references:
+  - schemas/dashboard.schema.json

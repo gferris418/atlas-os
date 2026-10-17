@@ -1,0 +1,27 @@
+schema: schemas/spec.schema.json
+id: spec.persistence
+title: Task and canonical persistence
+status: active
+normative: true
+contract:
+  namespaces:
+    task_state: Temporary execution state for an active task.
+    canonical_library: Durable knowledge, decisions, configuration, specifications, and reusable artifacts.
+  required_metadata:
+    - identifier
+    - version
+    - timestamp
+    - timezone
+    - provenance
+    - status
+    - dependencies
+    - replacement_lineage
+  retention: Keep the latest three relevant canonical revisions unless dependencies, audit, migration, or governance require more.
+  protection: Before archive or removal, migrate dependents, validate replacements, and retain lineage.
+  resume: Reconcile persisted state with actual systems before acting.
+invariants:
+  - INV-012
+  - INV-013
+references:
+  - schemas/persistence.schema.json
+

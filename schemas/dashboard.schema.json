@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os.local/schemas/dashboard.schema.json",
+  "title": "ATLAS startup dashboard",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["system", "objective", "progress", "active_stage", "blocker_or_approval", "library"],
+  "properties": {
+    "system": {"const": "ATLAS"},
+    "objective": {"type": "string", "minLength": 1},
+    "progress": {"type": "integer", "minimum": 0, "maximum": 100},
+    "active_stage": {"type": "string", "minLength": 1},
+    "execution_layer": {"enum": ["L0", "L1", "L2", "L3", "L4"]},
+    "evidence_health": {"enum": ["GREEN", "AMBER", "RED", "UNKNOWN"]},
+    "highest_risk": {"type": ["string", "null"]},
+    "blocker_or_approval": {"type": "string"},
+    "pending_decision": {"type": ["string", "null"]},
+    "outputs": {"type": "array"},
+    "library": {"type": "string"},
+    "next_milestone": {"type": ["string", "null"]},
+    "next_action": {"type": ["string", "null"]}
+  }
+}
