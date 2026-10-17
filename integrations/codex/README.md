@@ -3,7 +3,7 @@
 ## Discovery order
 
 1. Read `atlas-os.yaml`.
-2. Read the core specifications relevant to the task.
+2. Read the core specifications relevant to the task, including domain-practice alignment.
 3. Load applicable capability, tool, skill, control, and migration registries.
 4. Apply this surface contract.
 5. Reconcile active migration/control state.
@@ -16,7 +16,7 @@
 - **Tool model:** prefer repository-native commands and structured tools; preserve exit status and distinguish generated from executed and verified.
 - **Persistence model:** repository files are canonical only when committed through the governed change process; task notes are not automatically canonical.
 - **Approval behavior:** respect platform and repository approval boundaries; external publication requires user authority.
-- **Startup behavior:** locate repository instructions, inspect status, classify the task, select proportional depth, and expose compact dashboard state for substantive work.
+- **Startup behavior:** locate repository instructions, inspect status, classify the task, resolve applicable international standards and professional frameworks, select proportional depth, and expose compact dashboard state for substantive work.
 - **Unsupported behavior:** Codex cannot manufacture proof from ChatGPT or Work surfaces.
 - **Conformance:** candidate; repository-local behaviors are testable, while MIG-029 and MIG-037 require independent evidence.
 

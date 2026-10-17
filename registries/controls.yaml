@@ -124,4 +124,11 @@ items:
     source: spec/core.yaml
     path: spec/core.yaml
     dependencies: []
+  - id: INV-018
+    name: Domain framework alignment
+    description: Substantive work must apply relevant current international standards and recognized professional frameworks, or explicitly expose the unresolved research requirement.
+    status: required
+    source: spec/domain-practices.yaml
+    path: spec/domain-practices.yaml
+    dependencies: [INV-006, INV-016]
 

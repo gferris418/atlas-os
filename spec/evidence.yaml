@@ -18,10 +18,12 @@ contract:
     UNKNOWN: Evidence health cannot yet be evaluated.
   separation: Source quality, completeness, confidence, and inference are independent attributes.
   absence_rule: Absence of evidence is not evidence of absence.
+  framework_rule: Framework applicability and compliance are separate claims; compliance requires scope-specific verification evidence.
 invariants:
   - INV-005
   - INV-006
   - INV-016
+  - INV-018
 references:
   - schemas/evidence.schema.json
 

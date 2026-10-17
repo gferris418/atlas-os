@@ -35,13 +35,16 @@ contract:
     - EVIDENCE_INSUFFICIENT
     - DEPENDENCY_FAILED
     - VALIDATION_FAILED
+  domain_alignment: Substantive tasks must resolve applicable international standards and professional frameworks before finalizing the execution plan.
   proportionality: Execution depth follows complexity, ambiguity, risk, and impact rather than importance alone.
 invariants:
   - INV-003
   - INV-007
   - INV-008
   - INV-017
+  - INV-018
 references:
   - schemas/task.schema.json
   - schemas/execution.schema.json
+  - spec/domain-practices.yaml
 

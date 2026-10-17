@@ -9,7 +9,7 @@
     "id": {"type": "string", "pattern": "^EVD-[A-Z0-9-]+$"},
     "claim": {"type": "string", "minLength": 1},
     "class": {"enum": ["VERIFIED", "SUPPORTED", "INFERRED", "ASSUMED", "SPECULATIVE", "UNKNOWN"]},
-    "source_quality": {"enum": ["USER_AUTHORITATIVE", "CONNECTED_AUTHORITATIVE", "OFFICIAL_PRIMARY", "CANONICAL_PROJECT", "HIGH_QUALITY_SECONDARY", "COMMUNITY", "MODEL_PRIOR", "UNKNOWN"]},
+    "source_quality": {"enum": ["USER_AUTHORITATIVE", "CONNECTED_AUTHORITATIVE", "INTERNATIONAL_STANDARD", "PROFESSIONAL_FRAMEWORK", "OFFICIAL_PRIMARY", "CANONICAL_PROJECT", "HIGH_QUALITY_SECONDARY", "COMMUNITY", "MODEL_PRIOR", "UNKNOWN"]},
     "completeness": {"type": "number", "minimum": 0, "maximum": 1},
     "confidence": {"type": "number", "minimum": 0, "maximum": 1},
     "provenance": {"type": "object", "minProperties": 1},

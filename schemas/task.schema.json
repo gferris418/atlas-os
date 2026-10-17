@@ -20,7 +20,30 @@
     "evidence": {"type": "array"},
     "approvals": {"type": "array"},
     "verification": {"type": "array"},
-    "assumptions": {"type": "array"}
-  }
+    "assumptions": {"type": "array"},
+    "domain_alignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["domains", "status", "frameworks", "applicability", "deviations", "compliance", "evidence"],
+      "properties": {
+        "domains": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true},
+        "status": {"enum": ["ALIGNED", "RESEARCH_REQUIRED", "NOT_APPLICABLE"]},
+        "frameworks": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "applicability": {"type": "object"},
+        "deviations": {"type": "array"},
+        "compliance": {"enum": ["VERIFIED", "SUPPORTED", "UNVERIFIED", "NOT_CLAIMED"]},
+        "evidence": {"type": "array"}
+      }
+    }
+  },
+  "allOf": [{
+    "if": {
+      "properties": {
+        "execution_depth": {"enum": ["L1", "L2", "L3", "L4"]}
+      },
+      "required": ["execution_depth"]
+    },
+    "then": {"required": ["domain_alignment"]}
+  }]
 }
 

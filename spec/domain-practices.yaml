@@ -1,0 +1,37 @@
+schema: schemas/spec.schema.json
+id: spec.domain-practices
+title: Domain standards and best-practice alignment
+status: active
+normative: true
+contract:
+  applicability: Every substantive task must assess relevant international standards, recognized professional frameworks, and current domain best practices.
+  method:
+    - Identify the task domains, jurisdictions, lifecycle stages, risk level, and intended claims.
+    - Resolve applicable binding requirements before voluntary frameworks.
+    - Prefer current official editions from international standards bodies and recognized professional authorities.
+    - Record each framework identifier, issuer, edition or version policy, official source, applicability, and implementation mapping.
+    - Tailor recommendations to context without silently weakening mandatory controls.
+    - Record justified deviations, conflicts, gaps, and unavailable evidence.
+    - Recheck currency when standards, regulations, or professional guidance may have changed.
+  precedence:
+    - applicable_law_and_regulation
+    - explicit_binding_user_or_contract_requirements
+    - international_standards
+    - recognized_professional_frameworks
+    - authoritative_domain_guidance
+    - local_or_project_practices
+  result_states:
+    ALIGNED: Applicable frameworks are identified and mapped, without implying certified compliance.
+    RESEARCH_REQUIRED: No adequate current authoritative framework has yet been established.
+    NOT_APPLICABLE: A documented assessment found no material domain framework for the task.
+  compliance_rule: Never claim compliance, certification, accreditation, or conformity without scope-specific verification evidence from a competent process.
+  proportionality: L0 tasks may omit explicit alignment only when no domain standard could materially change the result.
+  extensibility: The framework registry is a governed baseline, not an exhaustive global catalog.
+invariants:
+  - INV-006
+  - INV-016
+  - INV-018
+references:
+  - registries/frameworks.yaml
+  - schemas/task.schema.json
+  - spec/evidence.yaml

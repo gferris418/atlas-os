@@ -13,3 +13,5 @@ Evidence health summarizes required coverage:
 
 Missing evidence never closes a control or becomes evidence of absence.
 
+International standards and recognized professional frameworks are high-quality normative sources, but their applicability is still a separate evidence question. A task records the selected edition, scope, jurisdiction, and mapping. Alignment is not certification; compliance requires executed, scope-specific verification.
+

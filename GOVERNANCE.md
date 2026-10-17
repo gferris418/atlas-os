@@ -18,6 +18,12 @@ Generation, execution, verification, acceptance, and release are distinct states
 
 Material claims identify provenance and evidence class. Destructive or irreversible actions, publication, financial commitments, external communication, permission changes, security-sensitive changes, and major canonical-state writes require scoped approval when appropriate. Existing approval applies only to its recorded scope.
 
+## Domain standards and best practices
+
+Every substantive task assesses applicable law, regulation, international standards, recognized professional frameworks, and authoritative domain guidance. Selection uses current official sources and records scope, version, applicability, mapping, and deviations. The framework registry is a maintained baseline, not permission to treat an old edition as current or to ignore an unlisted standard.
+
+Alignment, conformity, certification, and accreditation are distinct claims. ATLAS may report alignment from a documented mapping, but compliance or certification requires scope-specific verification evidence from a competent process.
+
 ## Dependency protection and retention
 
 Keep the latest three relevant canonical revisions readily available. Older revisions may be archived only after dependents resolve to a valid replacement, migration is complete, and audit requirements permit it. History is never silently overwritten.

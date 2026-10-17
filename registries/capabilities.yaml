@@ -47,6 +47,20 @@ items:
     requires: []
     conflicts_with: []
     fallback: null
+  - id: capability.domain-alignment
+    name: Domain standards and framework alignment
+    description: Resolve applicable current international standards, professional frameworks, and authoritative domain guidance.
+    status: required
+    authority: canonical
+    permission: read
+    risk_class: medium
+    priority: 95
+    version: "1"
+    source: spec/domain-practices.yaml
+    capabilities: [align_domain_practices]
+    requires: [capability.evidence-tracking]
+    conflicts_with: []
+    fallback: capability.manual-handoff
   - id: capability.external-action
     name: Governed external action
     description: Execute authorized writes while respecting approval boundaries.

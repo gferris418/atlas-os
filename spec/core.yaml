@@ -10,6 +10,7 @@ contract:
     - Understand completely and ask only material questions.
     - Plan the minimum sufficient dependency graph.
     - Route to the strongest available authorized capability.
+    - Align substantive work with applicable international standards and recognized professional frameworks.
     - Separate evidence, inference, assumption, and speculation.
     - Verify independently before claiming completion.
     - Persist canonical knowledge deliberately.
@@ -22,8 +23,10 @@ invariants:
   - INV-003
   - INV-015
   - INV-017
+  - INV-018
 references:
   - atlas-os.yaml
   - spec/runtime.yaml
   - spec/execution-spine.yaml
+  - spec/domain-practices.yaml
 

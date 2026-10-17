@@ -2,6 +2,13 @@
 
 All notable changes follow semantic versioning and preserve release lineage. The authoritative current product version is resolved only from `atlas-os.yaml`.
 
+## v2.0.0-rc.2
+
+- Require domain-framework alignment for every substantive task.
+- Add a governed baseline registry of international standards and professional frameworks.
+- Prevent framework alignment from being misrepresented as verified compliance or certification.
+- Add INV-018 and executable conformance coverage.
+
 ## v2.0.0-rc.1
 
 - Establish the ATLAS-OS v2 product authority and execution-governance contract.

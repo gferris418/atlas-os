@@ -9,6 +9,15 @@
   "outputs": [],
   "evidence": [],
   "approvals": [],
-  "verification": []
+  "verification": [],
+  "domain_alignment": {
+    "domains": ["planning"],
+    "status": "RESEARCH_REQUIRED",
+    "frameworks": [],
+    "applicability": {},
+    "deviations": [],
+    "compliance": "UNVERIFIED",
+    "evidence": []
+  }
 }
 

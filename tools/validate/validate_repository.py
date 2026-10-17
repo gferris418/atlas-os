@@ -26,6 +26,7 @@ REQUIRED_PATHS = (
     "spec/core.yaml",
     "spec/runtime.yaml",
     "spec/execution-spine.yaml",
+    "spec/domain-practices.yaml",
     "schemas/atlas-os.schema.json",
     "schemas/task.schema.json",
     "schemas/execution.schema.json",
@@ -41,12 +42,14 @@ REQUIRED_PATHS = (
     "registries/surfaces.yaml",
     "registries/controls.yaml",
     "registries/migrations.yaml",
+    "registries/frameworks.yaml",
     "migration/MIG-029.yaml",
     "migration/MIG-037.yaml",
     "migration/dtif-reconciliation.yaml",
     "integrations/chatgpt/README.md",
     "integrations/codex/README.md",
     "integrations/work/README.md",
+    "docs/domain-practices.md",
     "tests/unit",
     "tests/conformance",
     "tests/regression",
@@ -183,6 +186,18 @@ def _validate_references(root: Path, documents: dict[str, Any], report: Validati
             for reference in document.get("references", []):
                 if not (root / reference).exists():
                     report.error(f"missing specification reference in {relative}: {reference}")
+
+    framework_registry = documents.get("registries/frameworks.yaml", {})
+    for item in framework_registry.get("items", []) if isinstance(framework_registry, dict) else []:
+        identifier = item.get("id", "<unknown>")
+        if item.get("authority") not in {"international-standard", "professional-framework", "official-primary"}:
+            report.error(f"framework lacks authoritative classification: {identifier}")
+        if not item.get("domains"):
+            report.error(f"framework lacks domain applicability: {identifier}")
+        if not str(item.get("official_source", "")).startswith("https://"):
+            report.error(f"framework lacks HTTPS official source: {identifier}")
+        if item.get("version_policy") == "current-official" and item.get("version") != "current-official":
+            report.error(f"current-official framework has conflicting version: {identifier}")
 
 
 def _validate_authority_and_release(root: Path, documents: dict[str, Any], report: ValidationReport) -> None:

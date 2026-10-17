@@ -6,6 +6,7 @@ from atlas_runtime import (
     ApprovalRequired,
     CanonicalRevisionInUse,
     StateStore,
+    align_domain_practices,
     build_plan,
     can_transition_release,
     create_dashboard,
@@ -62,6 +63,11 @@ class RuntimeInvariantConformance(unittest.TestCase):
     def test_inv_015_and_017_adapters_do_not_bypass_core(self) -> None:
         with self.assertRaises(ApprovalRequired):
             require_approval("change_permissions", {"status": "APPROVED", "scope": ["publish"]})
+
+    def test_inv_018_domain_framework_alignment(self) -> None:
+        unresolved = align_domain_practices("medical-device", [], substantive=True)
+        self.assertEqual("RESEARCH_REQUIRED", unresolved["status"])
+        self.assertNotEqual("VERIFIED", unresolved["compliance"])
 
 
 if __name__ == "__main__":

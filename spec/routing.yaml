@@ -16,6 +16,8 @@ contract:
   source_precedence:
     - user_authoritative
     - connected_authoritative
+    - applicable_international_standard
+    - recognized_professional_framework
     - official_primary
     - canonical_project
     - high_quality_secondary
@@ -26,6 +28,7 @@ contract:
     - Prefer connected private sources for private user information.
     - Do not invoke overlapping capabilities without material benefit.
     - Never claim an unavailable or unexecuted action occurred.
+    - Resolve current domain frameworks from official sources before relying on secondary summaries.
     - Skill triggers, prerequisites, conflicts, priority, authority, and version are governed registry data.
 invariants:
   - INV-007

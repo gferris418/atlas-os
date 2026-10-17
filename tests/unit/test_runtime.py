@@ -6,6 +6,7 @@ from atlas_runtime import (
     ApprovalRequired,
     CanonicalRevisionInUse,
     StateStore,
+    align_domain_practices,
     assess_completeness,
     build_plan,
     can_transition_release,
@@ -95,6 +96,60 @@ class EvidenceAndApprovalTests(unittest.TestCase):
             require_approval("publish")
         self.assertTrue(require_approval("publish", {"status": "APPROVED", "scope": ["publish"]}))
         self.assertTrue(require_approval("analyze"))
+
+
+class DomainPracticeTests(unittest.TestCase):
+    def test_substantive_task_selects_applicable_authoritative_frameworks(self) -> None:
+        result = align_domain_practices(
+            "artificial-intelligence",
+            [
+                {
+                    "id": "framework.iso-iec-42001",
+                    "domains": ["artificial-intelligence"],
+                    "status": "active",
+                    "authority": "international-standard",
+                    "official_source": "https://www.iso.org/standard/81230.html",
+                    "version": "current-official",
+                },
+                {
+                    "id": "framework.blog-advice",
+                    "domains": ["artificial-intelligence"],
+                    "status": "active",
+                    "authority": "community",
+                    "official_source": "https://example.invalid/advice",
+                    "version": "unknown",
+                },
+            ],
+            substantive=True,
+        )
+        self.assertEqual("ALIGNED", result["status"])
+        self.assertEqual(["framework.iso-iec-42001"], result["frameworks"])
+        self.assertEqual("UNVERIFIED", result["compliance"])
+
+    def test_missing_framework_requires_authoritative_research(self) -> None:
+        result = align_domain_practices("quantum-maritime-law", [], substantive=True)
+        self.assertEqual("RESEARCH_REQUIRED", result["status"])
+        self.assertIn("international", result["next_action"].lower())
+
+    def test_l0_task_does_not_create_framework_bureaucracy(self) -> None:
+        result = align_domain_practices("unit-conversion", [], substantive=False)
+        self.assertEqual("NOT_REQUIRED", result["status"])
+
+    def test_compliance_requires_verification_evidence(self) -> None:
+        result = align_domain_practices(
+            "information-security",
+            [{
+                "id": "framework.iso-iec-27001",
+                "domains": ["information-security"],
+                "status": "active",
+                "authority": "international-standard",
+                "official_source": "https://www.iso.org/standard/27001",
+                "version": "current-official",
+            }],
+            substantive=True,
+            verification={"passed": True, "evidence": ["audit-report"]},
+        )
+        self.assertEqual("VERIFIED", result["compliance"])
 
 
 class PersistenceAndReleaseTests(unittest.TestCase):

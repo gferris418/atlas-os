@@ -1,0 +1,218 @@
+schema: schemas/registry.schema.json
+registry:
+  id: registry.frameworks
+  type: framework
+  version: 1
+  status: active
+items:
+  - id: framework.iso-9001
+    name: ISO 9001 quality management systems
+    description: International requirements for quality-management systems and continual improvement.
+    status: active
+    authority: international-standard
+    priority: 80
+    version: current-official
+    source: https://www.iso.org/standards.html
+    issuer: International Organization for Standardization
+    official_source: https://www.iso.org/standards.html
+    domains: [quality-management]
+    jurisdictions: [international]
+    version_policy: current-official
+    applicability: Assess when a task affects organizational quality-management processes or controlled delivery.
+  - id: framework.iso-31000
+    name: ISO 31000 risk management
+    description: International principles and guidelines for managing risk.
+    status: active
+    authority: international-standard
+    priority: 85
+    version: current-official
+    source: https://www.iso.org/standards.html
+    issuer: International Organization for Standardization
+    official_source: https://www.iso.org/standards.html
+    domains: [risk-management]
+    jurisdictions: [international]
+    version_policy: current-official
+    applicability: Assess for material strategic, operational, safety, financial, or technology risk decisions.
+  - id: framework.iso-iec-27001
+    name: ISO/IEC 27001 information security management
+    description: International requirements for information-security management systems.
+    status: active
+    authority: international-standard
+    priority: 100
+    version: current-official
+    source: https://www.iso.org/standards.html
+    issuer: ISO and IEC
+    official_source: https://www.iso.org/standards.html
+    domains: [information-security, cybersecurity]
+    jurisdictions: [international]
+    version_policy: current-official
+    applicability: Assess for systems, data, controls, security governance, and security-sensitive change.
+  - id: framework.iso-iec-27701
+    name: ISO/IEC 27701 privacy information management
+    description: International privacy-information-management extension for information-security systems.
+    status: active
+    authority: international-standard
+    priority: 95
+    version: current-official
+    source: https://www.iso.org/standards.html
+    issuer: ISO and IEC
+    official_source: https://www.iso.org/standards.html
+    domains: [privacy, data-protection]
+    jurisdictions: [international]
+    version_policy: current-official
+    applicability: Assess when personal data, privacy roles, processing, or data-subject controls are material.
+  - id: framework.iso-iec-42001
+    name: ISO/IEC 42001 artificial intelligence management systems
+    description: International requirements for responsible organizational AI-management systems.
+    status: active
+    authority: international-standard
+    priority: 100
+    version: current-official
+    source: https://www.iso.org/standards.html
+    issuer: ISO and IEC
+    official_source: https://www.iso.org/standards.html
+    domains: [artificial-intelligence]
+    jurisdictions: [international]
+    version_policy: current-official
+    applicability: Assess for organizational design, deployment, operation, monitoring, or governance of AI systems.
+  - id: framework.iso-iec-23894
+    name: ISO/IEC 23894 artificial intelligence risk management
+    description: International guidance for AI-specific risk management.
+    status: active
+    authority: international-standard
+    priority: 95
+    version: current-official
+    source: https://www.iso.org/standards.html
+    issuer: ISO and IEC
+    official_source: https://www.iso.org/standards.html
+    domains: [artificial-intelligence, risk-management]
+    jurisdictions: [international]
+    version_policy: current-official
+    applicability: Assess when identifying, analyzing, treating, or monitoring AI risks.
+  - id: framework.iso-iec-ieee-12207
+    name: ISO/IEC/IEEE 12207 software life-cycle processes
+    description: International software life-cycle process framework.
+    status: active
+    authority: international-standard
+    priority: 90
+    version: current-official
+    source: https://www.iso.org/standards.html
+    issuer: ISO, IEC, and IEEE
+    official_source: https://www.iso.org/standards.html
+    domains: [software-engineering]
+    jurisdictions: [international]
+    version_policy: current-official
+    applicability: Assess for software acquisition, development, operation, maintenance, and retirement.
+  - id: framework.iso-iec-25010
+    name: ISO/IEC 25010 systems and software quality models
+    description: International product-quality and quality-in-use models for systems and software.
+    status: active
+    authority: international-standard
+    priority: 90
+    version: current-official
+    source: https://www.iso.org/standards.html
+    issuer: ISO and IEC
+    official_source: https://www.iso.org/standards.html
+    domains: [software-engineering, system-quality]
+    jurisdictions: [international]
+    version_policy: current-official
+    applicability: Assess when defining or evaluating system and software quality characteristics.
+  - id: framework.wcag-2-2
+    name: Web Content Accessibility Guidelines 2.2
+    description: W3C international accessibility recommendations for web content.
+    status: active
+    authority: international-standard
+    priority: 100
+    version: "2.2"
+    source: https://www.w3.org/TR/WCAG22/
+    issuer: World Wide Web Consortium
+    official_source: https://www.w3.org/TR/WCAG22/
+    domains: [accessibility, web-design, web-development]
+    jurisdictions: [international]
+    version_policy: explicitly-pinned
+    applicability: Assess for user-facing web content and web application interfaces.
+  - id: framework.iso-21502
+    name: ISO 21502 project management guidance
+    description: International guidance on project-management concepts and practices.
+    status: active
+    authority: international-standard
+    priority: 80
+    version: current-official
+    source: https://www.iso.org/standards.html
+    issuer: International Organization for Standardization
+    official_source: https://www.iso.org/standards.html
+    domains: [project-management]
+    jurisdictions: [international]
+    version_policy: current-official
+    applicability: Assess for governed project initiation, planning, delivery, control, and closure.
+  - id: framework.ifrs-accounting
+    name: IFRS Accounting Standards
+    description: International financial-reporting standards issued by the IFRS Foundation and IASB.
+    status: active
+    authority: international-standard
+    priority: 100
+    version: current-official
+    source: https://www.ifrs.org/issued-standards/list-of-standards/
+    issuer: IFRS Foundation and International Accounting Standards Board
+    official_source: https://www.ifrs.org/issued-standards/list-of-standards/
+    domains: [accounting, financial-reporting]
+    jurisdictions: [international]
+    version_policy: current-official
+    applicability: Assess subject to the reporting entity's adopted accounting basis and jurisdiction.
+  - id: framework.basel
+    name: Basel Framework
+    description: International prudential standards for banking supervision.
+    status: active
+    authority: international-standard
+    priority: 100
+    version: current-official
+    source: https://www.bis.org/basel_framework/
+    issuer: Basel Committee on Banking Supervision
+    official_source: https://www.bis.org/basel_framework/
+    domains: [banking, prudential-risk]
+    jurisdictions: [international]
+    version_policy: current-official
+    applicability: Assess for regulated banking capital, liquidity, exposure, and supervisory requirements.
+  - id: framework.who-guidelines
+    name: WHO guidelines
+    description: Current official World Health Organization normative guidance selected for the health topic at issue.
+    status: active
+    authority: official-primary
+    priority: 90
+    version: current-official
+    source: https://www.who.int/publications/i
+    issuer: World Health Organization
+    official_source: https://www.who.int/publications/i
+    domains: [healthcare, public-health]
+    jurisdictions: [international]
+    version_policy: current-official
+    applicability: Select the topic-specific current guideline and reconcile it with local clinical and legal requirements.
+  - id: framework.hl7-fhir
+    name: HL7 FHIR
+    description: International healthcare-data interoperability specification maintained by HL7 International.
+    status: active
+    authority: professional-framework
+    priority: 90
+    version: current-official
+    source: https://hl7.org/fhir/
+    issuer: HL7 International
+    official_source: https://hl7.org/fhir/
+    domains: [healthcare-interoperability]
+    jurisdictions: [international]
+    version_policy: current-official
+    applicability: Assess for interoperable healthcare information models, APIs, and exchange workflows.
+  - id: framework.nist-ai-rmf
+    name: NIST AI Risk Management Framework
+    description: Widely used official framework for governing and managing AI risks.
+    status: active
+    authority: official-primary
+    priority: 85
+    version: current-official
+    source: https://www.nist.gov/itl/ai-risk-management-framework
+    issuer: United States National Institute of Standards and Technology
+    official_source: https://www.nist.gov/itl/ai-risk-management-framework
+    domains: [artificial-intelligence, risk-management]
+    jurisdictions: [international-use, united-states]
+    version_policy: current-official
+    applicability: Use as complementary official guidance where its scope fits; do not mislabel it as an international standard.
+

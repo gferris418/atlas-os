@@ -28,6 +28,12 @@ EVIDENCE_CLASSES = {
     "VERIFIED", "SUPPORTED", "INFERRED", "ASSUMED", "SPECULATIVE", "UNKNOWN",
 }
 
+FRAMEWORK_AUTHORITIES = {
+    "international-standard",
+    "professional-framework",
+    "official-primary",
+}
+
 RELEASE_TRANSITIONS = {
     "DRAFT": {"CANDIDATE"},
     "CANDIDATE": {"VERIFIED"},
@@ -127,6 +133,72 @@ def determine_execution_depth(
     if steps >= 2:
         return "L1"
     return "L0"
+
+
+def align_domain_practices(
+    domain: str,
+    frameworks: Iterable[dict[str, Any]],
+    *,
+    substantive: bool = True,
+    verification: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Resolve authoritative domain practices without inventing compliance.
+
+    A substantive task must either select applicable international standards or
+    professional frameworks, or expose an explicit research requirement. L0
+    work can skip this control when no domain framework could affect the result.
+    """
+    if not substantive:
+        return {
+            "domain": domain,
+            "status": "NOT_REQUIRED",
+            "frameworks": [],
+            "compliance": "NOT_ASSESSED",
+            "deviations": [],
+            "next_action": None,
+        }
+
+    candidates = [
+        item
+        for item in frameworks
+        if item.get("status") == "active"
+        and item.get("authority") in FRAMEWORK_AUTHORITIES
+        and item.get("official_source")
+        and (domain in item.get("domains", []) or "cross-domain" in item.get("domains", []))
+    ]
+    candidates.sort(
+        key=lambda item: (
+            domain not in item.get("domains", []),
+            -item.get("priority", 0),
+            item["id"],
+        )
+    )
+    if not candidates:
+        return {
+            "domain": domain,
+            "status": "RESEARCH_REQUIRED",
+            "frameworks": [],
+            "compliance": "UNVERIFIED",
+            "deviations": [],
+            "next_action": "Identify current authoritative international standards and professional frameworks for this domain.",
+        }
+
+    verified = bool(
+        verification
+        and verification.get("passed")
+        and verification.get("evidence")
+    )
+    return {
+        "domain": domain,
+        "status": "ALIGNED",
+        "frameworks": [item["id"] for item in candidates],
+        "versions": {item["id"]: item.get("version", "current-official") for item in candidates},
+        "sources": {item["id"]: item["official_source"] for item in candidates},
+        "applicability": {item["id"]: "APPLICABLE_PENDING_TAILORING" for item in candidates},
+        "compliance": "VERIFIED" if verified else "UNVERIFIED",
+        "deviations": [],
+        "next_action": None,
+    }
 
 
 def build_plan(tasks: Iterable[dict[str, Any]]) -> list[str]:

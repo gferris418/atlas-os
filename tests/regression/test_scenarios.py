@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from atlas_runtime import ApprovalRequired, determine_execution_depth, require_approval, verify_evidence
+from atlas_runtime import ApprovalRequired, align_domain_practices, determine_execution_depth, require_approval, verify_evidence
 
 
 SCENARIOS = [
@@ -22,6 +22,7 @@ SCENARIOS = [
     ("REG-014", "cross-surface adapter behavior", {"steps": 7}, "L2"),
     ("REG-015", "user changes objective mid-task", {"steps": 5, "ambiguity": True}, "L2"),
     ("REG-016", "user supplies approval", {"steps": 4, "external_action": True}, "L2"),
+    ("REG-017", "domain framework alignment", {"steps": 4}, "L2"),
 ]
 
 
@@ -42,6 +43,11 @@ class ScenarioRegressionTests(unittest.TestCase):
 
     def test_insufficient_evidence_remains_unverified(self) -> None:
         self.assertEqual("UNKNOWN", verify_evidence({"class": "UNKNOWN"})["class"])
+
+    def test_domain_work_without_framework_enters_research_required(self) -> None:
+        result = align_domain_practices("unregistered-domain", [], substantive=True)
+        self.assertEqual("RESEARCH_REQUIRED", result["status"])
+        self.assertEqual("UNVERIFIED", result["compliance"])
 
 
 if __name__ == "__main__":

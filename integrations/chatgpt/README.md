@@ -11,7 +11,7 @@
 - **Tool model:** route through the active tool/connector catalog and record actual execution evidence.
 - **Persistence model:** separate conversational task state from explicitly durable library artifacts.
 - **Approval behavior:** require scoped approval for material external writes and high-impact actions.
-- **Startup behavior:** initialize compact dashboard state for substantive tasks.
+- **Startup behavior:** initialize compact dashboard state and resolve applicable domain standards and frameworks for substantive tasks.
 - **Unsupported behavior:** do not claim repository commands, writes, or connected-source access unless the surface exposes and executes them.
 - **Conformance:** candidate; independent bootstrap and propagation proof remain open.
 
