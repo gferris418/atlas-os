@@ -2,6 +2,23 @@
 
 All notable changes follow semantic versioning and preserve release lineage. The authoritative current product version is resolved only from `atlas-os.yaml`.
 
+## v2.0.0-rc.6
+
+- Require a concrete plan identifier before dashboard initialization or work-unit execution.
+- Add executable shared startup and delivery adapters for ChatGPT, Codex, and Work surface configurations.
+- Add atomic filesystem persistence with path containment, fsync, read-back verification, SHA-256 receipts, idempotent retries, and conflicting-overwrite protection.
+- Replace arbitrary persistence evidence dictionaries with validated receipt records.
+- Add integration tests for cross-surface plan gating, real durable delivery, and unavailable persistence.
+- Keep independent host bootstrap, propagation, and DTIF controls open until their external evidence exists.
+
+## v2.0.0-rc.5
+
+- Require a plan before execution and block dependent work while material clarification is pending.
+- Expand the lightweight dashboard with timestamp, measured duration, safe input and processing summaries, output, goal, task, playbook, frameworks, SOP, profile, and persistence state.
+- Route every output profile to a logical canonical-library collection and correct supported filename format.
+- Require durable-write evidence before reporting an output as `SAVED`; expose blocked or unavailable persistence explicitly.
+- Preserve privacy by excluding secrets, raw sensitive prompts, and private chain-of-thought from dashboard and library metadata by default.
+
 ## v2.0.0-rc.4
 
 - Prefer native host capabilities and prohibit duplicative ATLAS behavior unless it adds material governance, persistence, interoperability, evidence, or verification value.

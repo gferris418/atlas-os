@@ -6,6 +6,21 @@ normative: true
 contract:
   minimum_fields:
     - system
+    - surface
+    - plan_id
+    - timestamp
+    - duration_ms
+    - input_summary
+    - processing_summary
+    - output_summary
+    - goal
+    - task
+    - playbook
+    - frameworks
+    - sop
+    - output_profile
+    - plan_status
+    - clarification_status
     - progress
     - active_stage
     - active_unit
@@ -28,11 +43,16 @@ contract:
   realtime_rule: Update at meaningful events such as work-unit start, completion, blocker, approval, verification, and delivery; do not poll or emit token-by-token status.
   update_rule: Keep updates short and emit only when operational state materially changes.
   performance: Dashboard generation must remain deterministic, local, and constant-cost relative to task size.
-  privacy: Expose useful state but never private chain-of-thought or hidden reasoning tokens.
+  privacy: Summarize input and processing safely; never expose or persist secrets, raw sensitive prompts, private chain-of-thought, or hidden reasoning tokens by default.
+  processing_semantics: Processing is a concise public stage-and-action summary, not hidden reasoning.
+  plan_identity: Every dashboard binds to a non-empty concrete plan identifier; READY is never inferred from an omitted plan.
+  duration_semantics: Show measured elapsed duration in milliseconds; never fabricate precision.
+  library_semantics: Show persistence status, format, and location. SAVED requires durable-write evidence; otherwise show PENDING, READY, BLOCKED, or CAPABILITY_UNAVAILABLE.
 invariants:
   - INV-003
   - INV-004
   - INV-017
   - INV-020
+  - INV-021
 references:
   - schemas/dashboard.schema.json

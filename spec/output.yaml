@@ -53,6 +53,7 @@ contract:
   validation_rule: Validate machine-readable formats, binding deliverables, citations, artifacts, and material claims; do not impose schema or template overhead on ordinary conversation.
   envelope_rule: The structured output envelope is available for workflows and integrations, but is not required for ordinary human-readable answers.
   performance_rule: Profile selection and basic validation must be local and deterministic; expensive rendering or conversion runs only when the requested artifact requires it.
+  persistence_rule: Each profile declares a canonical library collection and file extension for every supported format; delivery ends with a save receipt or an explicit persistence failure state.
   claims_rule: Format validity does not establish factual correctness, evidence quality, acceptance, or compliance.
 invariants:
   - INV-006
@@ -60,6 +61,7 @@ invariants:
   - INV-009
   - INV-016
   - INV-020
+  - INV-021
 references:
   - registries/output-profiles.yaml
   - schemas/output.schema.json

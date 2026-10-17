@@ -1,6 +1,6 @@
 # ATLAS OS
 
-**Current candidate:** `v2.0.0-rc.4`
+**Current candidate:** `v2.0.0-rc.6`
 **Classification:** Internal  
 **Release status:** **CANDIDATE / HOLD** pending independent cross-surface proof.
 
@@ -32,6 +32,7 @@ ATLAS uses capable host-platform features directly. It does not recreate ChatGPT
 5. [`integrations/`](integrations/) adapts the core contract to execution surfaces.
 6. [`migration/`](migration/) records open transition controls and evidence.
 7. [`legacy/`](legacy/) contains historical references and is never active authority.
+8. [`library/`](library/) stores authorized, reusable output artifacts by profile-defined collection.
 
 Component revisions may describe compatibility and lineage, but cannot declare a competing product release.
 
@@ -40,14 +41,19 @@ Component revisions may describe compatibility and lineage, but cannot declare a
 Every prompt exposes compact operational state without private reasoning. Nontrivial work is split into atomic units with one active completion target; the display updates only at meaningful state changes:
 
 ```text
-ATLAS [####------] 40%
-Now 1/3 · EXECUTION: implement current work unit
+ATLAS/core [####------] 40% | 2026-10-17T23:30:00+06:00 | 420 ms
+Goal update repository | Task 1/3 · EXECUTION: implement current work unit
+Input requested repository update | Processing validating the active unit
+Playbook test-first change | Framework ATLAS execution spine
+SOP plan → execute → verify → persist → deliver | Plan plan-change:READY | Clarification NOT_REQUIRED
+Output implementation pending | Profile output.technical-spec
+Library READY · library/specifications/change.md (markdown)
 Quality PENDING | Blocker None
 ```
 
-The text-only visual is deterministic and constant-cost. Safe operations may be batched within the active unit, but a unit is not marked complete until its completion criteria are verified.
+The text-only visual is deterministic and constant-cost. Input and processing are safe summaries, never private chain-of-thought. Safe operations may be batched within the active unit, but a unit is not marked complete until its completion criteria are verified.
 
-The machine-readable dashboard contract is in [`spec/dashboard.yaml`](spec/dashboard.yaml) and [`schemas/dashboard.schema.json`](schemas/dashboard.schema.json).
+Every dashboard and work-unit selection is bound to a concrete plan identifier. The machine-readable dashboard contract is in [`spec/dashboard.yaml`](spec/dashboard.yaml) and [`schemas/dashboard.schema.json`](schemas/dashboard.schema.json).
 
 ## Evidence and routing
 
@@ -71,11 +77,11 @@ See [taxonomy and classification](docs/taxonomy-and-classification.md) for the m
 
 ## Persistence
 
-Task execution state and durable canonical library state are separate namespaces. Canonical revisions carry identifiers, versions, timestamps, provenance, status, dependencies, and replacement lineage. A revision with active dependents cannot be archived or removed.
+Task execution state and durable canonical library state are separate namespaces. Every delivered output is routed by its output profile to `answers`, `analyses`, `decisions`, `research`, `execution`, `specifications`, `data`, or `artifacts` in the correct supported format. The filesystem adapter contains paths beneath the configured library, writes atomically, syncs, reads back, and returns a SHA-256 receipt before `SAVED` is allowed. Unavailable or unauthorized persistence remains visibly blocked. Canonical revisions carry identifiers, versions, timestamps, provenance, status, dependencies, and replacement lineage. A revision with active dependents cannot be archived or removed.
 
 ## Repository map
 
-- `atlas_runtime/` — reference implementation of core invariants.
+- `atlas_runtime/` — reference runtime, executable surface seams, and durable persistence adapter.
 - `spec/` — normative declarative specifications.
 - `schemas/` — JSON Schemas for state and governance artifacts.
 - `registries/` — governed capabilities and control indexes.
@@ -83,6 +89,7 @@ Task execution state and durable canonical library state are separate namespaces
 - `tools/validate/` — repository-wide validation.
 - `tools/package/` — deterministic candidate packaging.
 - `docs/` — architecture, operation, and release guidance.
+- `library/` — durable, reusable outputs and storage guidance.
 
 ## Validate
 
@@ -91,6 +98,7 @@ python -m pip install -r requirements.txt
 python -m unittest discover -s tests/unit -v
 python -m unittest discover -s tests/conformance -v
 python -m unittest discover -s tests/regression -v
+python -m unittest discover -s tests/integration -v
 python tools/validate/validate_repository.py .
 ```
 

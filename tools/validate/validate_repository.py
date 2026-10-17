@@ -64,6 +64,7 @@ REQUIRED_PATHS = (
     "tests/unit",
     "tests/conformance",
     "tests/regression",
+    "tests/integration",
     "tools/package/build_release.py",
     ".github/workflows/validate.yml",
     ".github/workflows/release.yml",
@@ -246,11 +247,15 @@ def _validate_references(root: Path, documents: dict[str, Any], report: Validati
             "format", "supported_formats", "required_fields", "task_classes",
             "outcome_first", "citations", "visuals", "max_initial_sections",
             "machine_readable", "validation_checks", "standards",
+            "library_collection", "file_extensions",
         ):
             if required not in item:
                 report.error(f"output profile lacks {required}: {identifier}")
         if item.get("format") not in item.get("supported_formats", []):
             report.error(f"output profile default format is unsupported: {identifier}")
+        missing_extensions = set(item.get("supported_formats", [])) - set(item.get("file_extensions", {}))
+        if missing_extensions:
+            report.error(f"output profile lacks file extensions {identifier}: {sorted(missing_extensions)}")
         unknown_fields = set(item.get("required_fields", [])) - output_fields
         if unknown_fields:
             report.error(f"output profile has unknown required fields {identifier}: {sorted(unknown_fields)}")

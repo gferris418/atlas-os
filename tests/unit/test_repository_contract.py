@@ -9,7 +9,7 @@ from pathlib import Path
 import jsonschema
 import yaml
 
-from atlas_runtime import create_dashboard, select_output_profile, validate_output_record
+from atlas_runtime import create_dashboard, prepare_library_record, select_output_profile, validate_output_record
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[2]
 class RepositoryContractTests(unittest.TestCase):
     def test_manifest_is_only_product_version_authority(self) -> None:
         manifest = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
-        self.assertEqual("2.0.0-rc.4", manifest["product"]["version"])
+        self.assertEqual("2.0.0-rc.6", manifest["product"]["version"])
         self.assertEqual("atlas-os.yaml#/product/version", (ROOT / "VERSION").read_text().strip())
 
     def test_closed_migration_requires_evidence(self) -> None:
@@ -42,8 +42,39 @@ class RepositoryContractTests(unittest.TestCase):
         schema = json.loads((ROOT / "schemas/dashboard.schema.json").read_text())
         dashboard = create_dashboard(
             "Verify contract", progress=50, active_unit="validate", completed_units=1, total_units=2,
+            timestamp="2026-10-17T23:30:00+06:00",
+            plan_id="plan-verify", plan_status="READY",
         )
         jsonschema.validate(dashboard, schema)
+
+    def test_library_record_matches_persistence_schema(self) -> None:
+        schema = json.loads((ROOT / "schemas/persistence.schema.json").read_text())
+        registry = yaml.safe_load((ROOT / "registries/output-profiles.yaml").read_text())
+        profile = next(item for item in registry["items"] if item["id"] == "output.decision-brief")
+        record = prepare_library_record(
+            "decision-001", profile, timestamp="2026-10-17T23:30:00+06:00",
+            timezone_name="Asia/Dhaka",
+        )
+        jsonschema.validate(record, schema, format_checker=jsonschema.FormatChecker())
+        invalid_saved = dict(record)
+        invalid_saved["delivery_status"] = "SAVED"
+        invalid_saved["persistence_evidence"] = {"claim": True}
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.validate(invalid_saved, schema, format_checker=jsonschema.FormatChecker())
+        dashboard_schema = json.loads((ROOT / "schemas/dashboard.schema.json").read_text())
+        dashboard = create_dashboard(
+            "Decide", timestamp="2026-10-17T23:30:00+06:00", library=record,
+            plan_id="plan-decide", plan_status="READY",
+        )
+        jsonschema.validate(dashboard, dashboard_schema, format_checker=jsonschema.FormatChecker())
+
+        task_state = {
+            "id": "task-001", "namespace": "TASK", "version": "1",
+            "timestamp": "2026-10-17T23:30:00+06:00", "timezone": "Asia/Dhaka",
+            "provenance": {"source": "user"}, "status": "ACTIVE",
+            "dependencies": [], "replaces": None,
+        }
+        jsonschema.validate(task_state, schema, format_checker=jsonschema.FormatChecker())
 
     def test_output_profile_registry_and_sample_envelope_agree(self) -> None:
         schema = json.loads((ROOT / "schemas/output.schema.json").read_text())

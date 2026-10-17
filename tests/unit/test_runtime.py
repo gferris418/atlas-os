@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from atlas_runtime import (
     ApprovalRequired,
     CanonicalRevisionInUse,
+    FileSystemLibraryAdapter,
     StateStore,
     align_domain_practices,
     assess_completeness,
@@ -12,9 +15,11 @@ from atlas_runtime import (
     can_transition_release,
     classify_domain_context,
     classify_task,
+    confirm_library_save,
     create_dashboard,
     determine_execution_depth,
     normalize_intent,
+    prepare_library_record,
     render_dashboard,
     require_approval,
     route_capability,
@@ -70,14 +75,14 @@ class PlanningTests(unittest.TestCase):
             select_next_work_unit([
                 {"id": "a", "status": "ACTIVE", "dependencies": []},
                 {"id": "b", "status": "ACTIVE", "dependencies": []},
-            ])
+            ], plan_id="plan-1", plan_status="READY")
 
     def test_atomic_plan_selects_one_ready_unit_in_plan_order(self) -> None:
         selected = select_next_work_unit([
             {"id": "understand", "status": "COMPLETED", "dependencies": []},
             {"id": "implement", "status": "PENDING", "dependencies": ["understand"]},
             {"id": "verify", "status": "PENDING", "dependencies": ["implement"]},
-        ])
+        ], plan_id="plan-1", plan_status="READY")
         self.assertEqual("implement", selected)
 
     def test_atomic_plan_rejects_active_unit_with_incomplete_dependency(self) -> None:
@@ -85,12 +90,17 @@ class PlanningTests(unittest.TestCase):
             select_next_work_unit([
                 {"id": "understand", "status": "PENDING", "dependencies": []},
                 {"id": "implement", "status": "ACTIVE", "dependencies": ["understand"]},
-            ])
+            ], plan_id="plan-1", plan_status="READY")
 
     def test_completed_atomic_plan_has_no_next_unit(self) -> None:
         self.assertIsNone(select_next_work_unit([
             {"id": "done", "status": "COMPLETED", "dependencies": []},
-        ]))
+        ], plan_id="plan-1", plan_status="READY"))
+
+    def test_atomic_plan_requires_concrete_plan_identity(self) -> None:
+        tasks = [{"id": "one", "status": "PENDING", "dependencies": []}]
+        with self.assertRaises((TypeError, ValueError)):
+            select_next_work_unit(tasks, plan_id="", plan_status="READY")
 
 
 class RoutingTests(unittest.TestCase):
@@ -344,6 +354,79 @@ class DomainClassificationTests(unittest.TestCase):
 
 
 class PersistenceAndReleaseTests(unittest.TestCase):
+    def test_output_is_routed_to_profile_library_collection_and_format(self) -> None:
+        record = prepare_library_record(
+            "radar-requirements",
+            {
+                "id": "output.technical-spec",
+                "format": "markdown",
+                "supported_formats": ["markdown", "json", "yaml"],
+                "library_collection": "specifications",
+                "file_extension": "md",
+            },
+            library_root="library",
+        )
+        self.assertEqual("READY", record["delivery_status"])
+        self.assertEqual("markdown", record["format"])
+        self.assertEqual("library/specifications/radar-requirements.md", record["location"])
+        with self.assertRaises(ValueError):
+            confirm_library_save(record, {"claim": True})
+
+        with TemporaryDirectory() as temporary_directory:
+            adapter = FileSystemLibraryAdapter(Path(temporary_directory))
+            saved = adapter.save(record, "verified content")
+            target = Path(temporary_directory) / record["location"]
+            self.assertEqual("verified content", target.read_text(encoding="utf-8"))
+            self.assertEqual("SAVED", saved["delivery_status"])
+            self.assertEqual(record["location"], saved["persistence_evidence"]["location"])
+            self.assertRegex(saved["persistence_evidence"]["checksum"], r"^sha256:[0-9a-f]{64}$")
+            repeated = adapter.save(record, "verified content")
+            self.assertEqual(saved["persistence_evidence"]["checksum"], repeated["persistence_evidence"]["checksum"])
+            with self.assertRaises(FileExistsError):
+                adapter.save(record, "different content")
+            self.assertEqual("verified content", target.read_text(encoding="utf-8"))
+
+    def test_library_paths_cannot_escape_declared_root(self) -> None:
+        profile = {
+            "id": "output.answer-concise", "format": "markdown",
+            "supported_formats": ["markdown"], "library_collection": "../outside",
+            "file_extension": "md",
+        }
+        with self.assertRaises(ValueError):
+            prepare_library_record("answer", profile)
+
+    def test_filesystem_adapter_rejects_symlink_escape(self) -> None:
+        profile = {
+            "id": "output.answer-concise", "format": "markdown",
+            "supported_formats": ["markdown"], "library_collection": "answers",
+            "file_extension": "md",
+        }
+        record = prepare_library_record("answer", profile)
+        with TemporaryDirectory() as temporary_directory:
+            workspace = Path(temporary_directory)
+            outside = workspace / "outside"
+            outside.mkdir()
+            (workspace / "library").mkdir()
+            (workspace / "library/answers").symlink_to(outside, target_is_directory=True)
+            with self.assertRaises(ValueError):
+                FileSystemLibraryAdapter(workspace).save(record, "content")
+            self.assertFalse((outside / "answer.md").exists())
+
+    def test_library_record_exposes_unavailable_or_unauthorized_storage(self) -> None:
+        profile = {
+            "id": "output.answer-concise",
+            "format": "markdown",
+            "supported_formats": ["markdown"],
+            "library_collection": "answers",
+            "file_extension": "md",
+        }
+        unavailable = prepare_library_record("answer", profile, capability_available=False)
+        blocked = prepare_library_record("answer", profile, authorized=False)
+        self.assertEqual("CAPABILITY_UNAVAILABLE", unavailable["delivery_status"])
+        self.assertIsNone(unavailable["location"])
+        self.assertEqual("BLOCKED", blocked["delivery_status"])
+        self.assertIsNone(blocked["location"])
+
     def test_task_and_canonical_namespaces_do_not_collide(self) -> None:
         store = StateStore()
         store.save_task("same", {"status": "ACTIVE"})
@@ -375,14 +458,34 @@ class ClassificationAndDashboardTests(unittest.TestCase):
     def test_every_prompt_initializes_a_compact_dashboard(self) -> None:
         dashboard = create_dashboard(
             "Convert units", progress=40, active_unit="calculate", completed_units=1, total_units=2,
-            substantive=False,
+            substantive=False, timestamp="2026-10-17T23:30:00+06:00", duration_ms=12,
+            input_summary="Convert 10 km to miles", processing_summary="Applying SI conversion",
+            output_summary="Pending verified result", playbook="Direct calculation",
+            frameworks=["SI", "ISO 80000"], sop="Plan → calculate → verify → save",
+            output_profile="output.answer-concise",
+            plan_id="plan-convert", plan_status="READY",
         )
         self.assertEqual("ATLAS", dashboard["system"])
         self.assertEqual("[####------] 40%", dashboard["progress_visual"])
         rendered = render_dashboard(dashboard)
         self.assertIn("1/2", rendered)
         self.assertIn("calculate", rendered)
-        self.assertLessEqual(len(rendered.splitlines()), 4)
+        for value in (
+            "2026-10-17T23:30:00+06:00", "12 ms", "Convert 10 km to miles",
+            "Applying SI conversion", "Pending verified result", "Direct calculation",
+            "SI, ISO 80000", "Plan → calculate → verify → save", "output.answer-concise",
+        ):
+            self.assertIn(value, rendered)
+        self.assertLessEqual(len(rendered.splitlines()), 8)
+
+    def test_execution_cannot_start_before_plan_or_material_clarification(self) -> None:
+        tasks = [{"id": "one", "status": "PENDING", "dependencies": []}]
+        with self.assertRaises(ValueError):
+            select_next_work_unit(tasks, plan_id="plan-1", plan_status="DRAFT")
+        with self.assertRaises(ValueError):
+            select_next_work_unit(
+                tasks, plan_id="plan-1", plan_status="READY", clarification_status="PENDING"
+            )
 
 
 if __name__ == "__main__":

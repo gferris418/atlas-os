@@ -17,6 +17,8 @@ ATLAS improves host-generated output through small, task-fit contracts. The host
 
 Selection order is explicit user choice, binding deliverable or tool contract, task/audience fit, then the concise-answer default. A user-requested available profile is never silently replaced by automatic selection.
 
+Each profile also declares a logical canonical-library collection and a filename extension for every supported format. This makes outputs discoverable without forcing every adapter to use the same physical storage service. Delivery ends with a verified `SAVED` receipt or an explicit `BLOCKED` or `CAPABILITY_UNAVAILABLE` state.
+
 ## Progressive disclosure
 
 Human-readable output starts with the outcome. Material evidence, actions, and risks follow. Technical detail, source lists, appendices, and machine-readable artifacts appear only when they are useful or requested.

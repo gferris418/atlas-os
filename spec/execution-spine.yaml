@@ -21,7 +21,8 @@ contract:
     - DELIVERY
   optimization: Implementations may combine or delegate internal operations to native host capabilities when stage responsibilities remain satisfied; the user-facing workflow should stay compact.
   visibility: One canonical plan and execution spine must govern user-visible state.
-  progress: Every prompt exposes a compact event-driven dashboard; nontrivial plans activate and finish one atomic work unit at a time.
+  progress: Every prompt exposes a compact event-driven dashboard with plan, task, method, timing, safe processing summary, output, quality, and persistence state; plans activate and finish one atomic work unit at a time.
+  planning_gate: PLANNING creates a concrete plan identifier before EXECUTION. Material questions are resolved before dependent work, while safe independent work may continue.
   output: Output-profile selection is integrated into planning and delivery without adding another user-visible stage.
   resume: Reconcile persisted state against actual external state before continuing.
 invariants:
@@ -29,6 +30,7 @@ invariants:
   - INV-007
   - INV-008
   - INV-009
+  - INV-021
 references:
   - spec/context.yaml
   - spec/planning.yaml

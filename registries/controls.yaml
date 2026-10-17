@@ -145,4 +145,11 @@ items:
     source: spec/planning.yaml
     path: spec/planning.yaml
     dependencies: [INV-003, INV-004, INV-007, INV-017]
+  - id: INV-021
+    name: Planned observable durable delivery
+    description: Every prompt must plan before execution, expose concise execution metadata, resolve material clarification before dependent work, and produce a truthful library delivery state.
+    status: required
+    source: spec/runtime.yaml
+    path: spec/runtime.yaml
+    dependencies: [INV-004, INV-012, INV-016, INV-020]
 

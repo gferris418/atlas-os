@@ -16,4 +16,5 @@
 - **Output behavior:** honor explicit user formats, otherwise select the smallest task-fit output profile and validate delivered artifacts through native application state.
 - **Unsupported behavior:** do not assume repository execution or a connector that is not present.
 - **Conformance:** candidate pending independent bootstrap and latest-control propagation proof.
+- **Executable seam:** `get_surface_adapter("work")` validates a concrete plan, initializes dashboard state, and reports unavailable persistence unless the workspace supplies an authorized durable adapter.
 

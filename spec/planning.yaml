@@ -6,6 +6,8 @@ normative: true
 contract:
   method:
     - Determine the terminal outcome.
+    - Create a plan before execution; a trivial task may use a single implicit work unit that remains visible in the dashboard.
+    - Ask a concise clarifying question only when a material gap could change the goal, scope, authorization, safety, or required output; continue safe independent work when possible.
     - Identify required outputs.
     - Decompose nontrivial work into the smallest independently verifiable work units that remain useful.
     - Give every work unit one objective, explicit dependencies, and observable completion criteria.
@@ -16,6 +18,7 @@ contract:
     - Define verification criteria.
     - Execute against one canonical plan.
   graph_fields:
+    - plan_id
     - id
     - objective
     - status
@@ -26,6 +29,7 @@ contract:
     - approvals
     - verification
   work_in_progress_limit: One user-visible atomic work unit may be ACTIVE at a time.
+  execution_gate: Work may enter EXECUTION only when a concrete plan identifier is supplied, the plan is READY, and material clarification is NOT_REQUIRED or RESOLVED.
   atomic_completion: A work unit becomes COMPLETED only after its completion criteria are checked; generated or attempted work is not completion.
   optimization: Create the minimum sufficient execution graph and avoid decomposition that adds no decision, control, or verification value.
   performance: Prefer native host capabilities and low-overhead operations; parallelize safe reads or checks only within one active completion target.
@@ -34,6 +38,7 @@ invariants:
   - INV-011
   - INV-013
   - INV-020
+  - INV-021
 references:
   - schemas/task.schema.json
   - schemas/execution.schema.json

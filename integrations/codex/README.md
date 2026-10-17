@@ -21,6 +21,7 @@
 - **Output behavior:** honor explicit user formats, otherwise select the smallest task-fit output profile; verify files, commands, and artifacts before delivery.
 - **Unsupported behavior:** Codex cannot manufacture proof from ChatGPT or Work surfaces.
 - **Conformance:** candidate; repository-local behaviors are testable, while MIG-029 and MIG-037 require independent evidence.
+- **Executable seam:** `get_surface_adapter("codex")` validates a concrete plan, initializes dashboard state, and can deliver through the verified filesystem library adapter.
 
 Codex-specific instructions remain subordinate to the ATLAS core and must not fork its meaning.
 

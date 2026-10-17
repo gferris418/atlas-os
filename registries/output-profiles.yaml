@@ -13,6 +13,8 @@ items:
     task_classes: [ANSWER]
     format: markdown
     supported_formats: [markdown]
+    library_collection: answers
+    file_extensions: {markdown: md}
     required_fields: [result, verification]
     optional_fields: [evidence, assumptions, next_actions]
     outcome_first: true
@@ -30,6 +32,8 @@ items:
     task_classes: [ANALYSIS]
     format: markdown
     supported_formats: [markdown]
+    library_collection: analyses
+    file_extensions: {markdown: md}
     required_fields: [result, evidence, verification]
     optional_fields: [assumptions, risks, next_actions]
     outcome_first: true
@@ -47,6 +51,8 @@ items:
     task_classes: [DECISION, PLANNING]
     format: markdown
     supported_formats: [markdown, pdf]
+    library_collection: decisions
+    file_extensions: {markdown: md, pdf: pdf}
     required_fields: [result, evidence, risks, next_actions, verification]
     optional_fields: [assumptions, artifacts]
     outcome_first: true
@@ -64,6 +70,8 @@ items:
     task_classes: [RESEARCH]
     format: markdown
     supported_formats: [markdown, pdf]
+    library_collection: research
+    file_extensions: {markdown: md, pdf: pdf}
     required_fields: [result, evidence, verification]
     optional_fields: [assumptions, risks, next_actions, artifacts]
     outcome_first: true
@@ -81,6 +89,8 @@ items:
     task_classes: [WORKFLOW, EXTERNAL_ACTION, MONITORING, MULTI_STAGE]
     format: markdown
     supported_formats: [markdown]
+    library_collection: execution
+    file_extensions: {markdown: md}
     required_fields: [result, next_actions, verification]
     optional_fields: [evidence, risks, artifacts]
     outcome_first: true
@@ -98,6 +108,8 @@ items:
     task_classes: [CODING, DEBUGGING, DESIGN]
     format: markdown
     supported_formats: [markdown, json, yaml]
+    library_collection: specifications
+    file_extensions: {markdown: md, json: json, yaml: yaml}
     required_fields: [result, verification]
     optional_fields: [evidence, assumptions, risks, next_actions, artifacts]
     outcome_first: true
@@ -115,6 +127,8 @@ items:
     task_classes: [DATA]
     format: json
     supported_formats: [json, csv, yaml]
+    library_collection: data
+    file_extensions: {json: json, csv: csv, yaml: yaml}
     required_fields: [result, verification]
     optional_fields: [evidence, assumptions, risks, next_actions, artifacts]
     outcome_first: false
@@ -132,6 +146,8 @@ items:
     task_classes: [DOCUMENT, WRITING]
     format: mixed
     supported_formats: [markdown, pdf, html, mixed]
+    library_collection: artifacts
+    file_extensions: {markdown: md, pdf: pdf, html: html, mixed: zip}
     required_fields: [result, artifacts, verification]
     optional_fields: [evidence, assumptions, risks, next_actions]
     outcome_first: true

@@ -58,6 +58,11 @@
           "risk_flags": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
           "format": {"enum": ["markdown", "json", "csv", "yaml", "html", "pdf", "mixed"]},
           "supported_formats": {"type": "array", "items": {"enum": ["markdown", "json", "csv", "yaml", "html", "pdf", "mixed"]}, "uniqueItems": true},
+          "library_collection": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+          "file_extensions": {
+            "type": "object",
+            "additionalProperties": {"type": "string", "pattern": "^[a-z0-9]+$"}
+          },
           "required_fields": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
           "optional_fields": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
           "outcome_first": {"type": "boolean"},

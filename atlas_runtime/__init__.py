@@ -3,6 +3,7 @@
 from .runtime import (
     ApprovalRequired,
     CanonicalRevisionInUse,
+    PersistenceReceipt,
     StateStore,
     align_domain_practices,
     assess_completeness,
@@ -10,9 +11,11 @@ from .runtime import (
     can_transition_release,
     classify_domain_context,
     classify_task,
+    confirm_library_save,
     create_dashboard,
     determine_execution_depth,
     normalize_intent,
+    prepare_library_record,
     render_dashboard,
     require_approval,
     route_capability,
@@ -21,10 +24,16 @@ from .runtime import (
     validate_output_record,
     verify_evidence,
 )
+from .adapters import LibraryStorage, SurfaceAdapter, get_surface_adapter
+from .persistence import FileSystemLibraryAdapter
 
 __all__ = [
     "ApprovalRequired",
     "CanonicalRevisionInUse",
+    "FileSystemLibraryAdapter",
+    "LibraryStorage",
+    "PersistenceReceipt",
+    "SurfaceAdapter",
     "StateStore",
     "align_domain_practices",
     "assess_completeness",
@@ -32,9 +41,12 @@ __all__ = [
     "can_transition_release",
     "classify_domain_context",
     "classify_task",
+    "confirm_library_save",
     "create_dashboard",
     "determine_execution_depth",
+    "get_surface_adapter",
     "normalize_intent",
+    "prepare_library_record",
     "render_dashboard",
     "require_approval",
     "route_capability",

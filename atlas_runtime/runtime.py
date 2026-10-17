@@ -10,7 +10,10 @@ import re
 from collections import defaultdict, deque
 from copy import deepcopy
 from dataclasses import dataclass, field
+from datetime import datetime
+from pathlib import PurePosixPath
 from typing import Any, Iterable
+from zoneinfo import ZoneInfo
 
 
 TASK_CLASSES = {
@@ -57,6 +60,31 @@ class ApprovalRequired(PermissionError):
 
 class CanonicalRevisionInUse(RuntimeError):
     """Raised when an active dependency protects a canonical revision."""
+
+
+@dataclass(frozen=True)
+class PersistenceReceipt:
+    """Validated evidence emitted after a durable adapter verifies its write."""
+
+    adapter: str
+    location: str
+    checksum: str
+    bytes_written: int
+    verified_at: str
+
+    def __post_init__(self) -> None:
+        if not self.adapter or not self.location:
+            raise ValueError("persistence receipt requires adapter and location")
+        if not re.fullmatch(r"sha256:[0-9a-f]{64}", self.checksum):
+            raise ValueError("persistence receipt requires a SHA-256 checksum")
+        if self.bytes_written < 0:
+            raise ValueError("persistence receipt bytes_written cannot be negative")
+        try:
+            moment = datetime.fromisoformat(self.verified_at)
+        except ValueError as error:
+            raise ValueError("persistence receipt verified_at must be RFC 3339") from error
+        if moment.tzinfo is None:
+            raise ValueError("persistence receipt verified_at requires an offset")
 
 
 def normalize_intent(text: str) -> dict[str, Any]:
@@ -338,13 +366,25 @@ def build_plan(tasks: Iterable[dict[str, Any]]) -> list[str]:
     return ordered
 
 
-def select_next_work_unit(tasks: Iterable[dict[str, Any]]) -> str | None:
+def select_next_work_unit(
+    tasks: Iterable[dict[str, Any]], *, plan_id: str, plan_status: str,
+    clarification_status: str = "NOT_REQUIRED",
+) -> str | None:
     """Return the single active or next ready atomic work unit.
 
     User-visible work has a work-in-progress limit of one. Implementations may
     batch safe read-only operations inside that unit, but may not expose two
     active completion targets or bypass dependency completion.
     """
+    if not plan_id.strip():
+        raise ValueError("execution requires a concrete plan identifier")
+    if plan_status != "READY":
+        raise ValueError("execution requires a READY plan")
+    if clarification_status == "PENDING":
+        raise ValueError("material clarification must be resolved before execution")
+    if clarification_status not in {"NOT_REQUIRED", "RESOLVED"}:
+        raise ValueError("invalid clarification status")
+
     records = list(tasks)
     by_id = {item["id"]: item for item in records}
     if len(by_id) != len(records):
@@ -467,12 +507,115 @@ def can_transition_release(current: str, target: str, open_blockers: Iterable[st
     return True
 
 
-def create_dashboard(
-    objective: str, *, progress: int = 0, active_stage: str = "INTAKE",
-    active_unit: str | None = None, completed_units: int = 0, total_units: int = 1,
-    blocker: str | None = None, library: str = "Not required", substantive: bool = True,
-    quality_gate: str = "PENDING", performance_mode: str = "LEAN",
+def _timestamp_now(timezone_name: str) -> str:
+    try:
+        timezone = ZoneInfo(timezone_name)
+    except (KeyError, ValueError) as error:
+        raise ValueError(f"unknown timezone: {timezone_name}") from error
+    return datetime.now(timezone).isoformat(timespec="seconds")
+
+
+def prepare_library_record(
+    output_id: str,
+    profile: dict[str, Any],
+    *,
+    requested_format: str | None = None,
+    library_root: str = "library",
+    capability_available: bool = True,
+    authorized: bool = True,
+    sensitivity_allowed: bool = True,
+    timestamp: str | None = None,
+    timezone_name: str = "UTC",
 ) -> dict[str, Any]:
+    """Plan a canonical output location without claiming it has been saved."""
+    output_format = requested_format or profile.get("format")
+    supported_formats = set(profile.get("supported_formats", []))
+    if output_format not in supported_formats:
+        raise ValueError(f"unsupported output format for {profile.get('id')}: {output_format}")
+
+    collection = profile.get("library_collection")
+    if not isinstance(collection, str) or not re.fullmatch(r"[a-z0-9-]+", collection):
+        raise ValueError("output profile requires a safe library collection")
+    extensions = profile.get("file_extensions", {})
+    extension = extensions.get(output_format) or profile.get("file_extension")
+    if not isinstance(extension, str) or not re.fullmatch(r"[a-z0-9]+", extension):
+        raise ValueError(f"output profile lacks a safe extension for {output_format}")
+
+    root = PurePosixPath(library_root)
+    if root.is_absolute() or not root.parts or any(part in {"", ".", ".."} for part in root.parts):
+        raise ValueError("library root must be a safe relative path")
+
+    safe_id = re.sub(r"[^a-zA-Z0-9._-]+", "-", output_id).strip(".-")
+    if not safe_id:
+        raise ValueError("output identifier must contain a safe filename character")
+
+    if not capability_available:
+        delivery_status = "CAPABILITY_UNAVAILABLE"
+    elif not authorized or not sensitivity_allowed:
+        delivery_status = "BLOCKED"
+    else:
+        delivery_status = "READY"
+
+    location = None
+    if delivery_status == "READY":
+        location = str(PurePosixPath(library_root) / collection / f"{safe_id}.{extension}")
+
+    generated_at = timestamp or _timestamp_now(timezone_name)
+    return {
+        "id": output_id,
+        "namespace": "CANONICAL_LIBRARY",
+        "version": "1",
+        "timestamp": generated_at,
+        "timezone": timezone_name,
+        "provenance": {"output_profile": profile.get("id", "unknown")},
+        "status": "ACTIVE",
+        "delivery_status": delivery_status,
+        "dependencies": [],
+        "replaces": None,
+        "format": output_format,
+        "collection": collection,
+        "location": location,
+        "persistence_evidence": None,
+    }
+
+
+def confirm_library_save(record: dict[str, Any], receipt: PersistenceReceipt) -> dict[str, Any]:
+    """Mark a planned library record saved only after durable-write evidence exists."""
+    if record.get("delivery_status") != "READY" or not record.get("location"):
+        raise ValueError("only a READY library record can be confirmed saved")
+    if not isinstance(receipt, PersistenceReceipt):
+        raise ValueError("a validated persistence receipt is required before claiming SAVED")
+    if receipt.location != record["location"]:
+        raise ValueError("persistence receipt location does not match the planned record")
+    saved = deepcopy(record)
+    saved["delivery_status"] = "SAVED"
+    saved["persistence_evidence"] = {
+        "adapter": receipt.adapter,
+        "location": receipt.location,
+        "checksum": receipt.checksum,
+        "bytes_written": receipt.bytes_written,
+        "verified_at": receipt.verified_at,
+    }
+    return saved
+
+
+def create_dashboard(
+    objective: str, *, plan_id: str, plan_status: str, progress: int = 0,
+    active_stage: str = "INTAKE",
+    active_unit: str | None = None, completed_units: int = 0, total_units: int = 1,
+    blocker: str | None = None, library: dict[str, Any] | str | None = None,
+    substantive: bool = True, quality_gate: str = "PENDING",
+    performance_mode: str = "LEAN", timestamp: str | None = None,
+    timezone_name: str = "UTC", duration_ms: int = 0,
+    input_summary: str | None = None, processing_summary: str = "Plan initialized",
+    output_summary: str = "Pending", goal: str | None = None, task: str | None = None,
+    playbook: str = "Direct response", frameworks: Iterable[str] = ("ATLAS execution spine",),
+    sop: str = "Plan → execute → verify → persist → deliver",
+    output_profile: str = "output.answer-concise", surface: str = "core",
+    clarification_status: str = "NOT_REQUIRED",
+) -> dict[str, Any]:
+    if not plan_id.strip():
+        raise ValueError("dashboard requires a concrete plan identifier")
     if not 0 <= progress <= 100:
         raise ValueError("progress must be between 0 and 100")
     if total_units < 1 or not 0 <= completed_units <= total_units:
@@ -481,25 +624,76 @@ def create_dashboard(
         raise ValueError("invalid quality gate")
     if performance_mode != "LEAN":
         raise ValueError("unsupported performance mode")
+    if duration_ms < 0:
+        raise ValueError("duration_ms cannot be negative")
+    if plan_status not in {"DRAFT", "READY", "BLOCKED"}:
+        raise ValueError("invalid plan status")
+    if clarification_status not in {"NOT_REQUIRED", "PENDING", "RESOLVED"}:
+        raise ValueError("invalid clarification status")
+    if surface not in {"core", "chatgpt", "codex", "work"}:
+        raise ValueError("unsupported surface")
+    framework_list = list(dict.fromkeys(frameworks))
+    if not framework_list:
+        framework_list = ["Not applicable"]
+    if library is None or isinstance(library, str):
+        library_state = {
+            "status": "PENDING",
+            "location": None,
+            "format": "markdown",
+            "record_id": None,
+        }
+    else:
+        library_state = {
+            "status": library.get("delivery_status", library.get("status", "PENDING")),
+            "location": library.get("location"),
+            "format": library.get("format", "markdown"),
+            "record_id": library.get("record_id", library.get("id")),
+        }
     filled = min(10, max(0, round(progress / 10)))
     return {
         "system": "ATLAS", "objective": objective, "progress": progress,
+        "surface": surface,
+        "plan_id": plan_id,
+        "timestamp": timestamp or _timestamp_now(timezone_name),
+        "duration_ms": duration_ms,
+        "input_summary": input_summary or objective,
+        "processing_summary": processing_summary,
+        "output_summary": output_summary,
+        "goal": goal or objective,
+        "task": task or active_unit or objective,
+        "playbook": playbook,
+        "frameworks": framework_list,
+        "sop": sop,
+        "output_profile": output_profile,
+        "plan_status": plan_status,
+        "clarification_status": clarification_status,
         "progress_visual": f"[{'#' * filled}{'-' * (10 - filled)}] {progress}%",
         "active_stage": active_stage, "blocker_or_approval": blocker or "None",
         "active_unit": active_unit or objective,
         "completed_units": completed_units, "total_units": total_units,
-        "library": library, "quality_gate": quality_gate,
+        "library": library_state, "quality_gate": quality_gate,
         "performance_mode": performance_mode,
         "execution_layer": "L1" if substantive else "L0",
     }
 
 
 def render_dashboard(dashboard: dict[str, Any]) -> str:
-    """Render an event-driven dashboard in at most three compact lines."""
+    """Render an event-driven dashboard without exposing private reasoning."""
+    library = dashboard["library"]
+    library_detail = library["status"]
+    if library.get("location"):
+        library_detail += f" · {library['location']} ({library['format']})"
     return "\n".join((
-        f"ATLAS {dashboard['progress_visual']}",
-        f"Now {dashboard['completed_units']}/{dashboard['total_units']} · "
-        f"{dashboard['active_stage']}: {dashboard['active_unit']}",
+        f"ATLAS/{dashboard['surface']} {dashboard['progress_visual']} | "
+        f"{dashboard['timestamp']} | {dashboard['duration_ms']} ms",
+        f"Goal {dashboard['goal']} | Task {dashboard['completed_units']}/{dashboard['total_units']} · "
+        f"{dashboard['active_stage']}: {dashboard['task']}",
+        f"Input {dashboard['input_summary']} | Processing {dashboard['processing_summary']}",
+        f"Playbook {dashboard['playbook']} | Framework {', '.join(dashboard['frameworks'])}",
+        f"SOP {dashboard['sop']} | Plan {dashboard['plan_id']}:{dashboard['plan_status']} | "
+        f"Clarification {dashboard['clarification_status']}",
+        f"Output {dashboard['output_summary']} | Profile {dashboard['output_profile']}",
+        f"Library {library_detail}",
         f"Quality {dashboard['quality_gate']} | Blocker {dashboard['blocker_or_approval']}",
     ))
 

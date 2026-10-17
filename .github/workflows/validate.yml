@@ -21,5 +21,6 @@ jobs:
       - run: python -m unittest discover -s tests/unit -v
       - run: python -m unittest discover -s tests/conformance -v
       - run: python -m unittest discover -s tests/regression -v
+      - run: python -m unittest discover -s tests/integration -v
       - run: python tools/validate/validate_repository.py .
 

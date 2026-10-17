@@ -16,4 +16,5 @@
 - **Output behavior:** honor explicit user formats, otherwise select the smallest task-fit output profile and validate only material requirements.
 - **Unsupported behavior:** do not claim repository commands, writes, or connected-source access unless the surface exposes and executes them.
 - **Conformance:** candidate; independent bootstrap and propagation proof remain open.
+- **Executable seam:** `get_surface_adapter("chatgpt")` validates a concrete plan, initializes dashboard state, and reports unavailable persistence unless the host supplies an authorized durable adapter.
 

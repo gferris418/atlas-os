@@ -10,8 +10,10 @@ from atlas_runtime import (
     build_plan,
     can_transition_release,
     classify_domain_context,
+    confirm_library_save,
     create_dashboard,
     normalize_intent,
+    prepare_library_record,
     require_approval,
     select_next_work_unit,
     verify_evidence,
@@ -27,7 +29,9 @@ class RuntimeInvariantConformance(unittest.TestCase):
             self.assertIn(value, state["normalized"])
 
     def test_inv_003_and_004_substantive_dashboard(self) -> None:
-        state = create_dashboard("Conformance", substantive=True)
+        state = create_dashboard(
+            "Conformance", substantive=True, plan_id="plan-conformance", plan_status="READY"
+        )
         self.assertEqual("ATLAS", state["system"])
         self.assertEqual(0, state["progress"])
 
@@ -81,7 +85,26 @@ class RuntimeInvariantConformance(unittest.TestCase):
             select_next_work_unit([
                 {"id": "one", "status": "ACTIVE", "dependencies": []},
                 {"id": "two", "status": "ACTIVE", "dependencies": []},
-            ])
+            ], plan_id="plan-conformance", plan_status="READY")
+
+    def test_inv_021_plan_and_clarification_gate_execution(self) -> None:
+        tasks = [{"id": "one", "status": "PENDING", "dependencies": []}]
+        with self.assertRaises(ValueError):
+            select_next_work_unit(tasks, plan_id="plan-conformance", plan_status="DRAFT")
+        with self.assertRaises(ValueError):
+            select_next_work_unit(
+                tasks, plan_id="plan-conformance", plan_status="READY",
+                clarification_status="PENDING",
+            )
+
+        profile = {
+            "id": "output.answer-concise", "format": "markdown",
+            "supported_formats": ["markdown"], "library_collection": "answers",
+            "file_extension": "md",
+        }
+        record = prepare_library_record("answer", profile)
+        with self.assertRaises(ValueError):
+            confirm_library_save(record, {"claim": True})
 
 
 if __name__ == "__main__":
