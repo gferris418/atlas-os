@@ -26,4 +26,20 @@ jobs:
       - run: python -m unittest discover -s tests/regression -v
       - run: python -m unittest discover -s tests/integration -v
       - run: python tools/validate/validate_repository.py .
+      - name: Build deterministic main snapshot
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: python tools/package/build_release.py . dist
+      - name: Upload deterministic main snapshot
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: atlas-os-main-snapshot
+          path: |
+            dist/atlas-os-*.zip
+            dist/atlas-os-*.tar.gz
+            dist/atlas-os-*.manifest.json
+            dist/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
 
