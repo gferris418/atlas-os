@@ -35,6 +35,7 @@ contract:
     - EVIDENCE_INSUFFICIENT
     - DEPENDENCY_FAILED
     - VALIDATION_FAILED
+  domain_classification: Substantive tasks must resolve material taxonomy and classification facets before domain-framework selection.
   domain_alignment: Substantive tasks must resolve applicable international standards and professional frameworks before finalizing the execution plan.
   proportionality: Execution depth follows complexity, ambiguity, risk, and impact rather than importance alone.
 invariants:
@@ -43,8 +44,10 @@ invariants:
   - INV-008
   - INV-017
   - INV-018
+  - INV-019
 references:
   - schemas/task.schema.json
   - schemas/execution.schema.json
+  - spec/classification.yaml
   - spec/domain-practices.yaml
 

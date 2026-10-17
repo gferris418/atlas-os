@@ -131,4 +131,11 @@ items:
     source: spec/domain-practices.yaml
     path: spec/domain-practices.yaml
     dependencies: [INV-006, INV-016]
+  - id: INV-019
+    name: Governed domain classification
+    description: Substantive work must classify material domain facets through governed taxonomies before selecting frameworks, without guessing missing or conditional codes.
+    status: required
+    source: spec/classification.yaml
+    path: spec/classification.yaml
+    dependencies: [INV-006, INV-016]
 

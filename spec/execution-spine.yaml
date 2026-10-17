@@ -10,6 +10,7 @@ contract:
     - NORMALIZATION
     - COMPLETENESS_CHECK
     - TASK_CLASSIFICATION
+    - DOMAIN_CLASSIFICATION
     - DOMAIN_FRAMEWORK_ALIGNMENT
     - PLANNING
     - ROUTING
@@ -29,6 +30,7 @@ invariants:
 references:
   - spec/context.yaml
   - spec/planning.yaml
+  - spec/classification.yaml
   - spec/domain-practices.yaml
   - spec/verification.yaml
 

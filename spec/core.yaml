@@ -8,6 +8,7 @@ contract:
   principles:
     - Preserve intent before optimizing representation.
     - Understand completely and ask only material questions.
+    - Classify domain context with governed taxonomies before selecting frameworks.
     - Plan the minimum sufficient dependency graph.
     - Route to the strongest available authorized capability.
     - Align substantive work with applicable international standards and recognized professional frameworks.
@@ -24,9 +25,11 @@ invariants:
   - INV-015
   - INV-017
   - INV-018
+  - INV-019
 references:
   - atlas-os.yaml
   - spec/runtime.yaml
   - spec/execution-spine.yaml
+  - spec/classification.yaml
   - spec/domain-practices.yaml
 

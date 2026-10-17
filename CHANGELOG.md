@@ -2,6 +2,13 @@
 
 All notable changes follow semantic versioning and preserve release lineage. The authoritative current product version is resolved only from `atlas-os.yaml`.
 
+## v2.0.0-rc.3
+
+- Add governed taxonomy, industry, product, geography, customs, procurement, and defense-logistics classification standards.
+- Insert multi-axial domain classification before framework alignment.
+- Treat conditional classifications and missing codes as unresolved rather than inferred.
+- Add INV-019 and a Bangladesh Navy coastal-surveillance-radar regression scenario.
+
 ## v2.0.0-rc.2
 
 - Require domain-framework alignment for every substantive task.

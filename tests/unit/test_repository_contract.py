@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[2]
 class RepositoryContractTests(unittest.TestCase):
     def test_manifest_is_only_product_version_authority(self) -> None:
         manifest = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
-        self.assertEqual("2.0.0-rc.2", manifest["product"]["version"])
+        self.assertEqual("2.0.0-rc.3", manifest["product"]["version"])
         self.assertEqual("atlas-os.yaml#/product/version", (ROOT / "VERSION").read_text().strip())
 
     def test_closed_migration_requires_evidence(self) -> None:
@@ -36,20 +36,36 @@ class RepositoryContractTests(unittest.TestCase):
         )
         self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
 
-    def test_structured_tasks_require_domain_alignment(self) -> None:
+    def test_structured_tasks_require_domain_classification_and_alignment(self) -> None:
         schema = json.loads((ROOT / "schemas/task.schema.json").read_text())
         task = json.loads((ROOT / "tests/fixtures/sample-task.json").read_text())
         jsonschema.validate(task, schema)
+        task.pop("domain_classification")
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.validate(task, schema)
+        task = json.loads((ROOT / "tests/fixtures/sample-task.json").read_text())
         task.pop("domain_alignment")
         with self.assertRaises(jsonschema.ValidationError):
             jsonschema.validate(task, schema)
 
-    def test_l0_task_may_omit_explicit_domain_alignment(self) -> None:
+    def test_l0_task_may_omit_explicit_domain_classification_and_alignment(self) -> None:
         schema = json.loads((ROOT / "schemas/task.schema.json").read_text())
         task = json.loads((ROOT / "tests/fixtures/sample-task.json").read_text())
         task["execution_depth"] = "L0"
+        task.pop("domain_classification")
         task.pop("domain_alignment")
         jsonschema.validate(task, schema)
+
+    def test_bangladesh_navy_radar_workflow_example_is_schema_valid(self) -> None:
+        schema = json.loads((ROOT / "schemas/task.schema.json").read_text())
+        example = json.loads(
+            (ROOT / "examples/workflows/coastal-surveillance-radar-bangladesh-navy.json")
+            .read_text(encoding="utf-8")
+        )
+        jsonschema.validate(example, schema)
+        self.assertEqual("PARTIAL", example["domain_classification"]["status"])
+        self.assertEqual("BLOCKED", example["status"])
+        self.assertIn("lifecycle-stage", example["domain_classification"]["unresolved_facets"])
 
 
 if __name__ == "__main__":

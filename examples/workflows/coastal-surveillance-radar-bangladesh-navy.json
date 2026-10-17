@@ -1,0 +1,104 @@
+{
+  "id": "TASK-BD-NAVY-RADAR-001",
+  "objective": "Determine the authorized scope and applicable governance for a Bangladesh Navy coastal-surveillance-radar task",
+  "status": "BLOCKED",
+  "classification": ["RESEARCH", "ANALYSIS", "PLANNING", "MULTI_STAGE"],
+  "execution_depth": "L3",
+  "dependencies": [],
+  "inputs": [
+    {
+      "type": "user_prompt",
+      "value": "coastal surveillance radar for Bangladesh navy"
+    }
+  ],
+  "outputs": [
+    {
+      "type": "material_question",
+      "value": "What outcome and lifecycle stage are intended, and what information is authorized for use?"
+    }
+  ],
+  "evidence": [
+    {
+      "class": "SUPPORTED",
+      "claim": "The prompt identifies Bangladesh, a navy operator, and a coastal-surveillance-radar capability.",
+      "provenance": ["user_prompt", "registry.classifications"]
+    }
+  ],
+  "approvals": [],
+  "verification": [],
+  "assumptions": [
+    {
+      "value": "No operational, classified, procurement, design, or export scope is assumed until clarified.",
+      "class": "ASSUMED"
+    }
+  ],
+  "domain_classification": {
+    "status": "PARTIAL",
+    "facets": {
+      "capability": [
+        {
+          "id": "classification.capability.coastal-surveillance-radar",
+          "taxonomy": "taxonomy.atlas-capability-skos",
+          "code": "capability.coastal-surveillance-radar",
+          "label": "Coastal surveillance radar",
+          "version": "current-official",
+          "source": "spec/classification.yaml"
+        }
+      ],
+      "jurisdiction": [
+        {
+          "id": "classification.geo.bd",
+          "taxonomy": "taxonomy.iso-3166-1",
+          "code": "BD",
+          "label": "Bangladesh",
+          "version": "current-official",
+          "source": "https://www.iso.org/iso-3166-country-codes.html"
+        }
+      ],
+      "operator-industry": [
+        {
+          "id": "classification.industry.defence-activities",
+          "taxonomy": "taxonomy.un-isic",
+          "code": "8422",
+          "label": "Defence activities",
+          "version": "current-official",
+          "source": "https://unstats.un.org/unsd/classifications/Econ/isic"
+        }
+      ]
+    },
+    "taxonomy_references": [
+      "taxonomy.atlas-capability-skos",
+      "taxonomy.iso-3166-1",
+      "taxonomy.un-isic"
+    ],
+    "risk_flags": ["defense", "dual-use", "national-security", "operational-security"],
+    "unresolved_facets": ["lifecycle-stage"],
+    "conditional_candidates": [
+      {
+        "id": "classification.industry.navigation-equipment-manufacturing",
+        "taxonomy": "taxonomy.un-isic",
+        "code": "2651",
+        "conditions": ["supplier-or-manufacturer-analysis"]
+      },
+      {
+        "id": "classification.product.radar-hs",
+        "taxonomy": "taxonomy.wco-hs",
+        "code": "8526",
+        "conditions": ["cross-border-trade-or-customs"]
+      }
+    ],
+    "evidence": ["user_prompt", "registries/classifications.yaml"],
+    "next_action": "Clarify intended outcome, lifecycle stage, authorization, and information sensitivity before framework selection."
+  },
+  "domain_alignment": {
+    "domains": ["defense", "maritime-surveillance", "radar-systems"],
+    "status": "RESEARCH_REQUIRED",
+    "frameworks": [],
+    "applicability": {
+      "reason": "Framework selection is deferred until the lifecycle, jurisdictional, and information-sensitivity scope is resolved."
+    },
+    "deviations": [],
+    "compliance": "UNVERIFIED",
+    "evidence": []
+  }
+}

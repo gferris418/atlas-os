@@ -1,0 +1,43 @@
+schema: schemas/spec.schema.json
+id: spec.classification
+title: Taxonomy and industry classification
+status: active
+normative: true
+contract:
+  purpose: Classify substantive work before selecting domain frameworks, requirements, or evidence sources.
+  sequence: DOMAIN_CLASSIFICATION follows TASK_CLASSIFICATION and precedes DOMAIN_FRAMEWORK_ALIGNMENT.
+  required_facets:
+    - jurisdiction
+    - operator-industry
+    - supplier-industry
+    - product-or-service
+    - capability
+    - lifecycle-stage
+    - stakeholder
+    - information-sensitivity
+  method:
+    - Preserve separate facets instead of forcing the whole prompt into one industry or product code.
+    - Prefer international reference classifications and current official sources.
+    - Record taxonomy identifier, version policy, code, label, provenance, applicability, and confidence.
+    - Distinguish operator industry, supplier industry, product or service, and capability.
+    - Apply conditional schemes such as customs, procurement, and defense logistics only when their context is material.
+    - Use explicit crosswalks; never assume that codes from different schemes are equivalent.
+    - Mark missing or unverified codes as unresolved instead of guessing.
+    - Recheck classification editions and code status when currency could affect the result.
+  result_states:
+    CLASSIFIED: All facets material to the task are resolved with governed taxonomy references.
+    PARTIAL: At least one useful facet is resolved but material context remains unresolved.
+    RESEARCH_REQUIRED: No adequate authoritative classification has been established.
+    NOT_REQUIRED: A proportionality assessment found that classification cannot materially affect the result.
+  sensitive_domain_rule: Defense, national-security, dual-use, operational-security, and export-control flags require scope, authorization, and information-sensitivity checks before detailed work.
+  claims_rule: Classification is contextual metadata; it does not establish legal status, export classification, procurement eligibility, compliance, or authorization.
+  example_rule: A Bangladesh Navy coastal-surveillance-radar prompt must separate Bangladesh jurisdiction, defense operator activity, surveillance-radar capability, supplier activity, product code, lifecycle, and sensitivity.
+invariants:
+  - INV-006
+  - INV-016
+  - INV-019
+references:
+  - registries/taxonomies.yaml
+  - registries/classifications.yaml
+  - schemas/task.schema.json
+  - spec/domain-practices.yaml

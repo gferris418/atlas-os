@@ -6,7 +6,7 @@ normative: true
 contract:
   applicability: Every substantive task must assess relevant international standards, recognized professional frameworks, and current domain best practices.
   method:
-    - Identify the task domains, jurisdictions, lifecycle stages, risk level, and intended claims.
+    - Resolve the governed domain classification, including jurisdictions, actor industries, products or services, capabilities, lifecycle stages, information sensitivity, and risk flags.
     - Resolve applicable binding requirements before voluntary frameworks.
     - Prefer current official editions from international standards bodies and recognized professional authorities.
     - Record each framework identifier, issuer, edition or version policy, official source, applicability, and implementation mapping.
@@ -33,5 +33,6 @@ invariants:
   - INV-018
 references:
   - registries/frameworks.yaml
+  - spec/classification.yaml
   - schemas/task.schema.json
   - spec/evidence.yaml

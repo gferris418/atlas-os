@@ -21,6 +21,39 @@
     "approvals": {"type": "array"},
     "verification": {"type": "array"},
     "assumptions": {"type": "array"},
+    "domain_classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "facets", "taxonomy_references", "risk_flags", "unresolved_facets", "conditional_candidates", "evidence", "next_action"],
+      "properties": {
+        "status": {"enum": ["CLASSIFIED", "PARTIAL", "RESEARCH_REQUIRED", "NOT_REQUIRED"]},
+        "facets": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "taxonomy", "code", "label", "version", "source"],
+              "properties": {
+                "id": {"type": "string"},
+                "taxonomy": {"type": "string", "pattern": "^taxonomy\\."},
+                "code": {"type": "string"},
+                "label": {"type": "string"},
+                "version": {"type": "string"},
+                "source": {"type": ["string", "null"]}
+              }
+            }
+          }
+        },
+        "taxonomy_references": {"type": "array", "items": {"type": "string", "pattern": "^taxonomy\\."}, "uniqueItems": true},
+        "risk_flags": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "unresolved_facets": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "conditional_candidates": {"type": "array"},
+        "evidence": {"type": "array"},
+        "next_action": {"type": ["string", "null"]}
+      }
+    },
     "domain_alignment": {
       "type": "object",
       "additionalProperties": false,
@@ -43,7 +76,7 @@
       },
       "required": ["execution_depth"]
     },
-    "then": {"required": ["domain_alignment"]}
+    "then": {"required": ["domain_classification", "domain_alignment"]}
   }]
 }
 

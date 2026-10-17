@@ -9,6 +9,7 @@ from atlas_runtime import (
     align_domain_practices,
     build_plan,
     can_transition_release,
+    classify_domain_context,
     create_dashboard,
     normalize_intent,
     require_approval,
@@ -68,6 +69,11 @@ class RuntimeInvariantConformance(unittest.TestCase):
         unresolved = align_domain_practices("medical-device", [], substantive=True)
         self.assertEqual("RESEARCH_REQUIRED", unresolved["status"])
         self.assertNotEqual("VERIFIED", unresolved["compliance"])
+
+    def test_inv_019_domain_classification_does_not_guess(self) -> None:
+        unresolved = classify_domain_context("specialist unmapped system", [], substantive=True)
+        self.assertEqual("RESEARCH_REQUIRED", unresolved["status"])
+        self.assertEqual({}, unresolved["facets"])
 
 
 if __name__ == "__main__":

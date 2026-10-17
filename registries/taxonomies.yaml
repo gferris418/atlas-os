@@ -1,0 +1,189 @@
+schema: schemas/registry.schema.json
+registry:
+  id: registry.taxonomies
+  type: taxonomy
+  version: 1
+  status: active
+items:
+  - id: taxonomy.iso-704
+    name: ISO 704 terminology work principles and methods
+    description: International principles for creating and maintaining coherent terminology systems.
+    status: active
+    authority: international-standard
+    version: current-official
+    source: https://www.iso.org/standards.html
+    issuer: International Organization for Standardization
+    official_source: https://www.iso.org/standards.html
+    domains: [taxonomy, terminology]
+    jurisdictions: [international]
+    version_policy: current-official
+    classification_scope: terminology
+    applicability: Use when defining concepts, terms, definitions, and concept relationships.
+  - id: taxonomy.iso-1087
+    name: ISO 1087 terminology work and terminology science vocabulary
+    description: International vocabulary for terminology work and terminology science.
+    status: active
+    authority: international-standard
+    version: current-official
+    source: https://www.iso.org/standards.html
+    issuer: International Organization for Standardization
+    official_source: https://www.iso.org/standards.html
+    domains: [taxonomy, terminology]
+    jurisdictions: [international]
+    version_policy: current-official
+    classification_scope: terminology
+    applicability: Use to keep taxonomy terminology and definitions consistent.
+  - id: taxonomy.iso-25964-1
+    name: ISO 25964-1 thesauri for information retrieval
+    description: International guidance for thesaurus construction, management, and information retrieval.
+    status: active
+    authority: international-standard
+    version: current-official
+    source: https://www.iso.org/standards.html
+    issuer: International Organization for Standardization
+    official_source: https://www.iso.org/standards.html
+    domains: [taxonomy, knowledge-organization]
+    jurisdictions: [international]
+    version_policy: current-official
+    classification_scope: knowledge-organization
+    applicability: Use for governed hierarchical and associative term relationships.
+  - id: taxonomy.iso-25964-2
+    name: ISO 25964-2 interoperability with other vocabularies
+    description: International guidance for mapping thesauri to other vocabularies and classification schemes.
+    status: active
+    authority: international-standard
+    version: current-official
+    source: https://www.iso.org/standards.html
+    issuer: International Organization for Standardization
+    official_source: https://www.iso.org/standards.html
+    domains: [taxonomy, knowledge-organization]
+    jurisdictions: [international]
+    version_policy: current-official
+    classification_scope: knowledge-organization
+    applicability: Use for explicit crosswalks without treating unlike classification systems as equivalent.
+  - id: taxonomy.w3c-skos
+    name: W3C Simple Knowledge Organization System
+    description: W3C recommendation for publishing and linking controlled vocabularies and concept schemes.
+    status: active
+    authority: international-standard
+    version: current-official
+    source: https://www.w3.org/TR/skos-reference/
+    issuer: World Wide Web Consortium
+    official_source: https://www.w3.org/TR/skos-reference/
+    domains: [taxonomy, semantic-web, knowledge-organization]
+    jurisdictions: [international]
+    version_policy: current-official
+    classification_scope: knowledge-organization
+    applicability: Use as the machine-readable model for ATLAS concept schemes and mappings.
+  - id: taxonomy.iso-iec-11179-3
+    name: ISO/IEC 11179-3 metadata registry metamodel
+    description: International metamodel for registering data elements, concepts, classifications, and provenance.
+    status: active
+    authority: international-standard
+    version: current-official
+    source: https://www.iso.org/standards.html
+    issuer: ISO and IEC
+    official_source: https://www.iso.org/standards.html
+    domains: [metadata, data-governance, taxonomy]
+    jurisdictions: [international]
+    version_policy: current-official
+    classification_scope: metadata
+    applicability: Use for identifiers, definitions, versions, provenance, stewardship, and status.
+  - id: taxonomy.iso-3166-1
+    name: ISO 3166-1 country codes
+    description: International country-name and country-code classification.
+    status: active
+    authority: international-standard
+    version: current-official
+    source: https://www.iso.org/iso-3166-country-codes.html
+    issuer: International Organization for Standardization
+    official_source: https://www.iso.org/iso-3166-country-codes.html
+    domains: [geography, jurisdiction]
+    jurisdictions: [international]
+    version_policy: current-official
+    classification_scope: geography
+    applicability: Use for country and jurisdiction facets; do not infer governing law solely from location.
+  - id: taxonomy.un-isic
+    name: UN International Standard Industrial Classification
+    description: United Nations international reference classification of productive economic activities.
+    status: active
+    authority: official-primary
+    version: current-official
+    source: https://unstats.un.org/unsd/classifications/Econ/isic
+    issuer: United Nations Statistics Division
+    official_source: https://unstats.un.org/unsd/classifications/Econ/isic
+    domains: [industry-classification, economic-activity]
+    jurisdictions: [international]
+    version_policy: current-official
+    classification_scope: economic-activity
+    applicability: Classify each actor's economic activity separately, including operator and supplier roles.
+  - id: taxonomy.un-cpc
+    name: UN Central Product Classification
+    description: United Nations international reference classification for goods and services.
+    status: active
+    authority: official-primary
+    version: current-official
+    source: https://unstats.un.org/unsd/classifications/Econ/cpc
+    issuer: United Nations Statistics Division
+    official_source: https://unstats.un.org/unsd/classifications/Econ/cpc
+    domains: [product-classification, services-classification]
+    jurisdictions: [international]
+    version_policy: current-official
+    classification_scope: products-services
+    applicability: Use for product or service classification after verifying the current official code and scope.
+  - id: taxonomy.wco-hs
+    name: WCO Harmonized System
+    description: International customs nomenclature for classifying traded goods.
+    status: active
+    authority: international-standard
+    version: "2022"
+    source: https://www.wcoomd.org/en/topics/nomenclature/instrument-and-tools/hs-nomenclature-2022-edition.aspx
+    issuer: World Customs Organization
+    official_source: https://www.wcoomd.org/en/topics/nomenclature/instrument-and-tools/hs-nomenclature-2022-edition.aspx
+    domains: [customs, trade, product-classification]
+    jurisdictions: [international]
+    version_policy: explicitly-pinned
+    classification_scope: customs
+    applicability: Apply only when customs, import, export, or cross-border trade context is material.
+  - id: taxonomy.unspsc
+    name: United Nations Standard Products and Services Code
+    description: Global products-and-services taxonomy commonly used in procurement and spend analysis.
+    status: active
+    authority: professional-framework
+    version: current-official
+    source: https://www.unspsc.org/
+    issuer: GS1 US
+    official_source: https://www.unspsc.org/
+    domains: [procurement, product-classification, services-classification]
+    jurisdictions: [international-use]
+    version_policy: current-official
+    classification_scope: procurement
+    applicability: Apply when procurement or spend classification is material and verify licensed/current code data.
+  - id: taxonomy.nato-codification-system
+    name: NATO Codification System
+    description: Official system for standardized identification and classification of defense supply items.
+    status: active
+    authority: official-primary
+    version: current-official
+    source: https://www.nato.int/cps/en/natohq/topics_82605.htm
+    issuer: NATO Allied Committee 135
+    official_source: https://www.nato.int/cps/en/natohq/topics_82605.htm
+    domains: [defense-logistics, supply-classification]
+    jurisdictions: [nato-and-participating-nations]
+    version_policy: current-official
+    classification_scope: defense-logistics
+    applicability: Apply only to defense materiel identification or logistics contexts with authoritative code access.
+  - id: taxonomy.atlas-capability-skos
+    name: ATLAS capability concept scheme
+    description: Internal capability vocabulary modeled using W3C SKOS and governed by ATLAS provenance rules.
+    status: active
+    authority: canonical
+    version: current-official
+    source: spec/classification.yaml
+    issuer: ATLAS OS
+    official_source: https://www.w3.org/TR/skos-reference/
+    domains: [cross-domain, capability-classification]
+    jurisdictions: [internal]
+    version_policy: current-official
+    classification_scope: internal-capability
+    applicability: Use for capability recognition; never present an internal concept as an external industry code.

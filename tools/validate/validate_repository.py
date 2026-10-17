@@ -26,6 +26,7 @@ REQUIRED_PATHS = (
     "spec/core.yaml",
     "spec/runtime.yaml",
     "spec/execution-spine.yaml",
+    "spec/classification.yaml",
     "spec/domain-practices.yaml",
     "schemas/atlas-os.schema.json",
     "schemas/task.schema.json",
@@ -43,6 +44,8 @@ REQUIRED_PATHS = (
     "registries/controls.yaml",
     "registries/migrations.yaml",
     "registries/frameworks.yaml",
+    "registries/taxonomies.yaml",
+    "registries/classifications.yaml",
     "migration/MIG-029.yaml",
     "migration/MIG-037.yaml",
     "migration/dtif-reconciliation.yaml",
@@ -50,6 +53,9 @@ REQUIRED_PATHS = (
     "integrations/codex/README.md",
     "integrations/work/README.md",
     "docs/domain-practices.md",
+    "docs/taxonomy-and-classification.md",
+    "docs/sample-workflow-coastal-surveillance-radar.md",
+    "examples/workflows/coastal-surveillance-radar-bangladesh-navy.json",
     "tests/unit",
     "tests/conformance",
     "tests/regression",
@@ -198,6 +204,30 @@ def _validate_references(root: Path, documents: dict[str, Any], report: Validati
             report.error(f"framework lacks HTTPS official source: {identifier}")
         if item.get("version_policy") == "current-official" and item.get("version") != "current-official":
             report.error(f"current-official framework has conflicting version: {identifier}")
+
+    taxonomy_registry = documents.get("registries/taxonomies.yaml", {})
+    for item in taxonomy_registry.get("items", []) if isinstance(taxonomy_registry, dict) else []:
+        identifier = item.get("id", "<unknown>")
+        if item.get("authority") not in {"international-standard", "professional-framework", "official-primary", "canonical"}:
+            report.error(f"taxonomy lacks authoritative classification: {identifier}")
+        if not item.get("classification_scope"):
+            report.error(f"taxonomy lacks classification scope: {identifier}")
+        if not str(item.get("official_source", "")).startswith("https://"):
+            report.error(f"taxonomy lacks HTTPS official source: {identifier}")
+        if item.get("version_policy") == "current-official" and item.get("version") != "current-official":
+            report.error(f"current-official taxonomy has conflicting version: {identifier}")
+
+    classification_registry = documents.get("registries/classifications.yaml", {})
+    for item in classification_registry.get("items", []) if isinstance(classification_registry, dict) else []:
+        identifier = item.get("id", "<unknown>")
+        for required in ("taxonomy", "facet", "code", "label", "version", "source"):
+            if not item.get(required):
+                report.error(f"classification lacks {required}: {identifier}")
+        taxonomy = item.get("taxonomy")
+        if taxonomy and taxonomy not in ids:
+            report.error(f"classification has unresolved taxonomy: {identifier}: {taxonomy}")
+        if not item.get("triggers") and not item.get("match_all"):
+            report.error(f"classification lacks match terms: {identifier}")
 
 
 def _validate_authority_and_release(root: Path, documents: dict[str, Any], report: ValidationReport) -> None:

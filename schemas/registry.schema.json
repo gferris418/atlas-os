@@ -12,7 +12,7 @@
       "required": ["id", "type", "version", "status"],
       "properties": {
         "id": {"type": "string", "pattern": "^registry\\.[a-z0-9.-]+$"},
-        "type": {"enum": ["capability", "tool", "skill", "surface", "control", "migration", "framework"]},
+        "type": {"enum": ["capability", "tool", "skill", "surface", "control", "migration", "framework", "taxonomy", "classification"]},
         "version": {"type": "integer", "minimum": 1},
         "status": {"enum": ["active", "draft", "deprecated"]}
       }
@@ -47,7 +47,15 @@
           "official_source": {"type": "string", "format": "uri"},
           "jurisdictions": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
           "version_policy": {"enum": ["current-official", "explicitly-pinned"]},
-          "applicability": {"type": "string"}
+          "applicability": {"type": "string"},
+          "classification_scope": {"enum": ["terminology", "knowledge-organization", "metadata", "geography", "economic-activity", "products-services", "customs", "procurement", "defense-logistics", "internal-capability"]},
+          "facet": {"enum": ["jurisdiction", "operator-industry", "supplier-industry", "product-or-service", "capability", "lifecycle-stage", "stakeholder", "information-sensitivity"]},
+          "taxonomy": {"type": "string", "pattern": "^taxonomy\\.[a-z0-9.-]+$"},
+          "code": {"type": "string", "minLength": 1},
+          "label": {"type": "string", "minLength": 1},
+          "match_all": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+          "conditions": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+          "risk_flags": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
         },
         "additionalProperties": false
       }

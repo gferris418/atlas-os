@@ -10,6 +10,7 @@ from atlas_runtime import (
     assess_completeness,
     build_plan,
     can_transition_release,
+    classify_domain_context,
     classify_task,
     create_dashboard,
     determine_execution_depth,
@@ -150,6 +151,74 @@ class DomainPracticeTests(unittest.TestCase):
             verification={"passed": True, "evidence": ["audit-report"]},
         )
         self.assertEqual("VERIFIED", result["compliance"])
+
+
+class DomainClassificationTests(unittest.TestCase):
+    def test_classification_is_multi_axial_and_exposes_missing_context(self) -> None:
+        records = [
+            {
+                "id": "classification.geo.bd",
+                "status": "active",
+                "facet": "jurisdiction",
+                "taxonomy": "taxonomy.iso-3166-1",
+                "code": "BD",
+                "label": "Bangladesh",
+                "triggers": ["bangladesh"],
+            },
+            {
+                "id": "classification.industry.defence-activities",
+                "status": "active",
+                "facet": "operator-industry",
+                "taxonomy": "taxonomy.un-isic",
+                "code": "8422",
+                "label": "Defence activities",
+                "triggers": ["navy", "naval"],
+                "risk_flags": ["defense", "national-security"],
+            },
+            {
+                "id": "classification.capability.coastal-surveillance-radar",
+                "status": "active",
+                "facet": "capability",
+                "taxonomy": "taxonomy.atlas-capability-skos",
+                "code": "capability.coastal-surveillance-radar",
+                "label": "Coastal surveillance radar",
+                "match_all": ["coastal", "surveillance", "radar"],
+                "risk_flags": ["defense", "dual-use", "operational-security"],
+            },
+            {
+                "id": "classification.product.radar-hs",
+                "status": "active",
+                "facet": "product-or-service",
+                "taxonomy": "taxonomy.wco-hs",
+                "code": "8526",
+                "label": "Radar apparatus and related radio apparatus",
+                "triggers": ["radar"],
+                "conditions": ["cross-border-trade-or-customs"],
+            },
+        ]
+        result = classify_domain_context(
+            "coastal surveillance radar for Bangladesh navy",
+            records,
+            required_facets=("jurisdiction", "operator-industry", "capability", "lifecycle-stage"),
+        )
+        self.assertEqual("PARTIAL", result["status"])
+        self.assertEqual(["lifecycle-stage"], result["unresolved_facets"])
+        self.assertEqual("BD", result["facets"]["jurisdiction"][0]["code"])
+        self.assertEqual("8422", result["facets"]["operator-industry"][0]["code"])
+        self.assertIn("operational-security", result["risk_flags"])
+        self.assertEqual(
+            ["classification.product.radar-hs"],
+            [item["id"] for item in result["conditional_candidates"]],
+        )
+
+    def test_unknown_domain_requires_taxonomy_research(self) -> None:
+        result = classify_domain_context("unmapped specialist system", [], substantive=True)
+        self.assertEqual("RESEARCH_REQUIRED", result["status"])
+        self.assertIn("authoritative", result["next_action"].lower())
+
+    def test_non_substantive_task_does_not_force_classification(self) -> None:
+        result = classify_domain_context("convert one metre to centimetres", [], substantive=False)
+        self.assertEqual("NOT_REQUIRED", result["status"])
 
 
 class PersistenceAndReleaseTests(unittest.TestCase):

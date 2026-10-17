@@ -1,6 +1,6 @@
 # ATLAS OS
 
-**Current candidate:** `v2.0.0-rc.2`
+**Current candidate:** `v2.0.0-rc.3`
 **Classification:** Internal  
 **Release status:** **CANDIDATE / HOLD** pending independent cross-surface proof.
 
@@ -12,7 +12,8 @@ ATLAS is not an autonomous model or a collection of prompts. The repository is t
 
 ```text
 INTAKE -> CONTEXT PRESERVATION -> NORMALIZATION -> COMPLETENESS CHECK
-       -> TASK CLASSIFICATION -> DOMAIN FRAMEWORK ALIGNMENT
+       -> TASK CLASSIFICATION -> DOMAIN CLASSIFICATION
+       -> DOMAIN FRAMEWORK ALIGNMENT
        -> DEPENDENCY-AWARE PLANNING
        -> CAPABILITY ROUTING -> EVIDENCE ACQUISITION -> EXECUTION
        -> VERIFICATION -> PERSISTENCE -> DELIVERY
@@ -52,9 +53,13 @@ ATLAS distinguishes `VERIFIED`, `SUPPORTED`, `INFERRED`, `ASSUMED`, `SPECULATIVE
 
 ## International standards and domain practices
 
-Every substantive task must assess and apply relevant current international standards, recognized professional frameworks, and authoritative domain best practices. ATLAS records the framework, issuer, official source, version or edition policy, applicability, implementation mapping, and justified deviations. Applicable law, regulation, and binding requirements take precedence.
+Every substantive task first uses governed taxonomies to separate jurisdiction, operator and supplier industries, product or service, capability, lifecycle, and information sensitivity. The baseline [taxonomy registry](registries/taxonomies.yaml) covers international terminology, knowledge-organization, metadata, geography, economic-activity, product, customs, procurement, and defense-logistics schemes. Conditional schemes are not applied outside their intended context, and missing codes remain unresolved.
+
+ATLAS then assesses and applies relevant current international standards, recognized professional frameworks, and authoritative domain best practices. It records the framework, issuer, official source, version or edition policy, applicability, implementation mapping, and justified deviations. Applicable law, regulation, and binding requirements take precedence.
 
 The baseline [framework registry](registries/frameworks.yaml) is deliberately extensible rather than exhaustive. If no adequate current framework is known, ATLAS reports `RESEARCH_REQUIRED` and consults official sources instead of silently falling back to generic advice. Alignment does not imply certification or compliance; those claims require scope-specific verification evidence.
+
+See [taxonomy and classification](docs/taxonomy-and-classification.md) for the multi-axial model and the [sample Bangladesh Navy coastal-surveillance-radar workflow](docs/sample-workflow-coastal-surveillance-radar.md) for a complete stage-by-stage example.
 
 ## Persistence
 

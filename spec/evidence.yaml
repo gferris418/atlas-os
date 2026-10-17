@@ -19,11 +19,13 @@ contract:
   separation: Source quality, completeness, confidence, and inference are independent attributes.
   absence_rule: Absence of evidence is not evidence of absence.
   framework_rule: Framework applicability and compliance are separate claims; compliance requires scope-specific verification evidence.
+  classification_rule: A taxonomy match is not evidence that a conditional code, legal status, or crosswalk applies.
 invariants:
   - INV-005
   - INV-006
   - INV-016
   - INV-018
+  - INV-019
 references:
   - schemas/evidence.schema.json
 

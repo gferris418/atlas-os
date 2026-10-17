@@ -121,6 +121,112 @@ def classify_task(text: str) -> list[str]:
     return sorted(labels & TASK_CLASSES)
 
 
+def classify_domain_context(
+    text: str,
+    classifications: Iterable[dict[str, Any]],
+    *,
+    substantive: bool = True,
+    required_facets: Iterable[str] = (),
+    active_conditions: Iterable[str] = (),
+) -> dict[str, Any]:
+    """Classify domain context without guessing missing taxonomy codes.
+
+    Records may use ``triggers`` for any-term matching and ``match_all`` for
+    phrase-component matching. Conditional records are exposed as candidates
+    until their declared context is active, so a customs code, for example,
+    is not treated as applicable merely because a product was mentioned.
+    """
+    if not substantive:
+        return {
+            "status": "NOT_REQUIRED",
+            "facets": {},
+            "taxonomy_references": [],
+            "risk_flags": [],
+            "unresolved_facets": [],
+            "conditional_candidates": [],
+            "evidence": [],
+            "next_action": None,
+        }
+
+    lowered = " ".join(text.lower().split())
+    enabled_conditions = set(active_conditions)
+    facets: dict[str, list[dict[str, str]]] = defaultdict(list)
+    taxonomy_references: set[str] = set()
+    risk_flags: set[str] = set()
+    conditional_candidates: list[dict[str, Any]] = []
+
+    for record in classifications:
+        if record.get("status") != "active":
+            continue
+        triggers = [str(term).lower() for term in record.get("triggers", [])]
+        match_all = [str(term).lower() for term in record.get("match_all", [])]
+        lexical_match = (
+            (bool(triggers) and any(term in lowered for term in triggers))
+            or (bool(match_all) and all(term in lowered for term in match_all))
+        )
+        if not lexical_match:
+            continue
+
+        conditions = set(record.get("conditions", []))
+        if not conditions.issubset(enabled_conditions):
+            conditional_candidates.append({
+                "id": record["id"],
+                "taxonomy": record["taxonomy"],
+                "code": record["code"],
+                "label": record["label"],
+                "version": record.get("version", "current-official"),
+                "source": record.get("source"),
+                "conditions": sorted(conditions),
+            })
+            continue
+
+        facet = record["facet"]
+        facets[facet].append({
+            "id": record["id"],
+            "taxonomy": record["taxonomy"],
+            "code": record["code"],
+            "label": record["label"],
+            "version": record.get("version", "current-official"),
+            "source": record.get("source"),
+        })
+        taxonomy_references.add(record["taxonomy"])
+        risk_flags.update(record.get("risk_flags", []))
+
+    ordered_facets = {
+        facet: sorted(values, key=lambda item: item["id"])
+        for facet, values in sorted(facets.items())
+    }
+    unresolved = sorted(set(required_facets) - set(ordered_facets))
+    conditional_candidates.sort(key=lambda item: item["id"])
+
+    if not ordered_facets:
+        status = "RESEARCH_REQUIRED"
+        next_action = "Identify current authoritative taxonomy and classification sources for this domain."
+    elif unresolved:
+        status = "PARTIAL"
+        if {"defense", "national-security", "operational-security"} & risk_flags:
+            next_action = (
+                "Clarify the unresolved facets, intended lifecycle, authorization, and permitted "
+                "information sensitivity before selecting domain frameworks."
+            )
+        else:
+            next_action = "Clarify unresolved classification facets before selecting domain frameworks."
+    else:
+        status = "CLASSIFIED"
+        next_action = "Use the classified facets to select applicable requirements and domain frameworks."
+
+    return {
+        "status": status,
+        "facets": ordered_facets,
+        "taxonomy_references": sorted(taxonomy_references),
+        "risk_flags": sorted(risk_flags),
+        "unresolved_facets": unresolved,
+        "conditional_candidates": conditional_candidates,
+        "evidence": [],
+        "next_action": next_action,
+    }
+
+
 def determine_execution_depth(
     *, steps: int = 1, risk: str = "low", external_action: bool = False, ambiguity: bool = False
 ) -> str:
