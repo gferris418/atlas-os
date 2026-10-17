@@ -14,7 +14,6 @@ from typing import Any
 import jsonschema
 import yaml
 
-
 REQUIRED_PATHS = (
     "README.md",
     "atlas-os.yaml",
@@ -23,6 +22,7 @@ REQUIRED_PATHS = (
     "GOVERNANCE.md",
     "CONTRIBUTING.md",
     "SECURITY.md",
+    "requirements.lock",
     "spec/core.yaml",
     "spec/runtime.yaml",
     "spec/execution-spine.yaml",
@@ -53,6 +53,8 @@ REQUIRED_PATHS = (
     "migration/MIG-037.yaml",
     "migration/dtif-reconciliation.yaml",
     "integrations/chatgpt/README.md",
+    "integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md",
+    "integrations/chatgpt/RELEASE-VERIFICATION.md",
     "integrations/codex/README.md",
     "integrations/work/README.md",
     "docs/domain-practices.md",
@@ -68,6 +70,7 @@ REQUIRED_PATHS = (
     "tools/package/build_release.py",
     ".github/workflows/validate.yml",
     ".github/workflows/release.yml",
+    ".github/dependabot.yml",
 )
 
 STRUCTURED_GLOBS = (
@@ -323,6 +326,36 @@ def _validate_authority_and_release(root: Path, documents: dict[str, Any], repor
         report.error("README claims RELEASED while release blockers are open")
 
 
+def _validate_distribution_controls(root: Path, documents: dict[str, Any], report: ValidationReport) -> None:
+    manifest = documents.get("atlas-os.yaml", {})
+    version = manifest.get("product", {}).get("version") if isinstance(manifest, dict) else None
+    instructions = root / "integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md"
+    if instructions.exists():
+        text = instructions.read_text(encoding="utf-8")
+        if version and f"Version: `{version}`" not in text:
+            report.error("ChatGPT instructions do not match the manifest version")
+        for required in ("ATLAS/chatgpt", "Control revision:", "CAPABILITY_UNAVAILABLE"):
+            if required not in text:
+                report.error(f"ChatGPT instructions lack required control: {required}")
+
+    lock_path = root / "requirements.lock"
+    if lock_path.exists():
+        lock_text = lock_path.read_text(encoding="utf-8")
+        if "--hash=sha256:" not in lock_text:
+            report.error("requirements.lock is not hash locked")
+
+    for relative in (".github/workflows/validate.yml", ".github/workflows/release.yml"):
+        path = root / relative
+        if not path.exists():
+            continue
+        workflow = path.read_text(encoding="utf-8")
+        for reference in re.findall(r"uses:\s*[^@\s]+@([^\s#]+)", workflow):
+            if not re.fullmatch(r"[0-9a-f]{40}", reference):
+                report.error(f"workflow action is not commit-pinned: {relative}: {reference}")
+        if "pip install --require-hashes --requirement requirements.lock" not in workflow:
+            report.error(f"workflow does not install the hash-locked dependency graph: {relative}")
+
+
 def validate_repository(root: Path) -> ValidationReport:
     root = root.resolve()
     report = ValidationReport()
@@ -331,6 +364,7 @@ def validate_repository(root: Path) -> ValidationReport:
     _validate_schemas(root, documents, report)
     _validate_references(root, documents, report)
     _validate_authority_and_release(root, documents, report)
+    _validate_distribution_controls(root, documents, report)
     return report
 
 

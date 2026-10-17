@@ -9,8 +9,13 @@ from pathlib import Path
 import jsonschema
 import yaml
 
-from atlas_runtime import create_dashboard, prepare_library_record, select_output_profile, validate_output_record
-
+from atlas_runtime import (
+    create_dashboard,
+    prepare_library_record,
+    select_output_profile,
+    validate_output_record,
+)
+from tools.package.build_release import validate_release_tag
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -18,14 +23,28 @@ ROOT = Path(__file__).resolve().parents[2]
 class RepositoryContractTests(unittest.TestCase):
     def test_manifest_is_only_product_version_authority(self) -> None:
         manifest = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
-        self.assertEqual("2.0.0-rc.6", manifest["product"]["version"])
+        self.assertEqual("2.0.0-rc.7", manifest["product"]["version"])
         self.assertEqual("atlas-os.yaml#/product/version", (ROOT / "VERSION").read_text().strip())
+
+    def test_release_tag_must_match_manifest_and_release_state(self) -> None:
+        manifest = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
+        version = manifest["product"]["version"]
+        self.assertEqual(f"v{version}", validate_release_tag(manifest, f"v{version}", ["MIG-029"]))
+        with self.assertRaisesRegex(RuntimeError, "does not match"):
+            validate_release_tag(manifest, "v2.0.0", ["MIG-029"])
+
+        stable = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
+        stable["product"].update({"version": "2.0.0", "status": "RELEASED", "release_channel": "stable"})
+        with self.assertRaisesRegex(RuntimeError, "open release blockers"):
+            validate_release_tag(stable, "v2.0.0", ["MIG-029"])
+        self.assertEqual("v2.0.0", validate_release_tag(stable, "v2.0.0", []))
 
     def test_closed_migration_requires_evidence(self) -> None:
         schema = json.loads((ROOT / "schemas/migration.schema.json").read_text())
         record = yaml.safe_load((ROOT / "migration/MIG-029.yaml").read_text())
         record["status"] = "CLOSED"
         record["closed_at"] = "2026-10-17T20:00:00+06:00"
+        record["evidence"] = []
         with self.assertRaises(jsonschema.ValidationError):
             jsonschema.validate(record, schema, format_checker=jsonschema.FormatChecker())
 
@@ -43,6 +62,7 @@ class RepositoryContractTests(unittest.TestCase):
         dashboard = create_dashboard(
             "Verify contract", progress=50, active_unit="validate", completed_units=1, total_units=2,
             timestamp="2026-10-17T23:30:00+06:00",
+            timezone_name="Asia/Dhaka",
             plan_id="plan-verify", plan_status="READY",
         )
         jsonschema.validate(dashboard, schema)
@@ -64,6 +84,7 @@ class RepositoryContractTests(unittest.TestCase):
         dashboard_schema = json.loads((ROOT / "schemas/dashboard.schema.json").read_text())
         dashboard = create_dashboard(
             "Decide", timestamp="2026-10-17T23:30:00+06:00", library=record,
+            timezone_name="Asia/Dhaka",
             plan_id="plan-decide", plan_status="READY",
         )
         jsonschema.validate(dashboard, dashboard_schema, format_checker=jsonschema.FormatChecker())

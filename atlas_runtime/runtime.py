@@ -15,7 +15,6 @@ from pathlib import PurePosixPath
 from typing import Any, Iterable
 from zoneinfo import ZoneInfo
 
-
 TASK_CLASSES = {
     "ANSWER", "RESEARCH", "ANALYSIS", "DECISION", "WRITING", "DOCUMENT",
     "DATA", "CODING", "DEBUGGING", "DESIGN", "PLANNING", "WORKFLOW",
@@ -29,6 +28,10 @@ HIGH_IMPACT_ACTIONS = {
 
 EVIDENCE_CLASSES = {
     "VERIFIED", "SUPPORTED", "INFERRED", "ASSUMED", "SPECULATIVE", "UNKNOWN",
+}
+
+WORK_UNIT_STATUSES = {
+    "PENDING", "ACTIVE", "BLOCKED", "PARTIAL", "COMPLETED", "FAILED", "CANCELLED",
 }
 
 FRAMEWORK_AUTHORITIES = {
@@ -51,6 +54,10 @@ _CRITICAL_LITERAL = re.compile(
     r"\b\d{4}-\d{2}-\d{2}\b|"
     r"\b[A-Z][A-Z0-9]+(?:-[A-Z0-9]+)+\b|"
     r"`[^`]+`|\"[^\"]+\"|'[^']+')"
+)
+
+_RFC3339_TIMESTAMP = re.compile(
+    r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$"
 )
 
 
@@ -343,7 +350,11 @@ def align_domain_practices(
 
 def build_plan(tasks: Iterable[dict[str, Any]]) -> list[str]:
     """Return a stable topological order or reject unresolved/cyclic graphs."""
-    records = {item["id"]: item for item in tasks}
+    task_records = list(tasks)
+    identifiers = [item["id"] for item in task_records]
+    if len(set(identifiers)) != len(identifiers):
+        raise ValueError("work unit identifiers must be unique")
+    records = {item["id"]: item for item in task_records}
     indegree = {task_id: 0 for task_id in records}
     dependents: dict[str, list[str]] = defaultdict(list)
     for task_id, record in records.items():
@@ -390,6 +401,14 @@ def select_next_work_unit(
     if len(by_id) != len(records):
         raise ValueError("work unit identifiers must be unique")
 
+    invalid_statuses = sorted({
+        str(item.get("status"))
+        for item in records
+        if item.get("status") not in WORK_UNIT_STATUSES
+    })
+    if invalid_statuses:
+        raise ValueError(f"invalid work unit status: {', '.join(invalid_statuses)}")
+
     completed = {item["id"] for item in records if item.get("status") == "COMPLETED"}
     for item in records:
         for dependency in item.get("dependencies", []):
@@ -409,7 +428,14 @@ def select_next_work_unit(
         dependencies = item.get("dependencies", [])
         if item.get("status") == "PENDING" and set(dependencies).issubset(completed):
             return item["id"]
-    return None
+    if all(item.get("status") == "COMPLETED" for item in records):
+        return None
+    stalled = ", ".join(
+        f"{item['id']}={item['status']}"
+        for item in records
+        if item.get("status") != "COMPLETED"
+    )
+    raise ValueError(f"plan has no executable work unit: {stalled}")
 
 
 def route_capability(requirement: str, capabilities: Iterable[dict[str, Any]]) -> dict[str, Any]:
@@ -507,12 +533,26 @@ def can_transition_release(current: str, target: str, open_blockers: Iterable[st
     return True
 
 
-def _timestamp_now(timezone_name: str) -> str:
+def _validated_timestamp(timestamp: str | None, timezone_name: str) -> str:
     try:
         timezone = ZoneInfo(timezone_name)
     except (KeyError, ValueError) as error:
         raise ValueError(f"unknown timezone: {timezone_name}") from error
-    return datetime.now(timezone).isoformat(timespec="seconds")
+    if timestamp is None:
+        return datetime.now(timezone).isoformat(timespec="seconds")
+    if not isinstance(timestamp, str):
+        raise TypeError("timestamp must be an RFC 3339 string")
+    try:
+        moment = datetime.fromisoformat(timestamp)
+    except ValueError as error:
+        raise ValueError("timestamp must be RFC 3339") from error
+    if moment.tzinfo is None or moment.utcoffset() is None:
+        raise ValueError("timestamp requires an offset")
+    if not _RFC3339_TIMESTAMP.fullmatch(timestamp):
+        raise ValueError("timestamp must be RFC 3339")
+    if moment.utcoffset() != moment.astimezone(timezone).utcoffset():
+        raise ValueError(f"timestamp offset does not match timezone: {timezone_name}")
+    return timestamp
 
 
 def prepare_library_record(
@@ -560,7 +600,7 @@ def prepare_library_record(
     if delivery_status == "READY":
         location = str(PurePosixPath(library_root) / collection / f"{safe_id}.{extension}")
 
-    generated_at = timestamp or _timestamp_now(timezone_name)
+    generated_at = _validated_timestamp(timestamp, timezone_name)
     return {
         "id": output_id,
         "namespace": "CANONICAL_LIBRARY",
@@ -654,7 +694,7 @@ def create_dashboard(
         "system": "ATLAS", "objective": objective, "progress": progress,
         "surface": surface,
         "plan_id": plan_id,
-        "timestamp": timestamp or _timestamp_now(timezone_name),
+        "timestamp": _validated_timestamp(timestamp, timezone_name),
         "duration_ms": duration_ms,
         "input_summary": input_summary or objective,
         "processing_summary": processing_summary,

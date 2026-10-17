@@ -1,6 +1,6 @@
 # ATLAS OS
 
-**Current candidate:** `v2.0.0-rc.6`
+**Current candidate:** `v2.0.0-rc.7`
 **Classification:** Internal  
 **Release status:** **CANDIDATE / HOLD** pending independent cross-surface proof.
 
@@ -94,7 +94,7 @@ Task execution state and durable canonical library state are separate namespaces
 ## Validate
 
 ```bash
-python -m pip install -r requirements.txt
+python -m pip install --require-hashes -r requirements.lock
 python -m unittest discover -s tests/unit -v
 python -m unittest discover -s tests/conformance -v
 python -m unittest discover -s tests/regression -v

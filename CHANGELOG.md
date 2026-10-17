@@ -2,6 +2,14 @@
 
 All notable changes follow semantic versioning and preserve release lineage. The authoritative current product version is resolved only from `atlas-os.yaml`.
 
+## v2.0.0-rc.7
+
+- Bind publication tags to manifest version, channel, lifecycle state, and stable-release blocker state.
+- Reject duplicate work-unit IDs, invalid task states, stalled-plan false completion, and contradictory timestamp/timezone metadata.
+- Harden filesystem persistence against symlink-root escape and link-swap attacks.
+- Pin CI actions immutably, install from a hash-locked dependency graph, and run dependency vulnerability auditing.
+- Add a single-file, version-bound ChatGPT compatibility profile with local integration validation.
+
 ## v2.0.0-rc.6
 
 - Require a concrete plan identifier before dashboard initialization or work-unit execution.

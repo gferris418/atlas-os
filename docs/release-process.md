@@ -13,3 +13,5 @@ The lifecycle is `DRAFT -> CANDIDATE -> VERIFIED -> RELEASED -> SUPERSEDED -> AR
 
 The stable `v2.0.0` tag is forbidden while any release-blocking control is open. Candidate artifacts use the exact identifier in `atlas-os.yaml`. Packaging does not imply acceptance, release, or publication.
 
+Publication builds pass the triggering tag to `build_release.py --tag`. The build fails unless the tag exactly matches `v<manifest version>` and the manifest channel/status is compatible; a stable tag additionally fails while any declared release blocker is open.
+

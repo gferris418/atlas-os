@@ -12,7 +12,14 @@ acceptance_criteria:
   - Publish a uniquely identifiable control revision without redefining core semantics.
   - Demonstrate the same revision is resolved by ChatGPT, Codex, and Work adapters.
   - Capture independent evidence and reconcile any stale surface state.
-evidence: []
+evidence:
+  - type: local-control-publication-candidate
+    timestamp: "2026-10-17T23:57:16+06:00"
+    version: 2.0.0-rc.7
+    control_revision: chatgpt-bootstrap-2026-10-17-r1
+    source: integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md
+    result: READY_FOR_EXTERNAL_PROOF
+    limitations: Independent resolution by ChatGPT, Codex, and Work is not yet observed.
 owner: atlas-maintainers
 notes: Remains open until cross-surface propagation is observed rather than inferred.
 

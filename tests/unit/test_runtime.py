@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import os
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
 from atlas_runtime import (
     ApprovalRequired,
@@ -23,8 +25,8 @@ from atlas_runtime import (
     render_dashboard,
     require_approval,
     route_capability,
-    select_output_profile,
     select_next_work_unit,
+    select_output_profile,
     validate_output_record,
     verify_evidence,
 )
@@ -70,12 +72,31 @@ class PlanningTests(unittest.TestCase):
                 {"id": "b", "dependencies": ["a"]},
             ])
 
+    def test_duplicate_work_unit_identifiers_are_rejected_before_planning(self) -> None:
+        with self.assertRaisesRegex(ValueError, "unique"):
+            build_plan([
+                {"id": "same", "dependencies": []},
+                {"id": "same", "dependencies": []},
+            ])
+
     def test_atomic_plan_allows_only_one_active_work_unit(self) -> None:
         with self.assertRaises(ValueError):
             select_next_work_unit([
                 {"id": "a", "status": "ACTIVE", "dependencies": []},
                 {"id": "b", "status": "ACTIVE", "dependencies": []},
             ], plan_id="plan-1", plan_status="READY")
+
+    def test_atomic_plan_rejects_unknown_or_stalled_task_states(self) -> None:
+        with self.assertRaisesRegex(ValueError, "invalid work unit status"):
+            select_next_work_unit(
+                [{"id": "one", "status": "TYPO", "dependencies": []}],
+                plan_id="plan-1", plan_status="READY",
+            )
+        with self.assertRaisesRegex(ValueError, "no executable work unit"):
+            select_next_work_unit(
+                [{"id": "one", "status": "BLOCKED", "dependencies": []}],
+                plan_id="plan-1", plan_status="READY",
+            )
 
     def test_atomic_plan_selects_one_ready_unit_in_plan_order(self) -> None:
         selected = select_next_work_unit([
@@ -412,6 +433,153 @@ class PersistenceAndReleaseTests(unittest.TestCase):
                 FileSystemLibraryAdapter(workspace).save(record, "content")
             self.assertFalse((outside / "answer.md").exists())
 
+    def test_filesystem_adapter_rejects_symlinked_library_root(self) -> None:
+        profile = {
+            "id": "output.answer-concise", "format": "markdown",
+            "supported_formats": ["markdown"], "library_collection": "answers",
+            "file_extension": "md",
+        }
+        record = prepare_library_record("answer", profile)
+        with TemporaryDirectory() as temporary_directory:
+            base = Path(temporary_directory)
+            workspace = base / "workspace"
+            outside = base / "outside"
+            workspace.mkdir()
+            outside.mkdir()
+            (workspace / "library").symlink_to(outside, target_is_directory=True)
+            with self.assertRaisesRegex(ValueError, "library root"):
+                FileSystemLibraryAdapter(workspace).save(record, "content")
+            self.assertFalse((outside / "answers/answer.md").exists())
+
+    def test_filesystem_adapter_rechecks_root_after_construction(self) -> None:
+        profile = {
+            "id": "output.answer-concise", "format": "markdown",
+            "supported_formats": ["markdown"], "library_collection": "answers",
+            "file_extension": "md",
+        }
+        record = prepare_library_record("answer", profile)
+        with TemporaryDirectory() as temporary_directory:
+            base = Path(temporary_directory)
+            workspace = base / "workspace"
+            outside = base / "outside"
+            workspace.mkdir()
+            outside.mkdir()
+            (workspace / "library").mkdir()
+            adapter = FileSystemLibraryAdapter(workspace)
+            (workspace / "library").rename(workspace / "original-library")
+            (workspace / "library").symlink_to(outside, target_is_directory=True)
+            with self.assertRaisesRegex(ValueError, "library root"):
+                adapter.save(record, "content")
+            self.assertFalse((outside / "answers/answer.md").exists())
+
+    def test_filesystem_adapter_detects_directory_swap_during_save(self) -> None:
+        profile = {
+            "id": "output.answer-concise", "format": "markdown",
+            "supported_formats": ["markdown"], "library_collection": "answers",
+            "file_extension": "md",
+        }
+        record = prepare_library_record("answer", profile)
+        with TemporaryDirectory() as temporary_directory:
+            base = Path(temporary_directory)
+            workspace = base / "workspace"
+            outside = base / "outside"
+            (workspace / "library/answers").mkdir(parents=True)
+            outside.mkdir()
+            adapter = FileSystemLibraryAdapter(workspace)
+            real_link = os.link
+
+            def swap_parent_then_link(*args: object, **kwargs: object) -> None:
+                answers = workspace / "library/answers"
+                answers.rename(workspace / "library/original-answers")
+                answers.symlink_to(outside, target_is_directory=True)
+                real_link(*args, **kwargs)
+
+            with (
+                patch("atlas_runtime.persistence.os.link", side_effect=swap_parent_then_link),
+                self.assertRaisesRegex(OSError, "changed during persistence"),
+            ):
+                adapter.save(record, "content")
+            self.assertFalse((outside / "answer.md").exists())
+            self.assertFalse((workspace / "library/original-answers/answer.md").exists())
+
+    def test_filesystem_adapter_rejects_root_move_and_symlink_back_during_save(self) -> None:
+        profile = {
+            "id": "output.answer-concise", "format": "markdown",
+            "supported_formats": ["markdown"], "library_collection": "answers",
+            "file_extension": "md",
+        }
+        record = prepare_library_record("answer", profile)
+        with TemporaryDirectory() as temporary_directory:
+            base = Path(temporary_directory)
+            workspace = base / "workspace"
+            outside = base / "outside"
+            (workspace / "library/answers").mkdir(parents=True)
+            outside.mkdir()
+            adapter = FileSystemLibraryAdapter(workspace)
+            real_link = os.link
+
+            def move_root_then_link(*args: object, **kwargs: object) -> None:
+                moved = outside / "escaped-library"
+                (workspace / "library").rename(moved)
+                (workspace / "library").symlink_to(moved, target_is_directory=True)
+                real_link(*args, **kwargs)
+
+            with (
+                patch("atlas_runtime.persistence.os.link", side_effect=move_root_then_link),
+                self.assertRaisesRegex(OSError, "changed during persistence"),
+            ):
+                adapter.save(record, "content")
+            self.assertFalse((outside / "escaped-library/answers/answer.md").exists())
+
+    def test_filesystem_adapter_idempotent_retry_does_not_require_new_file(self) -> None:
+        profile = {
+            "id": "output.answer-concise", "format": "markdown",
+            "supported_formats": ["markdown"], "library_collection": "answers",
+            "file_extension": "md",
+        }
+        record = prepare_library_record("answer", profile)
+        with TemporaryDirectory() as temporary_directory:
+            adapter = FileSystemLibraryAdapter(Path(temporary_directory))
+            first = adapter.save(record, "content")
+            real_open = os.open
+
+            def reject_new_files(path: object, flags: int, *args: object, **kwargs: object) -> int:
+                if flags & os.O_CREAT:
+                    raise PermissionError("new files are not allowed")
+                return real_open(path, flags, *args, **kwargs)
+
+            with patch("atlas_runtime.persistence.os.open", side_effect=reject_new_files):
+                repeated = adapter.save(record, "content")
+            self.assertEqual(
+                first["persistence_evidence"]["checksum"],
+                repeated["persistence_evidence"]["checksum"],
+            )
+
+    def test_supplied_timestamps_require_offsets_and_match_declared_timezone(self) -> None:
+        profile = {
+            "id": "output.answer-concise", "format": "markdown",
+            "supported_formats": ["markdown"], "library_collection": "answers",
+            "file_extension": "md",
+        }
+        with self.assertRaisesRegex(ValueError, "offset"):
+            prepare_library_record(
+                "answer", profile, timestamp="2026-10-17T23:30:00", timezone_name="UTC"
+            )
+        with self.assertRaisesRegex(ValueError, "RFC 3339"):
+            prepare_library_record(
+                "answer", profile, timestamp="2026-10-17 23:30:00+00:00", timezone_name="UTC"
+            )
+        with self.assertRaisesRegex(ValueError, "timezone"):
+            prepare_library_record(
+                "answer", profile,
+                timestamp="2026-10-17T23:30:00+06:00", timezone_name="UTC",
+            )
+        with self.assertRaisesRegex(ValueError, "timezone"):
+            create_dashboard(
+                "Answer", plan_id="plan-answer", plan_status="READY",
+                timestamp="2026-10-17T23:30:00+06:00", timezone_name="UTC",
+            )
+
     def test_library_record_exposes_unavailable_or_unauthorized_storage(self) -> None:
         profile = {
             "id": "output.answer-concise",
@@ -459,6 +627,7 @@ class ClassificationAndDashboardTests(unittest.TestCase):
         dashboard = create_dashboard(
             "Convert units", progress=40, active_unit="calculate", completed_units=1, total_units=2,
             substantive=False, timestamp="2026-10-17T23:30:00+06:00", duration_ms=12,
+            timezone_name="Asia/Dhaka",
             input_summary="Convert 10 km to miles", processing_summary="Applying SI conversion",
             output_summary="Pending verified result", playbook="Direct calculation",
             frameworks=["SI", "ISO 80000"], sop="Plan → calculate → verify → save",

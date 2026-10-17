@@ -13,7 +13,7 @@ import subprocess
 import sys
 import tarfile
 import zipfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
@@ -54,6 +54,49 @@ def _payload(root: Path, files: list[Path]) -> list[dict[str, object]]:
     ]
 
 
+def _open_release_blockers(root: Path, manifest: dict[str, object]) -> list[str]:
+    blockers = manifest.get("release", {}).get("blocking_controls", [])
+    open_blockers: list[str] = []
+    for blocker in blockers:
+        matches = [
+            path for path in (root / "migration").glob("*.yaml")
+            if yaml.safe_load(path.read_text(encoding="utf-8")).get("id") == blocker
+        ]
+        if not matches:
+            open_blockers.append(str(blocker))
+            continue
+        record = yaml.safe_load(matches[0].read_text(encoding="utf-8"))
+        if record.get("status") != "CLOSED":
+            open_blockers.append(str(blocker))
+    return open_blockers
+
+
+def validate_release_tag(
+    manifest: dict[str, object], tag: str, open_blockers: list[str]
+) -> str:
+    """Bind a publication tag to manifest identity and release governance."""
+    product = manifest["product"]
+    version = str(product["version"])
+    expected = f"v{version}"
+    if tag != expected:
+        raise RuntimeError(f"release tag {tag!r} does not match manifest version {expected!r}")
+
+    status = product["status"]
+    channel = product["release_channel"]
+    prerelease = "-" in version
+    if prerelease:
+        if status not in {"CANDIDATE", "VERIFIED"} or channel != "candidate":
+            raise RuntimeError("prerelease tag requires candidate channel and candidate/verified status")
+    else:
+        if status != "RELEASED" or channel != "stable":
+            raise RuntimeError("stable tag requires RELEASED status on the stable channel")
+        if open_blockers:
+            raise RuntimeError(
+                "stable tag is forbidden with open release blockers: " + ", ".join(open_blockers)
+            )
+    return expected
+
+
 def _build_tar(root: Path, output: Path, prefix: str, files: list[Path], epoch: int) -> None:
     with output.open("wb") as raw:
         with gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0) as compressed:
@@ -69,7 +112,7 @@ def _build_tar(root: Path, output: Path, prefix: str, files: list[Path], epoch: 
 
 
 def _build_zip(root: Path, output: Path, prefix: str, files: list[Path], epoch: int) -> None:
-    moment = datetime.fromtimestamp(max(epoch, 315532800), tz=timezone.utc)
+    moment = datetime.fromtimestamp(max(epoch, 315532800), tz=UTC)
     stamp = (moment.year, moment.month, moment.day, moment.hour, moment.minute, moment.second)
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for path in files:
@@ -81,13 +124,15 @@ def _build_zip(root: Path, output: Path, prefix: str, files: list[Path], epoch: 
             archive.writestr(info, path.read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
 
 
-def build(root: Path, output_dir: Path) -> list[Path]:
+def build(root: Path, output_dir: Path, *, release_tag: str | None = None) -> list[Path]:
     root = root.resolve()
     output_dir = (root / output_dir).resolve() if not output_dir.is_absolute() else output_dir.resolve()
     subprocess.run([sys.executable, "tools/validate/validate_repository.py", "."], cwd=root, check=True)
-    _assert_clean(root)
 
     manifest = yaml.safe_load((root / "atlas-os.yaml").read_text(encoding="utf-8"))
+    if release_tag is not None:
+        validate_release_tag(manifest, release_tag, _open_release_blockers(root, manifest))
+    _assert_clean(root)
     version = manifest["product"]["version"]
     status = manifest["product"]["status"]
     commit = _run(["git", "rev-parse", "HEAD"], root)
@@ -127,9 +172,10 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("root", nargs="?", default=".", type=Path)
     parser.add_argument("output", nargs="?", default="dist", type=Path)
+    parser.add_argument("--tag", help="publication tag, which must match manifest release truth")
     args = parser.parse_args(argv)
     try:
-        outputs = build(args.root, args.output)
+        outputs = build(args.root, args.output, release_tag=args.tag)
     except (RuntimeError, subprocess.CalledProcessError, KeyError, OSError) as exc:
         print(f"ATLAS release build FAILED: {exc}", file=sys.stderr)
         return 1

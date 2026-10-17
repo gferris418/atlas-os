@@ -5,7 +5,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Iterable, Protocol
 
-from .runtime import build_plan, create_dashboard, prepare_library_record, select_next_work_unit
+from .runtime import (
+    build_plan,
+    create_dashboard,
+    prepare_library_record,
+    select_next_work_unit,
+)
 
 
 class LibraryStorage(Protocol):
@@ -24,6 +29,7 @@ class SurfaceAdapter:
         plan_id: str,
         clarification_status: str = "NOT_REQUIRED",
         timestamp: str | None = None,
+        timezone_name: str = "UTC",
     ) -> dict[str, Any]:
         records = list(tasks)
         if not records:
@@ -42,6 +48,7 @@ class SurfaceAdapter:
             plan_status="READY",
             surface=self.surface_id,
             timestamp=timestamp,
+            timezone_name=timezone_name,
             active_stage="PLANNING" if active_unit is None else "EXECUTION",
             active_unit=active_unit or "Plan complete",
             completed_units=completed,

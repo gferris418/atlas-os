@@ -18,6 +18,7 @@ class SurfaceAdapterIntegrationTests(unittest.TestCase):
                     tasks,
                     plan_id=f"plan-{surface}",
                     timestamp="2026-10-17T23:30:00+06:00",
+                    timezone_name="Asia/Dhaka",
                 )
                 self.assertEqual(surface, dashboard["surface"])
                 self.assertEqual(f"plan-{surface}", dashboard["plan_id"])
@@ -35,6 +36,7 @@ class SurfaceAdapterIntegrationTests(unittest.TestCase):
             result = get_surface_adapter("codex").deliver(
                 "answer-001", profile, "Durable answer", storage=storage,
                 timestamp="2026-10-17T23:30:00+06:00",
+                timezone_name="Asia/Dhaka",
             )
             self.assertEqual("SAVED", result["delivery_status"])
             saved_path = Path(temporary_directory) / "library/answers/answer-001.md"

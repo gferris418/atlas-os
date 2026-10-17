@@ -6,5 +6,7 @@
 4. Run every validation command documented in `README.md`.
 5. Explain evidence, compatibility impact, open blockers, and required approvals in the pull request.
 
+When `requirements.txt` changes, regenerate the universal hash lock with `uv pip compile requirements.txt --generate-hashes --universal --output-file requirements.lock`, review the resolution, and run the locked install plus vulnerability audit before committing it.
+
 Do not close migration controls, weaken assertions, or change release state merely to obtain a green build.
 

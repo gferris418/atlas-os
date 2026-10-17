@@ -4,6 +4,8 @@
 
 `atlas-os.yaml -> core specifications -> applicable registries -> this contract -> active controls -> task execution`
 
+For immediate use in a ChatGPT Project, Custom GPT, or ordinary chat, paste or upload [`ATLAS-CHATGPT-INSTRUCTIONS.md`](ATLAS-CHATGPT-INSTRUCTIONS.md). It is the version-bound compatibility profile; the full repository remains the higher authority when attached.
+
 ## Contract
 
 - **Capabilities:** conversation, tool use when exposed, connected private sources when authorized, public research, artifact delivery.
