@@ -72,7 +72,7 @@
   "allOf": [{
     "if": {
       "properties": {
-        "execution_depth": {"enum": ["L1", "L2", "L3", "L4"]}
+        "execution_depth": {"enum": ["L2", "L3", "L4"]}
       },
       "required": ["execution_depth"]
     },

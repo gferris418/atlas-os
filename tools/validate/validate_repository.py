@@ -28,6 +28,7 @@ REQUIRED_PATHS = (
     "spec/execution-spine.yaml",
     "spec/classification.yaml",
     "spec/domain-practices.yaml",
+    "spec/output.yaml",
     "schemas/atlas-os.schema.json",
     "schemas/task.schema.json",
     "schemas/execution.schema.json",
@@ -37,6 +38,7 @@ REQUIRED_PATHS = (
     "schemas/migration.schema.json",
     "schemas/registry.schema.json",
     "schemas/dashboard.schema.json",
+    "schemas/output.schema.json",
     "registries/capabilities.yaml",
     "registries/tools.yaml",
     "registries/skills.yaml",
@@ -46,6 +48,7 @@ REQUIRED_PATHS = (
     "registries/frameworks.yaml",
     "registries/taxonomies.yaml",
     "registries/classifications.yaml",
+    "registries/output-profiles.yaml",
     "migration/MIG-029.yaml",
     "migration/MIG-037.yaml",
     "migration/dtif-reconciliation.yaml",
@@ -55,7 +58,9 @@ REQUIRED_PATHS = (
     "docs/domain-practices.md",
     "docs/taxonomy-and-classification.md",
     "docs/sample-workflow-coastal-surveillance-radar.md",
+    "docs/output-standards.md",
     "examples/workflows/coastal-surveillance-radar-bangladesh-navy.json",
+    "tests/fixtures/sample-output.json",
     "tests/unit",
     "tests/conformance",
     "tests/regression",
@@ -228,6 +233,38 @@ def _validate_references(root: Path, documents: dict[str, Any], report: Validati
             report.error(f"classification has unresolved taxonomy: {identifier}: {taxonomy}")
         if not item.get("triggers") and not item.get("match_all"):
             report.error(f"classification lacks match terms: {identifier}")
+
+    output_schema = documents.get("schemas/output.schema.json", {})
+    output_fields = set(output_schema.get("properties", {})) if isinstance(output_schema, dict) else set()
+    output_registry = documents.get("registries/output-profiles.yaml", {})
+    output_items = output_registry.get("items", []) if isinstance(output_registry, dict) else []
+    for item in output_items:
+        identifier = item.get("id", "<unknown>")
+        if not str(identifier).startswith("output."):
+            report.error(f"output profile has invalid id: {identifier}")
+        for required in (
+            "format", "supported_formats", "required_fields", "task_classes",
+            "outcome_first", "citations", "visuals", "max_initial_sections",
+            "machine_readable", "validation_checks", "standards",
+        ):
+            if required not in item:
+                report.error(f"output profile lacks {required}: {identifier}")
+        if item.get("format") not in item.get("supported_formats", []):
+            report.error(f"output profile default format is unsupported: {identifier}")
+        unknown_fields = set(item.get("required_fields", [])) - output_fields
+        if unknown_fields:
+            report.error(f"output profile has unknown required fields {identifier}: {sorted(unknown_fields)}")
+        overlap = set(item.get("required_fields", [])) & set(item.get("optional_fields", []))
+        if overlap:
+            report.error(f"output profile repeats required fields as optional {identifier}: {sorted(overlap)}")
+
+    profile_ids = {item.get("id") for item in output_items}
+    if "output.answer-concise" not in profile_ids:
+        report.error("output profile registry lacks the concise-answer fallback")
+    output_spec = documents.get("spec/output.yaml", {})
+    for identifier in output_spec.get("contract", {}).get("profiles", []) if isinstance(output_spec, dict) else []:
+        if identifier not in profile_ids:
+            report.error(f"output specification references missing profile: {identifier}")
 
 
 def _validate_authority_and_release(root: Path, documents: dict[str, Any], report: ValidationReport) -> None:

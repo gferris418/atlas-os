@@ -13,6 +13,7 @@ from atlas_runtime import (
     create_dashboard,
     normalize_intent,
     require_approval,
+    select_next_work_unit,
     verify_evidence,
 )
 
@@ -74,6 +75,13 @@ class RuntimeInvariantConformance(unittest.TestCase):
         unresolved = classify_domain_context("specialist unmapped system", [], substantive=True)
         self.assertEqual("RESEARCH_REQUIRED", unresolved["status"])
         self.assertEqual({}, unresolved["facets"])
+
+    def test_inv_020_atomic_execution_has_one_active_unit(self) -> None:
+        with self.assertRaises(ValueError):
+            select_next_work_unit([
+                {"id": "one", "status": "ACTIVE", "dependencies": []},
+                {"id": "two", "status": "ACTIVE", "dependencies": []},
+            ])
 
 
 if __name__ == "__main__":

@@ -37,6 +37,10 @@ contract:
     - VALIDATION_FAILED
   domain_classification: Substantive tasks must resolve material taxonomy and classification facets before domain-framework selection.
   domain_alignment: Substantive tasks must resolve applicable international standards and professional frameworks before finalizing the execution plan.
+  host_capability_rule: Prefer native host understanding, conversation, generation, and tool behavior; ATLAS adds only material governance, persistence, interoperability, evidence, or verification.
+  atomic_execution: Nontrivial work executes through one active atomic unit at a time with event-driven dashboard updates.
+  quality_performance_rule: Choose the lightest technique that preserves correctness, evidence, and required controls; avoid duplicated work and unnecessary latency.
+  output_rule: Select a user-requested or task-fit output profile, preserve progressive disclosure, and validate only material requirements.
   proportionality: Execution depth follows complexity, ambiguity, risk, and impact rather than importance alone.
 invariants:
   - INV-003
@@ -45,9 +49,11 @@ invariants:
   - INV-017
   - INV-018
   - INV-019
+  - INV-020
 references:
   - schemas/task.schema.json
   - schemas/execution.schema.json
   - spec/classification.yaml
   - spec/domain-practices.yaml
+  - spec/output.yaml
 

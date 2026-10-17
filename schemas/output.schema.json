@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os.local/schemas/output.schema.json",
+  "title": "ATLAS structured output envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["profile", "status", "format", "result", "verification"],
+  "properties": {
+    "profile": {"type": "string", "pattern": "^output\\.[a-z0-9.-]+$"},
+    "status": {"enum": ["PENDING", "PARTIAL", "COMPLETED", "FAILED"]},
+    "format": {"enum": ["markdown", "json", "csv", "yaml", "html", "pdf", "mixed"]},
+    "language": {"type": "string", "minLength": 2},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "result": {},
+    "evidence": {"type": "array"},
+    "assumptions": {"type": "array"},
+    "risks": {"type": "array"},
+    "next_actions": {"type": "array"},
+    "artifacts": {"type": "array"},
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {"enum": ["PENDING", "PASS", "FAIL", "NOT_REQUIRED"]},
+        "checks": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

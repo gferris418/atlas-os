@@ -12,6 +12,7 @@ from atlas_runtime import (
     classify_domain_context,
     determine_execution_depth,
     require_approval,
+    select_output_profile,
     verify_evidence,
 )
 
@@ -38,6 +39,7 @@ SCENARIOS = [
     ("REG-016", "user supplies approval", {"steps": 4, "external_action": True}, "L2"),
     ("REG-017", "domain framework alignment", {"steps": 4}, "L2"),
     ("REG-018", "taxonomy and industry classification", {"steps": 4, "ambiguity": True}, "L2"),
+    ("REG-019", "proportional output profile selection", {"steps": 2}, "L1"),
 ]
 
 
@@ -79,6 +81,17 @@ class ScenarioRegressionTests(unittest.TestCase):
         self.assertEqual("8422", result["facets"]["operator-industry"][0]["code"])
         self.assertIn("defense", result["risk_flags"])
         self.assertIn("operational-security", result["risk_flags"])
+
+    def test_research_uses_sourced_output_without_overriding_explicit_choice(self) -> None:
+        registry = yaml.safe_load(
+            (ROOT / "registries/output-profiles.yaml").read_text(encoding="utf-8")
+        )
+        selected = select_output_profile(["RESEARCH", "ANALYSIS"], registry["items"])
+        self.assertEqual("output.research-sourced", selected["id"])
+        requested = select_output_profile(
+            ["RESEARCH"], registry["items"], requested_id="output.answer-concise"
+        )
+        self.assertEqual("output.answer-concise", requested["id"])
 
 
 if __name__ == "__main__":

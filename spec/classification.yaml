@@ -6,7 +6,7 @@ normative: true
 contract:
   purpose: Classify substantive work before selecting domain frameworks, requirements, or evidence sources.
   sequence: DOMAIN_CLASSIFICATION follows TASK_CLASSIFICATION and precedes DOMAIN_FRAMEWORK_ALIGNMENT.
-  required_facets:
+  available_facets:
     - jurisdiction
     - operator-industry
     - supplier-industry
@@ -15,6 +15,7 @@ contract:
     - lifecycle-stage
     - stakeholder
     - information-sensitivity
+  materiality: Resolve only facets that can change the answer, requirements, controls, routing, evidence, or authorization; unused facets create no recordkeeping obligation.
   method:
     - Preserve separate facets instead of forcing the whole prompt into one industry or product code.
     - Prefer international reference classifications and current official sources.

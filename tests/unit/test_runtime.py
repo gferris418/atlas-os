@@ -15,8 +15,12 @@ from atlas_runtime import (
     create_dashboard,
     determine_execution_depth,
     normalize_intent,
+    render_dashboard,
     require_approval,
     route_capability,
+    select_output_profile,
+    select_next_work_unit,
+    validate_output_record,
     verify_evidence,
 )
 
@@ -61,6 +65,33 @@ class PlanningTests(unittest.TestCase):
                 {"id": "b", "dependencies": ["a"]},
             ])
 
+    def test_atomic_plan_allows_only_one_active_work_unit(self) -> None:
+        with self.assertRaises(ValueError):
+            select_next_work_unit([
+                {"id": "a", "status": "ACTIVE", "dependencies": []},
+                {"id": "b", "status": "ACTIVE", "dependencies": []},
+            ])
+
+    def test_atomic_plan_selects_one_ready_unit_in_plan_order(self) -> None:
+        selected = select_next_work_unit([
+            {"id": "understand", "status": "COMPLETED", "dependencies": []},
+            {"id": "implement", "status": "PENDING", "dependencies": ["understand"]},
+            {"id": "verify", "status": "PENDING", "dependencies": ["implement"]},
+        ])
+        self.assertEqual("implement", selected)
+
+    def test_atomic_plan_rejects_active_unit_with_incomplete_dependency(self) -> None:
+        with self.assertRaises(ValueError):
+            select_next_work_unit([
+                {"id": "understand", "status": "PENDING", "dependencies": []},
+                {"id": "implement", "status": "ACTIVE", "dependencies": ["understand"]},
+            ])
+
+    def test_completed_atomic_plan_has_no_next_unit(self) -> None:
+        self.assertIsNone(select_next_work_unit([
+            {"id": "done", "status": "COMPLETED", "dependencies": []},
+        ]))
+
 
 class RoutingTests(unittest.TestCase):
     def test_authoritative_available_capability_wins(self) -> None:
@@ -97,6 +128,81 @@ class EvidenceAndApprovalTests(unittest.TestCase):
             require_approval("publish")
         self.assertTrue(require_approval("publish", {"status": "APPROVED", "scope": ["publish"]}))
         self.assertTrue(require_approval("analyze"))
+
+
+class OutputProfileTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.profiles = [
+            {
+                "id": "output.answer-concise",
+                "status": "active",
+                "applies_to": ["ANSWER"],
+                "format": "markdown",
+                "priority": 10,
+                "required_fields": ["result", "verification"],
+                "machine_readable": False,
+            },
+            {
+                "id": "output.decision-brief",
+                "status": "active",
+                "applies_to": ["DECISION"],
+                "format": "markdown",
+                "priority": 100,
+                "required_fields": ["result", "evidence", "risks", "next_actions", "verification"],
+                "machine_readable": False,
+            },
+            {
+                "id": "output.data-structured",
+                "status": "active",
+                "applies_to": ["DATA"],
+                "format": "json",
+                "priority": 90,
+                "required_fields": ["result", "verification"],
+                "machine_readable": True,
+            },
+        ]
+
+    def test_profile_selection_uses_task_fit_without_overriding_user_choice(self) -> None:
+        selected = select_output_profile(["ANALYSIS", "DECISION"], self.profiles)
+        self.assertEqual("output.decision-brief", selected["id"])
+        requested = select_output_profile(
+            ["DECISION"], self.profiles, requested_id="output.answer-concise"
+        )
+        self.assertEqual("output.answer-concise", requested["id"])
+
+    def test_machine_readable_request_selects_structured_profile(self) -> None:
+        selected = select_output_profile(["DATA"], self.profiles, machine_readable=True)
+        self.assertEqual("output.data-structured", selected["id"])
+
+    def test_output_validation_checks_only_profile_requirements(self) -> None:
+        profile = self.profiles[1]
+        incomplete = validate_output_record(
+            {
+                "profile": profile["id"],
+                "status": "COMPLETED",
+                "result": {"recommendation": "Proceed"},
+                "risks": ["Cost"],
+                "next_actions": ["Approve"],
+                "verification": {"status": "PASS"},
+            },
+            profile,
+        )
+        self.assertFalse(incomplete["valid"])
+        self.assertIn("evidence", incomplete["errors"][0])
+
+        complete = validate_output_record(
+            {
+                "profile": profile["id"],
+                "status": "COMPLETED",
+                "result": {"recommendation": "Proceed"},
+                "evidence": ["assessment"],
+                "risks": ["Cost"],
+                "next_actions": ["Approve"],
+                "verification": {"status": "PASS"},
+            },
+            profile,
+        )
+        self.assertTrue(complete["valid"])
 
 
 class DomainPracticeTests(unittest.TestCase):
@@ -220,6 +326,22 @@ class DomainClassificationTests(unittest.TestCase):
         result = classify_domain_context("convert one metre to centimetres", [], substantive=False)
         self.assertEqual("NOT_REQUIRED", result["status"])
 
+    def test_classification_without_material_facet_policy_is_not_complete(self) -> None:
+        result = classify_domain_context(
+            "Bangladesh",
+            [{
+                "id": "classification.geo.bd",
+                "status": "active",
+                "facet": "jurisdiction",
+                "taxonomy": "taxonomy.iso-3166-1",
+                "code": "BD",
+                "label": "Bangladesh",
+                "triggers": ["bangladesh"],
+            }],
+        )
+        self.assertEqual("PARTIAL", result["status"])
+        self.assertIn("material", result["next_action"].lower())
+
 
 class PersistenceAndReleaseTests(unittest.TestCase):
     def test_task_and_canonical_namespaces_do_not_collide(self) -> None:
@@ -250,10 +372,17 @@ class ClassificationAndDashboardTests(unittest.TestCase):
         self.assertEqual("L2", determine_execution_depth(steps=4))
         self.assertEqual("L4", determine_execution_depth(risk="critical"))
 
-    def test_substantive_task_initializes_dashboard(self) -> None:
-        dashboard = create_dashboard("Build repository", progress=0)
+    def test_every_prompt_initializes_a_compact_dashboard(self) -> None:
+        dashboard = create_dashboard(
+            "Convert units", progress=40, active_unit="calculate", completed_units=1, total_units=2,
+            substantive=False,
+        )
         self.assertEqual("ATLAS", dashboard["system"])
-        self.assertIsNone(create_dashboard("Convert units", substantive=False))
+        self.assertEqual("[####------] 40%", dashboard["progress_visual"])
+        rendered = render_dashboard(dashboard)
+        self.assertIn("1/2", rendered)
+        self.assertIn("calculate", rendered)
+        self.assertLessEqual(len(rendered.splitlines()), 4)
 
 
 if __name__ == "__main__":

@@ -13,8 +13,12 @@ from .runtime import (
     create_dashboard,
     determine_execution_depth,
     normalize_intent,
+    render_dashboard,
     require_approval,
     route_capability,
+    select_output_profile,
+    select_next_work_unit,
+    validate_output_record,
     verify_evidence,
 )
 
@@ -31,8 +35,12 @@ __all__ = [
     "create_dashboard",
     "determine_execution_depth",
     "normalize_intent",
+    "render_dashboard",
     "require_approval",
     "route_capability",
+    "select_output_profile",
+    "select_next_work_unit",
+    "validate_output_record",
     "verify_evidence",
 ]
 

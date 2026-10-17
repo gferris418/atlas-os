@@ -1,6 +1,6 @@
 # Taxonomy and industry classification
 
-ATLAS classifies substantive work before it chooses standards, frameworks, sources, or execution controls. Classification is multi-axial: a country, operator, supplier, product, capability, lifecycle stage, and information sensitivity answer different questions and must not be collapsed into one code.
+When classification can materially improve a result, ATLAS classifies the relevant context before it chooses standards, frameworks, sources, or execution controls. It uses capable host-language understanding to identify candidates and the governed registry to validate and record them. Classification is multi-axial: a country, operator, supplier, product, capability, lifecycle stage, and information sensitivity answer different questions and must not be collapsed into one code. Facets that cannot change the task create no recordkeeping obligation.
 
 ## Governed baseline
 

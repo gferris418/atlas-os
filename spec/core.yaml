@@ -6,18 +6,23 @@ normative: true
 contract:
   purpose: Govern agent execution between user intent and verified delivery.
   principles:
+    - Use capable host-platform features directly; do not recreate model, conversation, generation, or tool behavior that the host already provides.
     - Preserve intent before optimizing representation.
     - Understand completely and ask only material questions.
     - Classify domain context with governed taxonomies before selecting frameworks.
     - Plan the minimum sufficient dependency graph.
+    - Decompose nontrivial work into atomic units and finish one user-visible unit before activating the next.
     - Route to the strongest available authorized capability.
     - Align substantive work with applicable international standards and recognized professional frameworks.
     - Separate evidence, inference, assumption, and speculation.
     - Verify independently before claiming completion.
+    - Select a proportional output profile and validate only material format and quality requirements.
     - Persist canonical knowledge deliberately.
     - Keep governance proportional and hidden by default.
+    - Prefer lightweight, event-driven controls that improve quality without material latency or token overhead.
   exclusions:
     - ATLAS is not a replacement for the underlying model.
+    - ATLAS does not duplicate native host reasoning, language understanding, generation, conversation, or tool orchestration.
     - Surface adapters cannot redefine core semantics.
 invariants:
   - INV-001
@@ -26,10 +31,12 @@ invariants:
   - INV-017
   - INV-018
   - INV-019
+  - INV-020
 references:
   - atlas-os.yaml
   - spec/runtime.yaml
   - spec/execution-spine.yaml
   - spec/classification.yaml
   - spec/domain-practices.yaml
+  - spec/output.yaml
 

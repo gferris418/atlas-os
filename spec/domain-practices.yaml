@@ -25,7 +25,7 @@ contract:
     RESEARCH_REQUIRED: No adequate current authoritative framework has yet been established.
     NOT_APPLICABLE: A documented assessment found no material domain framework for the task.
   compliance_rule: Never claim compliance, certification, accreditation, or conformity without scope-specific verification evidence from a competent process.
-  proportionality: L0 tasks may omit explicit alignment only when no domain standard could materially change the result.
+  proportionality: L0 and L1 tasks may omit explicit alignment when no domain standard could materially change the result; L2-L4 tasks record the assessment.
   extensibility: The framework registry is a governed baseline, not an exhaustive global catalog.
 invariants:
   - INV-006

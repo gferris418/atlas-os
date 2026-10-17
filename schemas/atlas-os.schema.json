@@ -34,12 +34,13 @@
     "execution": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["spine", "runtime", "classification", "domain_practices", "default_depth"],
+      "required": ["spine", "runtime", "classification", "domain_practices", "output", "default_depth"],
       "properties": {
         "spine": {"type": "string"},
         "runtime": {"type": "string"},
         "classification": {"const": "spec/classification.yaml"},
         "domain_practices": {"const": "spec/domain-practices.yaml"},
+        "output": {"const": "spec/output.yaml"},
         "default_depth": {"enum": ["L0", "L1", "L2", "L3", "L4"]}
       }
     },

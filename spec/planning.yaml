@@ -7,9 +7,11 @@ contract:
   method:
     - Determine the terminal outcome.
     - Identify required outputs.
-    - Derive dependencies.
+    - Decompose nontrivial work into the smallest independently verifiable work units that remain useful.
+    - Give every work unit one objective, explicit dependencies, and observable completion criteria.
     - Order work by dependency.
-    - Identify independent parallel work.
+    - Keep one user-visible work unit active at a time and finish it before activating the next.
+    - Batch or parallelize only safe operations inside the active work unit when doing so improves performance without weakening evidence.
     - Identify approval gates.
     - Define verification criteria.
     - Execute against one canonical plan.
@@ -23,11 +25,15 @@ contract:
     - evidence
     - approvals
     - verification
-  optimization: Create the minimum sufficient execution graph.
+  work_in_progress_limit: One user-visible atomic work unit may be ACTIVE at a time.
+  atomic_completion: A work unit becomes COMPLETED only after its completion criteria are checked; generated or attempted work is not completion.
+  optimization: Create the minimum sufficient execution graph and avoid decomposition that adds no decision, control, or verification value.
+  performance: Prefer native host capabilities and low-overhead operations; parallelize safe reads or checks only within one active completion target.
 invariants:
   - INV-003
   - INV-011
   - INV-013
+  - INV-020
 references:
   - schemas/task.schema.json
   - schemas/execution.schema.json

@@ -138,4 +138,11 @@ items:
     source: spec/classification.yaml
     path: spec/classification.yaml
     dependencies: [INV-006, INV-016]
+  - id: INV-020
+    name: Lean atomic execution
+    description: ATLAS must prefer native host capabilities, execute one user-visible atomic work unit at a time, expose compact event-driven progress for every prompt, and avoid controls whose overhead exceeds their value.
+    status: required
+    source: spec/planning.yaml
+    path: spec/planning.yaml
+    dependencies: [INV-003, INV-004, INV-007, INV-017]
 

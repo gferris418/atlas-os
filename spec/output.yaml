@@ -1,0 +1,67 @@
+schema: schemas/spec.schema.json
+id: spec.output
+title: Output standards and profiles
+status: active
+normative: true
+contract:
+  purpose: Improve clarity, interoperability, accessibility, evidence integrity, and actionability without constraining capable host generation or adding unnecessary latency.
+  generation: The host generates content natively; ATLAS selects the smallest useful output contract and validates only material requirements.
+  selection_order:
+    - explicit_user_format_or_profile
+    - binding_deliverable_or_tool_contract
+    - task_and_audience_fit
+    - output.answer-concise
+  profiles:
+    - output.answer-concise
+    - output.analysis-standard
+    - output.decision-brief
+    - output.research-sourced
+    - output.execution-progress
+    - output.technical-spec
+    - output.data-structured
+    - output.artifact-delivery
+  progressive_disclosure:
+    layer_1: Direct outcome or answer.
+    layer_2: Material evidence, reasoning summary, actions, and risks.
+    layer_3: Technical detail, sources, appendices, and machine-readable artifacts when needed.
+  universal_quality:
+    - correctness
+    - relevance
+    - clarity
+    - evidence_integrity
+    - actionability
+    - accessibility
+    - format_validity
+    - conciseness
+    - safety_and_authorization
+    - performance
+  standards:
+    human_text: GitHub-Flavored Markdown
+    structured_data: JSON Schema 2020-12
+    api_contracts: OpenAPI 3.1
+    dates_and_times: ISO 8601 and RFC 3339
+    countries: ISO 3166
+    languages: BCP 47
+    currencies: ISO 4217
+    units: SI and ISO 80000
+    csv: RFC 4180 with UTF-8
+    web_accessibility: WCAG 2.2 AA when applicable
+    accessible_pdf: PDF/UA when applicable
+    archival_pdf: PDF/A when applicable
+    provenance: Lightweight evidence records; W3C PROV only for formal exchange.
+  visual_rule: Use a table, flow, timeline, tree, progress bar, or chart only when it communicates a material relationship more clearly than short prose.
+  validation_rule: Validate machine-readable formats, binding deliverables, citations, artifacts, and material claims; do not impose schema or template overhead on ordinary conversation.
+  envelope_rule: The structured output envelope is available for workflows and integrations, but is not required for ordinary human-readable answers.
+  performance_rule: Profile selection and basic validation must be local and deterministic; expensive rendering or conversion runs only when the requested artifact requires it.
+  claims_rule: Format validity does not establish factual correctness, evidence quality, acceptance, or compliance.
+invariants:
+  - INV-006
+  - INV-007
+  - INV-009
+  - INV-016
+  - INV-020
+references:
+  - registries/output-profiles.yaml
+  - schemas/output.schema.json
+  - spec/dashboard.yaml
+  - spec/evidence.yaml

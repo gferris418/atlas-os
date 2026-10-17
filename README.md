@@ -1,6 +1,6 @@
 # ATLAS OS
 
-**Current candidate:** `v2.0.0-rc.3`
+**Current candidate:** `v2.0.0-rc.4`
 **Classification:** Internal  
 **Release status:** **CANDIDATE / HOLD** pending independent cross-surface proof.
 
@@ -21,6 +21,8 @@ INTAKE -> CONTEXT PRESERVATION -> NORMALIZATION -> COMPLETENESS CHECK
 
 Execution depth is proportional: trivial work remains direct, while complex or high-impact work activates stronger planning, evidence, approval, and verification controls.
 
+ATLAS uses capable host-platform features directly. It does not recreate ChatGPT or another host's language understanding, conversation, generation, reasoning, or tool behavior unless a deterministic fallback is required. ATLAS adds the smallest useful layer of standards, evidence, authority, persistence, interoperability, and verification.
+
 ## Authority model
 
 1. [`atlas-os.yaml`](atlas-os.yaml) is the only product/release authority.
@@ -33,17 +35,17 @@ Execution depth is proportional: trivial work remains direct, while complex or h
 
 Component revisions may describe compatibility and lineage, but cannot declare a competing product release.
 
-## Startup dashboard
+## Lightweight control plane
 
-Substantive tasks expose compact operational state without private reasoning:
+Every prompt exposes compact operational state without private reasoning. Nontrivial work is split into atomic units with one active completion target; the display updates only at meaningful state changes:
 
 ```text
-ATLAS
-Progress: 0%
-Active: Understand and structure task
-Blocker / Approval: None
-Library: Loaded / Not required
+ATLAS [####------] 40%
+Now 1/3 · EXECUTION: implement current work unit
+Quality PENDING | Blocker None
 ```
+
+The text-only visual is deterministic and constant-cost. Safe operations may be batched within the active unit, but a unit is not marked complete until its completion criteria are verified.
 
 The machine-readable dashboard contract is in [`spec/dashboard.yaml`](spec/dashboard.yaml) and [`schemas/dashboard.schema.json`](schemas/dashboard.schema.json).
 
@@ -51,9 +53,15 @@ The machine-readable dashboard contract is in [`spec/dashboard.yaml`](spec/dashb
 
 ATLAS distinguishes `VERIFIED`, `SUPPORTED`, `INFERRED`, `ASSUMED`, `SPECULATIVE`, and `UNKNOWN`. Source quality, completeness, confidence, and inference remain separate. Routing selects the best available capability using task fit, authority, permissions, risk, and fallback behavior; the presence of a tool alone is not a reason to call it.
 
+## Output standards
+
+ATLAS lets the host generate naturally, then selects the smallest task-fit [output profile](registries/output-profiles.yaml). Eight baseline profiles cover concise answers, analysis, decisions, sourced research, execution progress, technical specifications, structured data, and artifact delivery. Explicit user formats take precedence.
+
+Outputs use progressive disclosure and material-only validation. Ordinary conversation avoids schema overhead; machine-readable data, citations, APIs, and artifacts use applicable standards such as JSON Schema 2020-12, RFC 4180, RFC 3339, OpenAPI 3.1, WCAG 2.2 AA, and accessible or archival PDF profiles. Visuals are used only when they make a material relationship clearer. See [output standards and profiles](docs/output-standards.md).
+
 ## International standards and domain practices
 
-Every substantive task first uses governed taxonomies to separate jurisdiction, operator and supplier industries, product or service, capability, lifecycle, and information sensitivity. The baseline [taxonomy registry](registries/taxonomies.yaml) covers international terminology, knowledge-organization, metadata, geography, economic-activity, product, customs, procurement, and defense-logistics schemes. Conditional schemes are not applied outside their intended context, and missing codes remain unresolved.
+When classification could materially change the result, ATLAS uses governed taxonomies to separate relevant jurisdiction, actor, product, capability, lifecycle, and sensitivity facets. It does not require unused facets. The baseline [taxonomy registry](registries/taxonomies.yaml) covers international terminology, knowledge-organization, metadata, geography, economic-activity, product, customs, procurement, and defense-logistics schemes. Conditional schemes are not applied outside their intended context, and missing codes remain unresolved.
 
 ATLAS then assesses and applies relevant current international standards, recognized professional frameworks, and authoritative domain best practices. It records the framework, issuer, official source, version or edition policy, applicability, implementation mapping, and justified deviations. Applicable law, regulation, and binding requirements take precedence.
 

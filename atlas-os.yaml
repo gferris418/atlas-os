@@ -2,7 +2,7 @@ schema: schemas/atlas-os.schema.json
 product:
   id: atlas-os
   name: ATLAS OS
-  version: 2.0.0-rc.3
+  version: 2.0.0-rc.4
   release_channel: candidate
   schema_version: 2
   status: CANDIDATE
@@ -16,6 +16,7 @@ execution:
   runtime: spec/runtime.yaml
   classification: spec/classification.yaml
   domain_practices: spec/domain-practices.yaml
+  output: spec/output.yaml
   default_depth: L1
 release:
   target_version: 2.0.0

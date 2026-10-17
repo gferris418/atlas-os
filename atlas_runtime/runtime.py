@@ -71,7 +71,7 @@ def normalize_intent(text: str) -> dict[str, Any]:
 
 
 def assess_completeness(task: dict[str, Any]) -> dict[str, Any]:
-    """Apply the W-question lens without turning it into a questionnaire."""
+    """Deterministic fallback for material gaps when host understanding is unavailable."""
     dimensions = ("who", "what", "when", "where", "why", "which", "how", "how_much")
     material = set(task.get("material_dimensions", ("what", "how")))
     supplied = {name for name in dimensions if task.get(name) not in (None, "", [])}
@@ -94,6 +94,7 @@ def assess_completeness(task: dict[str, Any]) -> dict[str, Any]:
 
 
 def classify_task(text: str) -> list[str]:
+    """Return fallback task labels; capable host classification takes precedence."""
     lowered = text.lower()
     labels: set[str] = set()
     rules = {
@@ -126,15 +127,16 @@ def classify_domain_context(
     classifications: Iterable[dict[str, Any]],
     *,
     substantive: bool = True,
-    required_facets: Iterable[str] = (),
+    required_facets: Iterable[str] | None = None,
     active_conditions: Iterable[str] = (),
 ) -> dict[str, Any]:
     """Classify domain context without guessing missing taxonomy codes.
 
-    Records may use ``triggers`` for any-term matching and ``match_all`` for
-    phrase-component matching. Conditional records are exposed as candidates
-    until their declared context is active, so a customs code, for example,
-    is not treated as applicable merely because a product was mentioned.
+    This lexical matcher is a deterministic fallback. Capable hosts should
+    identify candidates natively, then use the governed records and explicit
+    material facets for validation. Records may use ``triggers`` for any-term
+    matching and ``match_all`` for phrase-component matching. Conditional
+    records remain candidates until their declared context is active.
     """
     if not substantive:
         return {
@@ -196,12 +198,16 @@ def classify_domain_context(
         facet: sorted(values, key=lambda item: item["id"])
         for facet, values in sorted(facets.items())
     }
-    unresolved = sorted(set(required_facets) - set(ordered_facets))
+    material_policy_known = required_facets is not None
+    unresolved = sorted(set(required_facets or ()) - set(ordered_facets))
     conditional_candidates.sort(key=lambda item: item["id"])
 
     if not ordered_facets:
         status = "RESEARCH_REQUIRED"
         next_action = "Identify current authoritative taxonomy and classification sources for this domain."
+    elif not material_policy_known:
+        status = "PARTIAL"
+        next_action = "Determine which classification facets are material before declaring classification complete."
     elif unresolved:
         status = "PARTIAL"
         if {"defense", "national-security", "operational-security"} & risk_flags:
@@ -332,6 +338,40 @@ def build_plan(tasks: Iterable[dict[str, Any]]) -> list[str]:
     return ordered
 
 
+def select_next_work_unit(tasks: Iterable[dict[str, Any]]) -> str | None:
+    """Return the single active or next ready atomic work unit.
+
+    User-visible work has a work-in-progress limit of one. Implementations may
+    batch safe read-only operations inside that unit, but may not expose two
+    active completion targets or bypass dependency completion.
+    """
+    records = list(tasks)
+    by_id = {item["id"]: item for item in records}
+    if len(by_id) != len(records):
+        raise ValueError("work unit identifiers must be unique")
+
+    completed = {item["id"] for item in records if item.get("status") == "COMPLETED"}
+    for item in records:
+        for dependency in item.get("dependencies", []):
+            if dependency not in by_id:
+                raise KeyError(f"unresolved dependency: {dependency}")
+
+    active_records = [item for item in records if item.get("status") == "ACTIVE"]
+    active = [item["id"] for item in active_records]
+    if len(active) > 1:
+        raise ValueError("atomic execution allows only one active work unit")
+    if active:
+        if not set(active_records[0].get("dependencies", [])).issubset(completed):
+            raise ValueError("active work unit has incomplete dependencies")
+        return active[0]
+
+    for item in records:
+        dependencies = item.get("dependencies", [])
+        if item.get("status") == "PENDING" and set(dependencies).issubset(completed):
+            return item["id"]
+    return None
+
+
 def route_capability(requirement: str, capabilities: Iterable[dict[str, Any]]) -> dict[str, Any]:
     authority = {"user": 6, "connected": 5, "official": 4, "canonical": 3, "secondary": 2, "community": 1, "model": 0}
     candidates = [item for item in capabilities if item.get("available", True)
@@ -343,6 +383,61 @@ def route_capability(requirement: str, capabilities: Iterable[dict[str, Any]]) -
         authority.get(item.get("authority", "model"), -1),
         -item.get("risk", 0), -item.get("latency", 0), item["id"],
     ))
+
+
+def select_output_profile(
+    task_classes: Iterable[str],
+    profiles: Iterable[dict[str, Any]],
+    *,
+    requested_id: str | None = None,
+    machine_readable: bool = False,
+) -> dict[str, Any]:
+    """Select a lightweight output contract while preserving user choice."""
+    active = [item for item in profiles if item.get("status") == "active"]
+    if requested_id:
+        for item in active:
+            if item.get("id") == requested_id:
+                return deepcopy(item)
+        raise LookupError(f"requested output profile is unavailable: {requested_id}")
+
+    if machine_readable:
+        candidates = [item for item in active if item.get("machine_readable") is True]
+        if not candidates:
+            raise LookupError("no active machine-readable output profile")
+    else:
+        classes = set(task_classes)
+        candidates = [
+            item for item in active
+            if classes & set(item.get("task_classes", item.get("applies_to", [])))
+        ]
+        if not candidates:
+            candidates = [item for item in active if item.get("id") == "output.answer-concise"]
+        if not candidates:
+            raise LookupError("no applicable output profile")
+
+    selected = sorted(
+        candidates,
+        key=lambda item: (-item.get("priority", 0), item["id"]),
+    )[0]
+    return deepcopy(selected)
+
+
+def validate_output_record(record: dict[str, Any], profile: dict[str, Any]) -> dict[str, Any]:
+    """Validate only the material fields declared by an output profile."""
+    errors: list[str] = []
+    if record.get("profile") != profile.get("id"):
+        errors.append("profile does not match the selected output contract")
+
+    for field_name in profile.get("required_fields", []):
+        value = record.get(field_name)
+        if value is None or value == "" or value == [] or value == {}:
+            errors.append(f"required output field is missing or empty: {field_name}")
+
+    return {
+        "profile": profile.get("id"),
+        "valid": not errors,
+        "errors": errors,
+    }
 
 
 def verify_evidence(record: dict[str, Any], verification: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -374,17 +469,39 @@ def can_transition_release(current: str, target: str, open_blockers: Iterable[st
 
 def create_dashboard(
     objective: str, *, progress: int = 0, active_stage: str = "INTAKE",
+    active_unit: str | None = None, completed_units: int = 0, total_units: int = 1,
     blocker: str | None = None, library: str = "Not required", substantive: bool = True,
-) -> dict[str, Any] | None:
-    if not substantive:
-        return None
+    quality_gate: str = "PENDING", performance_mode: str = "LEAN",
+) -> dict[str, Any]:
     if not 0 <= progress <= 100:
         raise ValueError("progress must be between 0 and 100")
+    if total_units < 1 or not 0 <= completed_units <= total_units:
+        raise ValueError("work-unit progress is invalid")
+    if quality_gate not in {"PENDING", "PASS", "FAIL", "BLOCKED"}:
+        raise ValueError("invalid quality gate")
+    if performance_mode != "LEAN":
+        raise ValueError("unsupported performance mode")
+    filled = min(10, max(0, round(progress / 10)))
     return {
         "system": "ATLAS", "objective": objective, "progress": progress,
+        "progress_visual": f"[{'#' * filled}{'-' * (10 - filled)}] {progress}%",
         "active_stage": active_stage, "blocker_or_approval": blocker or "None",
-        "library": library,
+        "active_unit": active_unit or objective,
+        "completed_units": completed_units, "total_units": total_units,
+        "library": library, "quality_gate": quality_gate,
+        "performance_mode": performance_mode,
+        "execution_layer": "L1" if substantive else "L0",
     }
+
+
+def render_dashboard(dashboard: dict[str, Any]) -> str:
+    """Render an event-driven dashboard in at most three compact lines."""
+    return "\n".join((
+        f"ATLAS {dashboard['progress_visual']}",
+        f"Now {dashboard['completed_units']}/{dashboard['total_units']} · "
+        f"{dashboard['active_stage']}: {dashboard['active_unit']}",
+        f"Quality {dashboard['quality_gate']} | Blocker {dashboard['blocker_or_approval']}",
+    ))
 
 
 @dataclass

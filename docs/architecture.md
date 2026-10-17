@@ -1,6 +1,6 @@
 # Architecture
 
-ATLAS-OS is a normative execution-governance core surrounded by surface adapters. The core owns context, completeness, governed domain classification, domain-framework alignment, planning, routing, evidence, approval, verification, persistence, versioning, and user-visible execution state. Adapters map available surface capabilities into those contracts without copying or changing them.
+ATLAS-OS is a normative execution-governance core surrounded by surface adapters. The core owns context, completeness, governed domain classification, domain-framework alignment, planning, routing, evidence, approval, output profiles, verification, persistence, versioning, and user-visible execution state. Adapters use native surface capabilities and map them into those contracts without copying or changing them.
 
 ```text
 USER INTENT

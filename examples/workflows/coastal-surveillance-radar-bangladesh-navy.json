@@ -72,7 +72,7 @@
       "taxonomy.un-isic"
     ],
     "risk_flags": ["defense", "dual-use", "national-security", "operational-security"],
-    "unresolved_facets": ["lifecycle-stage"],
+    "unresolved_facets": ["information-sensitivity", "lifecycle-stage"],
     "conditional_candidates": [
       {
         "id": "classification.industry.navigation-equipment-manufacturing",
