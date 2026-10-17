@@ -25,6 +25,7 @@ contract:
     - Use explicit crosswalks; never assume that codes from different schemes are equivalent.
     - Mark missing or unverified codes as unresolved instead of guessing.
     - Recheck classification editions and code status when currency could affect the result.
+  handoff: When a specialist domain method is routed, the resolved classification snapshot is transferred unchanged through spec/domain-handoff.yaml; specialist enrichment must not silently redefine this ATLAS-owned classification.
   result_states:
     CLASSIFIED: All facets material to the task are resolved with governed taxonomy references.
     PARTIAL: At least one useful facet is resolved but material context remains unresolved.
@@ -42,3 +43,4 @@ references:
   - registries/classifications.yaml
   - schemas/task.schema.json
   - spec/domain-practices.yaml
+  - spec/domain-handoff.yaml
