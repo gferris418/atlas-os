@@ -1,0 +1,127 @@
+schema: schemas/registry.schema.json
+registry:
+  id: registry.controls
+  type: control
+  version: 1
+  status: active
+items:
+  - id: INV-001
+    name: Intent integrity
+    description: User intent must not be silently changed.
+    status: required
+    source: spec/context.yaml
+    path: spec/context.yaml
+    dependencies: []
+  - id: INV-002
+    name: Literal preservation
+    description: Critical literals must survive normalization.
+    status: required
+    source: spec/context.yaml
+    path: spec/context.yaml
+    dependencies: [INV-001]
+  - id: INV-003
+    name: Substantive state initialization
+    description: A substantive task must initialize ATLAS state.
+    status: required
+    source: spec/runtime.yaml
+    path: spec/runtime.yaml
+    dependencies: []
+  - id: INV-004
+    name: Dashboard visibility
+    description: A substantive task must expose startup dashboard state.
+    status: required
+    source: spec/dashboard.yaml
+    path: spec/dashboard.yaml
+    dependencies: [INV-003]
+  - id: INV-005
+    name: Assumption distinction
+    description: An assumption is not a fact.
+    status: required
+    source: spec/evidence.yaml
+    path: spec/evidence.yaml
+    dependencies: []
+  - id: INV-006
+    name: Inference distinction
+    description: An inference is not verification.
+    status: required
+    source: spec/evidence.yaml
+    path: spec/evidence.yaml
+    dependencies: [INV-005]
+  - id: INV-007
+    name: Generation distinction
+    description: Generation is not execution.
+    status: required
+    source: spec/verification.yaml
+    path: spec/verification.yaml
+    dependencies: []
+  - id: INV-008
+    name: Execution distinction
+    description: Execution is not verification.
+    status: required
+    source: spec/verification.yaml
+    path: spec/verification.yaml
+    dependencies: [INV-007]
+  - id: INV-009
+    name: Acceptance distinction
+    description: Verification is not acceptance.
+    status: required
+    source: spec/verification.yaml
+    path: spec/verification.yaml
+    dependencies: [INV-008]
+  - id: INV-010
+    name: Release blocker enforcement
+    description: Open release blockers cannot result in RELEASED state.
+    status: required
+    source: spec/versioning.yaml
+    path: spec/versioning.yaml
+    dependencies: [INV-016]
+  - id: INV-011
+    name: Approval boundary
+    description: High-impact external actions cannot execute without approval.
+    status: required
+    source: spec/approvals.yaml
+    path: spec/approvals.yaml
+    dependencies: []
+  - id: INV-012
+    name: State separation
+    description: Task state must not silently overwrite canonical state.
+    status: required
+    source: spec/persistence.yaml
+    path: spec/persistence.yaml
+    dependencies: []
+  - id: INV-013
+    name: Dependency protection
+    description: Active dependencies prevent canonical revision removal.
+    status: required
+    source: spec/persistence.yaml
+    path: spec/persistence.yaml
+    dependencies: [INV-012]
+  - id: INV-014
+    name: Unique version authority
+    description: Product version authority must resolve uniquely.
+    status: required
+    source: spec/versioning.yaml
+    path: spec/versioning.yaml
+    dependencies: []
+  - id: INV-015
+    name: Adapter subordination
+    description: Surface adapters cannot redefine ATLAS core semantics.
+    status: required
+    source: spec/core.yaml
+    path: spec/core.yaml
+    dependencies: []
+  - id: INV-016
+    name: Evidence integrity
+    description: Missing evidence cannot be converted into a pass.
+    status: required
+    source: spec/evidence.yaml
+    path: spec/evidence.yaml
+    dependencies: []
+  - id: INV-017
+    name: Governance enforcement
+    description: Governance may be hidden but may not be bypassed.
+    status: required
+    source: spec/core.yaml
+    path: spec/core.yaml
+    dependencies: []
+

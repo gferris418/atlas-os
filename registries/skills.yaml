@@ -1,0 +1,40 @@
+schema: schemas/registry.schema.json
+registry:
+  id: registry.skills
+  type: skill
+  version: 1
+  status: active
+items:
+  - id: skill.repository-engineering
+    name: Repository engineering
+    description: Implements and verifies scoped repository changes.
+    status: available
+    authority: canonical
+    permission: write
+    risk_class: medium
+    priority: 90
+    version: "1"
+    source: integrations/codex/README.md
+    triggers: [coding, debugging, migration]
+    applies_to: [surface.codex]
+    capabilities: [execute, test, validate]
+    requires: [tool.execution]
+    conflicts_with: []
+    fallback: capability.manual-handoff
+  - id: skill.evidence-research
+    name: Evidence research
+    description: Collects and reconciles source-backed evidence.
+    status: available
+    authority: canonical
+    permission: read
+    risk_class: low
+    priority: 80
+    version: "1"
+    source: spec/evidence.yaml
+    triggers: [research, current_information]
+    applies_to: [surface.chatgpt, surface.codex, surface.work]
+    capabilities: [public_research, private_research]
+    requires: [capability.evidence-tracking]
+    conflicts_with: []
+    fallback: tool.public-research
+

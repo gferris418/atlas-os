@@ -1,0 +1,50 @@
+schema: schemas/registry.schema.json
+registry:
+  id: registry.tools
+  type: tool
+  version: 1
+  status: active
+items:
+  - id: tool.structured-source
+    name: Structured source connector
+    description: Reads authoritative structured data exposed by a connected system.
+    status: available
+    authority: connected
+    permission: read
+    risk_class: low
+    priority: 100
+    version: "1"
+    source: spec/routing.yaml
+    capabilities: [private_research, structured_retrieval]
+    requires: [capability.evidence-tracking]
+    conflicts_with: []
+    fallback: tool.public-research
+  - id: tool.public-research
+    name: Public research
+    description: Retrieves current public primary and secondary sources.
+    status: available
+    authority: official
+    permission: read
+    risk_class: low
+    priority: 70
+    version: "1"
+    source: spec/routing.yaml
+    capabilities: [public_research]
+    requires: [capability.evidence-tracking]
+    conflicts_with: []
+    fallback: null
+  - id: tool.execution
+    name: Local execution
+    description: Runs repository commands and tests within authorized boundaries.
+    status: available
+    authority: canonical
+    permission: write
+    risk_class: medium
+    priority: 80
+    version: "1"
+    source: spec/verification.yaml
+    capabilities: [execute, test, validate]
+    requires: [capability.dependency-planning]
+    conflicts_with: []
+    fallback: capability.manual-handoff
+

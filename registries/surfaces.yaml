@@ -1,0 +1,53 @@
+schema: schemas/registry.schema.json
+registry:
+  id: registry.surfaces
+  type: surface
+  version: 1
+  status: active
+items:
+  - id: surface.chatgpt
+    name: ChatGPT
+    description: Conversational adapter with tools and connected sources subject to session capabilities.
+    status: active
+    authority: canonical
+    permission: read
+    risk_class: medium
+    priority: 80
+    version: "1"
+    source: integrations/chatgpt/README.md
+    path: integrations/chatgpt/README.md
+    capabilities: [conversation, public_research, private_research]
+    requires: [capability.context-preservation]
+    conflicts_with: []
+    fallback: capability.manual-handoff
+  - id: surface.codex
+    name: Codex
+    description: Repository and execution adapter with filesystem, command, and version-control capabilities.
+    status: active
+    authority: canonical
+    permission: write
+    risk_class: high
+    priority: 90
+    version: "1"
+    source: integrations/codex/README.md
+    path: integrations/codex/README.md
+    capabilities: [conversation, execute, test, validate, external_write]
+    requires: [capability.context-preservation, capability.dependency-planning]
+    conflicts_with: []
+    fallback: capability.manual-handoff
+  - id: surface.work
+    name: ChatGPT Work
+    description: Multi-step work adapter with connected applications and durable artifacts.
+    status: active
+    authority: canonical
+    permission: write
+    risk_class: high
+    priority: 85
+    version: "1"
+    source: integrations/work/README.md
+    path: integrations/work/README.md
+    capabilities: [conversation, private_research, workflow, external_write]
+    requires: [capability.context-preservation, capability.evidence-tracking]
+    conflicts_with: []
+    fallback: capability.manual-handoff
+

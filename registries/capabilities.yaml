@@ -1,0 +1,78 @@
+schema: schemas/registry.schema.json
+registry:
+  id: registry.capabilities
+  type: capability
+  version: 1
+  status: active
+items:
+  - id: capability.context-preservation
+    name: Context preservation
+    description: Preserve original intent, constraints, entities, and critical literals.
+    status: required
+    authority: canonical
+    permission: read
+    risk_class: low
+    priority: 100
+    version: "1"
+    source: spec/context.yaml
+    capabilities: [normalize_intent]
+    requires: []
+    conflicts_with: []
+    fallback: null
+  - id: capability.dependency-planning
+    name: Dependency-aware planning
+    description: Produce a minimal acyclic execution graph.
+    status: required
+    authority: canonical
+    permission: read
+    risk_class: medium
+    priority: 90
+    version: "1"
+    source: spec/planning.yaml
+    capabilities: [plan_tasks]
+    requires: [capability.context-preservation]
+    conflicts_with: []
+    fallback: null
+  - id: capability.evidence-tracking
+    name: Evidence tracking
+    description: Preserve provenance and semantic evidence classes.
+    status: required
+    authority: canonical
+    permission: read
+    risk_class: medium
+    priority: 90
+    version: "1"
+    source: spec/evidence.yaml
+    capabilities: [track_evidence, assess_evidence_health]
+    requires: []
+    conflicts_with: []
+    fallback: null
+  - id: capability.external-action
+    name: Governed external action
+    description: Execute authorized writes while respecting approval boundaries.
+    status: available
+    authority: connected
+    permission: write
+    risk_class: high
+    priority: 80
+    version: "1"
+    source: spec/approvals.yaml
+    capabilities: [external_write]
+    requires: [capability.evidence-tracking]
+    conflicts_with: []
+    fallback: capability.manual-handoff
+  - id: capability.manual-handoff
+    name: Manual handoff
+    description: Report a precise user action when automated execution is unavailable.
+    status: available
+    authority: user
+    permission: read
+    risk_class: low
+    priority: 10
+    version: "1"
+    source: spec/runtime.yaml
+    capabilities: [handoff]
+    requires: []
+    conflicts_with: []
+    fallback: null
+

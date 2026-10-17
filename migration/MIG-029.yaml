@@ -1,0 +1,17 @@
+schema: schemas/migration.schema.json
+id: MIG-029
+title: Independent bootstrap proof
+description: Independently demonstrate correct ATLAS bootstrap behavior in New Chat and ChatGPT Work.
+status: BLOCKED
+release_blocking: true
+opened_at: "2026-10-17T19:51:00+06:00"
+closed_at: null
+dependencies: []
+acceptance_criteria:
+  - A fresh New Chat loads the applicable ATLAS authority and exposes valid startup state.
+  - A fresh ChatGPT Work task loads the same core authority through its adapter.
+  - Evidence is independently captured with timestamps, surface identifiers, and expected behavior.
+evidence: []
+owner: atlas-maintainers
+notes: Codex repository execution cannot fabricate independent proof from other surfaces.
+
