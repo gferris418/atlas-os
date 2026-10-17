@@ -24,6 +24,11 @@ from .runtime import (
     validate_output_record,
     verify_evidence,
 )
+from .handoff import (
+    prepare_domain_context_handoff,
+    verify_domain_context_handoff,
+    verify_domain_handoff_receipt,
+)
 from .adapters import LibraryStorage, SurfaceAdapter, get_surface_adapter
 from .persistence import FileSystemLibraryAdapter
 
@@ -46,6 +51,7 @@ __all__ = [
     "determine_execution_depth",
     "get_surface_adapter",
     "normalize_intent",
+    "prepare_domain_context_handoff",
     "prepare_library_record",
     "render_dashboard",
     "require_approval",
@@ -53,6 +59,7 @@ __all__ = [
     "select_output_profile",
     "select_next_work_unit",
     "validate_output_record",
+    "verify_domain_context_handoff",
+    "verify_domain_handoff_receipt",
     "verify_evidence",
 ]
-

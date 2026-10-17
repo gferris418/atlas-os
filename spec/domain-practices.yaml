@@ -13,6 +13,7 @@ contract:
     - Tailor recommendations to context without silently weakening mandatory controls.
     - Record justified deviations, conflicts, gaps, and unavailable evidence.
     - Recheck currency when standards, regulations, or professional guidance may have changed.
+  handoff: When a specialist domain method is routed, the resolved domain-alignment snapshot is transferred unchanged through spec/domain-handoff.yaml; specialist methods may add domain interpretation but must not silently replace ATLAS-owned applicability or framework conclusions.
   precedence:
     - applicable_law_and_regulation
     - explicit_binding_user_or_contract_requirements
@@ -34,5 +35,6 @@ invariants:
 references:
   - registries/frameworks.yaml
   - spec/classification.yaml
+  - spec/domain-handoff.yaml
   - schemas/task.schema.json
   - spec/evidence.yaml

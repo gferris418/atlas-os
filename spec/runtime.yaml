@@ -37,6 +37,7 @@ contract:
     - VALIDATION_FAILED
   domain_classification: Substantive tasks must resolve material taxonomy and classification facets before domain-framework selection.
   domain_alignment: Substantive tasks must resolve applicable international standards and professional frameworks before finalizing the execution plan.
+  domain_handoff_rule: When a specialist domain method consumes ATLAS classification/alignment, ATLAS must create a schema-valid immutable handoff snapshot, verify its payload digest before delegation, and verify an exact return receipt before accepting the specialist result.
   host_capability_rule: Prefer native host understanding, conversation, generation, and tool behavior; ATLAS adds only material governance, persistence, interoperability, evidence, or verification.
   atomic_execution: Nontrivial work executes through one active atomic unit at a time with event-driven dashboard updates.
   planning_gate: Every prompt establishes a plan with a concrete identifier before execution; L0 may use one implicit unit, while unresolved material clarification blocks dependent execution.
@@ -58,8 +59,10 @@ invariants:
 references:
   - schemas/task.schema.json
   - schemas/execution.schema.json
+  - schemas/domain-context-handoff.schema.json
+  - schemas/domain-handoff-receipt.schema.json
   - spec/classification.yaml
   - spec/domain-practices.yaml
+  - spec/domain-handoff.yaml
   - spec/output.yaml
   - spec/persistence.yaml
-
