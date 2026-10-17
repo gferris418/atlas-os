@@ -1,0 +1,14 @@
+{
+  "id": "TASK-SAMPLE-001",
+  "objective": "Demonstrate a valid structured task fixture",
+  "status": "PENDING",
+  "classification": ["PLANNING"],
+  "execution_depth": "L1",
+  "dependencies": [],
+  "inputs": [],
+  "outputs": [],
+  "evidence": [],
+  "approvals": [],
+  "verification": []
+}
+
