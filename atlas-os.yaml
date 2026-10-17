@@ -16,6 +16,7 @@ execution:
   runtime: spec/runtime.yaml
   classification: spec/classification.yaml
   domain_practices: spec/domain-practices.yaml
+  domain_handoff: spec/domain-handoff.yaml
   output: spec/output.yaml
   default_depth: L1
 release:
@@ -34,4 +35,3 @@ artifacts:
   migrations: migration
   tests: tests
   library: library
-
