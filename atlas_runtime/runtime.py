@@ -10,7 +10,7 @@ import re
 from collections import defaultdict, deque
 from copy import deepcopy
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import PurePosixPath
 from typing import Any, Iterable
 from zoneinfo import ZoneInfo
@@ -512,20 +512,37 @@ def require_approval(
     input_sha256: str | None = None,
     precondition_revision: str | None = None,
     policy_revision: str | None = None,
-    now: str | None = None,
+    source_task_id: str | None = None,
+    source_plan_id: str | None = None,
+    source_work_unit_id: str | None = None,
+    handoff_id: str | None = None,
 ) -> bool:
     if action not in HIGH_IMPACT_ACTIONS:
         return True
-    if not approval or approval.get("status") != "APPROVED" or action not in approval.get("scope", []):
+    if not approval or approval.get("required") is not True or approval.get("status") != "APPROVED" or action not in approval.get("scope", []):
         raise ApprovalRequired(f"{action} requires scoped approval")
+    required_fields = {
+        "id", "required", "reason", "scope", "status", "requested_at", "approved_at",
+        "action_type", "target_id", "input_sha256", "precondition_revision",
+        "approver_identity", "issued_at", "expires_at", "policy_revision",
+        "source_task_id", "source_plan_id", "source_work_unit_id", "handoff_id",
+    }
+    if required_fields - set(approval):
+        raise ApprovalRequired(f"{action} requires a complete approval capability")
+    if not re.fullmatch(r"APR-[A-Z0-9-]+", str(approval.get("id", ""))):
+        raise ApprovalRequired(f"{action} requires a valid approval identifier")
     expected = {
         "action_type": action,
         "target_id": target_id,
         "input_sha256": input_sha256,
         "precondition_revision": precondition_revision,
         "policy_revision": policy_revision,
+        "source_task_id": source_task_id,
+        "source_plan_id": source_plan_id,
+        "source_work_unit_id": source_work_unit_id,
+        "handoff_id": handoff_id,
     }
-    if any(value is None or approval.get(field_name) != value for field_name, value in expected.items()):
+    if any((value is None and field_name != "handoff_id") or approval.get(field_name) != value for field_name, value in expected.items()):
         raise ApprovalRequired(f"{action} approval does not match the requested action")
     if not re.fullmatch(r"sha256:[0-9a-f]{64}", str(input_sha256)):
         raise ApprovalRequired(f"{action} requires an exact input digest")
@@ -534,12 +551,13 @@ def require_approval(
     try:
         issued_at = datetime.fromisoformat(str(approval["issued_at"]).replace("Z", "+00:00"))
         expires_at = datetime.fromisoformat(str(approval["expires_at"]).replace("Z", "+00:00"))
-        current = datetime.fromisoformat(str(now).replace("Z", "+00:00"))
+        approved_at = datetime.fromisoformat(str(approval["approved_at"]).replace("Z", "+00:00"))
     except (KeyError, TypeError, ValueError) as error:
         raise ApprovalRequired(f"{action} requires valid approval timestamps") from error
-    if any(moment.tzinfo is None for moment in (issued_at, expires_at, current)):
+    current = datetime.now(timezone.utc)
+    if any(moment.tzinfo is None for moment in (issued_at, approved_at, expires_at)):
         raise ApprovalRequired(f"{action} requires timezone-aware approval timestamps")
-    if not issued_at <= current < expires_at:
+    if not issued_at <= approved_at <= current < expires_at:
         raise ApprovalRequired(f"{action} approval is not currently valid")
     return True
 

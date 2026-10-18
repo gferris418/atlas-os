@@ -37,4 +37,4 @@ Use the smallest sufficient set:
 
 ## Specialist activation
 
-ATLAS never activates a specialist from raw keyword matching alone. Classification and planning first produce an explicit structured capability requirement. `route_domain_method` then selects a registered method, validates governance ownership, and requires an acceptable Domain Context Handoff when declared by the method. `BLOCKED` handoffs cannot activate dependent execution.
+ATLAS never activates a specialist from raw keyword matching alone. Classification and planning first produce an explicit structured capability requirement. `route_domain_method` consumes the complete active domain-method registry, validates governance ownership, and always requires an acceptable Domain Context Handoff. A registration cannot opt out of handoff validation, and `BLOCKED` handoffs cannot activate dependent execution.

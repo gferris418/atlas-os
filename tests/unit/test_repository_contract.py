@@ -75,6 +75,12 @@ class RepositoryContractTests(unittest.TestCase):
         registry = yaml.safe_load((ROOT / "registries/domain-methods.yaml").read_text())
         jsonschema.validate(registry, schema, format_checker=jsonschema.FormatChecker())
 
+        for field in ("requires_domain_handoff", "blocked_handoff_execution"):
+            bypass = yaml.safe_load((ROOT / "registries/domain-methods.yaml").read_text())
+            bypass["items"][0][field] = False
+            with self.subTest(field=field), self.assertRaises(jsonschema.ValidationError):
+                jsonschema.validate(bypass, schema)
+
     def test_compact_dashboard_matches_its_schema(self) -> None:
         schema = json.loads((ROOT / "schemas/dashboard.schema.json").read_text())
         dashboard = create_dashboard(

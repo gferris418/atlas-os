@@ -110,7 +110,14 @@
           "minItems": 1,
           "items": {"enum": ["READY", "PARTIAL"]},
           "uniqueItems": true
-        }
+        },
+        "activation_authority": {"const": "ATLAS_OS"},
+        "permission": {"const": "read"},
+        "requires_domain_handoff": {"const": true},
+        "blocked_handoff_execution": {"const": true},
+        "owns_execution_spine": {"const": false},
+        "owns_planning": {"const": false},
+        "owns_approvals": {"const": false}
       }
     }
   },

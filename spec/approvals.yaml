@@ -13,8 +13,9 @@ contract:
     - permission_change
     - security_sensitive_modification
     - major_canonical_state_change
-  scope: Approval is specific to the described action, target, input digest, precondition revision, policy revision, and validity interval.
-  binding: High-impact execution requires an exact action_type, target_id, input_sha256, precondition_revision, authenticated approver_identity, issued_at, expires_at, and policy_revision match.
+  scope: Approval is specific to the described action, target, input digest, precondition revision, execution context, policy revision, and validity interval.
+  binding: High-impact execution requires an exact action_type, target_id, input_sha256, precondition_revision, authenticated approver_identity, source task/plan/work-unit identity, optional handoff identity, issued_at, expires_at, and policy_revision match.
+  clock: Approval validity is evaluated against the ATLAS system clock; callers cannot supply the evaluation time.
   reuse: Do not request approval repeatedly for the same clearly approved scope.
   default: Reversible analysis and preparation proceed autonomously within authority.
 invariants:

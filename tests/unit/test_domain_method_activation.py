@@ -24,9 +24,11 @@ class DomainMethodActivationTests(unittest.TestCase):
             }),
         )
 
+    def _registry(self) -> dict:
+        return yaml.safe_load((ROOT / "registries/domain-methods.yaml").read_text())
+
     def _method(self) -> dict:
-        registry = yaml.safe_load((ROOT / "registries/domain-methods.yaml").read_text())
-        return registry["items"][0]
+        return self._registry()["items"][0]
 
     def _handoff(self, *, state: str = "READY", consumer: str = "ARGUS") -> dict:
         classification_status = "CLASSIFIED" if state == "READY" else "PARTIAL"
@@ -66,7 +68,7 @@ class DomainMethodActivationTests(unittest.TestCase):
     def test_argus_activates_only_for_explicit_structured_capability(self) -> None:
         decision = route_domain_method(
             "government_public_sector_opportunity_intelligence",
-            [self._method()],
+            self._registry(),
             execution_context=self._context(),
             handoff=self._handoff(),
         )
@@ -77,7 +79,7 @@ class DomainMethodActivationTests(unittest.TestCase):
         with self.assertRaisesRegex(LookupError, "no available domain method"):
             route_domain_method(
                 "general_factual_answer",
-                [self._method()],
+                self._registry(),
                 execution_context=self._context(),
                 handoff=self._handoff(),
             )
@@ -85,14 +87,14 @@ class DomainMethodActivationTests(unittest.TestCase):
     def test_missing_or_blocked_handoff_blocks_dependent_activation(self) -> None:
         missing = route_domain_method(
             "government_public_sector_opportunity_intelligence",
-            [self._method()],
+            self._registry(),
             execution_context=self._context(),
         )
         self.assertEqual({"status": "BLOCKED", "reason": "HANDOFF_REQUIRED", "method_id": "domain-method.argus-intelligence"}, missing)
 
         blocked = route_domain_method(
             "government_public_sector_opportunity_intelligence",
-            [self._method()],
+            self._registry(),
             execution_context=self._context(),
             handoff=self._handoff(state="BLOCKED"),
         )
@@ -102,7 +104,7 @@ class DomainMethodActivationTests(unittest.TestCase):
     def test_partial_handoff_may_activate_with_unresolved_context_preserved(self) -> None:
         decision = route_domain_method(
             "government_public_sector_opportunity_intelligence",
-            [self._method()],
+            self._registry(),
             execution_context=self._context(),
             handoff=self._handoff(state="PARTIAL"),
         )
@@ -114,7 +116,7 @@ class DomainMethodActivationTests(unittest.TestCase):
         method["accepted_handoff_states"].append("BLOCKED")
         decision = route_domain_method(
             "government_public_sector_opportunity_intelligence",
-            [method],
+            {**self._registry(), "items": [method]},
             execution_context=self._context(),
             handoff=self._handoff(state="BLOCKED"),
         )
@@ -146,7 +148,7 @@ class DomainMethodActivationTests(unittest.TestCase):
             with self.subTest(field_name=field_name):
                 decision = route_domain_method(
                     "government_public_sector_opportunity_intelligence",
-                    [self._method()],
+                    self._registry(),
                     execution_context=context,
                     handoff=self._handoff(),
                 )
@@ -160,7 +162,7 @@ class DomainMethodActivationTests(unittest.TestCase):
         with self.assertRaisesRegex(LookupError, "no available domain method"):
             route_domain_method(
                 "government_public_sector_opportunity_intelligence",
-                [method],
+                {**self._registry(), "items": [method]},
                 execution_context=self._context(),
                 handoff=self._handoff(),
             )
@@ -169,7 +171,7 @@ class DomainMethodActivationTests(unittest.TestCase):
         with self.assertRaisesRegex(LookupError, "no available domain method"):
             route_domain_method(
                 "government_public_sector_opportunity_intelligence",
-                [self._method()],
+                self._registry(),
                 execution_context=ExecutionContext(
                     task_id="TASK-ARGUS-ACTIVATION",
                     plan_id="plan-argus-activation",
@@ -184,7 +186,7 @@ class DomainMethodActivationTests(unittest.TestCase):
         with self.assertRaisesRegex(LookupError, "no available domain method"):
             route_domain_method(
                 "government_public_sector_opportunity_intelligence",
-                [method],
+                {**self._registry(), "items": [method]},
                 execution_context=ExecutionContext(
                     task_id="TASK-ARGUS-ACTIVATION",
                     plan_id="plan-argus-activation",
@@ -193,6 +195,29 @@ class DomainMethodActivationTests(unittest.TestCase):
                     available_capabilities=self._context().available_capabilities,
                     active_capabilities=frozenset({"capability.active-conflict"}),
                 ),
+                handoff=self._handoff(),
+            )
+
+    def test_domain_method_cannot_disable_governed_handoff(self) -> None:
+        for field in ("requires_domain_handoff", "blocked_handoff_execution"):
+            method = self._method()
+            method[field] = False
+            with self.subTest(field=field), self.assertRaisesRegex(ValueError, "governed handoff"):
+                route_domain_method(
+                    "government_public_sector_opportunity_intelligence",
+                    {**self._registry(), "items": [method]},
+                    execution_context=self._context(),
+                    handoff=None,
+                )
+
+    def test_inactive_registry_cannot_route_domain_method(self) -> None:
+        registry = self._registry()
+        registry["registry"]["status"] = "draft"
+        with self.assertRaisesRegex(LookupError, "registry is not active"):
+            route_domain_method(
+                "government_public_sector_opportunity_intelligence",
+                registry,
+                execution_context=self._context(),
                 handoff=self._handoff(),
             )
 

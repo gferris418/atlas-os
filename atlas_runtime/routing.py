@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from copy import deepcopy
 from typing import Any, Iterable
 
@@ -74,10 +75,12 @@ def _validate_domain_method(method: dict[str, Any]) -> None:
     method_id = method.get("id")
     if method.get("activation_authority") != "ATLAS_OS":
         raise ValueError(f"domain method has invalid activation authority: {method_id}")
+    if method.get("permission") != "read":
+        raise ValueError(f"domain method has invalid permission: {method_id}")
     if any(method.get(field) for field in ("owns_execution_spine", "owns_planning", "owns_approvals")):
         raise ValueError(f"domain method claims ATLAS governance ownership: {method_id}")
-    if method.get("requires_domain_handoff") and not method.get("blocked_handoff_execution"):
-        raise ValueError(f"domain method does not reject BLOCKED handoffs: {method_id}")
+    if method.get("requires_domain_handoff") is not True or method.get("blocked_handoff_execution") is not True:
+        raise ValueError(f"domain method must use the governed handoff: {method_id}")
     source_commit = str(method.get("source_commit", ""))
     contract_sha256 = str(method.get("contract_sha256", ""))
     if not re.fullmatch(r"[0-9a-f]{40}", source_commit):
@@ -90,12 +93,20 @@ def _validate_domain_method(method: dict[str, Any]) -> None:
 
 def route_domain_method(
     requirement: str,
-    methods: Iterable[dict[str, Any]],
+    registry: Mapping[str, Any],
     *,
     execution_context: ExecutionContext,
     handoff: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Select a governed specialist for the current correlated work unit."""
+    metadata = registry.get("registry")
+    if not isinstance(metadata, Mapping) or metadata.get("type") != "domain-method":
+        raise ValueError("domain method routing requires a domain-method registry")
+    if metadata.get("status") != "active":
+        raise LookupError("domain method registry is not active")
+    methods = registry.get("items")
+    if not isinstance(methods, list):
+        raise ValueError("domain method registry requires an items list")
     candidates = [
         method for method in methods
         if _eligible(
@@ -117,22 +128,21 @@ def route_domain_method(
     method_id = method.get("id")
     _validate_domain_method(method)
 
-    if method.get("requires_domain_handoff"):
-        if handoff is None:
-            return {"status": "BLOCKED", "reason": "HANDOFF_REQUIRED", "method_id": method_id}
-        verify_domain_context_handoff(handoff)
-        mismatches = execution_context_mismatches(handoff, execution_context)
-        if mismatches:
-            return {
-                "status": "BLOCKED",
-                "reason": "HANDOFF_EXECUTION_CONTEXT_MISMATCH",
-                "method_id": method_id,
-                "mismatches": mismatches,
-            }
-        if handoff.get("consumer") != method.get("consumer_id"):
-            return {"status": "BLOCKED", "reason": "HANDOFF_CONSUMER_MISMATCH", "method_id": method_id}
-        if handoff.get("state") == "BLOCKED" or handoff.get("state") not in method.get("accepted_handoff_states", []):
-            return {"status": "BLOCKED", "reason": "HANDOFF_STATE_NOT_ACCEPTED", "method_id": method_id}
+    if handoff is None:
+        return {"status": "BLOCKED", "reason": "HANDOFF_REQUIRED", "method_id": method_id}
+    verify_domain_context_handoff(handoff)
+    mismatches = execution_context_mismatches(handoff, execution_context)
+    if mismatches:
+        return {
+            "status": "BLOCKED",
+            "reason": "HANDOFF_EXECUTION_CONTEXT_MISMATCH",
+            "method_id": method_id,
+            "mismatches": mismatches,
+        }
+    if handoff.get("consumer") != method.get("consumer_id"):
+        return {"status": "BLOCKED", "reason": "HANDOFF_CONSUMER_MISMATCH", "method_id": method_id}
+    if handoff.get("state") == "BLOCKED" or handoff.get("state") not in method.get("accepted_handoff_states", []):
+        return {"status": "BLOCKED", "reason": "HANDOFF_STATE_NOT_ACCEPTED", "method_id": method_id}
 
     return {
         "status": "ACTIVATE",
@@ -141,6 +151,6 @@ def route_domain_method(
         "task_id": execution_context.task_id,
         "plan_id": execution_context.plan_id,
         "work_unit_id": execution_context.work_unit_id,
-        "handoff_id": handoff.get("handoff_id") if handoff else None,
-        "unresolved_material": deepcopy(handoff.get("unresolved_material", [])) if handoff else [],
+        "handoff_id": handoff["handoff_id"],
+        "unresolved_material": deepcopy(handoff.get("unresolved_material", [])),
     }
