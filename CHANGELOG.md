@@ -2,6 +2,12 @@
 
 All notable changes follow semantic versioning and preserve release lineage. The authoritative current product version is resolved only from `atlas-os.yaml`.
 
+## v2.0.0-rc.11
+
+- Add a directly executable `python -m atlas_runtime` boundary over the existing public execution interface.
+- Default to the four-line text control plane and offer two-event NDJSON for low-overhead machine streaming.
+- Add subprocess acceptance coverage for valid text, NDJSON, and malformed-input behavior.
+
 ## v2.0.0-rc.10
 
 - Add one public `execute(ExecutionEnvelope)` interface that composes normalization, task classification, dependency planning, atomic work selection, timing, and control-plane state.
