@@ -49,6 +49,7 @@ REQUIRED_PATHS = (
     "registries/taxonomies.yaml",
     "registries/classifications.yaml",
     "registries/output-profiles.yaml",
+    "registries/domain-methods.yaml",
     "migration/MIG-029.yaml",
     "migration/MIG-037.yaml",
     "migration/dtif-reconciliation.yaml",
@@ -61,6 +62,7 @@ REQUIRED_PATHS = (
     "docs/taxonomy-and-classification.md",
     "docs/sample-workflow-coastal-surveillance-radar.md",
     "docs/output-standards.md",
+    "docs/artifact-model.md",
     "examples/workflows/coastal-surveillance-radar-bangladesh-navy.json",
     "tests/fixtures/sample-output.json",
     "tests/unit",
@@ -273,6 +275,24 @@ def _validate_references(root: Path, documents: dict[str, Any], report: Validati
     for identifier in output_spec.get("contract", {}).get("profiles", []) if isinstance(output_spec, dict) else []:
         if identifier not in profile_ids:
             report.error(f"output specification references missing profile: {identifier}")
+
+    domain_method_registry = documents.get("registries/domain-methods.yaml", {})
+    domain_methods = domain_method_registry.get("items", []) if isinstance(domain_method_registry, dict) else []
+    for item in domain_methods:
+        identifier = item.get("id", "<unknown>")
+        for required in (
+            "capabilities", "activation_authority", "consumer_id", "requires_domain_handoff",
+            "accepted_handoff_states", "blocked_handoff_execution", "owns_execution_spine",
+            "owns_planning", "owns_approvals",
+        ):
+            if required not in item:
+                report.error(f"domain method lacks {required}: {identifier}")
+        if item.get("activation_authority") != "ATLAS_OS":
+            report.error(f"domain method activation authority is not ATLAS_OS: {identifier}")
+        if "BLOCKED" in item.get("accepted_handoff_states", []):
+            report.error(f"domain method accepts BLOCKED handoff: {identifier}")
+        if any(item.get(field) for field in ("owns_execution_spine", "owns_planning", "owns_approvals")):
+            report.error(f"domain method claims ATLAS governance ownership: {identifier}")
 
 
 def _validate_authority_and_release(root: Path, documents: dict[str, Any], report: ValidationReport) -> None:

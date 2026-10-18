@@ -26,6 +26,7 @@ from .runtime import (
 )
 from .handoff import (
     prepare_domain_context_handoff,
+    route_domain_method,
     verify_domain_context_handoff,
     verify_domain_handoff_receipt,
 )
@@ -55,6 +56,7 @@ __all__ = [
     "prepare_library_record",
     "render_dashboard",
     "require_approval",
+    "route_domain_method",
     "route_capability",
     "select_output_profile",
     "select_next_work_unit",

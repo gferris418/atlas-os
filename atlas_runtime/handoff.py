@@ -6,7 +6,7 @@ import hashlib
 import json
 from copy import deepcopy
 from datetime import datetime
-from typing import Any
+from typing import Any, Iterable
 
 CONTRACT_VERSION = "1.0.0"
 
@@ -111,3 +111,52 @@ def verify_domain_handoff_receipt(handoff: dict[str, Any], receipt: dict[str, An
         raise ValueError("domain handoff receipt must be ACCEPTED")
     _validate_timestamp(str(receipt.get("received_at", "")), "received_at")
     return True
+
+
+def route_domain_method(
+    requirement: str,
+    methods: Iterable[dict[str, Any]],
+    *,
+    handoff: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Select a specialist only from an explicit structured capability requirement.
+
+    Raw prompt keywords are deliberately outside this seam. Classification and
+    planning establish the capability requirement first; this router then applies
+    the registered handoff and ownership controls.
+    """
+    candidates = [
+        method
+        for method in methods
+        if method.get("status") in {"active", "available"}
+        and requirement in method.get("capabilities", [])
+    ]
+    candidates.sort(key=lambda method: (-method.get("priority", 0), method.get("id", "")))
+    if not candidates:
+        raise LookupError(f"no available domain method satisfies {requirement}")
+
+    method = candidates[0]
+    method_id = method.get("id")
+    if method.get("activation_authority") != "ATLAS_OS":
+        raise ValueError(f"domain method has invalid activation authority: {method_id}")
+    if any(method.get(field) for field in ("owns_execution_spine", "owns_planning", "owns_approvals")):
+        raise ValueError(f"domain method claims ATLAS governance ownership: {method_id}")
+    if method.get("requires_domain_handoff", False) and not method.get("blocked_handoff_execution", False):
+        raise ValueError(f"domain method does not reject BLOCKED handoffs: {method_id}")
+
+    if method.get("requires_domain_handoff", False):
+        if handoff is None:
+            return {"status": "BLOCKED", "reason": "HANDOFF_REQUIRED", "method_id": method_id}
+        verify_domain_context_handoff(handoff)
+        if handoff.get("consumer") != method.get("consumer_id"):
+            return {"status": "BLOCKED", "reason": "HANDOFF_CONSUMER_MISMATCH", "method_id": method_id}
+        if handoff.get("state") == "BLOCKED" or handoff.get("state") not in method.get("accepted_handoff_states", []):
+            return {"status": "BLOCKED", "reason": "HANDOFF_STATE_NOT_ACCEPTED", "method_id": method_id}
+
+    return {
+        "status": "ACTIVATE",
+        "method_id": method_id,
+        "requirement": requirement,
+        "handoff_id": handoff.get("handoff_id") if handoff else None,
+        "unresolved_material": deepcopy(handoff.get("unresolved_material", [])) if handoff else [],
+    }

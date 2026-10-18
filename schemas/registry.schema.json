@@ -12,7 +12,7 @@
       "required": ["id", "type", "version", "status"],
       "properties": {
         "id": {"type": "string", "pattern": "^registry\\.[a-z0-9.-]+$"},
-        "type": {"enum": ["capability", "tool", "skill", "surface", "control", "migration", "framework", "taxonomy", "classification", "output-profile"]},
+        "type": {"enum": ["capability", "tool", "skill", "surface", "control", "migration", "framework", "taxonomy", "classification", "output-profile", "domain-method"]},
         "version": {"type": "integer", "minimum": 1},
         "status": {"enum": ["active", "draft", "deprecated"]}
       }
@@ -72,7 +72,15 @@
           "machine_readable": {"type": "boolean"},
           "validation_checks": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
           "standards": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
-          "task_classes": {"type": "array", "items": {"enum": ["ANSWER", "RESEARCH", "ANALYSIS", "DECISION", "WRITING", "DOCUMENT", "DATA", "CODING", "DEBUGGING", "DESIGN", "PLANNING", "WORKFLOW", "EXTERNAL_ACTION", "MONITORING", "MULTI_STAGE"]}, "uniqueItems": true}
+          "task_classes": {"type": "array", "items": {"enum": ["ANSWER", "RESEARCH", "ANALYSIS", "DECISION", "WRITING", "DOCUMENT", "DATA", "CODING", "DEBUGGING", "DESIGN", "PLANNING", "WORKFLOW", "EXTERNAL_ACTION", "MONITORING", "MULTI_STAGE"]}, "uniqueItems": true},
+          "activation_authority": {"type": "string", "minLength": 1},
+          "consumer_id": {"type": "string", "minLength": 1},
+          "requires_domain_handoff": {"type": "boolean"},
+          "accepted_handoff_states": {"type": "array", "items": {"enum": ["READY", "PARTIAL", "BLOCKED"]}, "uniqueItems": true},
+          "blocked_handoff_execution": {"type": "boolean"},
+          "owns_execution_spine": {"type": "boolean"},
+          "owns_planning": {"type": "boolean"},
+          "owns_approvals": {"type": "boolean"}
         },
         "additionalProperties": false
       }

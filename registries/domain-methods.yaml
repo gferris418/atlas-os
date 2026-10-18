@@ -1,0 +1,35 @@
+schema: schemas/registry.schema.json
+registry:
+  id: registry.domain-methods
+  type: domain-method
+  version: 1
+  status: active
+items:
+  - id: domain-method.argus-intelligence
+    name: ARGUS Intelligence
+    description: Specialist government and public-sector opportunity-intelligence method governed by the ATLAS execution spine.
+    status: available
+    authority: specialist-contract
+    permission: read
+    risk_class: medium
+    priority: 90
+    version: 2.0.0-rc.2
+    source: https://github.com/gferris418/argus-intelligence/blob/main/contracts/atlas/argus-activation-v1.json
+    triggers:
+      - explicit structured requirement for government or public-sector opportunity intelligence
+    task_classes: [RESEARCH, ANALYSIS, DECISION, MONITORING]
+    capabilities:
+      - government_public_sector_opportunity_intelligence
+    requires:
+      - capability.domain-alignment
+      - capability.evidence-tracking
+    conflicts_with: []
+    fallback: capability.manual-handoff
+    activation_authority: ATLAS_OS
+    consumer_id: ARGUS
+    requires_domain_handoff: true
+    accepted_handoff_states: [READY, PARTIAL]
+    blocked_handoff_execution: true
+    owns_execution_spine: false
+    owns_planning: false
+    owns_approvals: false

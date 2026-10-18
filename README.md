@@ -59,6 +59,8 @@ Every dashboard and work-unit selection is bound to a concrete plan identifier. 
 
 ATLAS distinguishes `VERIFIED`, `SUPPORTED`, `INFERRED`, `ASSUMED`, `SPECULATIVE`, and `UNKNOWN`. Source quality, completeness, confidence, and inference remain separate. Routing selects the best available capability using task fit, authority, permissions, risk, and fallback behavior; the presence of a tool alone is not a reason to call it.
 
+Specialist domain methods remain separate systems. ATLAS activates one only from an explicit structured capability requirement, an active registration in [`registries/domain-methods.yaml`](registries/domain-methods.yaml), and any required valid domain-context handoff. A specialist never owns the ATLAS execution spine, plan, or approvals. See the compact [artifact model](docs/artifact-model.md) for the distinction between frameworks, methodologies, playbooks, SOPs, workflows, protocols, schemas, adapters, and related structures.
+
 ## Output standards
 
 ATLAS lets the host generate naturally, then selects the smallest task-fit [output profile](registries/output-profiles.yaml). Eight baseline profiles cover concise answers, analysis, decisions, sourced research, execution progress, technical specifications, structured data, and artifact delivery. Explicit user formats take precedence.
