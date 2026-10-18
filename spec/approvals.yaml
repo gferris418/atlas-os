@@ -13,6 +13,10 @@ contract:
     - permission_change
     - security_sensitive_modification
     - major_canonical_state_change
+  safe_actions:
+    - reversible_analysis
+    - reversible_preparation
+  classification: Every executable operation must declare one or more governed semantic action classes before approval policy evaluation; missing or unknown classes fail closed.
   scope: Approval is specific to the described action, target, input digest, precondition revision, execution context, policy revision, and validity interval.
   binding: High-impact execution requires an exact action_type, target_id, input_sha256, precondition_revision, authenticated approver_identity, source task/plan/work-unit identity, optional handoff identity, issued_at, expires_at, and policy_revision match.
   clock: Approval validity is evaluated against the ATLAS system clock; callers cannot supply the evaluation time.

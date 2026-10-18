@@ -15,6 +15,7 @@ from atlas_runtime import (
     assess_completeness,
     build_plan,
     can_transition_release,
+    classify_action,
     classify_domain_context,
     classify_task,
     confirm_library_save,
@@ -139,6 +140,28 @@ class RoutingTests(unittest.TestCase):
 
 
 class EvidenceAndApprovalTests(unittest.TestCase):
+    def test_arbitrary_operation_is_governed_by_semantic_action_class(self) -> None:
+        classification = classify_action(
+            "MERGE_CANONICAL_ENTITY",
+            action_classes=["major_canonical_state_change"],
+        )
+        self.assertEqual(["major_canonical_state_change"], classification["action_classes"])
+        self.assertTrue(classification["approval_required"])
+        with self.assertRaises(ApprovalRequired):
+            require_approval(
+                "MERGE_CANONICAL_ENTITY",
+                action_classes=["major_canonical_state_change"],
+            )
+
+    def test_action_classification_is_required_and_fail_closed(self) -> None:
+        with self.assertRaises(ApprovalRequired):
+            require_approval("UNREGISTERED_OPERATION")
+        with self.assertRaises(ValueError):
+            classify_action("UNREGISTERED_OPERATION", action_classes=["unknown_class"])
+        self.assertTrue(
+            require_approval("ANALYZE", action_classes=["reversible_analysis"])
+        )
+
     def test_assumption_does_not_become_verified_without_check(self) -> None:
         evidence = {"class": "ASSUMED", "claim": "service is healthy"}
         self.assertEqual("ASSUMED", verify_evidence(evidence)["class"])
@@ -156,7 +179,7 @@ class EvidenceAndApprovalTests(unittest.TestCase):
 
     def test_high_impact_action_requires_scoped_approval(self) -> None:
         with self.assertRaises(ApprovalRequired):
-            require_approval("publish")
+            require_approval("publish", action_classes=["publication"])
         approval = {
             "id": "APR-PUBLISH-001",
             "required": True,
@@ -179,6 +202,7 @@ class EvidenceAndApprovalTests(unittest.TestCase):
         self.assertTrue(require_approval(
             "publish",
             approval,
+            action_classes=["publication"],
             target_id="release:atlas-os:2.0.0-rc.8",
             input_sha256="sha256:" + "a" * 64,
             precondition_revision="fffb1836",
@@ -186,7 +210,9 @@ class EvidenceAndApprovalTests(unittest.TestCase):
             source_task_id="TASK-ATLAS-PUBLISH", source_plan_id="plan-publish",
             source_work_unit_id="unit-publish", handoff_id=None,
         ))
-        self.assertTrue(require_approval("analyze"))
+        self.assertTrue(
+            require_approval("analyze", action_classes=["reversible_analysis"])
+        )
 
     def test_high_impact_approval_is_bound_and_unexpired(self) -> None:
         approval = {
@@ -220,7 +246,12 @@ class EvidenceAndApprovalTests(unittest.TestCase):
             request = dict(common)
             request[field] = value
             with self.subTest(field=field), self.assertRaises(ApprovalRequired):
-                require_approval("delete", approval, **request)
+                require_approval(
+                    "delete",
+                    approval,
+                    action_classes=["destructive_action"],
+                    **request,
+                )
 
     def test_caller_cannot_replay_expired_approval_with_historical_time(self) -> None:
         approval = {
@@ -237,6 +268,7 @@ class EvidenceAndApprovalTests(unittest.TestCase):
         with self.assertRaises(ApprovalRequired):
             require_approval(
                 "delete", approval, target_id="record:ARGUS-001",
+                action_classes=["destructive_action"],
                 input_sha256="sha256:" + "b" * 64,
                 precondition_revision="rev-7", policy_revision="approvals-v2",
                 source_task_id="TASK-ARGUS-DELETE", source_plan_id="plan-delete",
