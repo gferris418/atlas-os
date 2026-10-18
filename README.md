@@ -1,6 +1,6 @@
 # ATLAS OS
 
-**Current candidate:** `v2.0.0-rc.9`
+**Current candidate:** `v2.0.0-rc.10`
 **Classification:** Internal  
 **Release status:** **CANDIDATE / HOLD** pending independent cross-surface proof.
 
@@ -20,6 +20,20 @@ INTAKE -> CONTEXT PRESERVATION -> NORMALIZATION -> COMPLETENESS CHECK
 ```
 
 Execution depth is proportional: trivial work remains direct, while complex or high-impact work activates stronger planning, evidence, approval, and verification controls.
+
+The executable reference runtime exposes one preferred startup interface. Existing low-level functions remain available for compatibility:
+
+```python
+from atlas_runtime import ExecutionEnvelope, execute
+
+result = execute(ExecutionEnvelope(
+    objective="Assess the opportunity",
+    plan_id="plan-opportunity",
+    work_units=({"id": "assess", "status": "PENDING", "dependencies": []},),
+    surface="chatgpt",
+))
+print(result.compact_status)
+```
 
 ATLAS uses capable host-platform features directly. It does not recreate ChatGPT or another host's language understanding, conversation, generation, reasoning, or tool behavior unless a deterministic fallback is required. ATLAS adds the smallest useful layer of standards, evidence, authority, persistence, interoperability, and verification.
 
@@ -41,14 +55,10 @@ Component revisions may describe compatibility and lineage, but cannot declare a
 Every prompt exposes compact operational state without private reasoning. Nontrivial work is split into atomic units with one active completion target; the display updates only at meaningful state changes:
 
 ```text
-ATLAS/core [####------] 40% | 2026-10-17T23:30:00+06:00 | 420 ms
-Goal update repository | Task 1/3 · EXECUTION: implement current work unit
-Input requested repository update | Processing validating the active unit
-Playbook test-first change | Framework ATLAS execution spine
-SOP plan → execute → verify → persist → deliver | Plan plan-change:READY | Clarification NOT_REQUIRED
-Output implementation pending | Profile output.technical-spec
-Library READY · library/specifications/change.md (markdown)
-Quality PENDING | Blocker None
+ATLAS/core [####------] 40% | 2026-10-17T23:30:00+06:00 | 420 ms | Goal update repository | Task 1/3 · EXECUTION: implement current work unit
+Input requested repository update | Processing validating the active unit | Output implementation pending
+Playbook test-first change | Framework ATLAS execution spine | SOP plan → execute → verify → persist → deliver
+Plan plan-change:READY | Profile output.technical-spec | Library READY | Quality PENDING | Blocker None
 ```
 
 The text-only visual is deterministic and constant-cost. Input and processing are safe summaries, never private chain-of-thought. Safe operations may be batched within the active unit, but a unit is not marked complete until its completion criteria are verified.

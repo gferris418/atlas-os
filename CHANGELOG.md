@@ -2,6 +2,12 @@
 
 All notable changes follow semantic versioning and preserve release lineage. The authoritative current product version is resolved only from `atlas-os.yaml`.
 
+## v2.0.0-rc.10
+
+- Add one public `execute(ExecutionEnvelope)` interface that composes normalization, task classification, dependency planning, atomic work selection, timing, and control-plane state.
+- Route all ChatGPT, Codex, and Work startup adapters through the same execution interface without removing the existing low-level compatibility functions.
+- Add a four-line state-derived status view that preserves the required goal, task, input, processing, output, playbook, framework, SOP, plan, quality, library, and blocker fields.
+
 ## v2.0.0-rc.9
 
 - Classify every executable operation by governed semantic action classes before approval policy evaluation.

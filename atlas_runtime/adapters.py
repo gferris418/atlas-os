@@ -5,12 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Iterable, Protocol
 
-from .runtime import (
-    build_plan,
-    create_dashboard,
-    prepare_library_record,
-    select_next_work_unit,
-)
+from .engine import ExecutionEnvelope, execute
+from .runtime import prepare_library_record
 
 
 class LibraryStorage(Protocol):
@@ -31,32 +27,15 @@ class SurfaceAdapter:
         timestamp: str | None = None,
         timezone_name: str = "UTC",
     ) -> dict[str, Any]:
-        records = list(tasks)
-        if not records:
-            raise ValueError("surface startup requires at least one planned work unit")
-        build_plan(records)
-        active_unit = select_next_work_unit(
-            records,
+        return execute(ExecutionEnvelope(
+            objective=objective,
             plan_id=plan_id,
-            plan_status="READY",
-            clarification_status=clarification_status,
-        )
-        completed = sum(item.get("status") == "COMPLETED" for item in records)
-        return create_dashboard(
-            objective,
-            plan_id=plan_id,
-            plan_status="READY",
+            work_units=tasks,
             surface=self.surface_id,
             timestamp=timestamp,
             timezone_name=timezone_name,
-            active_stage="PLANNING" if active_unit is None else "EXECUTION",
-            active_unit=active_unit or "Plan complete",
-            completed_units=completed,
-            total_units=len(records),
-            progress=round(100 * completed / len(records)),
             clarification_status=clarification_status,
-            processing_summary="Plan validated; next atomic work unit selected",
-        )
+        )).dashboard
 
     def deliver(
         self,

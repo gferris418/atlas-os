@@ -2,21 +2,19 @@
 
 The canonical execution spine begins with intake and context preservation, then normalizes without semantic loss, assesses material completeness, classifies only material context, aligns it with applicable domain standards and frameworks, produces a dependency-aware plan, routes capabilities, acquires evidence, executes, verifies, persists deliberately, and delivers. A concrete plan identifier exists before execution; L0 may use one implicit unit. A material gap in goal, scope, authorization, safety, or output pauses dependent work for clarification, while safe independent work may continue. Native host understanding, conversation, generation, and tool behavior are used directly; ATLAS does not recreate them.
 
+The preferred executable entry point is `execute(ExecutionEnvelope)`. It normalizes intent, classifies the task, validates the dependency graph, selects one current atomic unit, measures runtime preparation, and derives the dashboard through one interface. Existing low-level runtime functions remain available for compatible integrations and focused testing. Surface adapters call this same interface rather than rebuilding the startup sequence.
+
 Execution depth ranges from L0 direct to L4 high-impact. The runtime chooses the lowest depth that still controls complexity, ambiguity, external impact, and risk. A conversion or simple factual response should remain direct. A multi-stage external workflow requires visible state, evidence, approvals, and independent verification.
 
 Nontrivial work is decomposed into atomic units with one objective and observable completion criteria. One user-visible unit is active at a time and must finish before the next activates. Safe reads and checks may run concurrently inside that unit when this improves performance without weakening evidence.
 
-Every prompt receives a compact control-plane update. Updates are event-driven—start, unit completion, blocker, approval, verification, and delivery—not timer-driven or token-by-token. The rendering is at most eight short text lines and requires no image generation or external service:
+Every prompt receives a compact control-plane update. Updates are event-driven—start, unit completion, blocker, approval, verification, and delivery—not timer-driven or token-by-token. The default rendering is at most four text lines and requires no image generation or external service:
 
 ```text
-ATLAS/core [####------] 40% | 2026-10-17T23:30:00+06:00 | 420 ms
-Goal update repository | Task 1/3 · EXECUTION: implement current work unit
-Input requested repository update | Processing validating the active unit
-Playbook test-first change | Framework ATLAS execution spine
-SOP plan → execute → verify → persist → deliver | Plan plan-change:READY | Clarification NOT_REQUIRED
-Output implementation pending | Profile output.technical-spec
-Library READY · library/specifications/change.md (markdown)
-Quality PENDING | Blocker None
+ATLAS/core [####------] 40% | 2026-10-17T23:30:00+06:00 | 420 ms | Goal update repository | Task 1/3 · EXECUTION: implement current work unit
+Input requested repository update | Processing validating the active unit | Output implementation pending
+Playbook test-first change | Framework ATLAS execution spine | SOP plan → execute → verify → persist → deliver
+Plan plan-change:READY | Profile output.technical-spec | Library READY | Quality PENDING | Blocker None
 ```
 
 The timestamp is RFC 3339 in the user's available timezone and duration is measured, not estimated. Input is minimized to a safe summary. Processing describes public stages and actions only; it never contains private chain-of-thought or hidden reasoning.
