@@ -66,6 +66,11 @@ class RepositoryContractTests(unittest.TestCase):
                 self.assertIn(checkout, workflow)
                 self.assertIn(setup_python, workflow)
                 self.assertIn("cache-dependency-path: requirements.lock", workflow)
+        validate_workflow = (ROOT / ".github/workflows/validate.yml").read_text(encoding="utf-8")
+        self.assertIn(
+            "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0",
+            validate_workflow,
+        )
 
     def test_domain_method_schema_requires_activation_invariants(self) -> None:
         schema = json.loads((ROOT / "schemas/registry.schema.json").read_text())
