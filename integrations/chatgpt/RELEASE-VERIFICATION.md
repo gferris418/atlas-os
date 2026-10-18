@@ -4,8 +4,8 @@ Use this checklist in a genuinely fresh ChatGPT conversation and, separately, in
 
 ## Test identity
 
-- ATLAS version: `2.0.0-rc.8`
-- Control revision: `chatgpt-bootstrap-2026-10-18-r2`
+- ATLAS version: `2.0.0-rc.9`
+- Control revision: `chatgpt-bootstrap-2026-10-19-r3`
 - Instruction artifact: `integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md`
 
 ## Procedure
