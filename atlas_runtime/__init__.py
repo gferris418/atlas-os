@@ -23,6 +23,11 @@ from .runtime import (
     validate_output_record,
     verify_evidence,
 )
+from .authentication import (
+    attest_control_record,
+    canonical_record_sha256,
+    verify_control_record_attestation,
+)
 from .handoff import (
     ExecutionContext,
     prepare_domain_context_handoff,
@@ -35,6 +40,7 @@ from .persistence import FileSystemLibraryAdapter
 
 __all__ = [
     "ApprovalRequired",
+    "attest_control_record",
     "CanonicalRevisionInUse",
     "FileSystemLibraryAdapter",
     "ExecutionContext",
@@ -46,6 +52,7 @@ __all__ = [
     "assess_completeness",
     "build_plan",
     "can_transition_release",
+    "canonical_record_sha256",
     "classify_domain_context",
     "classify_task",
     "confirm_library_save",
@@ -64,5 +71,6 @@ __all__ = [
     "validate_output_record",
     "verify_domain_context_handoff",
     "verify_domain_handoff_receipt",
+    "verify_control_record_attestation",
     "verify_evidence",
 ]

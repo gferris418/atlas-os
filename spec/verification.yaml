@@ -22,6 +22,7 @@ contract:
     - integration_checks
     - regression_tests
   rule: Verification must be proportional and must exercise the intended behavior.
+  cross_system_authenticity: ATLAS control records crossing a trust boundary use detached Ed25519 attestations verified against operator-pinned public keys; an unkeyed digest alone is not producer authentication.
 invariants:
   - INV-006
   - INV-007

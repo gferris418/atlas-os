@@ -38,3 +38,5 @@ Use the smallest sufficient set:
 ## Specialist activation
 
 ATLAS never activates a specialist from raw keyword matching alone. Classification and planning first produce an explicit structured capability requirement. `route_domain_method` consumes the complete active domain-method registry, validates governance ownership, and always requires an acceptable Domain Context Handoff. A registration cannot opt out of handoff validation, and `BLOCKED` handoffs cannot activate dependent execution.
+
+When a handoff or approval crosses into a specialist runtime, ATLAS emits a detached Ed25519 attestation over the complete record. The specialist verifies that signature with an operator-pinned public key; the payload SHA-256 remains an integrity and correlation value, not an authenticity claim.
