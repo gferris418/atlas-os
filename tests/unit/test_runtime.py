@@ -157,8 +157,65 @@ class EvidenceAndApprovalTests(unittest.TestCase):
     def test_high_impact_action_requires_scoped_approval(self) -> None:
         with self.assertRaises(ApprovalRequired):
             require_approval("publish")
-        self.assertTrue(require_approval("publish", {"status": "APPROVED", "scope": ["publish"]}))
+        approval = {
+            "id": "APR-PUBLISH-001",
+            "required": True,
+            "reason": "Publish the reviewed release",
+            "scope": ["publish"],
+            "status": "APPROVED",
+            "requested_at": "2026-10-18T05:00:00Z",
+            "approved_at": "2026-10-18T05:01:00Z",
+            "action_type": "publish",
+            "target_id": "release:atlas-os:2.0.0-rc.8",
+            "input_sha256": "sha256:" + "a" * 64,
+            "precondition_revision": "fffb1836",
+            "approver_identity": "user:maintainer",
+            "issued_at": "2026-10-18T05:01:00Z",
+            "expires_at": "2026-10-18T06:01:00Z",
+            "policy_revision": "approvals-v2",
+        }
+        self.assertTrue(require_approval(
+            "publish",
+            approval,
+            target_id="release:atlas-os:2.0.0-rc.8",
+            input_sha256="sha256:" + "a" * 64,
+            precondition_revision="fffb1836",
+            policy_revision="approvals-v2",
+            now="2026-10-18T05:30:00Z",
+        ))
         self.assertTrue(require_approval("analyze"))
+
+    def test_high_impact_approval_is_bound_and_unexpired(self) -> None:
+        approval = {
+            "status": "APPROVED",
+            "scope": ["delete"],
+            "action_type": "delete",
+            "target_id": "record:ARGUS-001",
+            "input_sha256": "sha256:" + "b" * 64,
+            "precondition_revision": "rev-7",
+            "approver_identity": "user:maintainer",
+            "issued_at": "2026-10-18T05:00:00Z",
+            "expires_at": "2026-10-18T05:15:00Z",
+            "policy_revision": "approvals-v2",
+        }
+        common = {
+            "target_id": "record:ARGUS-001",
+            "input_sha256": "sha256:" + "b" * 64,
+            "precondition_revision": "rev-7",
+            "policy_revision": "approvals-v2",
+            "now": "2026-10-18T05:10:00Z",
+        }
+        for field, value in (
+            ("target_id", "record:OTHER"),
+            ("input_sha256", "sha256:" + "c" * 64),
+            ("precondition_revision", "rev-8"),
+            ("policy_revision", "approvals-v3"),
+            ("now", "2026-10-18T05:16:00Z"),
+        ):
+            request = dict(common)
+            request[field] = value
+            with self.subTest(field=field), self.assertRaises(ApprovalRequired):
+                require_approval("delete", approval, **request)
 
 
 class OutputProfileTests(unittest.TestCase):

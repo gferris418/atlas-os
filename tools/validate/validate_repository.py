@@ -281,7 +281,10 @@ def _validate_references(root: Path, documents: dict[str, Any], report: Validati
     for item in domain_methods:
         identifier = item.get("id", "<unknown>")
         for required in (
-            "capabilities", "activation_authority", "consumer_id", "requires_domain_handoff",
+            "capabilities", "requires", "conflicts_with", "fallback", "authority",
+            "permission", "risk_class", "priority", "version", "source", "source_commit",
+            "contract_version", "contract_sha256", "task_classes", "activation_authority",
+            "consumer_id", "requires_domain_handoff",
             "accepted_handoff_states", "blocked_handoff_execution", "owns_execution_spine",
             "owns_planning", "owns_approvals",
         ):
@@ -293,6 +296,8 @@ def _validate_references(root: Path, documents: dict[str, Any], report: Validati
             report.error(f"domain method accepts BLOCKED handoff: {identifier}")
         if any(item.get(field) for field in ("owns_execution_spine", "owns_planning", "owns_approvals")):
             report.error(f"domain method claims ATLAS governance ownership: {identifier}")
+        if item.get("source_commit") not in item.get("source", ""):
+            report.error(f"domain method source is not immutable: {identifier}")
 
 
 def _validate_authority_and_release(root: Path, documents: dict[str, Any], report: ValidationReport) -> None:

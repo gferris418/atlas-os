@@ -1,6 +1,6 @@
 schema: schemas/spec.schema.json
 id: spec.routing
-title: Capability, tool, plugin, and skill routing
+title: Capability, tool, plugin, skill, and specialist-method routing
 status: active
 normative: true
 contract:
@@ -30,6 +30,9 @@ contract:
     - Never claim an unavailable or unexecuted action occurred.
     - Resolve current domain frameworks from official sources before relying on secondary summaries.
     - Skill triggers, prerequisites, conflicts, priority, authority, and version are governed registry data.
+    - Generic capabilities and specialist domain methods share one routing-policy module.
+    - Specialist activation requires an exact active ExecutionContext match for task, plan, and work unit.
+    - Denied permission, missing prerequisites, active conflicts, or an incompatible task class make a candidate ineligible.
 invariants:
   - INV-007
   - INV-011
@@ -38,4 +41,5 @@ references:
   - registries/capabilities.yaml
   - registries/tools.yaml
   - registries/skills.yaml
+  - registries/domain-methods.yaml
 

@@ -38,6 +38,9 @@
           "priority": {"type": "integer"},
           "version": {"type": "string"},
           "source": {"type": "string"},
+          "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+          "contract_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+          "contract_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
           "path": {"type": "string"},
           "release_blocking": {"type": "boolean"},
           "triggers": {"type": "array", "items": {"type": "string"}},
@@ -85,6 +88,48 @@
         "additionalProperties": false
       }
     }
-  }
+  },
+  "$defs": {
+    "domainMethod": {
+      "type": "object",
+      "required": [
+        "id", "name", "description", "status", "capabilities", "requires",
+        "conflicts_with", "fallback", "authority", "permission", "risk_class",
+        "priority", "version", "source", "source_commit", "contract_version",
+        "contract_sha256", "task_classes", "activation_authority", "consumer_id",
+        "requires_domain_handoff", "accepted_handoff_states",
+        "blocked_handoff_execution", "owns_execution_spine", "owns_planning",
+        "owns_approvals"
+      ],
+      "properties": {
+        "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "contract_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "contract_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "accepted_handoff_states": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"enum": ["READY", "PARTIAL"]},
+          "uniqueItems": true
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "registry": {
+            "properties": {"type": {"const": "domain-method"}},
+            "required": ["type"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "items": {"items": {"$ref": "#/$defs/domainMethod"}}
+        }
+      }
+    }
+  ]
 }
 

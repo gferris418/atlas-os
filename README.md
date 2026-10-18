@@ -1,6 +1,6 @@
 # ATLAS OS
 
-**Current candidate:** `v2.0.0-rc.7`
+**Current candidate:** `v2.0.0-rc.8`
 **Classification:** Internal  
 **Release status:** **CANDIDATE / HOLD** pending independent cross-surface proof.
 

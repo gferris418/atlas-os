@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[2]
 class RepositoryContractTests(unittest.TestCase):
     def test_manifest_is_only_product_version_authority(self) -> None:
         manifest = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
-        self.assertEqual("2.0.0-rc.7", manifest["product"]["version"])
+        self.assertEqual("2.0.0-rc.8", manifest["product"]["version"])
         self.assertEqual("atlas-os.yaml#/product/version", (ROOT / "VERSION").read_text().strip())
 
     def test_release_tag_must_match_manifest_and_release_state(self) -> None:
@@ -56,6 +56,24 @@ class RepositoryContractTests(unittest.TestCase):
             capture_output=True,
         )
         self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+
+    def test_domain_method_schema_requires_activation_invariants(self) -> None:
+        schema = json.loads((ROOT / "schemas/registry.schema.json").read_text())
+        incomplete = {
+            "schema": "schemas/registry.schema.json",
+            "registry": {
+                "id": "registry.probe",
+                "type": "domain-method",
+                "version": 1,
+                "status": "active",
+            },
+            "items": [{"id": "probe", "name": "Probe", "status": "available"}],
+        }
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.validate(incomplete, schema)
+
+        registry = yaml.safe_load((ROOT / "registries/domain-methods.yaml").read_text())
+        jsonschema.validate(registry, schema, format_checker=jsonschema.FormatChecker())
 
     def test_compact_dashboard_matches_its_schema(self) -> None:
         schema = json.loads((ROOT / "schemas/dashboard.schema.json").read_text())

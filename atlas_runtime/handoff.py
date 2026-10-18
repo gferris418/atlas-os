@@ -4,11 +4,32 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from copy import deepcopy
+from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Iterable
+from typing import Any
 
-CONTRACT_VERSION = "1.0.0"
+CONTRACT_VERSION = "1.1.0"
+
+
+@dataclass(frozen=True)
+class ExecutionContext:
+    """Identity and routing facts for one active ATLAS work unit."""
+
+    task_id: str
+    plan_id: str
+    work_unit_id: str
+    task_class: str
+    available_capabilities: frozenset[str] = field(default_factory=frozenset)
+    active_capabilities: frozenset[str] = field(default_factory=frozenset)
+
+    def __post_init__(self) -> None:
+        if not re.fullmatch(r"TASK-[A-Z0-9][A-Z0-9-]{2,63}", self.task_id):
+            raise ValueError("execution context requires a valid task_id")
+        for field_name in ("plan_id", "work_unit_id", "task_class"):
+            if not str(getattr(self, field_name)).strip():
+                raise ValueError(f"execution context requires {field_name}")
 
 
 def _validate_timestamp(value: str, field: str) -> None:
@@ -35,7 +56,8 @@ def _digest_payload(handoff: dict[str, Any]) -> str:
 
 
 def prepare_domain_context_handoff(
-    task: dict[str, Any], *, consumer: str, handoff_id: str, created_at: str
+    task: dict[str, Any], *, execution_context: ExecutionContext,
+    consumer: str, handoff_id: str, created_at: str,
 ) -> dict[str, Any]:
     """Create an immutable snapshot of ATLAS-owned domain context for a specialist.
 
@@ -44,6 +66,8 @@ def prepare_domain_context_handoff(
     """
     if not str(task.get("id", "")).strip():
         raise ValueError("domain handoff requires source task id")
+    if task["id"] != execution_context.task_id:
+        raise ValueError("domain handoff task does not match execution context")
     if "domain_classification" not in task:
         raise ValueError("domain handoff requires domain_classification")
     if "domain_alignment" not in task:
@@ -60,6 +84,8 @@ def prepare_domain_context_handoff(
         "contract_version": CONTRACT_VERSION,
         "handoff_id": handoff_id,
         "source_task_id": task["id"],
+        "source_plan_id": execution_context.plan_id,
+        "source_work_unit_id": execution_context.work_unit_id,
         "producer": "ATLAS_OS",
         "consumer": consumer,
         "created_at": created_at,
@@ -76,7 +102,8 @@ def prepare_domain_context_handoff(
 def verify_domain_context_handoff(handoff: dict[str, Any]) -> bool:
     """Reject mutation, stale correlation metadata, or internally inconsistent copies."""
     required = {
-        "contract_version", "handoff_id", "source_task_id", "producer", "consumer",
+        "contract_version", "handoff_id", "source_task_id", "source_plan_id",
+        "source_work_unit_id", "producer", "consumer",
         "created_at", "state", "domain_classification", "domain_alignment",
         "unresolved_material", "risk_flags", "payload_sha256",
     }
@@ -101,6 +128,18 @@ def verify_domain_context_handoff(handoff: dict[str, Any]) -> bool:
     return True
 
 
+def execution_context_mismatches(
+    handoff: dict[str, Any], execution_context: ExecutionContext,
+) -> list[str]:
+    """Return identity fields that do not belong to the active work unit."""
+    expected = {
+        "task_id": (handoff.get("source_task_id"), execution_context.task_id),
+        "plan_id": (handoff.get("source_plan_id"), execution_context.plan_id),
+        "work_unit_id": (handoff.get("source_work_unit_id"), execution_context.work_unit_id),
+    }
+    return [name for name, (observed, current) in expected.items() if observed != current]
+
+
 def verify_domain_handoff_receipt(handoff: dict[str, Any], receipt: dict[str, Any]) -> bool:
     """Require exact return correlation before ATLAS accepts a specialist result."""
     verify_domain_context_handoff(handoff)
@@ -111,52 +150,3 @@ def verify_domain_handoff_receipt(handoff: dict[str, Any], receipt: dict[str, An
         raise ValueError("domain handoff receipt must be ACCEPTED")
     _validate_timestamp(str(receipt.get("received_at", "")), "received_at")
     return True
-
-
-def route_domain_method(
-    requirement: str,
-    methods: Iterable[dict[str, Any]],
-    *,
-    handoff: dict[str, Any] | None = None,
-) -> dict[str, Any]:
-    """Select a specialist only from an explicit structured capability requirement.
-
-    Raw prompt keywords are deliberately outside this seam. Classification and
-    planning establish the capability requirement first; this router then applies
-    the registered handoff and ownership controls.
-    """
-    candidates = [
-        method
-        for method in methods
-        if method.get("status") in {"active", "available"}
-        and requirement in method.get("capabilities", [])
-    ]
-    candidates.sort(key=lambda method: (-method.get("priority", 0), method.get("id", "")))
-    if not candidates:
-        raise LookupError(f"no available domain method satisfies {requirement}")
-
-    method = candidates[0]
-    method_id = method.get("id")
-    if method.get("activation_authority") != "ATLAS_OS":
-        raise ValueError(f"domain method has invalid activation authority: {method_id}")
-    if any(method.get(field) for field in ("owns_execution_spine", "owns_planning", "owns_approvals")):
-        raise ValueError(f"domain method claims ATLAS governance ownership: {method_id}")
-    if method.get("requires_domain_handoff", False) and not method.get("blocked_handoff_execution", False):
-        raise ValueError(f"domain method does not reject BLOCKED handoffs: {method_id}")
-
-    if method.get("requires_domain_handoff", False):
-        if handoff is None:
-            return {"status": "BLOCKED", "reason": "HANDOFF_REQUIRED", "method_id": method_id}
-        verify_domain_context_handoff(handoff)
-        if handoff.get("consumer") != method.get("consumer_id"):
-            return {"status": "BLOCKED", "reason": "HANDOFF_CONSUMER_MISMATCH", "method_id": method_id}
-        if handoff.get("state") == "BLOCKED" or handoff.get("state") not in method.get("accepted_handoff_states", []):
-            return {"status": "BLOCKED", "reason": "HANDOFF_STATE_NOT_ACCEPTED", "method_id": method_id}
-
-    return {
-        "status": "ACTIVATE",
-        "method_id": method_id,
-        "requirement": requirement,
-        "handoff_id": handoff.get("handoff_id") if handoff else None,
-        "unresolved_material": deepcopy(handoff.get("unresolved_material", [])) if handoff else [],
-    }

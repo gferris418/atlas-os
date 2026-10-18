@@ -18,18 +18,18 @@ from .runtime import (
     prepare_library_record,
     render_dashboard,
     require_approval,
-    route_capability,
     select_output_profile,
     select_next_work_unit,
     validate_output_record,
     verify_evidence,
 )
 from .handoff import (
+    ExecutionContext,
     prepare_domain_context_handoff,
-    route_domain_method,
     verify_domain_context_handoff,
     verify_domain_handoff_receipt,
 )
+from .routing import route_capability, route_domain_method
 from .adapters import LibraryStorage, SurfaceAdapter, get_surface_adapter
 from .persistence import FileSystemLibraryAdapter
 
@@ -37,6 +37,7 @@ __all__ = [
     "ApprovalRequired",
     "CanonicalRevisionInUse",
     "FileSystemLibraryAdapter",
+    "ExecutionContext",
     "LibraryStorage",
     "PersistenceReceipt",
     "SurfaceAdapter",

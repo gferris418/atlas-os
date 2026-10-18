@@ -54,9 +54,24 @@ class ScenarioRegressionTests(unittest.TestCase):
             require_approval("delete")
 
     def test_supplied_approval_is_scoped(self) -> None:
-        self.assertTrue(require_approval("publish", {"status": "APPROVED", "scope": ["publish"]}))
+        approval = {
+            "status": "APPROVED", "scope": ["publish"], "action_type": "publish",
+            "target_id": "release:atlas", "input_sha256": "sha256:" + "a" * 64,
+            "precondition_revision": "rev-1", "approver_identity": "user:maintainer",
+            "issued_at": "2026-10-18T05:00:00Z", "expires_at": "2026-10-18T06:00:00Z",
+            "policy_revision": "approvals-v2",
+        }
+        self.assertTrue(require_approval(
+            "publish", approval, target_id="release:atlas",
+            input_sha256="sha256:" + "a" * 64, precondition_revision="rev-1",
+            policy_revision="approvals-v2", now="2026-10-18T05:30:00Z",
+        ))
         with self.assertRaises(ApprovalRequired):
-            require_approval("delete", {"status": "APPROVED", "scope": ["publish"]})
+            require_approval(
+                "delete", approval, target_id="release:atlas",
+                input_sha256="sha256:" + "a" * 64, precondition_revision="rev-1",
+                policy_revision="approvals-v2", now="2026-10-18T05:30:00Z",
+            )
 
     def test_insufficient_evidence_remains_unverified(self) -> None:
         self.assertEqual("UNKNOWN", verify_evidence({"class": "UNKNOWN"})["class"])

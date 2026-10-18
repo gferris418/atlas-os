@@ -2,6 +2,14 @@
 
 All notable changes follow semantic versioning and preserve release lineage. The authoritative current product version is resolved only from `atlas-os.yaml`.
 
+## v2.0.0-rc.8
+
+- Correlate every specialist handoff to the active task, plan, and work unit through a typed execution context.
+- Consolidate generic and specialist selection in one routing module and enforce permission, prerequisites, conflicts, task class, and immutable contract provenance.
+- Require domain-method invariants directly in the registry schema.
+- Bind high-impact approvals to the exact action, target, input digest, precondition, approver identity, validity interval, and policy revision.
+- Pin the ARGUS activation contract to an immutable source commit and SHA-256 digest.
+
 ## v2.0.0-rc.7
 
 - Bind publication tags to manifest version, channel, lifecycle state, and stable-release blocker state.

@@ -13,7 +13,8 @@ contract:
     - permission_change
     - security_sensitive_modification
     - major_canonical_state_change
-  scope: Approval is specific to the described action, target, and material impact.
+  scope: Approval is specific to the described action, target, input digest, precondition revision, policy revision, and validity interval.
+  binding: High-impact execution requires an exact action_type, target_id, input_sha256, precondition_revision, authenticated approver_identity, issued_at, expires_at, and policy_revision match.
   reuse: Do not request approval repeatedly for the same clearly approved scope.
   default: Reversible analysis and preparation proceed autonomously within authority.
 invariants:
