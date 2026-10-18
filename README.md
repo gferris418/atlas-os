@@ -1,6 +1,6 @@
 # ATLAS OS
 
-**Current candidate:** `v2.0.0-rc.10`
+**Current candidate:** `v2.0.0-rc.11`
 **Classification:** Internal  
 **Release status:** **CANDIDATE / HOLD** pending independent cross-surface proof.
 
@@ -34,6 +34,18 @@ result = execute(ExecutionEnvelope(
 ))
 print(result.compact_status)
 ```
+
+The same public interface is directly testable from a shell. Compact text is
+the low-overhead default; use NDJSON only when a machine consumer needs
+flushable events:
+
+```bash
+python -m atlas_runtime --input examples/execution-request.json
+python -m atlas_runtime --input examples/execution-request.json --format ndjson
+```
+
+See [`docs/live-testing.md`](docs/live-testing.md) for stdin, error, and scope
+examples.
 
 ATLAS uses capable host-platform features directly. It does not recreate ChatGPT or another host's language understanding, conversation, generation, reasoning, or tool behavior unless a deterministic fallback is required. ATLAS adds the smallest useful layer of standards, evidence, authority, persistence, interoperability, and verification.
 

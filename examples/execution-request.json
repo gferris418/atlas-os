@@ -1,0 +1,20 @@
+{
+  "objective": "Assess coastal surveillance radar",
+  "plan_id": "plan-radar",
+  "surface": "core",
+  "timezone_name": "UTC",
+  "work_units": [
+    {
+      "id": "classify",
+      "status": "COMPLETED",
+      "dependencies": []
+    },
+    {
+      "id": "assess",
+      "status": "PENDING",
+      "dependencies": [
+        "classify"
+      ]
+    }
+  ]
+}
