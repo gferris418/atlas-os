@@ -54,9 +54,32 @@ class ScenarioRegressionTests(unittest.TestCase):
             require_approval("delete")
 
     def test_supplied_approval_is_scoped(self) -> None:
-        self.assertTrue(require_approval("publish", {"status": "APPROVED", "scope": ["publish"]}))
+        approval = {
+            "status": "APPROVED", "scope": ["publish"], "action_type": "publish",
+            "target_id": "release:atlas", "input_sha256": "sha256:" + "a" * 64,
+            "precondition_revision": "rev-1", "approver_identity": "user:maintainer",
+            "id": "APR-PUBLISH-REGRESSION", "required": True, "reason": "Release approval",
+            "requested_at": "2026-10-18T05:00:00Z", "approved_at": "2026-10-18T05:01:00Z",
+            "issued_at": "2026-10-18T05:00:00Z", "expires_at": "2099-10-18T06:00:00Z",
+            "policy_revision": "approvals-v2",
+            "source_task_id": "TASK-ATLAS-RELEASE", "source_plan_id": "plan-release",
+            "source_work_unit_id": "unit-publish", "handoff_id": None,
+        }
+        self.assertTrue(require_approval(
+            "publish", approval, target_id="release:atlas",
+            input_sha256="sha256:" + "a" * 64, precondition_revision="rev-1",
+            policy_revision="approvals-v2",
+            source_task_id="TASK-ATLAS-RELEASE", source_plan_id="plan-release",
+            source_work_unit_id="unit-publish", handoff_id=None,
+        ))
         with self.assertRaises(ApprovalRequired):
-            require_approval("delete", {"status": "APPROVED", "scope": ["publish"]})
+            require_approval(
+                "delete", approval, target_id="release:atlas",
+                input_sha256="sha256:" + "a" * 64, precondition_revision="rev-1",
+                policy_revision="approvals-v2",
+                source_task_id="TASK-ATLAS-RELEASE", source_plan_id="plan-release",
+                source_work_unit_id="unit-publish", handoff_id=None,
+            )
 
     def test_insufficient_evidence_remains_unverified(self) -> None:
         self.assertEqual("UNKNOWN", verify_evidence({"class": "UNKNOWN"})["class"])

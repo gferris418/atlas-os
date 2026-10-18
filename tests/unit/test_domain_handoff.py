@@ -8,6 +8,7 @@ from pathlib import Path
 import jsonschema
 
 from atlas_runtime import (
+    ExecutionContext,
     prepare_domain_context_handoff,
     verify_domain_context_handoff,
     verify_domain_handoff_receipt,
@@ -17,6 +18,14 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class DomainContextHandoffTests(unittest.TestCase):
+    def _context(self) -> ExecutionContext:
+        return ExecutionContext(
+            task_id="TASK-SAMPLE-001",
+            plan_id="plan-domain-handoff",
+            work_unit_id="unit-domain-analysis",
+            task_class="ANALYSIS",
+        )
+
     def _task(self) -> dict:
         task = json.loads((ROOT / "tests/fixtures/sample-task.json").read_text())
         task["execution_depth"] = "L2"
@@ -35,14 +44,17 @@ class DomainContextHandoffTests(unittest.TestCase):
         task = self._task()
         handoff = prepare_domain_context_handoff(
             task,
+            execution_context=self._context(),
             consumer="ARGUS",
             handoff_id="HANDOFF-ARGUS-001",
             created_at="2026-10-18T03:00:00+06:00",
         )
-        self.assertEqual("1.0.0", handoff["contract_version"])
+        self.assertEqual("1.1.0", handoff["contract_version"])
         self.assertEqual("ATLAS_OS", handoff["producer"])
         self.assertEqual("ARGUS", handoff["consumer"])
         self.assertEqual(task["id"], handoff["source_task_id"])
+        self.assertEqual("plan-domain-handoff", handoff["source_plan_id"])
+        self.assertEqual("unit-domain-analysis", handoff["source_work_unit_id"])
         self.assertEqual(task["domain_classification"], handoff["domain_classification"])
         self.assertEqual(task["domain_alignment"], handoff["domain_alignment"])
         self.assertEqual(task["domain_classification"]["unresolved_facets"], handoff["unresolved_material"])
@@ -55,6 +67,7 @@ class DomainContextHandoffTests(unittest.TestCase):
         task = self._task()
         handoff = prepare_domain_context_handoff(
             task,
+            execution_context=self._context(),
             consumer="ARGUS",
             handoff_id="HANDOFF-ARGUS-002",
             created_at="2026-10-18T03:00:00+06:00",
@@ -76,6 +89,7 @@ class DomainContextHandoffTests(unittest.TestCase):
     def test_tampered_handoff_is_rejected(self) -> None:
         handoff = prepare_domain_context_handoff(
             self._task(),
+            execution_context=self._context(),
             consumer="ARGUS",
             handoff_id="HANDOFF-ARGUS-003",
             created_at="2026-10-18T03:00:00+06:00",
@@ -88,12 +102,13 @@ class DomainContextHandoffTests(unittest.TestCase):
     def test_mismatched_return_receipt_is_rejected(self) -> None:
         handoff = prepare_domain_context_handoff(
             self._task(),
+            execution_context=self._context(),
             consumer="ARGUS",
             handoff_id="HANDOFF-ARGUS-004",
             created_at="2026-10-18T03:00:00+06:00",
         )
         receipt = {
-            "contract_version": "1.0.0",
+            "contract_version": "1.1.0",
             "handoff_id": "HANDOFF-OTHER-004",
             "payload_sha256": handoff["payload_sha256"],
             "consumer": "ARGUS",
@@ -109,6 +124,7 @@ class DomainContextHandoffTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "domain_alignment"):
             prepare_domain_context_handoff(
                 task,
+                execution_context=self._context(),
                 consumer="ARGUS",
                 handoff_id="HANDOFF-ARGUS-005",
                 created_at="2026-10-18T03:00:00+06:00",

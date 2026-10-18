@@ -1,7 +1,7 @@
 # ATLAS-OS ChatGPT instructions
 
-Version: `2.0.0-rc.7`
-Control revision: `chatgpt-bootstrap-2026-10-17-r1`
+Version: `2.0.0-rc.8`
+Control revision: `chatgpt-bootstrap-2026-10-18-r2`
 Mode: ChatGPT compatibility profile
 
 Use these instructions in a ChatGPT Project, Custom GPT, or the first message of an ordinary chat. If the full ATLAS repository files are attached, treat `atlas-os.yaml` and its referenced specifications as the higher authority. Never claim that the Python runtime, filesystem, connectors, or durable storage are available unless the active ChatGPT session actually exposes and uses them.

@@ -157,8 +157,91 @@ class EvidenceAndApprovalTests(unittest.TestCase):
     def test_high_impact_action_requires_scoped_approval(self) -> None:
         with self.assertRaises(ApprovalRequired):
             require_approval("publish")
-        self.assertTrue(require_approval("publish", {"status": "APPROVED", "scope": ["publish"]}))
+        approval = {
+            "id": "APR-PUBLISH-001",
+            "required": True,
+            "reason": "Publish the reviewed release",
+            "scope": ["publish"],
+            "status": "APPROVED",
+            "requested_at": "2026-10-18T05:00:00Z",
+            "approved_at": "2026-10-18T05:01:00Z",
+            "action_type": "publish",
+            "target_id": "release:atlas-os:2.0.0-rc.8",
+            "input_sha256": "sha256:" + "a" * 64,
+            "precondition_revision": "fffb1836",
+            "approver_identity": "user:maintainer",
+            "issued_at": "2026-10-18T05:01:00Z",
+            "expires_at": "2099-10-18T06:01:00Z",
+            "policy_revision": "approvals-v2",
+            "source_task_id": "TASK-ATLAS-PUBLISH", "source_plan_id": "plan-publish",
+            "source_work_unit_id": "unit-publish", "handoff_id": None,
+        }
+        self.assertTrue(require_approval(
+            "publish",
+            approval,
+            target_id="release:atlas-os:2.0.0-rc.8",
+            input_sha256="sha256:" + "a" * 64,
+            precondition_revision="fffb1836",
+            policy_revision="approvals-v2",
+            source_task_id="TASK-ATLAS-PUBLISH", source_plan_id="plan-publish",
+            source_work_unit_id="unit-publish", handoff_id=None,
+        ))
         self.assertTrue(require_approval("analyze"))
+
+    def test_high_impact_approval_is_bound_and_unexpired(self) -> None:
+        approval = {
+            "status": "APPROVED",
+            "scope": ["delete"],
+            "action_type": "delete",
+            "target_id": "record:ARGUS-001",
+            "input_sha256": "sha256:" + "b" * 64,
+            "precondition_revision": "rev-7",
+            "approver_identity": "user:maintainer",
+            "issued_at": "2026-10-18T05:00:00Z",
+            "expires_at": "2000-10-18T05:15:00Z",
+            "policy_revision": "approvals-v2",
+            "source_task_id": "TASK-ARGUS-DELETE", "source_plan_id": "plan-delete",
+            "source_work_unit_id": "unit-delete", "handoff_id": "HANDOFF-ARGUS-READY",
+        }
+        common = {
+            "target_id": "record:ARGUS-001",
+            "input_sha256": "sha256:" + "b" * 64,
+            "precondition_revision": "rev-7",
+            "policy_revision": "approvals-v2",
+            "source_task_id": "TASK-ARGUS-DELETE", "source_plan_id": "plan-delete",
+            "source_work_unit_id": "unit-delete", "handoff_id": "HANDOFF-ARGUS-READY",
+        }
+        for field, value in (
+            ("target_id", "record:OTHER"),
+            ("input_sha256", "sha256:" + "c" * 64),
+            ("precondition_revision", "rev-8"),
+            ("policy_revision", "approvals-v3"),
+        ):
+            request = dict(common)
+            request[field] = value
+            with self.subTest(field=field), self.assertRaises(ApprovalRequired):
+                require_approval("delete", approval, **request)
+
+    def test_caller_cannot_replay_expired_approval_with_historical_time(self) -> None:
+        approval = {
+            "id": "APR-EXPIRED-001", "required": True, "reason": "old approval",
+            "scope": ["delete"], "status": "APPROVED",
+            "requested_at": "2000-01-01T00:00:00Z", "approved_at": "2000-01-01T00:01:00Z",
+            "action_type": "delete", "target_id": "record:ARGUS-001",
+            "input_sha256": "sha256:" + "b" * 64, "precondition_revision": "rev-7",
+            "approver_identity": "user:maintainer", "issued_at": "2000-01-01T00:01:00Z",
+            "expires_at": "2000-01-02T00:01:00Z", "policy_revision": "approvals-v2",
+            "source_task_id": "TASK-ARGUS-DELETE", "source_plan_id": "plan-delete",
+            "source_work_unit_id": "unit-delete", "handoff_id": "HANDOFF-ARGUS-READY",
+        }
+        with self.assertRaises(ApprovalRequired):
+            require_approval(
+                "delete", approval, target_id="record:ARGUS-001",
+                input_sha256="sha256:" + "b" * 64,
+                precondition_revision="rev-7", policy_revision="approvals-v2",
+                source_task_id="TASK-ARGUS-DELETE", source_plan_id="plan-delete",
+                source_work_unit_id="unit-delete", handoff_id="HANDOFF-ARGUS-READY",
+            )
 
 
 class OutputProfileTests(unittest.TestCase):

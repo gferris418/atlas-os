@@ -14,7 +14,10 @@ items:
     risk_class: medium
     priority: 90
     version: 2.0.0-rc.2
-    source: https://github.com/gferris418/argus-intelligence/blob/main/contracts/atlas/argus-activation-v1.json
+    source: https://github.com/gferris418/argus-intelligence/blob/fe7ef26ed90cda49b4962b9ab7f707640c4ddc62/contracts/atlas/argus-activation-v1.json
+    source_commit: fe7ef26ed90cda49b4962b9ab7f707640c4ddc62
+    contract_version: 1.0.0
+    contract_sha256: sha256:3aa1abac8283e7f40418fe04e9882a5d241a0c6b323bcfab855a6f4eca74bac7
     triggers:
       - explicit structured requirement for government or public-sector opportunity intelligence
     task_classes: [RESEARCH, ANALYSIS, DECISION, MONITORING]
