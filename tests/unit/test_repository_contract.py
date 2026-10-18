@@ -57,6 +57,16 @@ class RepositoryContractTests(unittest.TestCase):
         )
         self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
 
+    def test_ci_uses_node24_native_immutable_actions(self) -> None:
+        checkout = "actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0"
+        setup_python = "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0"
+        for workflow_name in ("validate.yml", "release.yml"):
+            workflow = (ROOT / ".github/workflows" / workflow_name).read_text(encoding="utf-8")
+            with self.subTest(workflow=workflow_name):
+                self.assertIn(checkout, workflow)
+                self.assertIn(setup_python, workflow)
+                self.assertIn("cache-dependency-path: requirements.lock", workflow)
+
     def test_domain_method_schema_requires_activation_invariants(self) -> None:
         schema = json.loads((ROOT / "schemas/registry.schema.json").read_text())
         incomplete = {
