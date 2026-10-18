@@ -51,7 +51,7 @@ class ScenarioRegressionTests(unittest.TestCase):
 
     def test_destructive_scenario_requires_approval(self) -> None:
         with self.assertRaises(ApprovalRequired):
-            require_approval("delete")
+            require_approval("delete", action_classes=["destructive_action"])
 
     def test_supplied_approval_is_scoped(self) -> None:
         approval = {
@@ -66,7 +66,7 @@ class ScenarioRegressionTests(unittest.TestCase):
             "source_work_unit_id": "unit-publish", "handoff_id": None,
         }
         self.assertTrue(require_approval(
-            "publish", approval, target_id="release:atlas",
+            "publish", approval, action_classes=["publication"], target_id="release:atlas",
             input_sha256="sha256:" + "a" * 64, precondition_revision="rev-1",
             policy_revision="approvals-v2",
             source_task_id="TASK-ATLAS-RELEASE", source_plan_id="plan-release",
@@ -74,7 +74,7 @@ class ScenarioRegressionTests(unittest.TestCase):
         ))
         with self.assertRaises(ApprovalRequired):
             require_approval(
-                "delete", approval, target_id="release:atlas",
+                "delete", approval, action_classes=["destructive_action"], target_id="release:atlas",
                 input_sha256="sha256:" + "a" * 64, precondition_revision="rev-1",
                 policy_revision="approvals-v2",
                 source_task_id="TASK-ATLAS-RELEASE", source_plan_id="plan-release",

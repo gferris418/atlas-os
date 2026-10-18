@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[2]
 class RepositoryContractTests(unittest.TestCase):
     def test_manifest_is_only_product_version_authority(self) -> None:
         manifest = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
-        self.assertEqual("2.0.0-rc.8", manifest["product"]["version"])
+        self.assertEqual("2.0.0-rc.9", manifest["product"]["version"])
         self.assertEqual("atlas-os.yaml#/product/version", (ROOT / "VERSION").read_text().strip())
 
     def test_release_tag_must_match_manifest_and_release_state(self) -> None:

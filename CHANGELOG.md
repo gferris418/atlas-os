@@ -2,6 +2,11 @@
 
 All notable changes follow semantic versioning and preserve release lineage. The authoritative current product version is resolved only from `atlas-os.yaml`.
 
+## v2.0.0-rc.9
+
+- Classify every executable operation by governed semantic action classes before approval policy evaluation.
+- Fail closed when action classification is missing or unknown, and remove the fixed high-impact verb list.
+
 ## v2.0.0-rc.8
 
 - Correlate every specialist handoff to the active task, plan, and work unit through a typed execution context.
