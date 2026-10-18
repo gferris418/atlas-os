@@ -36,6 +36,7 @@ from .handoff import (
     verify_domain_handoff_receipt,
 )
 from .routing import route_capability, route_domain_method
+from .engine import ExecutionEnvelope, ExecutionResult, execute
 from .adapters import LibraryStorage, SurfaceAdapter, get_surface_adapter
 from .persistence import FileSystemLibraryAdapter
 
@@ -45,6 +46,8 @@ __all__ = [
     "CanonicalRevisionInUse",
     "FileSystemLibraryAdapter",
     "ExecutionContext",
+    "ExecutionEnvelope",
+    "ExecutionResult",
     "LibraryStorage",
     "PersistenceReceipt",
     "SurfaceAdapter",
@@ -60,6 +63,7 @@ __all__ = [
     "confirm_library_save",
     "create_dashboard",
     "determine_execution_depth",
+    "execute",
     "get_surface_adapter",
     "normalize_intent",
     "prepare_domain_context_handoff",

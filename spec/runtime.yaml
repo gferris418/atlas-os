@@ -40,6 +40,7 @@ contract:
   domain_handoff_rule: When a specialist domain method consumes ATLAS classification/alignment, ATLAS must create a schema-valid immutable handoff snapshot, verify its payload digest before delegation, and verify an exact return receipt before accepting the specialist result.
   host_capability_rule: Prefer native host understanding, conversation, generation, and tool behavior; ATLAS adds only material governance, persistence, interoperability, evidence, or verification.
   atomic_execution: Nontrivial work executes through one active atomic unit at a time with event-driven dashboard updates.
+  execution_interface: Hosts should enter the executable reference runtime through execute(ExecutionEnvelope); low-level functions remain compatibility seams and implementation building blocks.
   planning_gate: Every prompt establishes a plan with a concrete identifier before execution; L0 may use one implicit unit, while unresolved material clarification blocks dependent execution.
   surface_adapters: ChatGPT, Codex, and Work use executable shared seams for startup, plan gating, dashboard creation, and delivery; host deployment and independent conformance evidence remain separate.
   observability: Every dashboard includes timestamp, measured duration, safe input and processing summaries, output summary, goal, task, playbook, frameworks, SOP, selected output profile, plan and clarification state, quality, blockers, and library delivery state.
