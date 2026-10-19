@@ -16,6 +16,13 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PublicKey,
 )
 
+GOVERNED_RECORD_CLASSES = frozenset({
+    "DOMAIN_CONTEXT_HANDOFF",
+    "EXECUTION_LEASE",
+    "APPROVAL",
+    "CONTROL_RECORD",
+})
+
 
 def _canonical_record(record: Mapping[str, Any]) -> bytes:
     return json.dumps(
@@ -66,6 +73,8 @@ def resolve_trusted_public_key(
     verified_at: str | datetime | None = None,
 ) -> bytes:
     """Resolve one lifecycle-governed ATLAS public key or fail closed."""
+    if record_class not in GOVERNED_RECORD_CLASSES:
+        raise ValueError("unsupported ATLAS control record class")
     if registry.get("registry_version") != "1.0.0" or registry.get("issuer") != "ATLAS_OS":
         raise ValueError("unsupported ATLAS signing-key registry")
     keys = registry.get("keys")
@@ -80,7 +89,13 @@ def resolve_trusted_public_key(
     if entry.get("status") != "ACTIVE":
         raise ValueError("ATLAS signing key is not active")
     allowed = entry.get("allowed_record_classes")
-    if not isinstance(allowed, list) or record_class not in allowed:
+    if (
+        not isinstance(allowed, list)
+        or not allowed
+        or any(scope not in GOVERNED_RECORD_CLASSES for scope in allowed)
+    ):
+        raise ValueError("ATLAS signing key record-class scope is invalid")
+    if record_class not in allowed:
         raise ValueError("ATLAS signing key is out of scope for record class")
     activated_at = _parse_timestamp(str(entry.get("activated_at", "")), "activated_at")
     expires_at = _parse_timestamp(str(entry.get("expires_at", "")), "expires_at")
