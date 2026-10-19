@@ -2,6 +2,14 @@
 
 All notable changes follow semantic versioning and preserve release lineage. The authoritative current product version is resolved only from `atlas-os.yaml`.
 
+## v2.0.0
+
+- Promote the validated ATLAS OS v2 execution-governance contract to the stable channel.
+- Include provider-independent capability admission, untrusted-content assurance, canonical-memory integrity, forecasting/foresight governance, and learning/calibration controls introduced through the release-candidate line.
+- Preserve the ARGUS specialist boundary, immutable activation contract, approval authority, evidence semantics, persistence controls, and deterministic release packaging.
+- Record the repository owner's 2026-10-19 release-risk acceptance for external-only bootstrap, propagation, and unavailable-DTIF proofs. `MIG-029`, `MIG-037`, and `DTIF-RECONCILIATION` remain open post-GA and are not represented as completed.
+- Keep future independent surface verification and DTIF reconciliation under normal migration governance without blocking the 2.0.0 stable release.
+
 ## v2.0.0-rc.12
 
 - Add provider-independent capability admission governance with explicit admission states, evidence gates, overlap analysis, runtime-availability checks, and graceful-degradation rules.
