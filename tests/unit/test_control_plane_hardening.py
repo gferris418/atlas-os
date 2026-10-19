@@ -8,7 +8,9 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from atlas_runtime import (
+    ExecutionContext,
     attest_control_record,
+    prepare_domain_context_handoff,
     prepare_execution_lease,
     resolve_trusted_public_key,
     verify_control_record_attestation_with_registry,
@@ -89,6 +91,15 @@ class SigningKeyLifecycleTests(unittest.TestCase):
                     verified_at=verified_at,
                 )
 
+    def test_unknown_record_class_fails_closed(self) -> None:
+        with self.assertRaises(ValueError):
+            resolve_trusted_public_key(
+                self._registry(record_classes=["UNSCOPED_RECORD"]),
+                key_id="atlas-primary-2026",
+                record_class="UNSCOPED_RECORD",
+                verified_at="2026-10-19T12:00:00Z",
+            )
+
     def test_rotation_overlap_allows_both_active_keys_and_compromise_cutover_revokes_old_key(self) -> None:
         second_private = Ed25519PrivateKey.generate()
         second_public = second_private.public_key().public_bytes(
@@ -129,23 +140,28 @@ class SigningKeyLifecycleTests(unittest.TestCase):
 
 class ExecutionLeaseTests(unittest.TestCase):
     def _handoff(self) -> dict:
-        return {
-            "contract_version": "1.2.0",
-            "handoff_id": "HANDOFF-ARGUS-001",
-            "source_task_id": "TASK-SAMPLE-001",
-            "source_plan_id": "plan-domain-handoff",
-            "source_work_unit_id": "unit-domain-analysis",
-            "producer": "ATLAS_OS",
-            "consumer": "ARGUS",
-            "created_at": "2026-10-18T00:00:00Z",
-            "activation_expires_at": "2026-10-19T00:00:00Z",
-            "state": "READY",
-            "domain_classification": {"status": "CLASSIFIED", "unresolved_facets": [], "risk_flags": []},
+        task = {
+            "id": "TASK-SAMPLE-001",
+            "domain_classification": {
+                "status": "CLASSIFIED",
+                "unresolved_facets": [],
+                "risk_flags": [],
+            },
             "domain_alignment": {"status": "ALIGNED"},
-            "unresolved_material": [],
-            "risk_flags": [],
-            "payload_sha256": "sha256:" + "a" * 64,
         }
+        context = ExecutionContext(
+            task_id="TASK-SAMPLE-001",
+            plan_id="plan-domain-handoff",
+            work_unit_id="unit-domain-analysis",
+            task_class="ANALYSIS",
+        )
+        return prepare_domain_context_handoff(
+            task,
+            execution_context=context,
+            consumer="ARGUS",
+            handoff_id="HANDOFF-ARGUS-001",
+            created_at="2026-10-18T00:00:00Z",
+        )
 
     def test_lease_binds_exact_handoff_and_remains_valid_after_activation_window(self) -> None:
         handoff = self._handoff()
@@ -166,6 +182,17 @@ class ExecutionLeaseTests(unittest.TestCase):
                 expected_lease_id="LEASE-ARGUS-001",
             )
         )
+
+    def test_lease_creation_rejects_tampered_handoff(self) -> None:
+        handoff = self._handoff()
+        handoff["consumer"] = "OTHER"
+        with self.assertRaises(ValueError):
+            prepare_execution_lease(
+                handoff,
+                execution_lease_id="LEASE-ARGUS-001",
+                issued_at="2026-10-18T00:05:00Z",
+                lease_expires_at="2026-10-22T00:05:00Z",
+            )
 
     def test_expired_cross_execution_and_superseded_lease_fail_closed(self) -> None:
         handoff = self._handoff()
