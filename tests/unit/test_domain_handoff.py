@@ -49,12 +49,13 @@ class DomainContextHandoffTests(unittest.TestCase):
             handoff_id="HANDOFF-ARGUS-001",
             created_at="2026-10-18T03:00:00+06:00",
         )
-        self.assertEqual("1.1.0", handoff["contract_version"])
+        self.assertEqual("1.2.0", handoff["contract_version"])
         self.assertEqual("ATLAS_OS", handoff["producer"])
         self.assertEqual("ARGUS", handoff["consumer"])
         self.assertEqual(task["id"], handoff["source_task_id"])
         self.assertEqual("plan-domain-handoff", handoff["source_plan_id"])
         self.assertEqual("unit-domain-analysis", handoff["source_work_unit_id"])
+        self.assertEqual("2026-10-19T03:00:00+06:00", handoff["activation_expires_at"])
         self.assertEqual(task["domain_classification"], handoff["domain_classification"])
         self.assertEqual(task["domain_alignment"], handoff["domain_alignment"])
         self.assertEqual(task["domain_classification"]["unresolved_facets"], handoff["unresolved_material"])
@@ -108,7 +109,7 @@ class DomainContextHandoffTests(unittest.TestCase):
             created_at="2026-10-18T03:00:00+06:00",
         )
         receipt = {
-            "contract_version": "1.1.0",
+            "contract_version": "1.2.0",
             "handoff_id": "HANDOFF-OTHER-004",
             "payload_sha256": handoff["payload_sha256"],
             "consumer": "ARGUS",
