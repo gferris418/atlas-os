@@ -4,6 +4,7 @@ import json
 import subprocess
 import sys
 import unittest
+from copy import deepcopy
 from pathlib import Path
 
 import jsonschema
@@ -23,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[2]
 class RepositoryContractTests(unittest.TestCase):
     def test_manifest_is_only_product_version_authority(self) -> None:
         manifest = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
-        self.assertEqual("2.0.0", manifest["product"]["version"])
+        self.assertEqual("2.0.1-rc.1", manifest["product"]["version"])
         self.assertEqual("atlas-os.yaml#/product/version", (ROOT / "VERSION").read_text().strip())
 
     def test_release_tag_must_match_manifest_and_release_state(self) -> None:
@@ -31,12 +32,18 @@ class RepositoryContractTests(unittest.TestCase):
         version = manifest["product"]["version"]
         self.assertEqual(f"v{version}", validate_release_tag(manifest, f"v{version}", []))
         with self.assertRaisesRegex(RuntimeError, "does not match"):
-            validate_release_tag(manifest, "v2.0.0-rc.12", [])
+            validate_release_tag(manifest, "v2.0.0", [])
 
-        blocked = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
+        stable = deepcopy(manifest)
+        stable["product"].update({
+            "version": "2.0.1",
+            "release_channel": "stable",
+            "status": "RELEASED",
+        })
+        stable["release"]["target_version"] = "2.0.1"
         with self.assertRaisesRegex(RuntimeError, "open release blockers"):
-            validate_release_tag(blocked, "v2.0.0", ["MIG-029"])
-        self.assertEqual("v2.0.0", validate_release_tag(blocked, "v2.0.0", []))
+            validate_release_tag(stable, "v2.0.1", ["MIG-029"])
+        self.assertEqual("v2.0.1", validate_release_tag(stable, "v2.0.1", []))
 
     def test_closed_migration_requires_evidence(self) -> None:
         schema = json.loads((ROOT / "schemas/migration.schema.json").read_text())
