@@ -6,6 +6,8 @@ import re
 from datetime import datetime, timezone
 from typing import Any
 
+from .handoff import verify_domain_context_handoff
+
 LEASE_CONTRACT_VERSION = "1.0.0"
 
 
@@ -45,6 +47,7 @@ def prepare_execution_lease(
     supersedes_lease_id: str | None = None,
 ) -> dict[str, Any]:
     """Create an ATLAS control record that authorizes continued specialist execution."""
+    verify_domain_context_handoff(handoff)
     _required_handoff_identity(handoff)
     if not re.fullmatch(r"LEASE-[A-Z0-9][A-Z0-9-]{2,95}", execution_lease_id):
         raise ValueError("execution lease requires a valid execution_lease_id")
@@ -81,6 +84,7 @@ def verify_execution_lease(
     expected_lease_id: str | None = None,
 ) -> bool:
     """Validate lease lifetime and exact correlation to one ATLAS handoff."""
+    verify_domain_context_handoff(handoff)
     _required_handoff_identity(handoff)
     required = {
         "contract_version",
@@ -101,8 +105,13 @@ def verify_execution_lease(
         raise ValueError(f"execution lease integrity check failed: missing {missing}")
     if lease["contract_version"] != LEASE_CONTRACT_VERSION:
         raise ValueError("execution lease integrity check failed: contract_version")
+    if not re.fullmatch(r"LEASE-[A-Z0-9][A-Z0-9-]{2,95}", str(lease["execution_lease_id"])):
+        raise ValueError("execution lease integrity check failed: execution_lease_id")
     if lease["producer"] != "ATLAS_OS":
         raise ValueError("execution lease integrity check failed: producer")
+    supersedes = lease["supersedes_lease_id"]
+    if supersedes is not None and not re.fullmatch(r"LEASE-[A-Z0-9][A-Z0-9-]{2,95}", str(supersedes)):
+        raise ValueError("execution lease integrity check failed: supersedes_lease_id")
     if expected_lease_id is not None and lease["execution_lease_id"] != expected_lease_id:
         raise ValueError("execution lease is stale or superseded")
     expected = {
