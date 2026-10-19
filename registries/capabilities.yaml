@@ -2,7 +2,7 @@ schema: schemas/registry.schema.json
 registry:
   id: registry.capabilities
   type: capability
-  version: 1
+  version: 2
   status: active
 items:
   - id: capability.context-preservation
@@ -58,6 +58,76 @@ items:
     version: "1"
     source: spec/domain-practices.yaml
     capabilities: [align_domain_practices]
+    requires: [capability.evidence-tracking]
+    conflicts_with: []
+    fallback: capability.manual-handoff
+  - id: capability.capability-admission
+    name: Capability admission governance
+    description: Evaluate and govern external capability providers without transferring ATLAS core authority to a provider.
+    status: required
+    authority: canonical
+    permission: read
+    risk_class: medium
+    priority: 96
+    version: "1"
+    source: spec/capability-admission.yaml
+    capabilities: [assess_provider, govern_provider_state, route_provider]
+    requires: [capability.evidence-tracking]
+    conflicts_with: []
+    fallback: capability.manual-handoff
+  - id: capability.untrusted-content-assurance
+    name: Untrusted-content assurance
+    description: Assess retrieved or provider-supplied content and tool paths for injection, authority confusion, data exposure, and unsafe action propagation.
+    status: available
+    authority: canonical
+    permission: read
+    risk_class: high
+    priority: 94
+    version: "1"
+    source: spec/capability-admission.yaml
+    capabilities: [assess_untrusted_content, assess_tool_boundary]
+    requires: [capability.capability-admission, capability.evidence-tracking]
+    conflicts_with: []
+    fallback: capability.manual-handoff
+  - id: capability.memory-integrity
+    name: Canonical memory integrity
+    description: Verify provenance, supersession, ambiguity, and authority state before remembered information is relied upon as current canonical context.
+    status: available
+    authority: canonical
+    permission: read
+    risk_class: medium
+    priority: 92
+    version: "1"
+    source: spec/capability-admission.yaml
+    capabilities: [verify_memory_integrity, trace_supersession]
+    requires: [capability.evidence-tracking]
+    conflicts_with: []
+    fallback: capability.manual-handoff
+  - id: capability.forecast-governance
+    name: Forecasting and foresight governance
+    description: Govern structured horizon scanning, evidence, scenarios, adversarial review, forecast vintages, updates, and outcome calibration.
+    status: available
+    authority: canonical
+    permission: read
+    risk_class: medium
+    priority: 91
+    version: "1"
+    source: spec/capability-admission.yaml
+    capabilities: [scan_horizon, govern_forecast, update_forecast, score_forecast]
+    requires: [capability.evidence-tracking, capability.capability-admission]
+    conflicts_with: []
+    fallback: capability.manual-handoff
+  - id: capability.learning-calibration
+    name: Learning and calibration
+    description: Measure provider, workflow, forecast, and decision outcomes without converting sparse or biased evidence into unsupported performance claims.
+    status: available
+    authority: canonical
+    permission: read
+    risk_class: medium
+    priority: 89
+    version: "1"
+    source: spec/capability-admission.yaml
+    capabilities: [measure_outcomes, calibrate_forecasts, attribute_errors]
     requires: [capability.evidence-tracking]
     conflicts_with: []
     fallback: capability.manual-handoff
