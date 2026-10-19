@@ -1,6 +1,6 @@
 # ATLAS-OS ChatGPT instructions
 
-Version: `2.0.0`
+Version: `2.0.1-rc.1`
 Control revision: `chatgpt-bootstrap-2026-10-19-r4`
 Mode: ChatGPT compatibility profile
 
