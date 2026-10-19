@@ -2,6 +2,15 @@
 
 All notable changes follow semantic versioning and preserve release lineage. The authoritative current product version is resolved only from `atlas-os.yaml`.
 
+## v2.0.0-rc.12
+
+- Add provider-independent capability admission governance with explicit admission states, evidence gates, overlap analysis, runtime-availability checks, and graceful-degradation rules.
+- Add governed capabilities for untrusted-content assurance, canonical-memory integrity, forecasting/foresight, and learning/calibration without making third-party providers hard runtime dependencies.
+- Require forecasting workflows to preserve evidence lineage, assumptions, scenarios, skeptical challenge, forecast vintages, falsifiable signposts, and outcome calibration before accuracy claims.
+- Preserve ATLAS authority over planning, approvals, evidence semantics, verification, persistence, and delivery while allowing ARGUS and other specialists to use admitted providers within their registered boundaries.
+- Document the October 2026 reference-provider review and keep provider-specific rankings distinct from measured production benchmarks.
+- Keep `MIG-029`, `MIG-037`, and `DTIF-RECONCILIATION` open; rc.12 remains a release candidate and does not imply stable-release readiness.
+
 ## v2.0.0-rc.11
 
 - Add a directly executable `python -m atlas_runtime` boundary over the existing public execution interface.
@@ -81,4 +90,3 @@ All notable changes follow semantic versioning and preserve release lineage. The
 - Establish the ATLAS-OS v2 product authority and execution-governance contract.
 - Add machine-readable specifications, schemas, registries, migrations, adapters, tests, validation, and deterministic packaging.
 - Carry MIG-029, MIG-037, and DTIF reconciliation as open release blockers.
-
