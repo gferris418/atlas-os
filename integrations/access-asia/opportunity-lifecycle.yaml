@@ -1,0 +1,44 @@
+schema_version: 1
+integration_id: access-asia-opportunity-lifecycle
+version: 1.0.0
+effective_date: 2026-10-19
+
+source_of_business_policy:
+  argus_profile: https://github.com/gferris418/argus-intelligence/blob/main/profiles/access-asia-opportunity-lifecycle.yaml
+  sharepoint_bootstrap: General/Business Intelligence/AI_CONTEXT.yaml
+
+identity:
+  naming: "[Year]_[PXnnnnn]_[ShortName]"
+  preserve_across_moves: true
+
+locations:
+  pre_submission: General/Business Intelligence/50_OPPORTUNITIES
+  submission_pre_award: General/REV/OPP Opportunities
+  post_award: General/OPS/PRJ Projects
+
+transition_rules:
+  promote_to_px:
+    destination: pre_submission
+    move_to_submission: false
+  tender_published:
+    move_to_submission: false
+  submission_active:
+    move_to_submission: true
+    definition: formal response-package execution has actually started for a specific solicitation after the bid decision
+  awarded_or_contract_activated:
+    move_to_project: true
+
+mutation_controls:
+  duplicate_folder_allowed: false
+  separate_bid_folder: false
+  verify_source_exists: true
+  verify_destination_absent: true
+  preserve_identifier: true
+  verify_move_before_completion_claim: true
+
+atlas_role:
+  - govern lifecycle mutation execution
+  - preserve exact target and preconditions
+  - require approval when policy classifies the move/action as gated
+  - verify resulting SharePoint state
+  - keep ARGUS and SharePoint pointers synchronized
