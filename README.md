@@ -1,8 +1,8 @@
 # ATLAS OS
 
-**Current candidate:** `v2.0.0-rc.12`
+**Current release:** `v2.0.0`
 **Classification:** Internal  
-**Release status:** **CANDIDATE / HOLD** pending independent cross-surface proof.
+**Release status:** **RELEASED / STABLE**.
 
 ATLAS-OS is a model-agnostic execution-governance specification for AI agents. It turns user intent into a controlled execution spine that preserves context, plans dependencies, routes capabilities, tracks evidence and uncertainty, enforces approval boundaries, verifies results, separates task state from canonical knowledge, and produces reproducible outputs.
 
@@ -119,7 +119,7 @@ See [`docs/chatgpt-library-install.md`](docs/chatgpt-library-install.md) for the
 - `registries/` — governed capabilities and control indexes.
 - `tests/` — unit, conformance, and scenario regression evidence.
 - `tools/validate/` — repository-wide validation.
-- `tools/package/` — deterministic candidate packaging.
+- `tools/package/` — deterministic release packaging.
 - `docs/` — architecture, operation, and release guidance.
 - `library/` — durable, reusable outputs and storage guidance.
 
@@ -140,14 +140,14 @@ python tools/validate/validate_repository.py .
 python tools/package/build_release.py . dist
 ```
 
-The package uses the candidate identifier from `atlas-os.yaml`, records the source commit, emits a manifest, and produces SHA-256 checksums.
+The package uses the release identifier from `atlas-os.yaml`, records the source commit, emits a manifest, and produces SHA-256 checksums.
 
-## Current blockers
+## Post-GA verification items
 
-- `MIG-029`: independent New Chat and ChatGPT Work bootstrap proof is pending.
-- `MIG-037`: independent cross-surface latest-control propagation proof is pending.
-- `DTIF-RECONCILIATION`: data reconciliation remains open before archive-only disposition.
+- `MIG-029`: independent New Chat and ChatGPT Work bootstrap proof remains to be captured.
+- `MIG-037`: independent cross-surface latest-control propagation proof remains to be captured after MIG-029.
+- `DTIF-RECONCILIATION`: DTIF reconciliation remains open because the bootstrap repository did not contain authoritative DTIF source data.
 
-Missing proof remains missing proof. These controls prevent a stable `v2.0.0` release but do not prevent a truthful release-candidate package.
+On 2026-10-19 the repository owner explicitly accepted these external-only items as post-GA residual work and directed stable release without waiting for them. They remain open and must not be described as completed; they are no longer release-blocking for `v2.0.0`.
 
 See [`GOVERNANCE.md`](GOVERNANCE.md), [`docs/architecture.md`](docs/architecture.md), and [`docs/release-process.md`](docs/release-process.md) for the normative change and release model.
