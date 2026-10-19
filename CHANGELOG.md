@@ -9,6 +9,7 @@ All notable changes follow semantic versioning and preserve release lineage. The
 - Require forecasting workflows to preserve evidence lineage, assumptions, scenarios, skeptical challenge, forecast vintages, falsifiable signposts, and outcome calibration before accuracy claims.
 - Preserve ATLAS authority over planning, approvals, evidence semantics, verification, persistence, and delivery while allowing ARGUS and other specialists to use admitted providers within their registered boundaries.
 - Document the October 2026 reference-provider review and keep provider-specific rankings distinct from measured production benchmarks.
+- Keep `MIG-029`, `MIG-037`, and `DTIF-RECONCILIATION` open; rc.12 remains a release candidate and does not imply stable-release readiness.
 
 ## v2.0.0-rc.11
 
