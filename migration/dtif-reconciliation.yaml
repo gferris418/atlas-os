@@ -3,7 +3,7 @@ id: DTIF-RECONCILIATION
 title: DTIF data reconciliation
 description: Reconcile DTIF canonical data, dependency references, and archive disposition.
 status: OPEN
-release_blocking: true
+release_blocking: false
 opened_at: "2026-10-17T19:51:00+06:00"
 closed_at: null
 dependencies: []
@@ -11,7 +11,11 @@ acceptance_criteria:
   - Identify the authoritative DTIF dataset and its provenance.
   - Reconcile active dependents against the proposed canonical replacement.
   - Validate replacement references before any archive-only disposition.
-evidence: []
+evidence:
+  - type: operator-release-risk-acceptance
+    timestamp: "2026-10-19T22:00:00+06:00"
+    version: 2.0.0
+    result: DEFERRED_POST_GA
+    limitations: No DTIF source data was present in the bootstrap repository; this evidence records release-risk acceptance only and does not satisfy reconciliation criteria.
 owner: atlas-maintainers
-notes: No DTIF source data was present in the bootstrap repository.
-
+notes: The repository owner explicitly directed GA release without waiting for unavailable DTIF source data. DTIF reconciliation remains open post-GA; no archive disposition or canonical replacement is implied by this release.

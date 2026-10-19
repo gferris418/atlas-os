@@ -23,21 +23,20 @@ ROOT = Path(__file__).resolve().parents[2]
 class RepositoryContractTests(unittest.TestCase):
     def test_manifest_is_only_product_version_authority(self) -> None:
         manifest = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
-        self.assertEqual("2.0.0-rc.12", manifest["product"]["version"])
+        self.assertEqual("2.0.0", manifest["product"]["version"])
         self.assertEqual("atlas-os.yaml#/product/version", (ROOT / "VERSION").read_text().strip())
 
     def test_release_tag_must_match_manifest_and_release_state(self) -> None:
         manifest = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
         version = manifest["product"]["version"]
-        self.assertEqual(f"v{version}", validate_release_tag(manifest, f"v{version}", ["MIG-029"]))
+        self.assertEqual(f"v{version}", validate_release_tag(manifest, f"v{version}", []))
         with self.assertRaisesRegex(RuntimeError, "does not match"):
-            validate_release_tag(manifest, "v2.0.0", ["MIG-029"])
+            validate_release_tag(manifest, "v2.0.0-rc.12", [])
 
-        stable = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
-        stable["product"].update({"version": "2.0.0", "status": "RELEASED", "release_channel": "stable"})
+        blocked = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
         with self.assertRaisesRegex(RuntimeError, "open release blockers"):
-            validate_release_tag(stable, "v2.0.0", ["MIG-029"])
-        self.assertEqual("v2.0.0", validate_release_tag(stable, "v2.0.0", []))
+            validate_release_tag(blocked, "v2.0.0", ["MIG-029"])
+        self.assertEqual("v2.0.0", validate_release_tag(blocked, "v2.0.0", []))
 
     def test_closed_migration_requires_evidence(self) -> None:
         schema = json.loads((ROOT / "schemas/migration.schema.json").read_text())
@@ -66,7 +65,7 @@ class RepositoryContractTests(unittest.TestCase):
                 self.assertIn(checkout, workflow)
                 self.assertIn(setup_python, workflow)
                 self.assertIn("cache-dependency-path: requirements.lock", workflow)
-        validate_workflow = (ROOT / ".github/workflows/validate.yml").read_text(encoding="utf-8")
+        validate_workflow = (ROOT / ".github/workflows" / "validate.yml").read_text(encoding="utf-8")
         self.assertIn(
             "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0",
             validate_workflow,

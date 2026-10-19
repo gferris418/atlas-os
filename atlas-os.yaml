@@ -2,10 +2,10 @@ schema: schemas/atlas-os.schema.json
 product:
   id: atlas-os
   name: ATLAS OS
-  version: 2.0.0-rc.12
-  release_channel: candidate
+  version: 2.0.0
+  release_channel: stable
   schema_version: 2
-  status: CANDIDATE
+  status: RELEASED
   classification: internal
 authority:
   manifest: atlas-os.yaml
@@ -21,10 +21,7 @@ execution:
   default_depth: L1
 release:
   target_version: 2.0.0
-  blocking_controls:
-    - MIG-029
-    - MIG-037
-    - DTIF-RECONCILIATION
+  blocking_controls: []
   package_command: python tools/package/build_release.py . dist
   validation_command: python tools/validate/validate_repository.py .
 artifacts:
