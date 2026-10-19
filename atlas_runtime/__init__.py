@@ -27,7 +27,9 @@ from .runtime import (
 from .authentication import (
     attest_control_record,
     canonical_record_sha256,
+    resolve_trusted_public_key,
     verify_control_record_attestation,
+    verify_control_record_attestation_with_registry,
 )
 from .handoff import (
     ExecutionContext,
@@ -35,6 +37,7 @@ from .handoff import (
     verify_domain_context_handoff,
     verify_domain_handoff_receipt,
 )
+from .lease import prepare_execution_lease, verify_execution_lease
 from .routing import route_capability, route_domain_method
 from .engine import ExecutionEnvelope, ExecutionResult, execute
 from .adapters import LibraryStorage, SurfaceAdapter, get_surface_adapter
@@ -67,9 +70,11 @@ __all__ = [
     "get_surface_adapter",
     "normalize_intent",
     "prepare_domain_context_handoff",
+    "prepare_execution_lease",
     "prepare_library_record",
     "render_dashboard",
     "require_approval",
+    "resolve_trusted_public_key",
     "route_domain_method",
     "route_capability",
     "select_output_profile",
@@ -78,5 +83,7 @@ __all__ = [
     "verify_domain_context_handoff",
     "verify_domain_handoff_receipt",
     "verify_control_record_attestation",
+    "verify_control_record_attestation_with_registry",
     "verify_evidence",
+    "verify_execution_lease",
 ]
