@@ -24,5 +24,12 @@ evidence:
     version: 2.0.0
     result: DEFERRED_POST_GA
     limitations: Acceptance criteria remain open; this evidence records release-risk acceptance only and is not proof of cross-surface bootstrap behavior.
+  - type: stable-external-proof-target
+    timestamp: "2026-10-20T16:07:00+06:00"
+    version: 2.0.1
+    control_revision: chatgpt-bootstrap-2026-10-19-r4
+    source: integrations/chatgpt/RELEASE-VERIFICATION.md
+    result: READY_FOR_EXTERNAL_PROOF
+    limitations: A genuinely fresh ChatGPT New Chat and separate ChatGPT Work task must execute the published checklist; this repository session cannot substitute for those independent host surfaces.
 owner: atlas-maintainers
-notes: The repository owner explicitly directed GA release without waiting for external-only surface proof. MIG-029 remains active post-GA and must be closed only after independent evidence satisfies its acceptance criteria.
+notes: The repository owner explicitly directed GA release without waiting for external-only surface proof. MIG-029 remains active post-GA. The current proof target is stable ATLAS 2.0.1 / chatgpt-bootstrap-2026-10-19-r4 and the control must be closed only after independent New Chat and ChatGPT Work evidence satisfies every acceptance criterion.

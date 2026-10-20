@@ -25,5 +25,12 @@ evidence:
     version: 2.0.0
     result: DEFERRED_POST_GA
     limitations: Acceptance criteria remain open; this evidence records release-risk acceptance only and is not propagation proof.
+  - type: stable-control-publication-candidate
+    timestamp: "2026-10-20T16:07:00+06:00"
+    version: 2.0.1
+    control_revision: chatgpt-bootstrap-2026-10-19-r4
+    source: integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md
+    result: READY_FOR_EXTERNAL_PROOF
+    limitations: The same stable revision still requires independent resolution evidence from ChatGPT, Codex, and Work. MIG-029 must close first.
 owner: atlas-maintainers
-notes: The repository owner explicitly directed GA release without waiting for external-only propagation proof. MIG-037 remains blocked on MIG-029 and is post-GA follow-up work.
+notes: The repository owner explicitly directed GA release without waiting for external-only propagation proof. MIG-037 remains blocked on MIG-029. The active propagation target is stable ATLAS 2.0.1 / chatgpt-bootstrap-2026-10-19-r4; no older rc7/r1 proof may be used to close this control.
