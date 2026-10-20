@@ -2,6 +2,15 @@
 
 All notable changes follow semantic versioning and preserve release lineage. The authoritative current product version is resolved only from `atlas-os.yaml`.
 
+## v2.0.1
+
+- Promote the validated `2.0.1-rc.1` control-plane hardening to the stable channel.
+- Add ATLAS-governed execution leases that separate the exact 24-hour initial handoff activation window from correlated ongoing execution, retry, resume, and result return.
+- Add lifecycle-governed Ed25519 signing-key trust with activation, expiry, status, record-class scope, supersession, and fail-closed resolution.
+- Upgrade the ATLAS/ARGUS seam to Domain Context Handoff `1.2.0`, Execution Lease `1.0.0`, and Signing Key Registry `1.0.0` without changing the ATLAS execution/approval authority boundary.
+- Record successful credentialed ATLAS↔ARGUS E2E verification in both `main`-push and pull-request contexts and enforce protected `main` branches before stable promotion.
+- Keep `MIG-029`, `MIG-037`, and `DTIF-RECONCILIATION` open as post-GA, non-release-blocking residuals; none is represented as completed.
+
 ## v2.0.0
 
 - Promote the validated ATLAS OS v2 execution-governance contract to the stable channel.
