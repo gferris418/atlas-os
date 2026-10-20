@@ -146,8 +146,8 @@ The package uses the release identifier from `atlas-os.yaml`, records the source
 
 - `MIG-029`: independent New Chat and ChatGPT Work bootstrap proof remains to be captured.
 - `MIG-037`: independent cross-surface latest-control propagation proof remains to be captured after MIG-029.
-- `DTIF-RECONCILIATION`: DTIF reconciliation remains open because the bootstrap repository did not contain authoritative DTIF source data.
+- `DTIF-RECONCILIATION`: **closed 2026-10-20** after authoritative DB-001/DB-002/DB-003 source hashes were verified, the accepted Wave-1 historical state was re-read and fingerprinted, all deferred legacy classes received explicit reverify-before-reuse dispositions, and ARGUS protected CI passed on exact evidence commit `caf8d76045d2d9f1cdb26cbe5b18e88d5862159a`.
 
-On 2026-10-19 the repository owner explicitly accepted these external-only items as post-GA residual work and directed stable release without waiting for them. They remain open and must not be described as completed; they remain non-blocking for `v2.0.1`.
+`MIG-029` and `MIG-037` remain external-surface proof items and must not be described as completed until their independent host evidence is captured. They remain non-blocking for `v2.0.1`. DTIF is now archive-only: retained source evidence is not current ARGUS truth and destructive deletion is not authorized by the reconciliation closure.
 
 See [`GOVERNANCE.md`](GOVERNANCE.md), [`docs/architecture.md`](docs/architecture.md), and [`docs/release-process.md`](docs/release-process.md) for the normative change and release model.
