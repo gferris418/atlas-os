@@ -23,8 +23,8 @@ items:
     dependencies: [MIG-029]
   - id: DTIF-RECONCILIATION
     name: DTIF data reconciliation
-    description: Reconcile DTIF data before archive-only disposition.
-    status: closed
+    description: Closed DTIF reconciliation control retained as historical archive-disposition evidence.
+    status: deprecated
     source: migration/dtif-reconciliation.yaml
     path: migration/dtif-reconciliation.yaml
     release_blocking: false
