@@ -2,10 +2,10 @@ schema: schemas/atlas-os.schema.json
 product:
   id: atlas-os
   name: ATLAS OS
-  version: 2.0.1-rc.1
-  release_channel: candidate
+  version: 2.0.1
+  release_channel: stable
   schema_version: 2
-  status: CANDIDATE
+  status: RELEASED
   classification: internal
 authority:
   manifest: atlas-os.yaml
