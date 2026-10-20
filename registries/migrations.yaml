@@ -24,7 +24,7 @@ items:
   - id: DTIF-RECONCILIATION
     name: DTIF data reconciliation
     description: Reconcile DTIF data before archive-only disposition.
-    status: open
+    status: closed
     source: migration/dtif-reconciliation.yaml
     path: migration/dtif-reconciliation.yaml
     release_blocking: false
