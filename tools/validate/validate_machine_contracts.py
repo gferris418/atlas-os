@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate ATLAS machine-discovery, surface, verification, and migration contracts."""
+"""Validate ATLAS machine-discovery, governance, surface, verification, and migration contracts."""
 
 from __future__ import annotations
 
@@ -35,7 +35,9 @@ def validate(root: Path) -> list[str]:
 
     required = (
         "atlas-ai.yaml",
+        "governance.yaml",
         "schemas/ai-manifest.schema.json",
+        "schemas/governance.schema.json",
         "schemas/surface-adapter.schema.json",
         "schemas/release-verification.schema.json",
         "schemas/migration.schema.json",
@@ -52,7 +54,9 @@ def validate(root: Path) -> list[str]:
 
     manifest = load(root / "atlas-os.yaml")
     ai_manifest = load(root / "atlas-ai.yaml")
+    governance = load(root / "governance.yaml")
     ai_schema = load(root / "schemas/ai-manifest.schema.json")
+    governance_schema = load(root / "schemas/governance.schema.json")
     surface_schema = load(root / "schemas/surface-adapter.schema.json")
     verification_schema = load(root / "schemas/release-verification.schema.json")
     migration_schema = load(root / "schemas/migration.schema.json")
@@ -61,6 +65,10 @@ def validate(root: Path) -> list[str]:
         jsonschema.validate(ai_manifest, ai_schema, format_checker=jsonschema.FormatChecker())
     except jsonschema.ValidationError as exc:
         errors.append(f"atlas-ai.yaml schema violation: {exc.message}")
+    try:
+        jsonschema.validate(governance, governance_schema, format_checker=jsonschema.FormatChecker())
+    except jsonschema.ValidationError as exc:
+        errors.append(f"governance.yaml schema violation: {exc.message}")
 
     product_version = manifest.get("product", {}).get("version")
     control_revision = manifest.get("execution", {}).get("control_revision")
@@ -74,8 +82,20 @@ def validate(root: Path) -> list[str]:
         )
     if manifest.get("authority", {}).get("ai_manifest") != "atlas-ai.yaml":
         errors.append("atlas-os.yaml does not bind atlas-ai.yaml as the AI discovery authority")
+    if manifest.get("authority", {}).get("governance") != "governance.yaml":
+        errors.append("atlas-os.yaml does not bind governance.yaml as the governance authority")
+    if governance.get("authority", {}).get("product_manifest") != "atlas-os.yaml":
+        errors.append("governance.yaml does not bind atlas-os.yaml as product authority")
+    if governance.get("authority", {}).get("ai_manifest") != "atlas-ai.yaml":
+        errors.append("governance.yaml does not bind atlas-ai.yaml as discovery authority")
 
     machine_contracts = set(ai_manifest.get("machine_contracts", []))
+    for required_machine in ("governance.yaml", "schemas/governance.schema.json"):
+        if required_machine not in machine_contracts:
+            errors.append(f"governance machine contract missing from AI discovery: {required_machine}")
+    if "GOVERNANCE.md" not in set(ai_manifest.get("human_guidance", [])):
+        errors.append("GOVERNANCE.md must be registered as human guidance, not machine authority")
+
     for relative in machine_contracts:
         path = root / relative
         if path.suffix not in {".yaml", ".yml", ".json"}:
@@ -202,6 +222,10 @@ def validate(root: Path) -> list[str]:
         errors.append(
             f"release blocker/AI verification control drift: {sorted(blockers)} != {sorted(machine_controls)}"
         )
+    if governance.get("release", {}).get("released_requires_no_open_blockers") is not True:
+        errors.append("governance must fail closed on release blockers")
+    if governance.get("release", {}).get("missing_evidence_is_pass") is not False:
+        errors.append("governance must not convert missing evidence into PASS")
     for blocker in blockers:
         record = migrations.get(blocker)
         if record is None:
