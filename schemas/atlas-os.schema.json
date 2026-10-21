@@ -25,10 +25,11 @@
     "authority": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["manifest", "ai_manifest", "core_spec", "version_pointer"],
+      "required": ["manifest", "ai_manifest", "governance", "core_spec", "version_pointer"],
       "properties": {
         "manifest": {"const": "atlas-os.yaml"},
         "ai_manifest": {"const": "atlas-ai.yaml"},
+        "governance": {"const": "governance.yaml"},
         "core_spec": {"type": "string"},
         "version_pointer": {"const": "atlas-os.yaml#/product/version"}
       }
@@ -65,7 +66,7 @@
     "artifacts": {
       "type": "object",
       "additionalProperties": {"type": "string"},
-      "required": ["specifications", "schemas", "registries", "integrations", "migrations", "tests"]
+      "required": ["governance", "specifications", "schemas", "registries", "integrations", "migrations", "tests"]
     }
   }
 }
