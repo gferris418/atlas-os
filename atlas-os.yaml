@@ -10,6 +10,7 @@ product:
   license: MIT
 authority:
   manifest: atlas-os.yaml
+  ai_manifest: ai/manifest.yaml
   core_spec: spec/core.yaml
   version_pointer: atlas-os.yaml#/product/version
 execution:
