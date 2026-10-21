@@ -36,6 +36,8 @@ contract:
     - DEPENDENCY_FAILED
     - VALIDATION_FAILED
   domain_classification: Substantive tasks must resolve material taxonomy and classification facets before domain-framework selection.
+  intent_profile: After taxonomy routing, classify the normalized objective as opportunity identification, supplier/vendor sourcing, market validation, general research, or a general task. The profile may recommend semantic capability requirements but has no authority to route a provider.
+  behavioral_learning: Behavioral preferences are explicit host-managed state, disabled by default, inspectable, reversible, and never inferred from silence. Durable learning requires separate user authorization and a verified persistence receipt.
   domain_alignment: Substantive tasks must resolve applicable international standards and professional frameworks before finalizing the execution plan.
   domain_handoff_rule: When a specialist domain method consumes ATLAS classification/alignment, ATLAS must create a schema-valid immutable handoff snapshot, verify its payload digest before delegation, and verify an exact return receipt before accepting the specialist result.
   host_capability_rule: Prefer native host understanding, conversation, generation, and tool behavior; ATLAS adds only material governance, persistence, interoperability, evidence, or verification.

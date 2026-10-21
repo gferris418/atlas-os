@@ -54,6 +54,39 @@ class CommandLineTests(unittest.TestCase):
         self.assertEqual("BLOCKED", events[1]["state"])
         self.assertIsNone(events[1]["active_unit"])
 
+    def test_cli_exposes_what_and_how_before_provider_routing(self) -> None:
+        request = {
+            "objective": (
+                "Find and assess public procurement opportunities for coastal "
+                "surveillance radar for Bangladesh Navy using public sources only"
+            ),
+            "task_id": "TASK-BD-RADAR-OPPORTUNITIES",
+            "plan_id": "plan-bd-radar-opportunities",
+            "surface": "chatgpt",
+            "clarification_status": "RESOLVED",
+            "timestamp": "2026-10-21T22:45:00+06:00",
+            "timezone_name": "Asia/Dhaka",
+            "work_units": [
+                {"id": "research", "status": "PENDING", "dependencies": []},
+            ],
+        }
+
+        structured = self._run("--format", "ndjson", input_text=json.dumps(request))
+        text = self._run(input_text=json.dumps(request))
+
+        self.assertEqual(0, structured.returncode, structured.stderr)
+        result_event = json.loads(structured.stdout.splitlines()[1])
+        self.assertIn("routing_preview", result_event)
+        self.assertEqual("PROPOSED", result_event["routing_preview"]["status"])
+        self.assertEqual([], result_event["routing_decisions"])
+        self.assertIn("Routing preview", text.stdout)
+        self.assertIn("Intent: OPPORTUNITY_IDENTIFICATION (recommend only)", text.stdout)
+        self.assertIn("ARGUS Intelligence", text.stdout)
+        self.assertIn("What:", text.stdout)
+        self.assertIn("How:", text.stdout)
+        self.assertIn("Permission: read", text.stdout)
+        self.assertIn("Approve this exact preview with digest", text.stdout)
+
     def test_invalid_json_fails_without_a_traceback(self) -> None:
         completed = self._run(input_text="not-json")
 

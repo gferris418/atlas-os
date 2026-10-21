@@ -160,8 +160,15 @@ def classify_task(text: str) -> list[str]:
     lowered = text.lower()
     labels: set[str] = set()
     rules = {
-        "CODING": ("code", "implement", "repository", "bug", "test"),
-        "DEBUGGING": ("debug", "failure", "broken", "error"),
+        "CODING": (
+            "code", "coding", "implement", "implementation", "implemented",
+            "implementing", "repository", "bug", "bugs", "test", "tests",
+            "tested", "testing",
+        ),
+        "DEBUGGING": (
+            "debug", "debugged", "debugging", "failure", "failures", "broken",
+            "error", "errors",
+        ),
         "RESEARCH": ("research", "find", "sources"),
         "ANALYSIS": ("analyze", "compare", "assess"),
         "WRITING": ("write", "draft", "rewrite"),
@@ -175,13 +182,76 @@ def classify_task(text: str) -> list[str]:
         "DECISION": ("decide", "recommend", "choose"),
     }
     for label, tokens in rules.items():
-        if any(token in lowered for token in tokens):
+        if any(
+            re.search(r"(?<!\w)" + re.escape(token) + r"(?!\w)", lowered)
+            for token in tokens
+        ):
             labels.add(label)
     if not labels:
         labels.add("ANSWER")
-    if len(labels) > 2 or any(token in lowered for token in ("multi-stage", "end-to-end", "then")):
+    if len(labels) > 2 or any(
+        re.search(r"(?<!\w)" + re.escape(token) + r"(?!\w)", lowered)
+        for token in ("multi-stage", "end-to-end", "then")
+    ):
         labels.add("MULTI_STAGE")
     return sorted(labels & TASK_CLASSES)
+
+
+def classify_task_intent(
+    text: str,
+    *,
+    task_classes: Iterable[str],
+    taxonomy_route: dict[str, Any],
+) -> dict[str, Any]:
+    """Return a domain-neutral intent profile that recommends capabilities only."""
+    lowered = " ".join(text.lower().split())
+    hierarchy = taxonomy_route.get("hierarchy") or {}
+    classes = set(task_classes)
+    categories = (
+        (
+            "OPPORTUNITY_IDENTIFICATION",
+            ("tender", "rfp", "request for proposal", "procurement opportunit", "lead generation"),
+        ),
+        (
+            "SUPPLIER_VENDOR_SOURCING",
+            ("supplier", "vendor", "manufacturer", "distributor", "sourcing"),
+        ),
+        (
+            "MARKET_VALIDATION",
+            ("business idea", "market validation", "market sizing", "feasibility", "competitive landscape"),
+        ),
+        (
+            "GENERAL_RESEARCH",
+            ("research", "understand", "explain", "specification", "standard", "what is"),
+        ),
+    )
+    category = "GENERAL_TASK"
+    matched: list[str] = []
+    for candidate, terms in categories:
+        matched = [term for term in terms if term in lowered]
+        if matched:
+            category = candidate
+            break
+
+    requirements: list[str] = []
+    if category == "OPPORTUNITY_IDENTIFICATION":
+        if hierarchy.get("domain") == "government-public-sector":
+            requirements.append("government_public_sector_opportunity_intelligence")
+        requirements.append("public_research")
+    elif category in {"SUPPLIER_VENDOR_SOURCING", "MARKET_VALIDATION"}:
+        requirements.append("public_research")
+    elif category == "GENERAL_RESEARCH" and (
+        "RESEARCH" in classes
+        or any(term in lowered for term in ("current", "public", "source", "latest"))
+    ):
+        requirements.append("public_research")
+
+    return {
+        "category": category,
+        "matched_evidence": matched,
+        "candidate_requirements": list(dict.fromkeys(requirements)),
+        "routing_authority": "RECOMMEND_ONLY",
+    }
 
 
 def _validated_taxonomies(taxonomies: Iterable[dict[str, Any]]) -> dict[str, dict[str, Any]]:
