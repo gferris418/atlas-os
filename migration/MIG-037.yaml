@@ -12,8 +12,8 @@ acceptance_criteria:
     requirement: Publish one uniquely identifiable provider-neutral control revision without redefining ATLAS core semantics.
     surfaces: [repository]
     evidence_type: repository-publication-evidence
-    status: PENDING
-    evidence_ids: [EVID-006]
+    status: PASS
+    evidence_ids: [EVID-007]
   - id: AC-02
     requirement: Independently demonstrate that ChatGPT, Codex, Work, and Hermes Agent resolve the same current control revision.
     surfaces: [chatgpt, codex, work, hermes-agent]
@@ -85,6 +85,16 @@ evidence:
     independent: false
     scope: [repository, chatgpt, codex, work, hermes-agent]
     result: READY_FOR_EXTERNAL_PROOF
-    limitations: Machine-readable verification contracts now exist for all supported surfaces, but independent propagation observations remain blocked on MIG-029 and have not yet occurred.
+    limitations: Machine-readable verification contracts exist for all supported surfaces, but independent propagation observations remain blocked on MIG-029 and have not yet occurred.
+  - id: EVID-007
+    type: repository-control-publication
+    timestamp: "2026-10-22T00:15:50+06:00"
+    version: 2.0.2-rc.3
+    control_revision: atlas-bootstrap-2026-10-22-r7
+    source: atlas-os.yaml
+    independent: false
+    scope: [repository]
+    result: PASS
+    limitations: This proves publication of one provider-neutral machine control revision in the repository only. It does not prove that any external AI host resolved or applied the revision.
 owner: atlas-maintainers
-notes: Stable v2.0.2 promotion remains blocked. The provider-neutral generic AI-host contract remains local schema/runtime conformance scope; an unregistered provider becomes an external proof target only when promoted to a documented supported adapter.
+notes: Stable v2.0.2 promotion remains blocked. The repository-publication criterion is complete; independent cross-surface propagation remains blocked on MIG-029. The provider-neutral generic AI-host contract remains local schema/runtime conformance scope; an unregistered provider becomes an external proof target only when promoted to a documented supported adapter.
