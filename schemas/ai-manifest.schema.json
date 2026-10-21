@@ -34,6 +34,8 @@
         "core_spec",
         "execution_spine",
         "runtime_spec",
+        "request_triage",
+        "architecture",
         "schema_catalog",
         "registry_catalog",
         "migration_catalog"
@@ -43,6 +45,18 @@
         "core_spec": {"const": "spec/core.yaml"},
         "execution_spine": {"const": "spec/execution-spine.yaml"},
         "runtime_spec": {"const": "spec/runtime.yaml"},
+        "request_triage": {"const": "spec/request-triage.yaml"},
+        "architecture": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mission_control", "control_plane", "observability", "domain_intelligence"],
+          "properties": {
+            "mission_control": {"const": "spec/mission-control.yaml"},
+            "control_plane": {"const": "spec/control-plane.yaml"},
+            "observability": {"const": "spec/observability.yaml"},
+            "domain_intelligence": {"const": "spec/domain-intelligence.yaml"}
+          }
+        },
         "schema_catalog": {"const": "schemas"},
         "registry_catalog": {"const": "registries"},
         "migration_catalog": {"const": "migration"}
