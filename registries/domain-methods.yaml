@@ -14,8 +14,8 @@ items:
     risk_class: medium
     priority: 90
     version: 2.2.0-rc.1
-    source: https://github.com/gferris418/argus-intelligence/blob/1d57ccfc6a492b11fabd76639d85cfb8a7898731/contracts/atlas/argus-activation-v1.json
-    source_commit: 1d57ccfc6a492b11fabd76639d85cfb8a7898731
+    source: https://github.com/gferris418/argus-intelligence/blob/ba97ace36832cd464351a2078ef3c4d7ff89c8bf/contracts/atlas/argus-activation-v1.json
+    source_commit: ba97ace36832cd464351a2078ef3c4d7ff89c8bf
     contract_version: 3.0.0
     contract_sha256: sha256:5b082a12c6f0b469cba274a0e43e29032e349e3d377cf6d12ffa58762e8cb307
     triggers:
