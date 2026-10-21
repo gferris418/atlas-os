@@ -10,7 +10,7 @@
     "product": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "name", "version", "release_channel", "schema_version", "status", "classification"],
+      "required": ["id", "name", "version", "release_channel", "schema_version", "status", "license"],
       "properties": {
         "id": {"const": "atlas-os"},
         "name": {"const": "ATLAS OS"},
@@ -18,7 +18,7 @@
         "release_channel": {"enum": ["draft", "candidate", "stable"]},
         "schema_version": {"const": 2},
         "status": {"enum": ["DRAFT", "CANDIDATE", "VERIFIED", "RELEASED", "SUPERSEDED", "ARCHIVED"]},
-        "classification": {"type": "string", "minLength": 1}
+        "license": {"type": "string", "minLength": 1}
       }
     },
     "authority": {

@@ -4,6 +4,7 @@ All notable changes follow semantic versioning and preserve release lineage. The
 
 ## v2.0.0-rc.8
 
+- Add an MIT `LICENSE` file and declare it in the manifest (`product.license`) and README; replace the non-normative "Internal" classification so downstream reuse has an explicit legal grant.
 - Correlate every specialist handoff to the active task, plan, and work unit through a typed execution context.
 - Consolidate generic and specialist selection in one routing module and enforce permission, prerequisites, conflicts, task class, and immutable contract provenance.
 - Require domain-method invariants directly in the registry schema.
