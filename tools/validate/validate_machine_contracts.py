@@ -50,12 +50,9 @@ def _machine_catalog(root: Path, directory: str) -> set[str]:
 def _expected_machine_contracts(root: Path) -> set[str]:
     integrations = {
         path.relative_to(root).as_posix()
-        for path in (root / "integrations").glob("*/adapter.yaml")
+        for path in (root / "integrations").rglob("*")
+        if path.is_file() and path.suffix in {".yaml", ".yml", ".json"}
     }
-    integrations.update(
-        path.relative_to(root).as_posix()
-        for path in (root / "integrations").glob("*/release-verification.yaml")
-    )
     migrations = {
         path.relative_to(root).as_posix()
         for path in (root / "migration").glob("*.yaml")
