@@ -112,7 +112,7 @@ class ExecutionEngineTests(unittest.TestCase):
         self.assertEqual("research", result.routing_preview["work_unit"])
         self.assertEqual(
             [
-                "intelligence_analysis",
+                "intelligence_collection",
                 "public_research",
             ],
             result.routing_preview["requirements"],
