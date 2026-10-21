@@ -10,6 +10,7 @@ from typing import Any, Iterable, Mapping
 
 import yaml
 
+from .collection import build_collection_mission
 from .handoff import ExecutionContext, prepare_domain_context_handoff
 from .routing import build_routing_preview, route_capability, route_domain_method
 from .runtime import (
@@ -47,6 +48,8 @@ DOMAIN_CONTEXT_TERMS = (
     "medical",
     "cybersecurity",
 )
+
+_ARGUS_COLLECTION_MODES = {"ARGUS_COLLECTION", "HYBRID"}
 
 
 @dataclass(frozen=True)
@@ -158,7 +161,7 @@ def _partial_intelligence_classification() -> dict[str, Any]:
         "unresolved_facets": ["intelligence-domain-context"],
         "conditional_candidates": [],
         "evidence": [],
-        "next_action": "ARGUS enriches domain context after governed activation.",
+        "next_action": "ARGUS enriches non-sensitive collection context after governed activation.",
     }
 
 
@@ -169,18 +172,18 @@ def _partial_intelligence_alignment() -> dict[str, Any]:
         "frameworks": [],
         "compliance": "NOT_ASSESSED",
         "deviations": [],
-        "next_action": "ARGUS resolves applicable intelligence-domain requirements and evidence hierarchy.",
+        "next_action": "ARGUS may enrich collection evidence; ATLAS retains canonical framework authority.",
     }
 
 
 def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     """Compile current ATLAS state through one stable public interface.
 
-    Request triage is the first semantic gate. General searches and tasks stay
-    on the direct ATLAS path and avoid deep domain controls unless material.
-    Intelligence-grade work is routed to ARGUS with a governed PARTIAL handoff;
-    ARGUS performs the deeper intelligence-domain enrichment while ATLAS keeps
-    authority, permissions, approvals, state, verification, and delivery.
+    Request triage is the first semantic gate. Ordinary searches and tasks stay
+    on the direct ATLAS path. Structured collection activates ARGUS only through
+    an ATLAS-owned Collection-Need Gate, bounded collection mission, governed
+    domain handoff, and approved provider preview. Sensitive collection retains
+    ATLAS classification and clarification controls before delegation.
     """
 
     started = perf_counter_ns()
@@ -194,18 +197,17 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     def registry_items(name: str) -> list[dict[str, Any]]:
         return list(registry_payload(name)["items"])
 
-    request_triage = triage_request(envelope.objective)
     normalized = normalize_intent(envelope.objective)["normalized"]
     task_classes = tuple(classify_task(normalized))
     request_triage = triage_request(normalized, task_classes=task_classes)
+    collection_route = request_triage["collection_mode"] in _ARGUS_COLLECTION_MODES
     intelligence_route = request_triage["route"] == "INTELLIGENCE"
-    direct_domain_context = (
-        not intelligence_route and _needs_direct_domain_context(normalized)
-    )
+    material_domain_context = _needs_direct_domain_context(normalized)
+    direct_domain_context = not collection_route and material_domain_context
 
     taxonomies = registry_items("taxonomies")
     taxonomy_route = _deferred_taxonomy_route()
-    if direct_domain_context:
+    if material_domain_context:
         taxonomy_route = route_taxonomy_layer(
             envelope.objective,
             registry_items("taxonomy-routes"),
@@ -221,6 +223,10 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         **intent_profile,
         "request_route": request_triage["route"],
         "intelligence_types": list(request_triage["intelligence_types"]),
+        "collection_mode": request_triage["collection_mode"],
+        "collection_required": request_triage["collection_required"],
+        "collection_types": list(request_triage["collection_types"]),
+        "collection_depth": request_triage["collection_depth"],
     }
     behavioral_learning_state = {
         "mode": "DISABLED",
@@ -229,7 +235,7 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         "proposed_updates": [],
     }
 
-    if direct_domain_context:
+    if material_domain_context:
         substantive = taxonomy_route["status"] == "ROUTED"
         material_dimensions = taxonomy_route["material_dimensions"] or ["what"]
         completeness = assess_completeness({
@@ -279,6 +285,16 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
             substantive=False,
         )
 
+    collection_mission: dict[str, Any] | None = None
+    if collection_route and envelope.task_id is not None:
+        collection_mission = build_collection_mission(
+            envelope.objective,
+            task_id=envelope.task_id,
+            plan_id=envelope.plan_id,
+            request_triage=request_triage,
+            risk_flags=domain_classification.get("risk_flags", []),
+        )
+
     plan = tuple(build_plan(work_units))
     capability_audit = audit_capability_providers(registry_items("capabilities"))
     preview_active_unit = select_next_work_unit(
@@ -311,13 +327,14 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
             *intent_profile["candidate_requirements"],
         ),
         intent_profile=intent_profile,
+        collection_mission=collection_mission,
     )
     blocking_stage: str | None = None
     blocker: str | None = None
     routing_decisions: list[dict[str, Any]] = []
     candidate_active_unit: str | None = None
 
-    if direct_domain_context and substantive and envelope.clarification_status != "RESOLVED":
+    if material_domain_context and substantive and envelope.clarification_status != "RESOLVED":
         if not completeness["complete"]:
             blocking_stage = "MATERIAL_CONTEXT_MATRIX"
             blocker = (
@@ -452,6 +469,7 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
                             },
                             execution_context=context,
                             handoff=handoff,
+                            collection_mission=routing_preview.get("collection_mission"),
                         )
                         routing_decisions.append({
                             "status": (
@@ -464,6 +482,7 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
                             "requirement": provider["requirement"],
                             "reason": decision.get("reason"),
                             "handoff_id": handoff["handoff_id"] if handoff else None,
+                            "collection_mission_id": decision.get("collection_mission_id"),
                             "preview_digest": routing_preview["digest"],
                         })
                     else:
@@ -518,7 +537,7 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         "REQUEST_TRIAGE",
         "INTENT_NORMALIZATION",
     )
-    if direct_domain_context:
+    if material_domain_context:
         preflight_trace += (
             "TAXONOMY_ROUTING",
             "MATERIAL_CONTEXT_MATRIX",
@@ -527,6 +546,8 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         )
     elif intelligence_route:
         preflight_trace += ("SPECIALIST_HANDOFF_PREPARATION",)
+    if collection_route:
+        preflight_trace += ("COLLECTION_MISSION",)
     preflight_trace += (
         "PLANNING",
         "CAPABILITY_AUDIT",
@@ -543,8 +564,8 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         )
 
     processing_summary = (
-        f"Route {request_triage['route']}; "
-        f"domain context {'ON_DEMAND' if not direct_domain_context else taxonomy_route['status']}; "
+        f"Route {request_triage['route']}; collection {request_triage['collection_mode']}; "
+        f"domain context {'ON_DEMAND' if not material_domain_context else taxonomy_route['status']}; "
         f"intent {intent_profile['category']}; "
         f"capability audit {capability_audit['status']}; "
         f"routing {envelope.routing_approval_status if routing_decisions else routing_preview['status']}; "
