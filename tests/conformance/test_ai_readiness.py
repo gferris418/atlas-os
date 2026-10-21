@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 import unittest
 from pathlib import Path
 
@@ -27,7 +29,8 @@ class MachineReadableAIReadinessTests(unittest.TestCase):
         schema = json.loads(schema_path.read_text(encoding="utf-8"))
         manifest = load_yaml("ai/manifest.yaml")
         jsonschema.validate(manifest, schema, format_checker=jsonschema.FormatChecker())
-        self.assertEqual(product["product"]["version"], manifest["product"]["version"])
+        self.assertNotIn("version", manifest["product"])
+        self.assertEqual("atlas-os.yaml#/product/version", manifest["product"]["version_pointer"])
         self.assertEqual("atlas-os.yaml", manifest["product"]["authority"])
         self.assertEqual(["yaml", "json"], manifest["policy"]["authoritative_formats"])
         self.assertEqual("documentation-only", manifest["policy"]["markdown_role"])
@@ -89,6 +92,16 @@ class MachineReadableAIReadinessTests(unittest.TestCase):
                 self.assertIn(record["id"], by_id)
                 self.assertEqual(record["status"].lower(), by_id[record["id"]]["status"])
                 self.assertEqual(record["release_blocking"], by_id[record["id"]]["release_blocking"])
+
+    def test_ai_readiness_validator_passes(self) -> None:
+        completed = subprocess.run(
+            [sys.executable, "tools/validate/validate_ai_readiness.py", "."],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
 
 
 if __name__ == "__main__":
