@@ -4,6 +4,18 @@ All notable changes follow semantic versioning and preserve release lineage. The
 
 ## Unreleased
 
+## v2.0.2-rc.4
+
+- Add `REQUEST_TRIAGE` as the first semantic execution gate with `GENERAL_SEARCH`, `GENERAL_TASK`, and `INTELLIGENCE` routes.
+- Keep ordinary searches and tasks on a direct ATLAS path; make taxonomy, classification, standards/framework alignment, and other domain processing conditional on materiality.
+- Introduce first-class machine contracts for Mission Control, Control Plane, Observability/Dashboard, and conditional Domain Intelligence.
+- Generalize ARGUS from a public-sector-opportunity-only specialist into the governed `intelligence_analysis` specialist for strategic, market, opportunity, competitive, stakeholder, political-economic, monitoring, forecasting, scenario, and decision intelligence.
+- Accept governed `PARTIAL` domain-context handoffs for ARGUS enrichment while preserving ATLAS authority over permissions, planning, routing, approvals, verification, persistence authorization, and final delivery.
+- Prevent downstream provider logic from silently escalating `GENERAL_SEARCH` or `GENERAL_TASK` into ARGUS activation.
+- Pin ARGUS Intelligence `2.1.0-rc.1` at commit `58459c2025f404598b13afe4567426b015c3e3eb` and activation-contract SHA-256 `1b233e8ae90cc214d0c2146ebeecb7de2a29a83636115c711a42e91a005b49a9`.
+- Publish provider-neutral control revision `atlas-bootstrap-2026-10-22-r8` and update current host verification contracts to test direct-search versus intelligence routing.
+- Keep `MIG-029` and `MIG-037` open until genuine independent host evidence verifies the current rc.4/r8 behavior.
+
 ## v2.0.2-rc.3
 
 - Add `atlas-ai.yaml` as a schema-validated machine discovery entrypoint while preserving `atlas-os.yaml` as the sole product/release authority.
