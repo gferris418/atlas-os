@@ -7,6 +7,7 @@ product:
   schema_version: 2
   status: RELEASED
   classification: internal
+  license: MIT
 authority:
   manifest: atlas-os.yaml
   core_spec: spec/core.yaml

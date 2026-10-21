@@ -27,6 +27,12 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertEqual("2.0.1", manifest["product"]["version"])
         self.assertEqual("atlas-os.yaml#/product/version", (ROOT / "VERSION").read_text().strip())
 
+    def test_manifest_declares_the_repository_license_separately_from_classification(self) -> None:
+        manifest = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
+        self.assertEqual("internal", manifest["product"]["classification"])
+        self.assertEqual("MIT", manifest["product"]["license"])
+        self.assertTrue((ROOT / "LICENSE").read_text(encoding="utf-8").startswith("MIT License"))
+
     def test_release_tag_must_match_manifest_and_release_state(self) -> None:
         manifest = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
         version = manifest["product"]["version"]

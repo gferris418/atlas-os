@@ -2,6 +2,7 @@
 
 **Current release:** `v2.0.1`
 **Classification:** Internal  
+**License:** [MIT](LICENSE)
 **Release status:** **RELEASED / STABLE**.
 
 ATLAS-OS is a model-agnostic execution-governance specification for AI agents. It turns user intent into a controlled execution spine that preserves context, plans dependencies, routes capabilities, tracks evidence and uncertainty, enforces approval boundaries, verifies results, separates task state from canonical knowledge, and produces reproducible outputs.
