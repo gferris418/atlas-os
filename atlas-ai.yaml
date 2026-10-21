@@ -17,6 +17,7 @@ discovery_order:
   - spec/execution-spine.yaml
   - applicable spec/*.yaml
   - applicable registries/*.yaml
+  - integrations/<surface>/adapter.yaml
   - active migration/*.yaml
   - integrations/<surface>/release-verification.yaml
 machine_contracts:
@@ -50,12 +51,18 @@ machine_contracts:
   - migration/MIG-029.yaml
   - migration/MIG-037.yaml
   - migration/dtif-reconciliation.yaml
+  - integrations/chatgpt/adapter.yaml
+  - integrations/codex/adapter.yaml
+  - integrations/work/adapter.yaml
+  - integrations/hermes-agent/adapter.yaml
+  - integrations/generic-ai-host/adapter.yaml
   - integrations/chatgpt/release-verification.yaml
   - integrations/codex/release-verification.yaml
   - integrations/work/release-verification.yaml
   - integrations/hermes-agent/release-verification.yaml
   - schemas/atlas-os.schema.json
   - schemas/ai-manifest.schema.json
+  - schemas/surface-adapter.schema.json
   - schemas/migration.schema.json
   - schemas/release-verification.schema.json
   - schemas/task.schema.json
