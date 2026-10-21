@@ -19,6 +19,7 @@ from atlas_runtime import (
     classify_action,
     classify_domain_context,
     classify_task,
+    classify_task_intent,
     confirm_library_save,
     create_dashboard,
     determine_execution_depth,
@@ -912,6 +913,39 @@ class ClassificationAndDashboardTests(unittest.TestCase):
         self.assertIn("RESEARCH", labels)
         self.assertIn("ANALYSIS", labels)
         self.assertIn("MULTI_STAGE", labels)
+
+    def test_task_intent_classification_recommends_but_does_not_route_providers(self) -> None:
+        opportunity = classify_task_intent(
+            "Find public procurement opportunities for coastal patrol vessels",
+            task_classes=["RESEARCH"],
+            taxonomy_route={"hierarchy": {"domain": "government-public-sector"}},
+        )
+        supplier = classify_task_intent(
+            "Find patrol vessel manufacturers and distributors",
+            task_classes=["RESEARCH"],
+            taxonomy_route={"hierarchy": {"domain": "industrial"}},
+        )
+        market = classify_task_intent(
+            "Validate a new maritime services business idea and market size",
+            task_classes=["ANALYSIS"],
+            taxonomy_route={"hierarchy": {"domain": "commercial"}},
+        )
+
+        self.assertEqual("OPPORTUNITY_IDENTIFICATION", opportunity["category"])
+        self.assertEqual(
+            [
+                "government_public_sector_opportunity_intelligence",
+                "public_research",
+            ],
+            opportunity["candidate_requirements"],
+        )
+        self.assertEqual("SUPPLIER_VENDOR_SOURCING", supplier["category"])
+        self.assertEqual(["public_research"], supplier["candidate_requirements"])
+        self.assertEqual("MARKET_VALIDATION", market["category"])
+        self.assertEqual(["public_research"], market["candidate_requirements"])
+        for profile in (opportunity, supplier, market):
+            self.assertEqual("RECOMMEND_ONLY", profile["routing_authority"])
+            self.assertTrue(profile["matched_evidence"])
 
     def test_depth_is_proportional(self) -> None:
         self.assertEqual("L0", determine_execution_depth())

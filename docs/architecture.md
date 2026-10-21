@@ -1,6 +1,6 @@
 # Architecture
 
-ATLAS-OS is a normative execution-governance core surrounded by surface adapters. The core owns context, completeness, governed domain classification, domain-framework alignment, planning, routing, evidence, approval, output profiles, verification, persistence, versioning, capability admission, and user-visible execution state. Adapters use native surface capabilities and map them into those contracts without copying or changing them.
+ATLAS-OS is a normative execution-governance core surrounded by surface adapters. The core owns context, a lightweight domain-neutral intent profile, completeness, governed domain classification, domain-framework alignment, planning, routing, evidence, approval, output profiles, verification, persistence, versioning, capability admission, and user-visible execution state. Adapters use native surface capabilities and map them into those contracts without copying or changing them.
 
 ```text
 USER INTENT
@@ -43,6 +43,8 @@ USER INTENT
 ```
 
 "OS" describes the governed execution layer around an AI agent; it does not describe the host machine's operating system. The core is independent of model provider, agent framework, desktop OS, and deployment location. Known adapters document concrete capability mappings, while the validated generic surface seam permits new AI hosts without changing core semantics.
+
+The same sequence applies across fertilizer, maritime assets, radar, software, healthcare, and other domains. Domain-specific taxonomies, classifications, standards, laws, and providers live in governed data or adapters; the core does not grow a separate hard-coded workflow for every industry.
 
 ## Provider-independent capabilities
 

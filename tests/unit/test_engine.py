@@ -93,6 +93,12 @@ class ExecutionEngineTests(unittest.TestCase):
         self.assertEqual("BLOCKED", result.state)
         self.assertIsNone(result.active_unit)
         self.assertEqual("ROUTING_PREVIEW", result.dashboard["active_stage"])
+        self.assertEqual(
+            "OPPORTUNITY_IDENTIFICATION",
+            result.intent_profile["category"],
+        )
+        self.assertEqual("DISABLED", result.behavioral_learning_state["mode"])
+        self.assertEqual("NOT_AUTHORIZED", result.behavioral_learning_state["persistence"])
         self.assertEqual("PROPOSED", result.routing_preview["status"])
         self.assertIn("task_id", result.routing_preview)
         self.assertEqual("TASK-BD-RADAR-OPPORTUNITIES", result.routing_preview["task_id"])

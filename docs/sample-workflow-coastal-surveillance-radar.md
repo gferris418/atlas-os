@@ -23,6 +23,8 @@ ATLAS preserves the literal entities and capability terms:
 
 The request does not state the intended outcome. ATLAS does not silently reinterpret it as acquisition, technical design, market research, or operational planning.
 
+The domain-neutral intent profile is therefore `GENERAL_RESEARCH` or `GENERAL_TASK`, depending on the surrounding request, with no authority to route a provider. If the user instead asks to “find public procurement opportunities,” the profile becomes `OPPORTUNITY_IDENTIFICATION` and recommends government/public-sector opportunity intelligence plus public research as semantic needs. ARGUS remains only a candidate provider until the later routing preview is approved.
+
 The Who/What/Where/When/Why/Which/How/How Much matrix is applied proportionally. Only missing answers that could change scope, authorization, safety, classification, or the deliverable become clarification questions.
 
 ## 3. Task classification and depth

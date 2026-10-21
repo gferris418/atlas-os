@@ -80,6 +80,7 @@ class CommandLineTests(unittest.TestCase):
         self.assertEqual("PROPOSED", result_event["routing_preview"]["status"])
         self.assertEqual([], result_event["routing_decisions"])
         self.assertIn("Routing preview", text.stdout)
+        self.assertIn("Intent: OPPORTUNITY_IDENTIFICATION (recommend only)", text.stdout)
         self.assertIn("ARGUS Intelligence", text.stdout)
         self.assertIn("What:", text.stdout)
         self.assertIn("How:", text.stdout)

@@ -56,10 +56,32 @@
     "quality_gate": {"enum": ["PENDING", "PASS", "FAIL", "BLOCKED"]},
     "performance_mode": {"const": "LEAN"},
     "framework_alignment": {"enum": ["ALIGNED", "RESEARCH_REQUIRED", "NOT_APPLICABLE", "NOT_REQUIRED"]},
+    "intent_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["category", "matched_evidence", "candidate_requirements", "routing_authority"],
+      "properties": {
+        "category": {"enum": ["OPPORTUNITY_IDENTIFICATION", "SUPPLIER_VENDOR_SOURCING", "MARKET_VALIDATION", "GENERAL_RESEARCH", "GENERAL_TASK"]},
+        "matched_evidence": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "candidate_requirements": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "routing_authority": {"const": "RECOMMEND_ONLY"}
+      }
+    },
+    "behavioral_learning_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "persistence", "applied_preferences", "proposed_updates"],
+      "properties": {
+        "mode": {"enum": ["DISABLED", "SESSION_ONLY", "USER_AUTHORIZED"]},
+        "persistence": {"enum": ["NOT_AUTHORIZED", "SESSION_ONLY", "HOST_MANAGED"]},
+        "applied_preferences": {"type": "array"},
+        "proposed_updates": {"type": "array"}
+      }
+    },
     "routing_preview": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "objective", "task_id", "plan_id", "surface", "plan", "work_unit", "requirements", "providers", "unmatched_requirements", "cyclic_provider_ids", "unresolved_gates", "execution_sequence", "steps", "approval_prompt", "digest"],
+      "required": ["status", "objective", "task_id", "plan_id", "surface", "plan", "work_unit", "requirements", "intent_profile", "providers", "unmatched_requirements", "cyclic_provider_ids", "unresolved_gates", "execution_sequence", "steps", "approval_prompt", "digest"],
       "properties": {
         "status": {"enum": ["NOT_REQUIRED", "PROPOSED"]},
         "objective": {"type": "string", "minLength": 1},
@@ -69,6 +91,17 @@
         "plan": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "work_unit": {"type": ["string", "null"]},
         "requirements": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "intent_profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["category", "matched_evidence", "candidate_requirements", "routing_authority"],
+          "properties": {
+            "category": {"enum": ["OPPORTUNITY_IDENTIFICATION", "SUPPLIER_VENDOR_SOURCING", "MARKET_VALIDATION", "GENERAL_RESEARCH", "GENERAL_TASK"]},
+            "matched_evidence": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+            "candidate_requirements": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+            "routing_authority": {"const": "RECOMMEND_ONLY"}
+          }
+        },
         "unresolved_gates": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "execution_sequence": {"type": "array", "items": {"type": "string"}},
         "providers": {

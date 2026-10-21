@@ -11,7 +11,7 @@ contract:
       purpose: Route the untouched prompt through the internal Domain -> Sub-Domain -> Vertical -> Artifact Class hierarchy and identify candidate governed classification schemes without assigning unverified external codes.
     - id: 1
       name: INTENT_NORMALIZATION
-      purpose: Resolve the goal, requested outcome, constraints, exclusions, and implicit expectations without losing original literals.
+      purpose: Resolve the goal, requested outcome, constraints, exclusions, and implicit expectations without losing original literals; classify the domain-neutral task intent and recommend semantic capability needs without routing a provider.
     - id: 2
       name: MATERIAL_CONTEXT_MATRIX
       purpose: Assess Who, What, Where, When, Why, Which, How, and How Much, asking only questions whose answers materially change execution.

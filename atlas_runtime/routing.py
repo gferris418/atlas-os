@@ -51,6 +51,7 @@ def build_routing_preview(
     domain_alignment: Mapping[str, Any] | None = None,
     additional_provider_groups: Mapping[str, Iterable[dict[str, Any]]] | None = None,
     requested_requirements: Iterable[str] = (),
+    intent_profile: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Describe proposed provider routing without activating a provider."""
     lowered = " ".join(text.lower().split())
@@ -235,6 +236,7 @@ def build_routing_preview(
         "plan": list(plan),
         "work_unit": work_unit,
         "requirements": requirements,
+        "intent_profile": deepcopy(intent_profile or {}),
         "providers": providers,
         "unmatched_requirements": unmatched_requirements,
         "cyclic_provider_ids": cyclic_provider_ids,

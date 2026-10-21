@@ -16,7 +16,7 @@ Use this skill when the user asks to run, install, apply, or govern work with AT
 
 1. Locate the repository root and read `atlas-os.yaml` as the sole product and release authority.
 2. Preserve the untouched prompt, then begin with the taxonomy layer: Domain -> Sub-Domain -> Vertical -> Artifact Class. Identify candidate classification schemes without assigning unverified external codes.
-3. Normalize intent and assess only material Who, What, Where, When, Why, Which, How, and How Much gaps.
+3. Normalize intent, classify the domain-neutral task intent, and recommend semantic capability needs without selecting or routing a provider; then assess only material Who, What, Where, When, Why, Which, How, and How Much gaps.
 4. Resolve applicable jurisdiction, operator industry, supplier industry, product or service, capability, lifecycle, stakeholder, and information-sensitivity classifications before selecting domain requirements or frameworks.
 5. Read `spec/core.yaml`, then only the additional active specifications, registries, and integration guidance material to the current task.
 6. Treat ATLAS-OS as an AI-agent governance layer. Never present it as a replacement or modification for the host machine's operating system.
@@ -36,3 +36,4 @@ For installation and host mapping, read `docs/ai-host-installation.md` and the m
 - Never treat model output as verified evidence by itself.
 - Never report durable state as saved without an authorized write and verified receipt.
 - Never create provider-specific core semantics; keep host behavior in its adapter.
+- Never learn silently from user behavior; preferences must be explicit, inspectable, reversible, and separately authorized before durable storage.

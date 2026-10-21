@@ -19,6 +19,7 @@ from .runtime import (
     build_plan,
     classify_domain_context,
     classify_task,
+    classify_task_intent,
     create_dashboard,
     normalize_intent,
     route_taxonomy_layer,
@@ -84,6 +85,8 @@ class ExecutionResult:
     domain_classification: dict[str, Any]
     domain_alignment: dict[str, Any]
     capability_audit: dict[str, Any]
+    intent_profile: dict[str, Any]
+    behavioral_learning_state: dict[str, Any]
     routing_preview: dict[str, Any]
     routing_decisions: tuple[dict[str, Any], ...]
     execution_trace: tuple[str, ...]
@@ -133,6 +136,17 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     )
     normalized = normalize_intent(envelope.objective)["normalized"]
     task_classes = tuple(classify_task(normalized))
+    intent_profile = classify_task_intent(
+        normalized,
+        task_classes=task_classes,
+        taxonomy_route=taxonomy_route,
+    )
+    behavioral_learning_state = {
+        "mode": "DISABLED",
+        "persistence": "NOT_AUTHORIZED",
+        "applied_preferences": [],
+        "proposed_updates": [],
+    }
     substantive = taxonomy_route["status"] == "ROUTED"
     material_dimensions = taxonomy_route["material_dimensions"] or ["what"]
     completeness = assess_completeness({
@@ -181,7 +195,11 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         domain_classification=domain_classification,
         domain_alignment=domain_alignment,
         additional_provider_groups=envelope.provider_inventory,
-        requested_requirements=envelope.capability_requirements,
+        requested_requirements=(
+            *envelope.capability_requirements,
+            *intent_profile["candidate_requirements"],
+        ),
+        intent_profile=intent_profile,
     )
     blocking_stage: str | None = None
     blocker: str | None = None
@@ -362,6 +380,7 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         )
     processing_summary = (
         f"Taxonomy {taxonomy_route['status']}; context "
+        f"intent {intent_profile['category']}; "
         f"{'COMPLETE' if completeness['complete'] else 'PARTIAL'}; classification "
         f"{domain_classification['status']}; capability audit {capability_audit['status']}; "
         f"routing {envelope.routing_approval_status if routing_decisions else routing_preview['status']}; "
@@ -394,6 +413,8 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     )
     dashboard["routing_preview"] = deepcopy(routing_preview)
     dashboard["routing_decisions"] = deepcopy(routing_decisions)
+    dashboard["intent_profile"] = deepcopy(intent_profile)
+    dashboard["behavioral_learning_state"] = deepcopy(behavioral_learning_state)
     dashboard["duration_ms"] = max(0, round((perf_counter_ns() - started) / 1_000_000))
     return ExecutionResult(
         state=state,
@@ -407,6 +428,8 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         domain_classification=domain_classification,
         domain_alignment=domain_alignment,
         capability_audit=capability_audit,
+        intent_profile=intent_profile,
+        behavioral_learning_state=behavioral_learning_state,
         routing_preview=routing_preview,
         routing_decisions=tuple(routing_decisions),
         execution_trace=execution_trace,

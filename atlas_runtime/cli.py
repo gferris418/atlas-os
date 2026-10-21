@@ -75,6 +75,8 @@ def _render_routing_preview(preview: dict[str, Any]) -> str:
     lines = [
         f"Routing preview · {preview['digest']}",
         f"Objective: {preview['objective']}",
+        f"Intent: {preview['intent_profile']['category']} "
+        f"({preview['intent_profile']['routing_authority'].lower().replace('_', ' ')})",
         f"Execution: {preview['task_id'] or 'task ID pending'} · {preview['plan_id']} · {preview['surface']}",
         f"Work unit: {preview['work_unit'] or 'none'}",
         "Execution sequence: " + (" -> ".join(preview["execution_sequence"]) or "no provider routing"),
@@ -109,6 +111,8 @@ def _write_result(stdout: TextIO, result: ExecutionResult, output_format: str) -
         "active_unit": result.active_unit,
         "event": "result",
         "plan": list(result.plan),
+        "intent_profile": result.intent_profile,
+        "behavioral_learning_state": result.behavioral_learning_state,
         "routing_decisions": list(result.routing_decisions),
         "routing_preview": result.routing_preview,
         "state": result.state,
