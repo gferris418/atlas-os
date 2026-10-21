@@ -22,20 +22,25 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class RepositoryContractTests(unittest.TestCase):
-    def test_execution_spine_uses_triage_first_conditional_domain_flow(self) -> None:
+    def test_execution_spine_uses_collection_need_before_domain_flow(self) -> None:
         spine = yaml.safe_load((ROOT / "spec/execution-spine.yaml").read_text(encoding="utf-8"))
         self.assertEqual(
             [
-                "REQUEST_TRIAGE",
-                "INTENT_NORMALIZATION",
+                "INTENT_AND_TARGET_INTERPRETATION",
+                "COLLECTION_NEED_GATE",
                 "CONDITIONAL_DOMAIN_CONTEXT",
                 "CAPABILITY_AND_EXECUTION_PLAN",
                 "DATA_PLANE_EXECUTION",
                 "ASSURANCE_AND_VERIFICATION",
-                "PERSISTENCE_AND_DELIVERY",
+                "OUTPUT_AND_PERSISTENCE",
             ],
             [layer["name"] for layer in spine["contract"].get("layers", [])],
         )
+        self.assertEqual(
+            "Human command, approval, pause/resume/abort, priority, scope and exception requests.",
+            spine["contract"]["cross_cutting"]["mission_control"],
+        )
+        self.assertIn("ARGUS does not create a competing spine", spine["contract"]["visibility"])
 
     def test_manifest_is_only_product_version_authority(self) -> None:
         manifest = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
