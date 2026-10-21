@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os.local/schemas/canonical-capability-registry.schema.json",
+  "title": "ATLAS Canonical Capability Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "registry", "items"],
+  "properties": {
+    "schema": {"const": "schemas/canonical-capability-registry.schema.json"},
+    "registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "status"],
+      "properties": {
+        "id": {"const": "registry.canonical-capabilities"},
+        "version": {"type": "integer", "minimum": 1},
+        "status": {"enum": ["active", "draft"]}
+      }
+    },
+    "items": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": {"$ref": "#/$defs/capability"}
+    }
+  },
+  "$defs": {
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "name", "owner", "class", "purpose", "status",
+        "accepted_task_classes", "supported_domains", "activation",
+        "collection_dependency", "permissions", "side_effect_class",
+        "evidence_requirement", "security_profile", "input_schema",
+        "output_schema", "fallback"
+      ],
+      "properties": {
+        "id": {"type": "string", "pattern": "^(atlas|argus)\\.[a-z0-9-]+$"},
+        "name": {"type": "string", "minLength": 1},
+        "owner": {"enum": ["ATLAS", "ARGUS"]},
+        "class": {"enum": ["KERNEL", "ROUTED", "SPECIALIST", "HYBRID"]},
+        "purpose": {"type": "string", "minLength": 1},
+        "status": {"enum": ["required", "available", "candidate"]},
+        "accepted_task_classes": {
+          "type": "array",
+          "items": {"enum": ["ANSWER", "RESEARCH", "ANALYSIS", "DECISION", "WRITING", "DOCUMENT", "DATA", "CODING", "DEBUGGING", "DESIGN", "PLANNING", "WORKFLOW", "EXTERNAL_ACTION", "MONITORING", "MULTI_STAGE"]},
+          "uniqueItems": true
+        },
+        "supported_domains": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "activation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["automatic", "conditions", "exclusions"],
+          "properties": {
+            "automatic": {"type": "boolean"},
+            "conditions": {"type": "array", "items": {"type": "string"}},
+            "exclusions": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "collection_dependency": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "allowed_collection_types"],
+          "properties": {
+            "mode": {"enum": ["NEVER", "OPTIONAL", "REQUIRED", "CONDITIONAL"]},
+            "allowed_collection_types": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+          }
+        },
+        "permissions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["read", "write", "external_action"],
+          "properties": {
+            "read": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+            "write": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+            "external_action": {"type": "boolean"}
+          }
+        },
+        "side_effect_class": {"enum": ["NONE", "REVERSIBLE", "MATERIAL", "HIGH_IMPACT"]},
+        "evidence_requirement": {"enum": ["NONE", "BASIC", "SOURCED", "CORROBORATED", "DECISION_GRADE"]},
+        "security_profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["untrusted_input", "tool_output_untrusted", "network_access", "sensitive_data"],
+          "properties": {
+            "untrusted_input": {"type": "boolean"},
+            "tool_output_untrusted": {"type": "boolean"},
+            "network_access": {"enum": ["NONE", "OPTIONAL", "REQUIRED"]},
+            "sensitive_data": {"enum": ["PROHIBITED", "CONDITIONAL", "ALLOWED_WITH_GOVERNANCE"]}
+          }
+        },
+        "input_schema": {"type": "string", "minLength": 1},
+        "output_schema": {"type": "string", "minLength": 1},
+        "fallback": {"type": ["string", "null"]}
+      }
+    }
+  }
+}
