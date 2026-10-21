@@ -1,0 +1,33 @@
+schema: schemas/spec.schema.json
+id: spec.observability
+title: Observability, measurement, and dashboard projection
+status: active
+normative: true
+contract:
+  purpose: Provide read-oriented measurement and state projections showing what is happening, what has happened, how execution is performing, and what needs attention.
+  owns:
+    - telemetry_projection
+    - progress_measurement
+    - performance_and_latency_measurement
+    - quality_and_verification_projection
+    - reliability_and_degradation_projection
+    - persistence_status_projection
+  dashboard_role: spec/dashboard.yaml defines the human presentation contract over observability state; Dashboard is not a source of execution authority.
+  source_of_truth_rule: Metrics and dashboard state must be derived from Control Plane, data-plane, verification, persistence, and specialist events or receipts. A displayed value cannot silently become authoritative state.
+  mutation_rule: A user action initiated from a dashboard is converted into a Mission Control command and evaluated by the Control Plane before any state change.
+  event_rule: Emit or refresh projections only at material state changes such as work-unit start or completion, blocker, approval, routing, verification, persistence, degradation, or delivery; do not poll or emit token-by-token progress.
+  measurement_rule: Measured values must use actual available telemetry; unavailable duration, cost, token, confidence, or performance values remain unavailable rather than fabricated.
+  performance_rule: Observability must remain lightweight, event-driven, and non-blocking relative to substantive execution.
+  privacy_rule: Never expose private chain-of-thought, hidden reasoning tokens, secrets, or unnecessary sensitive payloads as telemetry.
+invariants:
+  - INV-003
+  - INV-004
+  - INV-017
+  - INV-020
+  - INV-021
+references:
+  - spec/dashboard.yaml
+  - spec/mission-control.yaml
+  - spec/control-plane.yaml
+  - spec/verification.yaml
+  - spec/persistence.yaml
