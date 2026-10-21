@@ -268,11 +268,10 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
             registry_items("frameworks"),
             substantive=substantive,
         )
-        # A caller may mark the material clarification as RESOLVED. Preserve the
-        # identified risks and unresolved facets, but allow a PARTIAL handoff rather
-        # than silently discarding the sensitive classification or re-blocking the
-        # exact clarification state that the caller has resolved.
-        if collection_route and envelope.clarification_status == "RESOLVED":
+        # A bounded collection mission may carry unresolved sensitive facets as a
+        # PARTIAL handoff when no clarification was requested. Explicit PENDING
+        # clarification still blocks. Risks and unresolved facets remain visible.
+        if collection_route and envelope.clarification_status in {"RESOLVED", "NOT_REQUIRED"}:
             if domain_classification.get("status") == "RESEARCH_REQUIRED":
                 domain_classification = {
                     **domain_classification,
@@ -361,7 +360,12 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     routing_decisions: list[dict[str, Any]] = []
     candidate_active_unit: str | None = None
 
-    if material_domain_context and substantive and envelope.clarification_status != "RESOLVED":
+    if (
+        material_domain_context
+        and substantive
+        and envelope.clarification_status != "RESOLVED"
+        and not (collection_route and envelope.clarification_status == "NOT_REQUIRED")
+    ):
         if not completeness["complete"]:
             blocking_stage = "MATERIAL_CONTEXT_MATRIX"
             blocker = "Clarify material context: " + ", ".join(completeness["questions"])
