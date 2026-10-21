@@ -92,7 +92,10 @@ def _render_routing_preview(preview: dict[str, Any]) -> str:
             f"  How: {provider['method']}",
             f"  Permission: {provider['permission']} | Data: {provider['data_scope']} | "
             f"Fallback: {provider['fallback'] or 'none'}",
+            f"  Identity: {provider['source']} @ {provider['version']} | "
+            f"Authority: {provider['authority']} | Risk: {provider['risk_class']}",
             f"  Prerequisites: {', '.join(provider['prerequisites']) or 'none'}",
+            f"  Conflicts: {', '.join(provider['conflicts_with']) or 'none'}",
             f"  Unresolved gates: {', '.join(provider['unresolved_gates']) or 'none'}",
         ))
     lines.append(f"Review: {preview['approval_prompt']}")

@@ -218,6 +218,13 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         elif domain_alignment["status"] == "RESEARCH_REQUIRED":
             blocking_stage = "DOMAIN_FRAMEWORK_ALIGNMENT"
             blocker = domain_alignment["next_action"]
+    if (
+        blocking_stage is None
+        and routing_preview["status"] == "PROPOSED"
+        and envelope.clarification_status == "PENDING"
+    ):
+        blocking_stage = "MATERIAL_CONTEXT_MATRIX"
+        blocker = "Resolve material clarification before provider routing or execution."
     if blocking_stage is None and routing_preview["status"] == "PROPOSED":
         if envelope.routing_approval_status == "PENDING":
             blocking_stage = "ROUTING_PREVIEW"
@@ -244,6 +251,15 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
                 blocker = (
                     "Provider prerequisite cycle: "
                     + ", ".join(routing_preview["cyclic_provider_ids"])
+                )
+            elif routing_preview["conflicting_provider_pairs"]:
+                blocking_stage = "ROUTING"
+                blocker = "Conflicting providers cannot be routed together."
+            elif routing_preview["missing_prerequisite_providers"]:
+                blocking_stage = "ROUTING"
+                blocker = (
+                    "Provider prerequisites are unavailable: "
+                    + ", ".join(routing_preview["missing_prerequisite_providers"])
                 )
             elif candidate_active_unit is not None:
                 context = ExecutionContext(

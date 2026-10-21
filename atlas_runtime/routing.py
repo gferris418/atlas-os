@@ -77,29 +77,45 @@ def build_routing_preview(
 
     requirements = list(dict.fromkeys(requirements))
 
-    provider_groups: list[tuple[str, list[dict[str, Any]]]] = [
+    built_in_provider_groups: list[tuple[str, list[dict[str, Any]]]] = [
         ("domain-method", list(domain_methods.get("items", []))),
         ("skill", list(skills)),
         ("tool", list(tools)),
         ("capability", list(capabilities)),
     ]
+    host_provider_groups: list[tuple[str, list[dict[str, Any]]]] = []
     if additional_provider_groups:
         unknown_types = set(additional_provider_groups) - _PROVIDER_TYPES
         if unknown_types:
             raise ValueError(
                 "unsupported provider type: " + ", ".join(sorted(unknown_types))
             )
-        provider_groups.extend(
+        host_provider_groups.extend(
             (provider_type, list(records))
             for provider_type, records in additional_provider_groups.items()
         )
-    host_provider_types = set(additional_provider_groups or {})
+    provider_groups = built_in_provider_groups + host_provider_groups
     required_host_fields = {
         "id", "name", "description", "status", "authority", "permission",
         "risk_class", "version", "source", "capabilities", "requires", "data_scope",
         "conflicts_with", "fallback",
     }
     seen_provider_ids: dict[str, str] = {}
+    for provider_type, records in host_provider_groups:
+        for record in records:
+            provider_id = str(record.get("id", ""))
+            missing = required_host_fields - set(record)
+            if missing:
+                raise ValueError(
+                    f"host provider {provider_id or '<unknown>'} lacks admission fields: "
+                    + ", ".join(sorted(missing))
+                )
+            if record.get("authority") not in _AUTHORITY:
+                raise ValueError(f"host provider has invalid authority: {provider_id}")
+            if record.get("permission") not in {"read", "write"}:
+                raise ValueError(f"host provider has invalid permission: {provider_id}")
+            if record.get("status") not in {"active", "available"}:
+                raise ValueError(f"host provider is not available: {provider_id}")
     for provider_type, records in provider_groups:
         for record in records:
             provider_id = str(record.get("id", ""))
@@ -108,19 +124,8 @@ def build_routing_preview(
             if provider_id in seen_provider_ids:
                 raise ValueError(f"provider id is registered more than once: {provider_id}")
             seen_provider_ids[provider_id] = provider_type
-            if provider_type in host_provider_types:
-                missing = required_host_fields - set(record)
-                if missing:
-                    raise ValueError(
-                        f"host provider {provider_id or '<unknown>'} lacks admission fields: "
-                        + ", ".join(sorted(missing))
-                    )
-                if record.get("authority") not in _AUTHORITY:
-                    raise ValueError(f"host provider has invalid authority: {provider_id}")
-                if record.get("permission") not in {"read", "write"}:
-                    raise ValueError(f"host provider has invalid permission: {provider_id}")
-                if record.get("status") not in {"active", "available"}:
-                    raise ValueError(f"host provider is not available: {provider_id}")
+    if work_unit is None:
+        requirements = []
     providers: list[dict[str, Any]] = []
     for requirement in requirements:
         for provider_type, records in provider_groups:
@@ -147,7 +152,12 @@ def build_routing_preview(
                         "return its result to the ATLAS plan for verification."
                     ),
                     "permission": record.get("permission", "read"),
+                    "authority": record.get("authority", "model"),
+                    "risk_class": record.get("risk_class", "unknown"),
+                    "version": str(record.get("version", "unknown")),
+                    "source": record.get("source", "unknown"),
                     "prerequisites": prerequisites,
+                    "conflicts_with": list(record.get("conflicts_with", [])),
                     "unresolved_gates": [],
                     "data_scope": (
                         record.get("data_scope")
@@ -193,6 +203,13 @@ def build_routing_preview(
             )
         provider["unresolved_gates"] = list(dict.fromkeys(unresolved))
 
+    conflicting_provider_pairs = sorted({
+        tuple(sorted((provider["id"], conflict)))
+        for provider in providers
+        for conflict in provider["conflicts_with"]
+        if conflict in candidate_ids and conflict != provider["id"]
+    })
+
     ordered: list[dict[str, Any]] = []
     remaining = list(providers)
     cyclic_provider_ids: list[str] = []
@@ -226,6 +243,18 @@ def build_routing_preview(
         unresolved_gates.append(
             "provider_dependency_cycle:" + ",".join(cyclic_provider_ids)
         )
+    unresolved_gates.extend(
+        "provider_conflict:" + ",".join(pair)
+        for pair in conflicting_provider_pairs
+    )
+    missing_prerequisite_providers = sorted(
+        provider["id"]
+        for provider in providers
+        if any(
+            gate.startswith("missing_prerequisite:")
+            for gate in provider["unresolved_gates"]
+        )
+    )
 
     preview = {
         "status": "PROPOSED" if requirements else "NOT_REQUIRED",
@@ -240,6 +269,8 @@ def build_routing_preview(
         "providers": providers,
         "unmatched_requirements": unmatched_requirements,
         "cyclic_provider_ids": cyclic_provider_ids,
+        "conflicting_provider_pairs": [list(pair) for pair in conflicting_provider_pairs],
+        "missing_prerequisite_providers": missing_prerequisite_providers,
         "unresolved_gates": unresolved_gates,
         "execution_sequence": [provider["id"] for provider in ordered],
         "steps": [

@@ -387,6 +387,188 @@ class ExecutionEngineTests(unittest.TestCase):
         self.assertEqual((), approved.routing_decisions)
         self.assertNotIn("EXECUTION", approved.execution_trace)
 
+    def test_provider_version_and_source_are_bound_to_preview_digest(self) -> None:
+        provider = {
+            "id": "function.bound-provider",
+            "name": "Bound provider",
+            "description": "Executes a version-bound host operation.",
+            "status": "available",
+            "authority": "connected",
+            "permission": "read",
+            "data_scope": "Approved input only",
+            "risk_class": "low",
+            "version": "1",
+            "source": "host:function.bound-provider@1",
+            "capabilities": ["bound_operation"],
+            "requires": [],
+            "conflicts_with": [],
+            "fallback": "capability.manual-handoff",
+        }
+        request = {
+            "objective": "Run the bound operation",
+            "task_id": "TASK-BOUND-OPERATION",
+            "plan_id": "plan-bound-operation",
+            "work_units": ({"id": "run", "status": "PENDING", "dependencies": []},),
+            "capability_requirements": ("bound_operation",),
+        }
+        proposal = execute(ExecutionEnvelope(
+            **request,
+            provider_inventory={"function": (provider,)},
+        ))
+        changed = {**provider, "version": "2", "source": "host:function.bound-provider@2"}
+
+        result = execute(ExecutionEnvelope(
+            **request,
+            provider_inventory={"function": (changed,)},
+            routing_approval_status="APPROVED",
+            routing_preview_digest=proposal.routing_preview["digest"],
+        ))
+
+        self.assertNotEqual(
+            proposal.routing_preview["digest"],
+            result.routing_preview["digest"],
+        )
+        self.assertEqual("BLOCKED", result.state)
+        self.assertEqual("ROUTING_PREVIEW", result.dashboard["active_stage"])
+
+    def test_pending_clarification_cannot_be_bypassed_by_routing_approval(self) -> None:
+        request = {
+            "objective": "Implement and test a repository change",
+            "task_id": "TASK-PENDING-CLARIFICATION",
+            "plan_id": "plan-pending-clarification",
+            "work_units": ({"id": "implement", "status": "PENDING", "dependencies": []},),
+            "surface": "codex",
+            "clarification_status": "PENDING",
+        }
+        proposal = execute(ExecutionEnvelope(**request))
+        result = execute(ExecutionEnvelope(
+            **request,
+            routing_approval_status="APPROVED",
+            routing_preview_digest=proposal.routing_preview["digest"],
+        ))
+
+        self.assertEqual("BLOCKED", result.state)
+        self.assertIsNone(result.active_unit)
+        self.assertNotIn("EXECUTION", result.execution_trace)
+
+    def test_conflicting_providers_fail_closed_before_routing(self) -> None:
+        base = {
+            "description": "Provides one conflicting operation.",
+            "status": "available",
+            "authority": "connected",
+            "permission": "read",
+            "data_scope": "Approved task input only",
+            "risk_class": "low",
+            "version": "1",
+            "source": "host:test",
+            "capabilities": ["conflicting_operation"],
+            "requires": [],
+            "fallback": "capability.manual-handoff",
+        }
+        request = {
+            "objective": "Run the governed operation",
+            "task_id": "TASK-CONFLICTING-OPERATION",
+            "plan_id": "plan-conflicting-operation",
+            "work_units": ({"id": "run", "status": "PENDING", "dependencies": []},),
+            "capability_requirements": ("conflicting_operation",),
+            "provider_inventory": {"function": (
+                {**base, "id": "function.alpha", "name": "Alpha", "conflicts_with": ["function.beta"]},
+                {**base, "id": "function.beta", "name": "Beta", "conflicts_with": []},
+            )},
+        }
+        proposal = execute(ExecutionEnvelope(**request))
+        self.assertEqual(
+            [["function.alpha", "function.beta"]],
+            proposal.routing_preview["conflicting_provider_pairs"],
+        )
+
+        approved = execute(ExecutionEnvelope(
+            **request,
+            routing_approval_status="APPROVED",
+            routing_preview_digest=proposal.routing_preview["digest"],
+        ))
+        self.assertEqual("BLOCKED", approved.state)
+        self.assertEqual((), approved.routing_decisions)
+        self.assertNotIn("EXECUTION", approved.execution_trace)
+
+    def test_missing_provider_prerequisite_returns_blocked_result(self) -> None:
+        provider = {
+            "id": "function.missing-prerequisite",
+            "name": "Missing prerequisite",
+            "description": "Requires an unavailable host capability.",
+            "status": "available",
+            "authority": "connected",
+            "permission": "read",
+            "data_scope": "Approved task input only",
+            "risk_class": "low",
+            "version": "1",
+            "source": "host:test",
+            "capabilities": ["guarded_operation"],
+            "requires": ["function.not-installed"],
+            "conflicts_with": [],
+            "fallback": "capability.manual-handoff",
+        }
+        request = {
+            "objective": "Run the guarded operation",
+            "task_id": "TASK-GUARDED-OPERATION",
+            "plan_id": "plan-guarded-operation",
+            "work_units": ({"id": "run", "status": "PENDING", "dependencies": []},),
+            "capability_requirements": ("guarded_operation",),
+            "provider_inventory": {"function": (provider,)},
+        }
+        proposal = execute(ExecutionEnvelope(**request))
+        approved = execute(ExecutionEnvelope(
+            **request,
+            routing_approval_status="APPROVED",
+            routing_preview_digest=proposal.routing_preview["digest"],
+        ))
+
+        self.assertEqual("BLOCKED", approved.state)
+        self.assertEqual("ROUTING", approved.dashboard["active_stage"])
+        self.assertEqual((), approved.routing_decisions)
+        self.assertNotIn("EXECUTION", approved.execution_trace)
+
+    def test_host_tool_inventory_does_not_revalidate_built_in_tools_as_host_records(self) -> None:
+        provider = {
+            "id": "tool.host-estimator",
+            "name": "Host estimator",
+            "description": "Reads approved values and estimates a result.",
+            "status": "available",
+            "authority": "connected",
+            "permission": "read",
+            "data_scope": "Approved estimate inputs only",
+            "risk_class": "low",
+            "version": "1",
+            "source": "host:tool.host-estimator",
+            "capabilities": ["host_estimate"],
+            "requires": [],
+            "conflicts_with": [],
+            "fallback": "capability.manual-handoff",
+        }
+        result = execute(ExecutionEnvelope(
+            objective="Estimate the approved values",
+            task_id="TASK-HOST-ESTIMATE",
+            plan_id="plan-host-estimate",
+            work_units=({"id": "estimate", "status": "PENDING", "dependencies": []},),
+            capability_requirements=("host_estimate",),
+            provider_inventory={"tool": (provider,)},
+        ))
+        self.assertEqual("ROUTING_PREVIEW", result.dashboard["active_stage"])
+
+    def test_completed_plan_does_not_request_provider_approval_again(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective="Implement and test a repository change",
+            task_id="TASK-COMPLETED-REPOSITORY-CHANGE",
+            plan_id="plan-completed-repository-change",
+            work_units=({"id": "implement", "status": "COMPLETED", "dependencies": []},),
+            surface="codex",
+        ))
+
+        self.assertEqual("COMPLETED", result.state)
+        self.assertIsNone(result.active_unit)
+        self.assertEqual("NOT_REQUIRED", result.routing_preview["status"])
+        self.assertNotIn("ROUTING_PREVIEW", result.execution_trace)
+
     def test_exact_preview_approval_routes_research_providers_before_execution(self) -> None:
         request = {
             "objective": "Find current public sources about ISO 9001",

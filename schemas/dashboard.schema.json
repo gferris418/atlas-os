@@ -81,7 +81,7 @@
     "routing_preview": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "objective", "task_id", "plan_id", "surface", "plan", "work_unit", "requirements", "intent_profile", "providers", "unmatched_requirements", "cyclic_provider_ids", "unresolved_gates", "execution_sequence", "steps", "approval_prompt", "digest"],
+      "required": ["status", "objective", "task_id", "plan_id", "surface", "plan", "work_unit", "requirements", "intent_profile", "providers", "unmatched_requirements", "cyclic_provider_ids", "conflicting_provider_pairs", "missing_prerequisite_providers", "unresolved_gates", "execution_sequence", "steps", "approval_prompt", "digest"],
       "properties": {
         "status": {"enum": ["NOT_REQUIRED", "PROPOSED"]},
         "objective": {"type": "string", "minLength": 1},
@@ -109,7 +109,7 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["id", "type", "name", "requirement", "purpose", "method", "permission", "prerequisites", "unresolved_gates", "data_scope", "fallback"],
+            "required": ["id", "type", "name", "requirement", "purpose", "method", "permission", "authority", "risk_class", "version", "source", "prerequisites", "conflicts_with", "unresolved_gates", "data_scope", "fallback"],
             "properties": {
               "id": {"type": "string", "minLength": 1},
               "type": {"enum": ["capability", "domain-method", "function", "model", "plugin", "skill", "subagent", "tool"]},
@@ -118,7 +118,12 @@
               "purpose": {"type": "string", "minLength": 1},
               "method": {"type": "string", "minLength": 1},
               "permission": {"enum": ["read", "write"]},
+              "authority": {"type": "string", "minLength": 1},
+              "risk_class": {"type": "string", "minLength": 1},
+              "version": {"type": "string", "minLength": 1},
+              "source": {"type": "string", "minLength": 1},
               "prerequisites": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+              "conflicts_with": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
               "unresolved_gates": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
               "data_scope": {"type": "string", "minLength": 1},
               "fallback": {"type": ["string", "null"]}
@@ -127,6 +132,11 @@
         },
         "unmatched_requirements": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "cyclic_provider_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "conflicting_provider_pairs": {
+          "type": "array",
+          "items": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string"}, "uniqueItems": true}
+        },
+        "missing_prerequisite_providers": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "steps": {
           "type": "array",
           "items": {
