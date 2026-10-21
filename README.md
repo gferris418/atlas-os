@@ -2,9 +2,13 @@
 
 ATLAS-OS is a **model-agnostic execution-governance architecture for AI agents**. It remains the single operating architecture between user intent and verified delivery. ARGUS is nested inside ATLAS as the governed intelligence collection subsystem; it is not a peer operating system or alternative execution spine.
 
+It is **not a desktop operating system** and does not replace the host model, conversation engine, browser, tool runtime, or device OS.
+
 **Current candidate:** `v2.0.2-rc.4`  
 **Control revision:** `atlas-bootstrap-2026-10-22-r8`  
 **Target stable:** `v2.0.2`  
+**Information classification:** Internal  
+**License:** [MIT](LICENSE)  
 **Release status:** **CANDIDATE / EXTERNAL VERIFICATION PENDING**
 
 ## Fixed architecture
