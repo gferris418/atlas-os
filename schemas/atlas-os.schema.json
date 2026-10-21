@@ -4,7 +4,7 @@
   "title": "ATLAS-OS product manifest",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "product", "authority", "execution", "release", "artifacts"],
+  "required": ["schema", "product", "authority", "architecture", "execution", "release", "artifacts"],
   "properties": {
     "schema": {"const": "schemas/atlas-os.schema.json"},
     "product": {
@@ -34,11 +34,23 @@
         "version_pointer": {"const": "atlas-os.yaml#/product/version"}
       }
     },
+    "architecture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mission_control", "control_plane", "observability", "domain_intelligence"],
+      "properties": {
+        "mission_control": {"const": "spec/mission-control.yaml"},
+        "control_plane": {"const": "spec/control-plane.yaml"},
+        "observability": {"const": "spec/observability.yaml"},
+        "domain_intelligence": {"const": "spec/domain-intelligence.yaml"}
+      }
+    },
     "execution": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["spine", "runtime", "classification", "domain_practices", "domain_handoff", "output", "default_depth", "control_revision"],
+      "required": ["request_triage", "spine", "runtime", "classification", "domain_practices", "domain_handoff", "output", "default_depth", "control_revision"],
       "properties": {
+        "request_triage": {"const": "spec/request-triage.yaml"},
         "spine": {"type": "string"},
         "runtime": {"type": "string"},
         "classification": {"const": "spec/classification.yaml"},

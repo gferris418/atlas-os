@@ -1,12 +1,18 @@
 schema: schemas/ai-manifest.schema.json
 id: atlas-os-ai-entrypoint
-product_version: 2.0.2-rc.3
-control_revision: atlas-bootstrap-2026-10-22-r7
+product_version: 2.0.2-rc.4
+control_revision: atlas-bootstrap-2026-10-22-r8
 authority:
   product_manifest: atlas-os.yaml
   core_spec: spec/core.yaml
   execution_spine: spec/execution-spine.yaml
   runtime_spec: spec/runtime.yaml
+  request_triage: spec/request-triage.yaml
+  architecture:
+    mission_control: spec/mission-control.yaml
+    control_plane: spec/control-plane.yaml
+    observability: spec/observability.yaml
+    domain_intelligence: spec/domain-intelligence.yaml
   schema_catalog: schemas
   registry_catalog: registries
   migration_catalog: migration
@@ -15,6 +21,8 @@ discovery_order:
   - atlas-os.yaml
   - governance.yaml
   - spec/core.yaml
+  - spec/request-triage.yaml
+  - spec/control-plane.yaml
   - spec/execution-spine.yaml
   - applicable spec/*.yaml
   - applicable registries/*.{yaml,json}
@@ -28,15 +36,20 @@ machine_contracts:
   - spec/classification.yaml
   - spec/completeness.yaml
   - spec/context.yaml
+  - spec/control-plane.yaml
   - spec/core.yaml
   - spec/dashboard.yaml
   - spec/domain-handoff.yaml
+  - spec/domain-intelligence.yaml
   - spec/domain-practices.yaml
   - spec/evidence.yaml
   - spec/execution-spine.yaml
+  - spec/mission-control.yaml
+  - spec/observability.yaml
   - spec/output.yaml
   - spec/persistence.yaml
   - spec/planning.yaml
+  - spec/request-triage.yaml
   - spec/routing.yaml
   - spec/runtime.yaml
   - spec/verification.yaml

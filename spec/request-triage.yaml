@@ -1,0 +1,30 @@
+schema: schemas/spec.schema.json
+id: spec.request-triage
+title: Request triage and fast-path routing
+status: active
+normative: true
+contract:
+  purpose: Make the minimum first-stage routing decision before deep domain processing or provider selection.
+  routes:
+    GENERAL_SEARCH: Retrieve or research information directly through ATLAS without activating a specialist intelligence method.
+    GENERAL_TASK: Produce, transform, calculate, analyze, or execute ordinary work directly through ATLAS.
+    INTELLIGENCE: Delegate intelligence-grade analysis to ARGUS while ATLAS retains authority, permissions, approvals, state, verification, and delivery.
+  first_semantic_gate: Request triage occurs immediately after the lossless raw-input boundary and before taxonomy routing, deep classification, framework alignment, or provider routing.
+  general_search_rule: A government, company, industry, tender, person, or place mention alone does not make a request intelligence-grade.
+  intelligence_threshold: INTELLIGENCE requires an intelligence objective such as strategic assessment, opportunity qualification, competitive or stakeholder analysis, political-economic assessment, monitoring, forecasting, scenarios, probability estimation, or decision intelligence.
+  argus_capability: intelligence_analysis
+  argus_rule: ARGUS is activated only when route is INTELLIGENCE or when the user explicitly requests ARGUS and the request is admissible.
+  direct_path_rule: GENERAL_SEARCH and GENERAL_TASK skip deep taxonomy, classification, and framework alignment unless those controls can materially change correctness, authorization, safety, or the requested outcome.
+  partial_handoff_rule: INTELLIGENCE may be handed to ARGUS with governed PARTIAL domain context. ARGUS enriches intelligence-domain context after activation and cannot replace ATLAS authority or permissions.
+  performance_rule: Triage must be deterministic or host-native, local to the request, and constant-cost relative to downstream task size; it must not perform web research, taxonomy research, or specialist execution merely to choose the route.
+  fallback_rule: When confidence is insufficient to distinguish a direct route from INTELLIGENCE, prefer the direct ATLAS route unless specialist intelligence is materially required; escalate only when ambiguity changes execution or risk.
+invariants:
+  - INV-001
+  - INV-002
+  - INV-017
+  - INV-018
+references:
+  - spec/control-plane.yaml
+  - spec/domain-intelligence.yaml
+  - spec/routing.yaml
+  - registries/domain-methods.yaml

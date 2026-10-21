@@ -83,6 +83,8 @@
           "validation_checks": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
           "standards": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
           "task_classes": {"type": "array", "items": {"enum": ["ANSWER", "RESEARCH", "ANALYSIS", "DECISION", "WRITING", "DOCUMENT", "DATA", "CODING", "DEBUGGING", "DESIGN", "PLANNING", "WORKFLOW", "EXTERNAL_ACTION", "MONITORING", "MULTI_STAGE"]}, "uniqueItems": true},
+          "request_route": {"enum": ["GENERAL_SEARCH", "GENERAL_TASK", "INTELLIGENCE"]},
+          "intelligence_types": {"type": "array", "items": {"enum": ["STRATEGIC_INTELLIGENCE", "MARKET_INTELLIGENCE", "OPPORTUNITY_INTELLIGENCE", "COMPETITIVE_INTELLIGENCE", "STAKEHOLDER_INTELLIGENCE", "POLITICAL_ECONOMIC_INTELLIGENCE", "MONITORING_INTELLIGENCE", "FORECASTING_INTELLIGENCE", "SCENARIO_INTELLIGENCE", "DECISION_INTELLIGENCE"]}, "uniqueItems": true},
           "activation_authority": {"type": "string", "minLength": 1},
           "consumer_id": {"type": "string", "minLength": 1},
           "requires_domain_handoff": {"type": "boolean"},

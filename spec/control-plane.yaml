@@ -1,0 +1,44 @@
+schema: schemas/spec.schema.json
+id: spec.control-plane
+title: Authoritative governance and orchestration control plane
+status: active
+normative: true
+contract:
+  purpose: Determine what may happen, who or what may perform it, under which authority and permissions, in what state, and through which governed route.
+  owns:
+    - product_and_control_authority
+    - policy_evaluation
+    - permission_and_authorization_state
+    - plan_and_work_unit_state
+    - approval_state
+    - provider_and_capability_routing
+    - execution_leases
+    - lifecycle_state_transitions
+    - dependency_management
+    - external_state_reconciliation
+    - persistence_authorization
+    - control_receipts_and_audit_events
+  request_triage: spec/request-triage.yaml is the first semantic routing gate. The Control Plane uses its route to choose direct ATLAS execution or governed ARGUS delegation before deeper processing.
+  argus_boundary: ARGUS may own specialist intelligence analysis and intelligence-domain enrichment after activation, but never owns the ATLAS execution spine, plan, permissions, approval state, control authority, or final verification decision.
+  mission_control_boundary: Mission Control may request state changes; only the Control Plane may admit and apply them after governance checks.
+  dashboard_boundary: Dashboard and observability surfaces are read projections of authoritative state and cannot mutate plans, permissions, approvals, routing, or execution directly.
+  data_plane_boundary: The Control Plane authorizes execution but does not perform the substantive host or specialist work itself.
+  transition_rule: Every material state transition must be attributable to a trigger, actor or provider, authority basis, previous state, next state, and result through existing execution, approval, routing, lease, persistence, or verification records.
+  fail_closed_rule: Missing authority, missing required approval, stale state, mismatched routing digest, invalid handoff, invalid lease, or prohibited permission blocks dependent execution.
+  performance_rule: Governance is proportional. Direct requests must not pay intelligence-domain or specialist-routing cost unless materially required.
+invariants:
+  - INV-007
+  - INV-008
+  - INV-009
+  - INV-011
+  - INV-017
+  - INV-020
+  - INV-021
+references:
+  - spec/request-triage.yaml
+  - spec/planning.yaml
+  - spec/routing.yaml
+  - spec/approvals.yaml
+  - spec/runtime.yaml
+  - spec/persistence.yaml
+  - spec/verification.yaml

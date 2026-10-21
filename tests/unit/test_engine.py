@@ -37,11 +37,13 @@ class ExecutionEngineTests(unittest.TestCase):
         self.assertEqual(("classify", "assess"), result.plan)
         self.assertIsNone(result.active_unit)
         self.assertIn("ANALYSIS", result.task_classes)
+        self.assertEqual("GENERAL_TASK", result.request_route)
         self.assertEqual("ROUTED", result.taxonomy_route["status"])
         self.assertEqual("maritime-defense", result.taxonomy_route["hierarchy"]["vertical"])
         self.assertEqual("PARTIAL", result.domain_classification["status"])
         self.assertEqual("PASS", result.capability_audit["status"])
-        self.assertEqual("TAXONOMY_ROUTING", result.execution_trace[0])
+        self.assertEqual("REQUEST_TRIAGE", result.execution_trace[0])
+        self.assertIn("TAXONOMY_ROUTING", result.execution_trace)
         self.assertIn("CAPABILITY_AUDIT", result.execution_trace)
         self.assertNotIn("EXECUTION", result.execution_trace)
         self.assertEqual("chatgpt", result.dashboard["surface"])
@@ -55,7 +57,8 @@ class ExecutionEngineTests(unittest.TestCase):
         for label in ("Input", "Processing", "Output", "Playbook", "Framework", "SOP"):
             with self.subTest(label=label):
                 self.assertIn(label, result.compact_status)
-        self.assertIn("Taxonomy ROUTED", result.dashboard["processing_summary"])
+        self.assertIn("Route GENERAL_TASK", result.dashboard["processing_summary"])
+        self.assertIn("domain context ROUTED", result.dashboard["processing_summary"])
 
     def test_explicitly_resolved_clarification_unlocks_routed_execution(self) -> None:
         result = execute(ExecutionEnvelope(
@@ -91,6 +94,7 @@ class ExecutionEngineTests(unittest.TestCase):
         ))
 
         self.assertEqual("BLOCKED", result.state)
+        self.assertEqual("INTELLIGENCE", result.request_route)
         self.assertIsNone(result.active_unit)
         self.assertEqual("ROUTING_PREVIEW", result.dashboard["active_stage"])
         self.assertEqual(
@@ -108,7 +112,7 @@ class ExecutionEngineTests(unittest.TestCase):
         self.assertEqual("research", result.routing_preview["work_unit"])
         self.assertEqual(
             [
-                "government_public_sector_opportunity_intelligence",
+                "intelligence_analysis",
                 "public_research",
             ],
             result.routing_preview["requirements"],
@@ -138,9 +142,13 @@ class ExecutionEngineTests(unittest.TestCase):
             ["capability.domain-alignment", "capability.evidence-tracking"],
             argus["prerequisites"],
         )
-        self.assertIn("domain_handoff_state:BLOCKED", argus["unresolved_gates"])
+        self.assertNotIn("domain_handoff_state:BLOCKED", argus["unresolved_gates"])
         self.assertIn(
-            "domain-method.argus-intelligence:domain_handoff_state:BLOCKED",
+            "domain_classification:intelligence-domain-context",
+            argus["unresolved_gates"],
+        )
+        self.assertIn(
+            "domain-method.argus-intelligence:domain_classification:intelligence-domain-context",
             result.routing_preview["unresolved_gates"],
         )
         digest_payload = {
@@ -647,7 +655,7 @@ class ExecutionEngineTests(unittest.TestCase):
             "source": f"https://example.invalid/method/{source_commit}/contract.json",
             "source_commit": source_commit,
             "contract_sha256": "sha256:" + "b" * 64,
-            "capabilities": ["government_public_sector_opportunity_intelligence"],
+            "capabilities": ["host_specialist_research"],
             "requires": [],
             "conflicts_with": [],
             "fallback": "capability.manual-handoff",
@@ -666,7 +674,7 @@ class ExecutionEngineTests(unittest.TestCase):
             "task_id": "TASK-HOST-METHOD",
             "plan_id": "plan-host-method",
             "work_units": ({"id": "research", "status": "PENDING", "dependencies": []},),
-            "capability_requirements": ("government_public_sector_opportunity_intelligence",),
+            "capability_requirements": ("host_specialist_research",),
             "provider_inventory": {"domain-method": (method,)},
             "timestamp": "2026-10-21T23:31:00+06:00",
             "timezone_name": "Asia/Dhaka",
@@ -735,8 +743,8 @@ class ExecutionEngineTests(unittest.TestCase):
     def test_multilabel_task_uses_provider_compatible_routing_class(self) -> None:
         request = {
             "objective": (
-                "Research and write a report on public procurement opportunities "
-                "for Bangladesh Navy coastal surveillance radar"
+                "Research and write a report assessing which public procurement opportunities "
+                "for Bangladesh Navy coastal surveillance radar we should pursue"
             ),
             "task_id": "TASK-MULTILABEL-RADAR-RESEARCH",
             "plan_id": "plan-multilabel-radar-research",
@@ -759,9 +767,10 @@ class ExecutionEngineTests(unittest.TestCase):
             if decision["provider_id"] == "domain-method.argus-intelligence"
         )
         self.assertIn("RESEARCH", result.task_classes)
-        self.assertEqual("BLOCKED", argus["status"])
-        self.assertEqual("HANDOFF_STATE_NOT_ACCEPTED", argus["reason"])
-        self.assertNotIn("EXECUTION", result.execution_trace)
+        self.assertEqual("ROUTED", argus["status"])
+        self.assertIsNone(argus["reason"])
+        self.assertEqual("READY", result.state)
+        self.assertIn("EXECUTION", result.execution_trace)
 
     def test_provider_task_class_change_invalidates_preview_approval(self) -> None:
         provider = {
@@ -874,7 +883,7 @@ class ExecutionEngineTests(unittest.TestCase):
                 self.assertEqual((), result.routing_decisions)
                 self.assertNotIn("EXECUTION", result.execution_trace)
 
-    def test_approved_argus_preview_still_requires_acceptable_domain_handoff(self) -> None:
+    def test_approved_argus_preview_accepts_governed_partial_domain_handoff(self) -> None:
         request = {
             "objective": (
                 "Find and assess public procurement opportunities for coastal "
@@ -903,13 +912,13 @@ class ExecutionEngineTests(unittest.TestCase):
             for decision in result.routing_decisions
             if decision["provider_id"] == "domain-method.argus-intelligence"
         )
-        self.assertEqual("BLOCKED", result.state)
-        self.assertIsNone(result.active_unit)
-        self.assertEqual("ROUTING", result.dashboard["active_stage"])
-        self.assertEqual("BLOCKED", argus["status"])
-        self.assertEqual("HANDOFF_STATE_NOT_ACCEPTED", argus["reason"])
+        self.assertEqual("READY", result.state)
+        self.assertEqual("research", result.active_unit)
+        self.assertEqual("EXECUTION", result.dashboard["active_stage"])
+        self.assertEqual("ROUTED", argus["status"])
+        self.assertIsNone(argus["reason"])
         self.assertTrue(argus["handoff_id"].startswith("HANDOFF-"))
-        self.assertNotIn("EXECUTION", result.execution_trace)
+        self.assertIn("EXECUTION", result.execution_trace)
 
     def test_execute_consumes_work_units_once_and_does_not_mutate_them(self) -> None:
         source = [

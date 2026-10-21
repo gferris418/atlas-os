@@ -1,0 +1,35 @@
+schema: schemas/spec.schema.json
+id: spec.mission-control
+title: Human mission command and intervention
+status: active
+normative: true
+contract:
+  purpose: Provide the exclusive human supervisory command surface for governed ATLAS execution.
+  owns:
+    - mission_objective_and_scope
+    - human_approval_and_rejection
+    - pause_resume_abort_requests
+    - priority_and_scope_change_requests
+    - escalation_and_exception_requests
+    - human_risk_acknowledgement
+  command_semantics: Human interactions that change execution are emitted as explicit commands or approval decisions; the presentation surface itself does not directly mutate Control Plane state.
+  control_plane_boundary: The Control Plane validates every state-changing Mission Control request against authority, permissions, policy, approvals, current state, and non-waivable restrictions before accepting it.
+  non_waivable_boundaries:
+    - host_platform_permissions
+    - safety_and_security_constraints
+    - applicable_legal_restrictions
+    - immutable_atlas_invariants
+    - external_system_authorization
+    - evidence_requirements_declared_non_waivable
+  read_path: Mission Control consumes Dashboard and Control Plane projections to support human decisions but is not their source of truth.
+  intervention_rule: Pause, resume, abort, scope change, provider change, external action, and material exception requests must remain auditable and correlated to the active mission, plan, and work unit when applicable.
+  separation_rule: Mission Control expresses human intent and authorization; it does not own policy evaluation, provider routing, specialist analysis, execution state, or telemetry computation.
+invariants:
+  - INV-011
+  - INV-015
+  - INV-017
+references:
+  - spec/control-plane.yaml
+  - spec/observability.yaml
+  - spec/approvals.yaml
+  - spec/dashboard.yaml

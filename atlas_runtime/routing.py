@@ -30,6 +30,11 @@ _PROVIDER_TYPES = {
     "capability", "domain-method", "function", "model", "plugin", "skill", "subagent", "tool",
 }
 
+_INTELLIGENCE_REQUIREMENTS = {
+    "intelligence_analysis",
+    "government_public_sector_opportunity_intelligence",
+}
+
 
 def build_routing_preview(
     text: str,
@@ -58,13 +63,21 @@ def build_routing_preview(
     task_class_order = list(dict.fromkeys(task_classes))
     classes = set(task_class_order)
     hierarchy = taxonomy_route.get("hierarchy") or {}
+    request_route = (intent_profile or {}).get("request_route")
     requirements = [
         str(requirement).strip()
         for requirement in requested_requirements
         if str(requirement).strip()
     ]
+    if request_route in {"GENERAL_SEARCH", "GENERAL_TASK"}:
+        requirements = [
+            requirement
+            for requirement in requirements
+            if requirement not in _INTELLIGENCE_REQUIREMENTS
+        ]
     if (
-        hierarchy.get("domain") == "government-public-sector"
+        request_route is None
+        and hierarchy.get("domain") == "government-public-sector"
         and "opportunit" in lowered
         and classes & {"RESEARCH", "ANALYSIS", "DECISION", "MONITORING"}
     ):

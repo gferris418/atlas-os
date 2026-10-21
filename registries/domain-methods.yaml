@@ -2,26 +2,39 @@ schema: schemas/registry.schema.json
 registry:
   id: registry.domain-methods
   type: domain-method
-  version: 1
+  version: 2
   status: active
 items:
   - id: domain-method.argus-intelligence
     name: ARGUS Intelligence
-    description: Specialist government and public-sector opportunity-intelligence method governed by the ATLAS execution spine.
+    description: Governed specialist for strategic, market, opportunity, competitive, stakeholder, political-economic, monitoring, forecasting, scenario, and decision intelligence.
     status: available
     authority: specialist-contract
     permission: read
     risk_class: medium
     priority: 90
-    version: 2.0.0-rc.2
-    source: https://github.com/gferris418/argus-intelligence/blob/fe7ef26ed90cda49b4962b9ab7f707640c4ddc62/contracts/atlas/argus-activation-v1.json
-    source_commit: fe7ef26ed90cda49b4962b9ab7f707640c4ddc62
-    contract_version: 1.0.0
-    contract_sha256: sha256:3aa1abac8283e7f40418fe04e9882a5d241a0c6b323bcfab855a6f4eca74bac7
+    version: 2.1.0-rc.1
+    source: https://github.com/gferris418/argus-intelligence/blob/58459c2025f404598b13afe4567426b015c3e3eb/contracts/atlas/argus-activation-v1.json
+    source_commit: 58459c2025f404598b13afe4567426b015c3e3eb
+    contract_version: 2.0.0
+    contract_sha256: sha256:1b233e8ae90cc214d0c2146ebeecb7de2a29a83636115c711a42e91a005b49a9
     triggers:
-      - explicit structured requirement for government or public-sector opportunity intelligence
+      - ATLAS request triage selects INTELLIGENCE with an explicit intelligence objective
     task_classes: [RESEARCH, ANALYSIS, DECISION, MONITORING]
+    request_route: INTELLIGENCE
+    intelligence_types:
+      - STRATEGIC_INTELLIGENCE
+      - MARKET_INTELLIGENCE
+      - OPPORTUNITY_INTELLIGENCE
+      - COMPETITIVE_INTELLIGENCE
+      - STAKEHOLDER_INTELLIGENCE
+      - POLITICAL_ECONOMIC_INTELLIGENCE
+      - MONITORING_INTELLIGENCE
+      - FORECASTING_INTELLIGENCE
+      - SCENARIO_INTELLIGENCE
+      - DECISION_INTELLIGENCE
     capabilities:
+      - intelligence_analysis
       - government_public_sector_opportunity_intelligence
     requires:
       - capability.domain-alignment

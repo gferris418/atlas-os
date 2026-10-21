@@ -35,6 +35,24 @@
     "completed_units": {"type": "integer", "minimum": 0},
     "total_units": {"type": "integer", "minimum": 1},
     "execution_layer": {"enum": ["L0", "L1", "L2", "L3", "L4"]},
+    "request_triage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["route", "confidence", "rationale_code", "specialist", "capability_requirements", "intelligence_types", "domain_context_mode"],
+      "properties": {
+        "route": {"enum": ["GENERAL_SEARCH", "GENERAL_TASK", "INTELLIGENCE"]},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "rationale_code": {"type": "string", "minLength": 1},
+        "specialist": {"type": ["string", "null"]},
+        "capability_requirements": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "intelligence_types": {
+          "type": "array",
+          "items": {"enum": ["STRATEGIC_INTELLIGENCE", "MARKET_INTELLIGENCE", "OPPORTUNITY_INTELLIGENCE", "COMPETITIVE_INTELLIGENCE", "STAKEHOLDER_INTELLIGENCE", "POLITICAL_ECONOMIC_INTELLIGENCE", "MONITORING_INTELLIGENCE", "FORECASTING_INTELLIGENCE", "SCENARIO_INTELLIGENCE", "DECISION_INTELLIGENCE"]},
+          "uniqueItems": true
+        },
+        "domain_context_mode": {"enum": ["ON_DEMAND", "ARGUS_ENRICHES"]}
+      }
+    },
     "evidence_health": {"enum": ["GREEN", "AMBER", "RED", "UNKNOWN"]},
     "highest_risk": {"type": ["string", "null"]},
     "blocker_or_approval": {"type": "string"},
@@ -64,7 +82,13 @@
         "category": {"enum": ["OPPORTUNITY_IDENTIFICATION", "SUPPLIER_VENDOR_SOURCING", "MARKET_VALIDATION", "GENERAL_RESEARCH", "GENERAL_TASK"]},
         "matched_evidence": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "candidate_requirements": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-        "routing_authority": {"const": "RECOMMEND_ONLY"}
+        "routing_authority": {"const": "RECOMMEND_ONLY"},
+        "request_route": {"enum": ["GENERAL_SEARCH", "GENERAL_TASK", "INTELLIGENCE"]},
+        "intelligence_types": {
+          "type": "array",
+          "items": {"enum": ["STRATEGIC_INTELLIGENCE", "MARKET_INTELLIGENCE", "OPPORTUNITY_INTELLIGENCE", "COMPETITIVE_INTELLIGENCE", "STAKEHOLDER_INTELLIGENCE", "POLITICAL_ECONOMIC_INTELLIGENCE", "MONITORING_INTELLIGENCE", "FORECASTING_INTELLIGENCE", "SCENARIO_INTELLIGENCE", "DECISION_INTELLIGENCE"]},
+          "uniqueItems": true
+        }
       }
     },
     "behavioral_learning_state": {
@@ -99,7 +123,13 @@
             "category": {"enum": ["OPPORTUNITY_IDENTIFICATION", "SUPPLIER_VENDOR_SOURCING", "MARKET_VALIDATION", "GENERAL_RESEARCH", "GENERAL_TASK"]},
             "matched_evidence": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
             "candidate_requirements": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-            "routing_authority": {"const": "RECOMMEND_ONLY"}
+            "routing_authority": {"const": "RECOMMEND_ONLY"},
+            "request_route": {"enum": ["GENERAL_SEARCH", "GENERAL_TASK", "INTELLIGENCE"]},
+            "intelligence_types": {
+              "type": "array",
+              "items": {"enum": ["STRATEGIC_INTELLIGENCE", "MARKET_INTELLIGENCE", "OPPORTUNITY_INTELLIGENCE", "COMPETITIVE_INTELLIGENCE", "STAKEHOLDER_INTELLIGENCE", "POLITICAL_ECONOMIC_INTELLIGENCE", "MONITORING_INTELLIGENCE", "FORECASTING_INTELLIGENCE", "SCENARIO_INTELLIGENCE", "DECISION_INTELLIGENCE"]},
+              "uniqueItems": true
+            }
           }
         },
         "unresolved_gates": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},

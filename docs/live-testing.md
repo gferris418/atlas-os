@@ -11,7 +11,8 @@ python -m pip install --require-hashes -r requirements.lock
 python -m atlas_runtime --input examples/execution-request.json
 ```
 
-The default is a compact four-line text control plane. JSON may also be piped
+The default is a compact four-line text Dashboard: a read-only observability
+projection over the underlying Control Plane state. JSON may also be piped
 through stdin:
 
 ```bash

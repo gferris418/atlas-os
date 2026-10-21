@@ -4,8 +4,8 @@ This is the human companion to the authoritative machine verification contract a
 
 ## Test identity
 
-- ATLAS version: `2.0.2-rc.3`
-- Control revision: `atlas-bootstrap-2026-10-22-r7`
+- ATLAS version: `2.0.2-rc.4`
+- Control revision: `atlas-bootstrap-2026-10-22-r8`
 - AI discovery manifest: `atlas-ai.yaml`
 - Skill artifact: `.agents/skills/atlas-os/SKILL.md`
 
@@ -14,8 +14,9 @@ This is the human companion to the authoritative machine verification contract a
 1. Start Hermes Agent inside a fresh checkout with no earlier ATLAS conversation context.
 2. Resolve the repository through `atlas-ai.yaml`, review the project skill, and run `hermes skills trust` for the checkout.
 3. Execute every check in `integrations/hermes-agent/release-verification.yaml` and retain all required evidence fields.
-4. Record unavailable host capabilities as unavailable; do not reinterpret them as successful actions or as failures of unrelated core semantics.
-5. Do not translate checklist publication, local tests, or repository readiness into `PASS` for `MIG-037`.
+4. Confirm the triage-first behavior explicitly: plain current-tender lookup remains `GENERAL_SEARCH` without ARGUS, while the specified opportunity-assessment/ranking/monitoring prompt resolves to `INTELLIGENCE` with specialist `ARGUS`.
+5. Record unavailable host capabilities as unavailable; do not reinterpret them as successful actions or as failures of unrelated core semantics.
+6. Do not translate checklist publication, local tests, or repository readiness into `PASS` for `MIG-037`.
 
 ## Closure rule
 

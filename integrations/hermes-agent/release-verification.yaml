@@ -1,8 +1,8 @@
 schema: schemas/release-verification.schema.json
 id: verification.hermes-agent
 surface: hermes-agent
-product_version: 2.0.2-rc.3
-control_revision: atlas-bootstrap-2026-10-22-r7
+product_version: 2.0.2-rc.4
+control_revision: atlas-bootstrap-2026-10-22-r8
 status: READY_FOR_EXTERNAL_PROOF
 fresh_session_required: true
 independent_evidence_required: true
@@ -22,16 +22,16 @@ checks:
       - id: AST-02
         property: product_version
         operator: equals
-        expected: 2.0.2-rc.3
+        expected: 2.0.2-rc.4
       - id: AST-03
         property: control_revision
         operator: equals
-        expected: atlas-bootstrap-2026-10-22-r7
+        expected: atlas-bootstrap-2026-10-22-r8
     required_evidence: [session_id, timestamp, source_commit, skill_index]
     controls: [MIG-037]
   - id: CHK-02
     kind: prompt
-    input: /atlas-os Convert 10 kilometres to miles and show the ATLAS control plane.
+    input: /atlas-os Convert 10 kilometres to miles and show the ATLAS dashboard.
     assertions:
       - id: AST-01
         property: plan_id
@@ -78,11 +78,39 @@ checks:
       - id: AST-01
         property: product_version
         operator: equals
-        expected: 2.0.2-rc.3
+        expected: 2.0.2-rc.4
       - id: AST-02
         property: control_revision
         operator: equals
-        expected: atlas-bootstrap-2026-10-22-r7
+        expected: atlas-bootstrap-2026-10-22-r8
+    required_evidence: [session_id, timestamp, response]
+    controls: [MIG-037]
+  - id: CHK-06
+    kind: prompt
+    input: /atlas-os Find the current Bangladesh Railway tenders.
+    assertions:
+      - id: AST-01
+        property: request_route
+        operator: equals
+        expected: GENERAL_SEARCH
+      - id: AST-02
+        property: specialist
+        operator: absent
+        expected: true
+    required_evidence: [session_id, timestamp, response]
+    controls: [MIG-037]
+  - id: CHK-07
+    kind: prompt
+    input: /atlas-os Find and assess Bangladesh Railway opportunities we should pursue, rank them by win probability, identify competitors and decision makers, and monitor material developments.
+    assertions:
+      - id: AST-01
+        property: request_route
+        operator: equals
+        expected: INTELLIGENCE
+      - id: AST-02
+        property: specialist
+        operator: equals
+        expected: ARGUS
     required_evidence: [session_id, timestamp, response]
     controls: [MIG-037]
 evidence_requirements:
