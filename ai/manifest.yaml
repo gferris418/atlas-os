@@ -1,0 +1,79 @@
+schema: schemas/ai-manifest.schema.json
+product:
+  id: atlas-os
+  version: 2.0.2-rc.2
+  authority: atlas-os.yaml
+  control_revision: atlas-bootstrap-2026-10-21-r6
+policy:
+  authoritative_formats: [yaml, json]
+  markdown_role: documentation-only
+  ai_ready: true
+  structured_output_required: true
+authority:
+  core_spec: spec/core.yaml
+  execution_spine: spec/execution-spine.yaml
+  specifications:
+    - spec/approvals.yaml
+    - spec/capability-admission.yaml
+    - spec/classification.yaml
+    - spec/completeness.yaml
+    - spec/context.yaml
+    - spec/core.yaml
+    - spec/dashboard.yaml
+    - spec/domain-handoff.yaml
+    - spec/domain-practices.yaml
+    - spec/evidence.yaml
+    - spec/execution-spine.yaml
+    - spec/output.yaml
+    - spec/persistence.yaml
+    - spec/planning.yaml
+    - spec/routing.yaml
+    - spec/runtime.yaml
+  registries:
+    - registries/capabilities.yaml
+    - registries/tools.yaml
+    - registries/skills.yaml
+    - registries/surfaces.yaml
+    - registries/controls.yaml
+    - registries/migrations.yaml
+    - registries/frameworks.yaml
+    - registries/taxonomies.yaml
+    - registries/taxonomy-routes.yaml
+    - registries/classifications.yaml
+    - registries/output-profiles.yaml
+    - registries/domain-methods.yaml
+  schemas:
+    - schemas/atlas-os.schema.json
+    - schemas/ai-manifest.schema.json
+    - schemas/ai-host-adapter.schema.json
+    - schemas/release-verification.schema.json
+    - schemas/task.schema.json
+    - schemas/execution.schema.json
+    - schemas/evidence.schema.json
+    - schemas/approval.schema.json
+    - schemas/persistence.schema.json
+    - schemas/migration.schema.json
+    - schemas/registry.schema.json
+    - schemas/dashboard.schema.json
+    - schemas/output.schema.json
+adapters:
+  - {surface_id: surface.chatgpt, path: integrations/chatgpt/adapter.yaml}
+  - {surface_id: surface.codex, path: integrations/codex/adapter.yaml}
+  - {surface_id: surface.work, path: integrations/work/adapter.yaml}
+  - {surface_id: surface.hermes-agent, path: integrations/hermes-agent/adapter.yaml}
+  - {surface_id: surface.generic-ai-host, path: integrations/generic-ai-host/adapter.yaml}
+controls:
+  migrations:
+    - migration/MIG-029.yaml
+    - migration/MIG-037.yaml
+    - migration/dtif-reconciliation.yaml
+  release_verification:
+    - integrations/chatgpt/release-verification.yaml
+    - integrations/codex/release-verification.yaml
+    - integrations/work/release-verification.yaml
+    - integrations/hermes-agent/release-verification.yaml
+output:
+  schema: schemas/output.schema.json
+  registry: registries/output-profiles.yaml
+  canonical_formats: [json, yaml]
+  envelope_required: true
