@@ -87,7 +87,7 @@ def validate(root: Path) -> list[str]:
 
     product_version = product.get("product", {}).get("version")
     control_revision = manifest.get("product", {}).get("control_revision")
-    errors.require(manifest.get("product", {}).get("version") == product_version, "AI manifest version must match atlas-os.yaml")
+    errors.require(manifest.get("product", {}).get("version_pointer") == "atlas-os.yaml#/product/version", "AI manifest must resolve product version through atlas-os.yaml")
     errors.require(manifest.get("product", {}).get("authority") == "atlas-os.yaml", "AI manifest must resolve atlas-os.yaml as product authority")
     errors.require(manifest.get("policy", {}).get("authoritative_formats") == ["yaml", "json"], "AI authoritative formats must be YAML and JSON")
     errors.require(manifest.get("policy", {}).get("markdown_role") == "documentation-only", "Markdown must be documentation-only")
