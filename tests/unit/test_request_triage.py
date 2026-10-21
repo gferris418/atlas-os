@@ -46,6 +46,11 @@ class RequestTriageTests(unittest.TestCase):
         self.assertEqual("ARGUS_COLLECTION", result["collection_mode"])
         self.assertIn("PROCUREMENT_PLAN", result["collection_types"])
 
+    def test_procurement_forecast_uses_hybrid_collection(self) -> None:
+        result = self._triage("Forecast likely Bangladesh Navy procurements over 24 months")
+        self.assertEqual("HYBRID", result["collection_mode"])
+        self.assertIn("PROCUREMENT_DISCOVERY", result["collection_types"])
+
     def test_hybrid_collects_but_keeps_analysis_in_atlas(self) -> None:
         result = self._triage("compare ST Engineering and L3Harris for Bangladesh opportunities")
         self.assertEqual("HYBRID", result["collection_mode"])
@@ -67,12 +72,73 @@ class RequestTriageTests(unittest.TestCase):
         self.assertEqual("NONE", result["collection_mode"])
         self.assertEqual("GENERAL_TASK", result["route"])
 
+    def test_ordinary_operations_do_not_become_bare_targets(self) -> None:
+        for text in ("2 + 2", "Convert 10 USD to EUR", "Debug this SQL query"):
+            with self.subTest(text=text):
+                result = self._triage(text)
+                self.assertEqual("NONE", result["collection_mode"])
+                self.assertEqual("GENERAL_TASK", result["route"])
+
+    def test_supplied_procurement_document_transformation_stays_direct(self) -> None:
+        result = self._triage("Summarize the attached procurement plan.")
+        self.assertEqual("NONE", result["collection_mode"])
+        self.assertEqual("GENERAL_TASK", result["route"])
+
     def test_argus_registry_exposes_collection_capability(self) -> None:
         registry = yaml.safe_load((ROOT / "registries/domain-methods.yaml").read_text(encoding="utf-8"))
         method = next(item for item in registry["items"] if item["id"] == "domain-method.argus-intelligence")
         self.assertIn("intelligence_collection", method["capabilities"])
         self.assertEqual("2.2.0-rc.1", method["version"])
         self.assertEqual("INTELLIGENCE", method["request_route"])
+        self.assertIn("PLANNING", method["task_classes"])
+        self.assertIn("WORKFLOW", method["task_classes"])
+
+    def test_direct_request_cannot_force_collection_capability(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective="Explain photosynthesis.",
+            plan_id="plan-direct-guard",
+            task_id="TASK-DIRECT-GUARD",
+            work_units=[{"id": "answer", "status": "PENDING", "dependencies": []}],
+            clarification_status="RESOLVED",
+            capability_requirements=("intelligence_collection",),
+            timestamp="2026-10-22T05:20:00+06:00",
+        ))
+        self.assertEqual("ATLAS_DIRECT", result.request_triage["collection_mode"])
+        self.assertNotIn("intelligence_collection", result.routing_preview["requirements"])
+        self.assertFalse(any(
+            provider["id"] == "domain-method.argus-intelligence"
+            for provider in result.routing_preview["providers"]
+        ))
+
+    def test_collection_preview_contains_bound_mission(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective="ST Engineering",
+            plan_id="plan-collection-mission",
+            task_id="TASK-COLLECTION-MISSION",
+            work_units=[{"id": "collect", "status": "PENDING", "dependencies": []}],
+            clarification_status="RESOLVED",
+            timestamp="2026-10-22T05:20:00+06:00",
+        ))
+        mission = result.routing_preview["collection_mission"]
+        self.assertIsNotNone(mission)
+        self.assertEqual("TASK-COLLECTION-MISSION", mission["source_task_id"])
+        self.assertEqual("plan-collection-mission", mission["source_plan_id"])
+        self.assertEqual("ARGUS_COLLECTION", mission["collection_mode"])
+        self.assertEqual([], [gate for gate in result.routing_preview["unresolved_gates"] if "collection_mission" in gate])
+
+    def test_sensitive_collection_preserves_risk_classification(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective="Assess coastal surveillance radar for Bangladesh Navy",
+            plan_id="plan-sensitive-collection",
+            task_id="TASK-SENSITIVE-COLLECTION",
+            work_units=[{"id": "assess", "status": "PENDING", "dependencies": []}],
+            clarification_status="RESOLVED",
+            timestamp="2026-10-22T05:20:00+06:00",
+        ))
+        self.assertEqual("HYBRID", result.request_triage["collection_mode"])
+        self.assertIn("defense", result.domain_classification["risk_flags"])
+        self.assertIn("dual-use", result.domain_classification["risk_flags"])
+        self.assertIn("national-security", result.routing_preview["collection_mission"]["risk_flags"])
 
     def test_execution_result_exposes_collection_mode_in_dashboard(self) -> None:
         result = execute(ExecutionEnvelope(
