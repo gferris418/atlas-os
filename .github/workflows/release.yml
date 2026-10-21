@@ -29,6 +29,7 @@ jobs:
       - run: python -m unittest discover -s tests/integration -v
       - run: python tools/validate/validate_repository.py .
       - run: python tools/validate/validate_machine_contracts.py .
+      - run: python tools/validate/validate_output_contracts.py .
       - run: python tools/package/build_release.py . dist --tag "${GITHUB_REF_NAME}"
       - name: Create GitHub release and attach deterministic artifacts
         env:
