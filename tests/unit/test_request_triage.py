@@ -102,6 +102,7 @@ class RequestTriageTests(unittest.TestCase):
             clarification_status="RESOLVED",
             capability_requirements=("intelligence_collection",),
             timestamp="2026-10-22T05:20:00+06:00",
+            timezone_name="Asia/Dhaka",
         ))
         self.assertEqual("ATLAS_DIRECT", result.request_triage["collection_mode"])
         self.assertNotIn("intelligence_collection", result.routing_preview["requirements"])
@@ -118,6 +119,7 @@ class RequestTriageTests(unittest.TestCase):
             work_units=[{"id": "collect", "status": "PENDING", "dependencies": []}],
             clarification_status="RESOLVED",
             timestamp="2026-10-22T05:20:00+06:00",
+            timezone_name="Asia/Dhaka",
         ))
         mission = result.routing_preview["collection_mission"]
         self.assertIsNotNone(mission)
@@ -134,6 +136,7 @@ class RequestTriageTests(unittest.TestCase):
             work_units=[{"id": "assess", "status": "PENDING", "dependencies": []}],
             clarification_status="RESOLVED",
             timestamp="2026-10-22T05:20:00+06:00",
+            timezone_name="Asia/Dhaka",
         ))
         self.assertEqual("HYBRID", result.request_triage["collection_mode"])
         self.assertIn("defense", result.domain_classification["risk_flags"])
