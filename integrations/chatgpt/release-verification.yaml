@@ -1,0 +1,19 @@
+schema: schemas/release-verification.schema.json
+id: verify.chatgpt
+surface_id: surface.chatgpt
+version: 2.0.2-rc.2
+control_revision: atlas-bootstrap-2026-10-21-r6
+status: PENDING_EXTERNAL_EVIDENCE
+migration_controls: [MIG-029, MIG-037]
+dependencies: []
+acceptance_criteria:
+  - id: CHATGPT-FRESH-BOOTSTRAP
+    description: A genuinely fresh ChatGPT New Chat resolves the canonical ATLAS authority and reports the expected version and control revision.
+    evidence_required: [timestamp, surface_identifier, prompt, public_response]
+  - id: CHATGPT-TAXONOMY-FIRST
+    description: The fresh session demonstrates taxonomy-first routing before intent normalization and capability planning.
+    evidence_required: [public_response, observed_control_revision]
+  - id: CHATGPT-PROPAGATION
+    description: The same published control revision is independently resolved on ChatGPT for MIG-037.
+    evidence_required: [timestamp, observed_control_revision, independent_capture]
+evidence: []
