@@ -27,6 +27,7 @@ jobs:
       - run: python -m unittest discover -s tests/regression -v
       - run: python -m unittest discover -s tests/integration -v
       - run: python tools/validate/validate_repository.py .
+      - run: python tools/validate/validate_machine_contracts.py .
       - name: Build deterministic main snapshot
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: python tools/package/build_release.py . dist
