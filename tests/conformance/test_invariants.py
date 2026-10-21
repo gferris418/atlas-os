@@ -80,7 +80,9 @@ class RuntimeInvariantConformance(unittest.TestCase):
         self.assertNotEqual("VERIFIED", unresolved["compliance"])
 
     def test_inv_019_domain_classification_does_not_guess(self) -> None:
-        unresolved = classify_domain_context("specialist unmapped system", [], substantive=True)
+        unresolved = classify_domain_context(
+            "specialist unmapped system", [], taxonomies=[], substantive=True
+        )
         self.assertEqual("RESEARCH_REQUIRED", unresolved["status"])
         self.assertEqual({}, unresolved["facets"])
 

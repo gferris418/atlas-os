@@ -5,7 +5,18 @@ status: active
 normative: true
 contract:
   purpose: Classify substantive work before selecting domain frameworks, requirements, or evidence sources.
-  sequence: DOMAIN_CLASSIFICATION follows TASK_CLASSIFICATION and precedes DOMAIN_FRAMEWORK_ALIGNMENT.
+  sequence:
+    - TAXONOMY_SELECTION
+    - JURISDICTION_CLASSIFICATION
+    - OPERATOR_INDUSTRY_CLASSIFICATION
+    - SUPPLIER_INDUSTRY_CLASSIFICATION
+    - PRODUCT_OR_SERVICE_CLASSIFICATION
+    - CAPABILITY_CLASSIFICATION
+    - LIFECYCLE_STAGE_CLASSIFICATION
+    - STAKEHOLDER_CLASSIFICATION
+    - INFORMATION_SENSITIVITY_CLASSIFICATION
+    - DOMAIN_FRAMEWORK_ALIGNMENT
+  sequence_rule: Select and validate the applicable taxonomy or classification standard before assigning any domain facet code. Resolve only material facets, in the declared order, before domain-framework alignment or substantive planning.
   available_facets:
     - jurisdiction
     - operator-industry
@@ -17,6 +28,7 @@ contract:
     - information-sensitivity
   materiality: Resolve only facets that can change the answer, requirements, controls, routing, evidence, or authorization; unused facets create no recordkeeping obligation.
   method:
+    - Start by selecting applicable governed taxonomies and confirming their scope, authority, version policy, and current official source.
     - Preserve separate facets instead of forcing the whole prompt into one industry or product code.
     - Prefer international reference classifications and current official sources.
     - Record taxonomy identifier, version policy, code, label, provenance, applicability, and confidence.
