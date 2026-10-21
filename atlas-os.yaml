@@ -11,6 +11,7 @@ product:
 authority:
   manifest: atlas-os.yaml
   ai_manifest: atlas-ai.yaml
+  governance: governance.yaml
   core_spec: spec/core.yaml
   version_pointer: atlas-os.yaml#/product/version
 execution:
@@ -29,6 +30,7 @@ release:
   validation_command: python tools/validate/validate_repository.py . && python tools/validate/validate_machine_contracts.py . && python tools/validate/validate_output_contracts.py .
 artifacts:
   ai_entrypoint: atlas-ai.yaml
+  governance: governance.yaml
   specifications: spec
   schemas: schemas
   registries: registries
