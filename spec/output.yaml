@@ -4,8 +4,8 @@ title: Output standards and profiles
 status: active
 normative: true
 contract:
-  purpose: Improve clarity, interoperability, accessibility, evidence integrity, and actionability without constraining capable host generation or adding unnecessary latency.
-  generation: The host generates content natively; ATLAS selects the smallest useful output contract and validates only material requirements.
+  purpose: Improve clarity, interoperability, accessibility, evidence integrity, actionability, and AI reuse without constraining capable host generation or adding unnecessary latency.
+  generation: The host generates content natively; ATLAS records every completed output in the structured output envelope, then renders human-facing formats only when useful or requested.
   selection_order:
     - explicit_user_format_or_profile
     - binding_deliverable_or_tool_contract
@@ -21,9 +21,10 @@ contract:
     - output.data-structured
     - output.artifact-delivery
   progressive_disclosure:
-    layer_1: Direct outcome or answer.
-    layer_2: Material evidence, reasoning summary, actions, and risks.
-    layer_3: Technical detail, sources, appendices, and machine-readable artifacts when needed.
+    layer_1: Human rendering may show only the direct outcome or answer.
+    layer_2: Human rendering may add material evidence, reasoning summary, actions, and risks.
+    layer_3: Human rendering may add technical detail, sources, appendices, and rendered artifacts.
+    canonical: The complete machine-readable envelope remains available independently of presentation depth.
   universal_quality:
     - correctness
     - relevance
@@ -35,9 +36,11 @@ contract:
     - conciseness
     - safety_and_authorization
     - performance
+    - machine_interoperability
   standards:
+    canonical_output: JSON Schema 2020-12
+    canonical_serialization: JSON or YAML
     human_text: GitHub-Flavored Markdown
-    structured_data: JSON Schema 2020-12
     api_contracts: OpenAPI 3.1
     dates_and_times: ISO 8601 and RFC 3339
     countries: ISO 3166
@@ -50,10 +53,11 @@ contract:
     archival_pdf: PDF/A when applicable
     provenance: Lightweight evidence records; W3C PROV only for formal exchange.
   visual_rule: Use a table, flow, timeline, tree, progress bar, or chart only when it communicates a material relationship more clearly than short prose.
-  validation_rule: Validate machine-readable formats, binding deliverables, citations, artifacts, and material claims; do not impose schema or template overhead on ordinary conversation.
-  envelope_rule: The structured output envelope is available for workflows and integrations, but is not required for ordinary human-readable answers.
-  performance_rule: Profile selection and basic validation must be local and deterministic; expensive rendering or conversion runs only when the requested artifact requires it.
-  persistence_rule: Each profile declares a canonical library collection and file extension for every supported format; delivery ends with a save receipt or an explicit persistence failure state.
+  validation_rule: Validate the canonical structured envelope for every completed output and additionally validate binding deliverables, citations, rendered artifacts, and material claims when applicable.
+  envelope_rule: Every completed ATLAS output has a schema-valid structured envelope. Human chat, Markdown, PDF, HTML, CSV, and other requested representations are renderings or payload artifacts and do not replace canonical structured state.
+  user_format_rule: Explicit user formatting controls the presentation or artifact rendering; it does not remove the canonical structured representation used for AI interchange, validation, persistence, and provenance.
+  performance_rule: Profile selection and envelope validation must be local and deterministic; expensive rendering or conversion runs only when the requested artifact requires it.
+  persistence_rule: Each profile declares a structured canonical format and library collection plus extensions for supported renderings; delivery ends with a save receipt or an explicit persistence failure state.
   claims_rule: Format validity does not establish factual correctness, evidence quality, acceptance, or compliance.
 invariants:
   - INV-006
