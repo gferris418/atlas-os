@@ -1,0 +1,80 @@
+schema: schemas/ai-manifest.schema.json
+id: atlas-os-ai-entrypoint
+product_version: 2.0.2-rc.3
+control_revision: atlas-bootstrap-2026-10-22-r7
+authority:
+  product_manifest: atlas-os.yaml
+  core_spec: spec/core.yaml
+  execution_spine: spec/execution-spine.yaml
+  runtime_spec: spec/runtime.yaml
+  schema_catalog: schemas
+  registry_catalog: registries
+  migration_catalog: migration
+discovery_order:
+  - atlas-ai.yaml
+  - atlas-os.yaml
+  - spec/core.yaml
+  - spec/execution-spine.yaml
+  - applicable spec/*.yaml
+  - applicable registries/*.yaml
+  - active migration/*.yaml
+  - integrations/<surface>/release-verification.yaml
+machine_contracts:
+  - atlas-os.yaml
+  - spec/core.yaml
+  - spec/runtime.yaml
+  - spec/execution-spine.yaml
+  - spec/classification.yaml
+  - spec/domain-practices.yaml
+  - spec/domain-handoff.yaml
+  - spec/output.yaml
+  - spec/planning.yaml
+  - spec/routing.yaml
+  - spec/evidence.yaml
+  - spec/approvals.yaml
+  - spec/verification.yaml
+  - spec/persistence.yaml
+  - spec/versioning.yaml
+  - registries/capabilities.yaml
+  - registries/tools.yaml
+  - registries/skills.yaml
+  - registries/surfaces.yaml
+  - registries/controls.yaml
+  - registries/migrations.yaml
+  - registries/frameworks.yaml
+  - registries/taxonomies.yaml
+  - registries/taxonomy-routes.yaml
+  - registries/classifications.yaml
+  - registries/output-profiles.yaml
+  - registries/domain-methods.yaml
+  - migration/MIG-029.yaml
+  - migration/MIG-037.yaml
+  - migration/dtif-reconciliation.yaml
+  - integrations/chatgpt/release-verification.yaml
+  - integrations/codex/release-verification.yaml
+  - integrations/work/release-verification.yaml
+  - integrations/hermes-agent/release-verification.yaml
+  - schemas/atlas-os.schema.json
+  - schemas/ai-manifest.schema.json
+  - schemas/migration.schema.json
+  - schemas/release-verification.schema.json
+  - schemas/task.schema.json
+  - schemas/execution.schema.json
+  - schemas/evidence.schema.json
+  - schemas/approval.schema.json
+  - schemas/persistence.schema.json
+  - schemas/dashboard.schema.json
+  - schemas/output.schema.json
+  - schemas/registry.schema.json
+human_guidance:
+  - README.md
+  - docs/ai-host-installation.md
+  - integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md
+  - integrations/chatgpt/RELEASE-VERIFICATION.md
+  - integrations/hermes-agent/RELEASE-VERIFICATION.md
+  - .agents/skills/atlas-os/SKILL.md
+external_verification:
+  schema: schemas/release-verification.schema.json
+  control_registry: registries/migrations.yaml
+  controls: [MIG-029, MIG-037]
+  surfaces: [chatgpt, codex, work, hermes-agent]
