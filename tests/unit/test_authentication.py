@@ -11,8 +11,12 @@ from atlas_runtime import attest_control_record, verify_control_record_attestati
 
 class ControlAttestationTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.private_bytes = bytes(range(1, 33))
-        private_key = Ed25519PrivateKey.from_private_bytes(self.private_bytes)
+        private_key = Ed25519PrivateKey.generate()
+        self.private_bytes = private_key.private_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PrivateFormat.Raw,
+            encryption_algorithm=serialization.NoEncryption(),
+        )
         self.public_bytes = private_key.public_key().public_bytes(
             encoding=serialization.Encoding.Raw,
             format=serialization.PublicFormat.Raw,

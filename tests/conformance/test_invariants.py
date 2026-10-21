@@ -50,7 +50,7 @@ class RuntimeInvariantConformance(unittest.TestCase):
 
     def test_inv_011_approval(self) -> None:
         with self.assertRaises(ApprovalRequired):
-            require_approval("delete")
+            require_approval("delete", action_classes=["destructive_action"])
 
     def test_inv_012_state_separation(self) -> None:
         store = StateStore()
@@ -68,7 +68,11 @@ class RuntimeInvariantConformance(unittest.TestCase):
 
     def test_inv_015_and_017_adapters_do_not_bypass_core(self) -> None:
         with self.assertRaises(ApprovalRequired):
-            require_approval("change_permissions", {"status": "APPROVED", "scope": ["publish"]})
+            require_approval(
+                "change_permissions",
+                {"status": "APPROVED", "scope": ["publish"]},
+                action_classes=["permission_change"],
+            )
 
     def test_inv_018_domain_framework_alignment(self) -> None:
         unresolved = align_domain_practices("medical-device", [], substantive=True)

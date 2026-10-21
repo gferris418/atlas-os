@@ -21,10 +21,19 @@ TASK_CLASSES = {
     "EXTERNAL_ACTION", "MONITORING", "MULTI_STAGE",
 }
 
-HIGH_IMPACT_ACTIONS = {
-    "delete", "publish", "pay", "purchase", "send_external",
-    "change_permissions", "rotate_credentials", "release",
+GATED_ACTION_CLASSES = {
+    "destructive_action",
+    "irreversible_action",
+    "publication",
+    "financial_commitment",
+    "external_communication",
+    "permission_change",
+    "security_sensitive_modification",
+    "major_canonical_state_change",
 }
+
+SAFE_ACTION_CLASSES = {"reversible_analysis", "reversible_preparation"}
+ACTION_CLASSES = GATED_ACTION_CLASSES | SAFE_ACTION_CLASSES
 
 EVIDENCE_CLASSES = {
     "VERIFIED", "SUPPORTED", "INFERRED", "ASSUMED", "SPECULATIVE", "UNKNOWN",
@@ -504,10 +513,29 @@ def verify_evidence(record: dict[str, Any], verification: dict[str, Any] | None 
     return result
 
 
+def classify_action(action: str, *, action_classes: Iterable[str]) -> dict[str, Any]:
+    """Classify an executable operation by governed semantic effect, not its verb."""
+
+    if not str(action).strip():
+        raise ValueError("action identifier is required")
+    classes = sorted(set(action_classes))
+    if not classes:
+        raise ValueError(f"{action} requires at least one governed action class")
+    unknown = set(classes) - ACTION_CLASSES
+    if unknown:
+        raise ValueError(f"unknown action classes: {sorted(unknown)}")
+    return {
+        "action": action,
+        "action_classes": classes,
+        "approval_required": bool(set(classes) & GATED_ACTION_CLASSES),
+    }
+
+
 def require_approval(
     action: str,
     approval: dict[str, Any] | None = None,
     *,
+    action_classes: Iterable[str] | None = None,
     target_id: str | None = None,
     input_sha256: str | None = None,
     precondition_revision: str | None = None,
@@ -517,7 +545,11 @@ def require_approval(
     source_work_unit_id: str | None = None,
     handoff_id: str | None = None,
 ) -> bool:
-    if action not in HIGH_IMPACT_ACTIONS:
+    try:
+        classification = classify_action(action, action_classes=action_classes or ())
+    except ValueError as error:
+        raise ApprovalRequired(f"{action} requires governed action classification") from error
+    if not classification["approval_required"]:
         return True
     if not approval or approval.get("required") is not True or approval.get("status") != "APPROVED" or action not in approval.get("scope", []):
         raise ApprovalRequired(f"{action} requires scoped approval")

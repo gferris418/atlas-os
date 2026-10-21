@@ -14,13 +14,17 @@ contract:
   rules:
     - A substantive specialist-domain execution must receive a schema-valid domain-context handoff before consuming ATLAS domain context.
     - The handoff must copy the current task domain_classification and domain_alignment snapshots exactly.
-    - The producer must include source_task_id, source_plan_id, source_work_unit_id, handoff_id, contract_version, consumer, created_at, unresolved_material, risk_flags, and payload_sha256.
+    - The producer must include source_task_id, source_plan_id, source_work_unit_id, handoff_id, contract_version, consumer, created_at, activation_expires_at, unresolved_material, risk_flags, and payload_sha256.
+    - activation_expires_at is exactly 24 hours after created_at and controls only first activation/replay eligibility; it must not be reused as an execution or result-validity deadline after activation succeeds.
+    - Continued specialist execution after activation must be authorized by an ATLAS-produced execution lease bound to the exact handoff identity and payload digest.
+    - An execution lease must include execution_lease_id, issued_at, lease_expires_at, and any supersedes_lease_id; only a currently trusted ATLAS signing key scoped for EXECUTION_LEASE may attest it.
+    - Lease renewal or replacement must be represented by a new ATLAS-signed lease; consumers must reject expired, stale, superseded, or cross-handoff leases.
     - The payload SHA-256 covers the canonical handoff object excluding payload_sha256 and detects mutation after production.
     - The consumer may enrich the context for specialist analysis but must not silently redefine ATLAS taxonomy, classification, standards, framework applicability, risk flags, or unresolved facets.
     - PARTIAL context may be consumed only with unresolved facets preserved explicitly; BLOCKED context cannot authorize dependent specialist execution.
     - The consumer must return a schema-valid receipt containing the exact handoff_id, contract_version, payload_sha256, and consumer identity.
     - ATLAS must reject a returned specialist result when its receipt is missing, rejected, stale, mutated, or mismatched to the originating handoff.
-    - A new materially different domain-classification/alignment snapshot requires a new handoff_id and payload_sha256; old receipts must not be reused.
+    - A new materially different domain-classification/alignment snapshot requires a new handoff_id and payload_sha256; old receipts and leases must not be reused.
     - Specialist activation must compare source_task_id, source_plan_id, and source_work_unit_id with the active typed ExecutionContext and reject any mismatch.
   handoff_states:
     READY: Domain classification is CLASSIFIED and alignment is ALIGNED or NOT_APPLICABLE.
@@ -29,9 +33,14 @@ contract:
   integrity:
     algorithm: SHA-256
     canonicalization: UTF-8 JSON with sorted keys and compact separators, excluding payload_sha256.
+  trust:
+    registry: registries/signing-keys.json
+    registry_schema: schemas/signing-key-registry.schema.json
+    rule: Production control-record verification must enforce signing-key activation, expiry, status, issuer, algorithm, and allowed record class; unknown, inactive, expired, revoked, or out-of-scope keys fail closed.
   schemas:
     context: schemas/domain-context-handoff.schema.json
     receipt: schemas/domain-handoff-receipt.schema.json
+    execution_lease: schemas/execution-lease.schema.json
 invariants:
   - INV-006
   - INV-016

@@ -4,6 +4,7 @@ import json
 import subprocess
 import sys
 import unittest
+from copy import deepcopy
 from pathlib import Path
 
 import jsonschema
@@ -23,21 +24,26 @@ ROOT = Path(__file__).resolve().parents[2]
 class RepositoryContractTests(unittest.TestCase):
     def test_manifest_is_only_product_version_authority(self) -> None:
         manifest = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
-        self.assertEqual("2.0.0-rc.8", manifest["product"]["version"])
+        self.assertEqual("2.0.1", manifest["product"]["version"])
         self.assertEqual("atlas-os.yaml#/product/version", (ROOT / "VERSION").read_text().strip())
 
     def test_release_tag_must_match_manifest_and_release_state(self) -> None:
         manifest = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
         version = manifest["product"]["version"]
-        self.assertEqual(f"v{version}", validate_release_tag(manifest, f"v{version}", ["MIG-029"]))
+        self.assertEqual(f"v{version}", validate_release_tag(manifest, f"v{version}", []))
         with self.assertRaisesRegex(RuntimeError, "does not match"):
-            validate_release_tag(manifest, "v2.0.0", ["MIG-029"])
+            validate_release_tag(manifest, "v2.0.0", [])
 
-        stable = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
-        stable["product"].update({"version": "2.0.0", "status": "RELEASED", "release_channel": "stable"})
+        stable = deepcopy(manifest)
+        stable["product"].update({
+            "version": "2.0.1",
+            "release_channel": "stable",
+            "status": "RELEASED",
+        })
+        stable["release"]["target_version"] = "2.0.1"
         with self.assertRaisesRegex(RuntimeError, "open release blockers"):
-            validate_release_tag(stable, "v2.0.0", ["MIG-029"])
-        self.assertEqual("v2.0.0", validate_release_tag(stable, "v2.0.0", []))
+            validate_release_tag(stable, "v2.0.1", ["MIG-029"])
+        self.assertEqual("v2.0.1", validate_release_tag(stable, "v2.0.1", []))
 
     def test_closed_migration_requires_evidence(self) -> None:
         schema = json.loads((ROOT / "schemas/migration.schema.json").read_text())
@@ -56,6 +62,21 @@ class RepositoryContractTests(unittest.TestCase):
             capture_output=True,
         )
         self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
+
+    def test_ci_uses_node24_native_immutable_actions(self) -> None:
+        checkout = "actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0"
+        setup_python = "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0"
+        for workflow_name in ("validate.yml", "release.yml"):
+            workflow = (ROOT / ".github/workflows" / workflow_name).read_text(encoding="utf-8")
+            with self.subTest(workflow=workflow_name):
+                self.assertIn(checkout, workflow)
+                self.assertIn(setup_python, workflow)
+                self.assertIn("cache-dependency-path: requirements.lock", workflow)
+        validate_workflow = (ROOT / ".github/workflows" / "validate.yml").read_text(encoding="utf-8")
+        self.assertIn(
+            "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0",
+            validate_workflow,
+        )
 
     def test_domain_method_schema_requires_activation_invariants(self) -> None:
         schema = json.loads((ROOT / "schemas/registry.schema.json").read_text())
@@ -167,4 +188,3 @@ class RepositoryContractTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

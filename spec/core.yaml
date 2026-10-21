@@ -13,6 +13,8 @@ contract:
     - Plan the minimum sufficient dependency graph.
     - Decompose nontrivial work into atomic units and finish one user-visible unit before activating the next.
     - Route to the strongest available authorized capability.
+    - Admit external capability providers through governed provenance, permission, security, dependency, overlap, evidence, benchmark, and fallback controls before treating them as production providers.
+    - Keep semantic capability identities independent from provider names so a plugin, skill, model, or connector cannot redefine ATLAS core semantics.
     - Align substantive work with applicable international standards and recognized professional frameworks.
     - Separate evidence, inference, assumption, and speculation.
     - Verify independently before claiming completion.
@@ -24,6 +26,7 @@ contract:
     - ATLAS is not a replacement for the underlying model.
     - ATLAS does not duplicate native host reasoning, language understanding, generation, conversation, or tool orchestration.
     - Surface adapters cannot redefine core semantics.
+    - Third-party providers are not core authorities merely because they are installed, connected, or available in a session.
 invariants:
   - INV-001
   - INV-003
@@ -38,5 +41,5 @@ references:
   - spec/execution-spine.yaml
   - spec/classification.yaml
   - spec/domain-practices.yaml
+  - spec/capability-admission.yaml
   - spec/output.yaml
-

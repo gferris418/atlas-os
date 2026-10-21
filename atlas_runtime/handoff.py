@@ -7,10 +7,11 @@ import json
 import re
 from copy import deepcopy
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
-CONTRACT_VERSION = "1.1.0"
+CONTRACT_VERSION = "1.2.0"
+ACTIVATION_WINDOW = timedelta(hours=24)
 
 
 @dataclass(frozen=True)
@@ -32,13 +33,18 @@ class ExecutionContext:
                 raise ValueError(f"execution context requires {field_name}")
 
 
-def _validate_timestamp(value: str, field: str) -> None:
+def _parse_timestamp(value: str, field: str) -> datetime:
     try:
         moment = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError as error:
         raise ValueError(f"{field} must be RFC 3339") from error
     if moment.tzinfo is None:
         raise ValueError(f"{field} requires a timezone offset")
+    return moment
+
+
+def _validate_timestamp(value: str, field: str) -> None:
+    _parse_timestamp(value, field)
 
 
 def _state_for(classification: dict[str, Any], alignment: dict[str, Any]) -> str:
@@ -61,8 +67,9 @@ def prepare_domain_context_handoff(
 ) -> dict[str, Any]:
     """Create an immutable snapshot of ATLAS-owned domain context for a specialist.
 
-    The specialist may enrich this context for its domain purpose but must not
-    silently redefine the ATLAS classification or framework-alignment snapshot.
+    The handoff may be activated only during its explicit 24-hour activation
+    window. Continued execution after activation is governed separately by an
+    ATLAS-signed execution lease.
     """
     if not str(task.get("id", "")).strip():
         raise ValueError("domain handoff requires source task id")
@@ -76,7 +83,7 @@ def prepare_domain_context_handoff(
         raise ValueError("domain handoff requires consumer")
     if not handoff_id.strip():
         raise ValueError("domain handoff requires handoff_id")
-    _validate_timestamp(created_at, "created_at")
+    created = _parse_timestamp(created_at, "created_at")
 
     classification = deepcopy(task["domain_classification"])
     alignment = deepcopy(task["domain_alignment"])
@@ -89,6 +96,7 @@ def prepare_domain_context_handoff(
         "producer": "ATLAS_OS",
         "consumer": consumer,
         "created_at": created_at,
+        "activation_expires_at": (created + ACTIVATION_WINDOW).isoformat(),
         "state": _state_for(classification, alignment),
         "domain_classification": classification,
         "domain_alignment": alignment,
@@ -104,7 +112,7 @@ def verify_domain_context_handoff(handoff: dict[str, Any]) -> bool:
     required = {
         "contract_version", "handoff_id", "source_task_id", "source_plan_id",
         "source_work_unit_id", "producer", "consumer",
-        "created_at", "state", "domain_classification", "domain_alignment",
+        "created_at", "activation_expires_at", "state", "domain_classification", "domain_alignment",
         "unresolved_material", "risk_flags", "payload_sha256",
     }
     missing = sorted(required - set(handoff))
@@ -114,7 +122,10 @@ def verify_domain_context_handoff(handoff: dict[str, Any]) -> bool:
         raise ValueError("domain handoff integrity check failed: contract_version")
     if handoff["producer"] != "ATLAS_OS":
         raise ValueError("domain handoff integrity check failed: producer")
-    _validate_timestamp(handoff["created_at"], "created_at")
+    created = _parse_timestamp(handoff["created_at"], "created_at")
+    activation_expires = _parse_timestamp(handoff["activation_expires_at"], "activation_expires_at")
+    if activation_expires - created != ACTIVATION_WINDOW:
+        raise ValueError("domain handoff integrity check failed: activation_expires_at")
     classification = handoff["domain_classification"]
     alignment = handoff["domain_alignment"]
     if handoff["unresolved_material"] != classification.get("unresolved_facets", []):

@@ -2,6 +2,49 @@
 
 All notable changes follow semantic versioning and preserve release lineage. The authoritative current product version is resolved only from `atlas-os.yaml`.
 
+## v2.0.1
+
+- Promote the validated `2.0.1-rc.1` control-plane hardening to the stable channel.
+- Add ATLAS-governed execution leases that separate the exact 24-hour initial handoff activation window from correlated ongoing execution, retry, resume, and result return.
+- Add lifecycle-governed Ed25519 signing-key trust with activation, expiry, status, record-class scope, supersession, and fail-closed resolution.
+- Upgrade the ATLAS/ARGUS seam to Domain Context Handoff `1.2.0`, Execution Lease `1.0.0`, and Signing Key Registry `1.0.0` without changing the ATLAS execution/approval authority boundary.
+- Record successful credentialed ATLAS↔ARGUS E2E verification in both `main`-push and pull-request contexts and enforce protected `main` branches before stable promotion.
+- Keep `MIG-029`, `MIG-037`, and `DTIF-RECONCILIATION` open as post-GA, non-release-blocking residuals; none is represented as completed.
+
+## v2.0.0
+
+- Promote the validated ATLAS OS v2 execution-governance contract to the stable channel.
+- Include provider-independent capability admission, untrusted-content assurance, canonical-memory integrity, forecasting/foresight governance, and learning/calibration controls introduced through the release-candidate line.
+- Preserve the ARGUS specialist boundary, immutable activation contract, approval authority, evidence semantics, persistence controls, and deterministic release packaging.
+- Record the repository owner's 2026-10-19 release-risk acceptance for external-only bootstrap, propagation, and unavailable-DTIF proofs. `MIG-029`, `MIG-037`, and `DTIF-RECONCILIATION` remain open post-GA and are not represented as completed.
+- Keep future independent surface verification and DTIF reconciliation under normal migration governance without blocking the 2.0.0 stable release.
+
+## v2.0.0-rc.12
+
+- Add provider-independent capability admission governance with explicit admission states, evidence gates, overlap analysis, runtime-availability checks, and graceful-degradation rules.
+- Add governed capabilities for untrusted-content assurance, canonical-memory integrity, forecasting/foresight, and learning/calibration without making third-party providers hard runtime dependencies.
+- Require forecasting workflows to preserve evidence lineage, assumptions, scenarios, skeptical challenge, forecast vintages, falsifiable signposts, and outcome calibration before accuracy claims.
+- Preserve ATLAS authority over planning, approvals, evidence semantics, verification, persistence, and delivery while allowing ARGUS and other specialists to use admitted providers within their registered boundaries.
+- Document the October 2026 reference-provider review and keep provider-specific rankings distinct from measured production benchmarks.
+- Keep `MIG-029`, `MIG-037`, and `DTIF-RECONCILIATION` open; rc.12 remains a release candidate and does not imply stable-release readiness.
+
+## v2.0.0-rc.11
+
+- Add a directly executable `python -m atlas_runtime` boundary over the existing public execution interface.
+- Default to the four-line text control plane and offer two-event NDJSON for low-overhead machine streaming.
+- Add subprocess acceptance coverage for valid text, NDJSON, and malformed-input behavior.
+
+## v2.0.0-rc.10
+
+- Add one public `execute(ExecutionEnvelope)` interface that composes normalization, task classification, dependency planning, atomic work selection, timing, and control-plane state.
+- Route all ChatGPT, Codex, and Work startup adapters through the same execution interface without removing the existing low-level compatibility functions.
+- Add a four-line state-derived status view that preserves the required goal, task, input, processing, output, playbook, framework, SOP, plan, quality, library, and blocker fields.
+
+## v2.0.0-rc.9
+
+- Classify every executable operation by governed semantic action classes before approval policy evaluation.
+- Fail closed when action classification is missing or unknown, and remove the fixed high-impact verb list.
+
 ## v2.0.0-rc.8
 
 - Add an MIT `LICENSE` file and declare it in the manifest (`product.license`) and README; replace the non-normative "Internal" classification so downstream reuse has an explicit legal grant.
@@ -65,4 +108,3 @@ All notable changes follow semantic versioning and preserve release lineage. The
 - Establish the ATLAS-OS v2 product authority and execution-governance contract.
 - Add machine-readable specifications, schemas, registries, migrations, adapters, tests, validation, and deterministic packaging.
 - Carry MIG-029, MIG-037, and DTIF reconciliation as open release blockers.
-

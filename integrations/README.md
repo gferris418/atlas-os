@@ -4,11 +4,14 @@ Adapters translate surface capabilities into the common ATLAS execution contract
 
 The executable reference seam is `atlas_runtime.get_surface_adapter(surface_id)`. It validates a concrete plan and material-clarification state before selecting work, creates the common dashboard, and delivers through an authorized persistence adapter when one is present. This local seam does not replace independent host bootstrap and propagation evidence.
 
-Supported adapters:
+Supported surface adapters:
 
 - [ChatGPT](chatgpt/README.md)
 - [Codex](codex/README.md)
 - [ChatGPT Work](work/README.md)
 
-Conformance remains candidate-level while MIG-029 and MIG-037 are open.
+Business integration overlays:
 
+- [Access Asia opportunity lifecycle](access-asia/README.md) — preserves one permanent opportunity ID while routing working files from Business Intelligence to REV/OPP only at `SUBMISSION_ACTIVE`, then to OPS/PRJ on award/contract activation.
+
+Conformance remains candidate-level while MIG-029 and MIG-037 are open.
