@@ -919,6 +919,8 @@ class ClassificationAndDashboardTests(unittest.TestCase):
 
         self.assertIn("RESEARCH", labels)
         self.assertNotIn("CODING", labels)
+        self.assertIn("CODING", classify_task("Run tests"))
+        self.assertIn("CODING", classify_task("Start coding"))
 
     def test_task_intent_classification_recommends_but_does_not_route_providers(self) -> None:
         opportunity = classify_task_intent(

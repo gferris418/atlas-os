@@ -160,8 +160,15 @@ def classify_task(text: str) -> list[str]:
     lowered = text.lower()
     labels: set[str] = set()
     rules = {
-        "CODING": ("code", "implement", "repository", "bug", "test"),
-        "DEBUGGING": ("debug", "failure", "broken", "error"),
+        "CODING": (
+            "code", "coding", "implement", "implementation", "implemented",
+            "implementing", "repository", "bug", "bugs", "test", "tests",
+            "tested", "testing",
+        ),
+        "DEBUGGING": (
+            "debug", "debugged", "debugging", "failure", "failures", "broken",
+            "error", "errors",
+        ),
         "RESEARCH": ("research", "find", "sources"),
         "ANALYSIS": ("analyze", "compare", "assess"),
         "WRITING": ("write", "draft", "rewrite"),

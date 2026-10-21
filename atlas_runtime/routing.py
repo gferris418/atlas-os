@@ -154,8 +154,6 @@ def build_routing_preview(
         provider_type: str,
         record: Mapping[str, Any],
         requirement: str,
-        *,
-        dependency_for: str | None = None,
     ) -> dict[str, Any]:
         prerequisites = list(record.get("requires", []))
         accepted_task_classes = list(record.get("task_classes", []))
@@ -179,7 +177,6 @@ def build_routing_preview(
             "type": provider_type,
             "name": record["name"],
             "requirement": requirement,
-            "dependency_for": dependency_for,
             "purpose": record["description"],
             "method": (
                 f"Use {record['name']} after validating "
@@ -230,7 +227,6 @@ def build_routing_preview(
                 provider_type,
                 record,
                 prerequisite,
-                dependency_for=parent["id"],
             ))
             selected_ids.add(prerequisite)
 

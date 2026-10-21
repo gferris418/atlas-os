@@ -334,7 +334,10 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
                             )
                         decision = route_domain_method(
                             provider["requirement"],
-                            domain_registry,
+                            {
+                                **domain_registry,
+                                "items": [method_record],
+                            },
                             execution_context=context,
                             handoff=handoff,
                         )
