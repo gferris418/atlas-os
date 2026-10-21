@@ -47,7 +47,7 @@ class ExpandedAtlasArchitectureConformance(unittest.TestCase):
         self.assertIn("architecture", authority)
         self.assertEqual(self.EXPECTED_ARCHITECTURE, authority["architecture"])
 
-    def test_canonical_architecture_specs_are_active_normative_and_discovered(self) -> None:
+    def test_canonical_architecture_specs_are_active_normative_and_machine_authoritative(self) -> None:
         ai_manifest = load_yaml("atlas-ai.yaml")
         machine_contracts = set(ai_manifest.get("machine_contracts", []))
         for name in self.ACTIVE_AUTHORITIES:
@@ -60,7 +60,7 @@ class ExpandedAtlasArchitectureConformance(unittest.TestCase):
                 self.assertEqual("active", record.get("status"), relative)
                 self.assertIn(relative, machine_contracts)
 
-    def test_domain_intelligence_is_discovered_compatibility_alias_not_active_authority(self) -> None:
+    def test_domain_intelligence_is_compatibility_alias_not_machine_authority(self) -> None:
         ai_manifest = load_yaml("atlas-ai.yaml")
         machine_contracts = set(ai_manifest.get("machine_contracts", []))
         relative = self.EXPECTED_ARCHITECTURE["domain_intelligence"]
@@ -71,7 +71,7 @@ class ExpandedAtlasArchitectureConformance(unittest.TestCase):
             "spec/domain-context-services.yaml",
             record["contract"]["canonical_replacement"],
         )
-        self.assertIn(relative, machine_contracts)
+        self.assertNotIn(relative, machine_contracts)
 
     def test_argus_collection_is_nested_under_atlas_control_plane(self) -> None:
         collection = load_yaml("spec/collection-routing.yaml")["contract"]
