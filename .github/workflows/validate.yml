@@ -26,7 +26,7 @@ jobs:
       - run: python -m unittest discover -s tests/conformance -v
       - run: python -m unittest discover -s tests/regression -v
       - run: python -m unittest discover -s tests/integration -v
-      - run: python tools/validate/validate_repository.py .
+      - run: python tools/validate/validate_all.py .
       - name: Build deterministic main snapshot
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: python tools/package/build_release.py . dist
@@ -43,4 +43,3 @@ jobs:
           if-no-files-found: error
           retention-days: 90
           compression-level: 0
-
