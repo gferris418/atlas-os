@@ -98,10 +98,10 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
         }
 
     task_signal = bool(classes & {
-        "WRITING", "DOCUMENT", "DATA", "CODING", "DEBUGGING", "DESIGN",
-        "PLANNING", "WORKFLOW", "EXTERNAL_ACTION",
+        "ANALYSIS", "DECISION", "WRITING", "DOCUMENT", "DATA", "CODING",
+        "DEBUGGING", "DESIGN", "PLANNING", "WORKFLOW", "EXTERNAL_ACTION",
     }) or _has(normalized, (
-        r"\b(?:rewrite|draft|write|summari[sz]e|calculate|compute|convert|create|build|implement|fix|debug|update|edit|translate)\b",
+        r"\b(?:assess|evaluate|analy[sz]e|rewrite|draft|write|summari[sz]e|calculate|compute|convert|create|build|implement|fix|debug|update|edit|translate)\b",
     ))
     if task_signal:
         return {
@@ -114,7 +114,7 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
             "domain_context_mode": "ON_DEMAND",
         }
 
-    search_signal = bool(classes & {"ANSWER", "RESEARCH", "ANALYSIS"}) or _has(normalized, (
+    search_signal = bool(classes & {"ANSWER", "RESEARCH"}) or _has(normalized, (
         r"\b(?:find|search|look up|lookup|current|latest|what is|who is|when is|where is|explain|research)\b",
     ))
     return {
