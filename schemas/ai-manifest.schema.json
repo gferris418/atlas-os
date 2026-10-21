@@ -10,10 +10,10 @@
     "product": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "version", "authority", "control_revision"],
+      "required": ["id", "version_pointer", "authority", "control_revision"],
       "properties": {
         "id": {"const": "atlas-os"},
-        "version": {"type": "string", "minLength": 1},
+        "version_pointer": {"const": "atlas-os.yaml#/product/version"},
         "authority": {"const": "atlas-os.yaml"},
         "control_revision": {"type": "string", "minLength": 1}
       }
