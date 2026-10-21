@@ -90,19 +90,19 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
         r"\bprofile (?:of|on)\b", r"\bdecision maker(?:s)?\b",
     ))
 
-    # Transformations of material already supplied by the user are not collection
-    # missions even if the document subject contains procurement or intelligence terms.
     supplied_material = _has(normalized, (
         r"\battached\b", r"\buploaded\b", r"\bprovided\b", r"\bthis (?:document|file|text|plan|report)\b",
     ))
     transformation = bool(classes & {"WRITING", "DOCUMENT", "DATA", "CODING", "DEBUGGING"}) or _has(normalized, (
         r"\b(?:summari[sz]e|rewrite|draft|write|translate|convert|calculate|compute|debug|fix|edit|format|proofread)\b",
     ))
-    if supplied_material and transformation:
+    independent_collection_leg = monitor_signal or _has(normalized, (
+        r"\b(?:then|and then|also)\s+(?:monitor|watch|track|find|search|identify|profile|map)\b",
+        r"\b(?:then|and then|also)\b.*\b(?:procurement|opportunit(?:y|ies)|competitors?|suppliers?|stakeholders?)\b",
+    ))
+    if supplied_material and transformation and not independent_collection_leg:
         return _direct_result("GENERAL_TASK", "NONE", "SUPPLIED_MATERIAL_TRANSFORMATION", 0.99)
 
-    # Policy/regulatory subject analysis is ATLAS work unless the request separately
-    # asks for a structured target, procurement, landscape, or monitoring mission.
     if policy_or_rules and not explicit_collection_language and not monitor_signal:
         return _direct_result("GENERAL_SEARCH", "ATLAS_DIRECT", "POLICY_OR_RULES_DIRECT", 0.97)
 
@@ -115,8 +115,6 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
     if procurement_plan:
         collection_types.extend(["PROCUREMENT_PLAN", "PROCUREMENT_DISCOVERY"])
 
-    # Forecasting future procurements needs an evidence-collection leg even though
-    # the forecast itself remains ATLAS analysis.
     future_procurement = analytical_signal and _has(normalized, (
         r"\bprocurement(?:s)?\b", r"\bprocure(?:ment|ments)?\b", r"\bacquisition(?:s)?\b",
     )) and _has(normalized, (
@@ -175,9 +173,6 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
     if monitor_signal:
         collection_types.append("MONITORING")
 
-    # A bare strategic/commercial target is a collection request even without an
-    # analytical verb. Digits alone never establish a target; uppercase identifiers
-    # must contain alphabetic characters, and ordinary operation verbs win first.
     explanatory_question = _has(normalized, (
         r"^(?:what|who|when|where|why|how)\b", r"^explain\b", r"^define\b", r"^summari[sz]e\b",
     ))
@@ -233,7 +228,7 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
             else "STRUCTURED_COLLECTION_REQUIRED"
         )
         return {
-            "route": "INTELLIGENCE",  # compatibility projection only
+            "route": "INTELLIGENCE",
             "confidence": 0.96,
             "rationale_code": rationale,
             "specialist": "ARGUS",
