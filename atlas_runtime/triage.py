@@ -104,7 +104,9 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
     if procurement_plan:
         collection_types.extend(["PROCUREMENT_PLAN", "PROCUREMENT_DISCOVERY"])
 
-    project_pipeline = _has(normalized, (r"\bproject pipeline\b", r"\bprogramme pipeline\b", r"\bprogram pipeline\b"))
+    project_pipeline = _has(normalized, (
+        r"\bproject pipeline\b", r"\bprogramme pipeline\b", r"\bprogram pipeline\b",
+    ))
     if project_pipeline:
         collection_types.append("PROJECT_PIPELINE")
 
@@ -119,15 +121,29 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
         r"\bbangladesh (?:navy|army|air force|coast guard)\b", r"\bbadc\b",
         r"\bministry\b", r"\bdirectorate\b", r"\bauthority\b", r"\bcorporation\b",
     ))
-    product_for_buyer = buyer_cue and _has(normalized, (r".+\bfor\b.+", r"\bsupply\b.+", r"\bprocure\b.+"))
+    product_for_buyer = buyer_cue and _has(
+        normalized, (r".+\bfor\b.+", r"\bsupply\b.+", r"\bprocure\b.+")
+    )
     if product_for_buyer and not policy_or_rules:
         collection_types.extend(["BUYER_REQUIREMENT", "PRODUCT_CAPABILITY", "OPPORTUNITY_DISCOVERY"])
 
-    if _has(normalized, (r"\bcompetitor(?:s| landscape)?\b", r"\bcompetitive landscape\b")):
+    if _has(normalized, (
+        r"\bcompetitive landscape\b",
+        r"\bcompetitor landscape\b",
+        r"\bcompetitors\b.*\b(?:market|landscape|identify|find|list|compare|map)\b",
+        r"\b(?:identify|find|list|compare|map)\b.*\bcompetitors\b",
+    )):
         collection_types.append("COMPETITOR_LANDSCAPE")
-    if _has(normalized, (r"\bsupplier(?:s| landscape)?\b", r"\bvendor landscape\b")):
+    if _has(normalized, (
+        r"\bsupplier landscape\b",
+        r"\bvendor landscape\b",
+        r"\bsuppliers\b.*\b(?:market|landscape|identify|find|list|compare|map)\b",
+        r"\b(?:identify|find|list|compare|map)\b.*\bsuppliers\b",
+    )):
         collection_types.append("SUPPLIER_LANDSCAPE")
-    if _has(normalized, (r"\bstakeholder(?:s| network)?\b", r"\bdecision maker(?:s)?\b", r"\binfluence map\b")):
+    if _has(normalized, (
+        r"\bstakeholder(?:s| network)?\b", r"\bdecision maker(?:s)?\b", r"\binfluence map\b",
+    )):
         collection_types.append("STAKEHOLDER_NETWORK")
     if _has(normalized, (r"\binstalled base\b", r"\bexisting fleet\b", r"\bexisting system(?:s)?\b")):
         collection_types.append("INSTALLED_BASE")
@@ -139,8 +155,8 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
         collection_types.append("MONITORING")
 
     # A bare strategic/commercial target is a collection request even without an
-    # analytical verb. Preserve ordinary explanatory questions such as "What is X?"
-    # on the direct path.
+    # analytical verb. Preserve ordinary explanatory questions and ordinary task
+    # instructions (for example, supplier-letter rewriting) on the direct path.
     explanatory_question = _has(normalized, (
         r"^(?:what|who|when|where|why|how)\b", r"^explain\b", r"^define\b", r"^summari[sz]e\b",
     ))
@@ -178,13 +194,23 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
         collection_mode = "HYBRID" if analytical_signal else "ARGUS_COLLECTION"
         if "MONITORING" in collection_types:
             collection_depth = "C4_MONITOR"
-        elif set(collection_types) & {"PROCUREMENT_PLAN", "PROCUREMENT_DISCOVERY", "OPPORTUNITY_DISCOVERY", "BUYER_REQUIREMENT", "FUNDING_BUDGET", "PROJECT_PIPELINE"}:
+        elif set(collection_types) & {
+            "PROCUREMENT_PLAN", "PROCUREMENT_DISCOVERY", "OPPORTUNITY_DISCOVERY",
+            "BUYER_REQUIREMENT", "FUNDING_BUDGET", "PROJECT_PIPELINE",
+        }:
             collection_depth = "C3_OPPORTUNITY"
-        elif set(collection_types) & {"ENTITY_DOSSIER", "COMPETITOR_LANDSCAPE", "SUPPLIER_LANDSCAPE", "STAKEHOLDER_NETWORK", "MARKET_LANDSCAPE", "INSTALLED_BASE"}:
+        elif set(collection_types) & {
+            "ENTITY_DOSSIER", "COMPETITOR_LANDSCAPE", "SUPPLIER_LANDSCAPE",
+            "STAKEHOLDER_NETWORK", "MARKET_LANDSCAPE", "INSTALLED_BASE",
+        }:
             collection_depth = "C2_DOSSIER"
         else:
             collection_depth = "C1_PROFILE"
-        rationale = "STRUCTURED_COLLECTION_WITH_ATLAS_ANALYSIS" if collection_mode == "HYBRID" else "STRUCTURED_COLLECTION_REQUIRED"
+        rationale = (
+            "STRUCTURED_COLLECTION_WITH_ATLAS_ANALYSIS"
+            if collection_mode == "HYBRID"
+            else "STRUCTURED_COLLECTION_REQUIRED"
+        )
         return {
             "route": "INTELLIGENCE",  # compatibility projection only
             "confidence": 0.96,
