@@ -6,7 +6,7 @@ product:
   release_channel: candidate
   schema_version: 2
   status: CANDIDATE
-  classification: internal
+  license: MIT
 authority:
   manifest: atlas-os.yaml
   core_spec: spec/core.yaml
