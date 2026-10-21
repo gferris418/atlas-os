@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os.local/schemas/release-verification.schema.json",
+  "title": "ATLAS external release verification record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "id", "surface_id", "version", "control_revision", "status", "migration_controls", "dependencies", "acceptance_criteria", "evidence"],
+  "properties": {
+    "schema": {"const": "schemas/release-verification.schema.json"},
+    "id": {"type": "string", "pattern": "^verify\\.[a-z0-9.-]+$"},
+    "surface_id": {"type": "string", "pattern": "^surface\\.[a-z0-9.-]+$"},
+    "version": {"type": "string", "minLength": 1},
+    "control_revision": {"type": "string", "minLength": 1},
+    "status": {"enum": ["PENDING_EXTERNAL_EVIDENCE", "PASS", "FAIL", "BLOCKED"]},
+    "migration_controls": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^MIG-[0-9]{3}$"}, "uniqueItems": true},
+    "dependencies": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "acceptance_criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "description", "evidence_required"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[A-Z0-9-]+$"},
+          "description": {"type": "string", "minLength": 1},
+          "evidence_required": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["timestamp", "type", "source", "result"],
+        "properties": {
+          "timestamp": {"type": "string", "format": "date-time"},
+          "type": {"type": "string", "minLength": 1},
+          "source": {"type": "string", "minLength": 1},
+          "result": {"enum": ["PASS", "FAIL", "PARTIAL"]},
+          "notes": {"type": "string"}
+        }
+      }
+    }
+  }
+}
