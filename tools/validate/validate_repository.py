@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import re
 import sys
@@ -64,6 +65,7 @@ REQUIRED_PATHS = (
     "docs/output-standards.md",
     "docs/artifact-model.md",
     "docs/live-testing.md",
+    "docs/key-management.md",
     "examples/workflows/coastal-surveillance-radar-bangladesh-navy.json",
     "examples/execution-request.json",
     "tests/fixtures/sample-output.json",
@@ -82,6 +84,33 @@ STRUCTURED_GLOBS = (
     "spec/*.yaml",
     "registries/*.yaml",
     "migration/*.yaml",
+)
+
+CONTRACT_VERSION_BINDINGS = (
+    (
+        "atlas_runtime/handoff.py",
+        "CONTRACT_VERSION",
+        "schemas/domain-context-handoff.schema.json",
+        "contract_version",
+    ),
+    (
+        "atlas_runtime/handoff.py",
+        "CONTRACT_VERSION",
+        "schemas/domain-handoff-receipt.schema.json",
+        "contract_version",
+    ),
+    (
+        "atlas_runtime/lease.py",
+        "LEASE_CONTRACT_VERSION",
+        "schemas/execution-lease.schema.json",
+        "contract_version",
+    ),
+    (
+        "atlas_runtime/authentication.py",
+        "SIGNING_KEY_REGISTRY_VERSION",
+        "schemas/signing-key-registry.schema.json",
+        "registry_version",
+    ),
 )
 
 
@@ -159,6 +188,58 @@ def _validate_schemas(root: Path, documents: dict[str, Any], report: ValidationR
         for error in sorted(validator.iter_errors(document), key=lambda item: list(item.path)):
             location = ".".join(str(part) for part in error.path) or "<root>"
             report.error(f"schema violation {relative}:{location}: {error.message}")
+
+
+def _python_string_constant(path: Path, name: str) -> str:
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    matches = []
+    for node in tree.body:
+        if not isinstance(node, ast.Assign) or len(node.targets) != 1:
+            continue
+        target = node.targets[0]
+        if isinstance(target, ast.Name) and target.id == name:
+            matches.append(node.value)
+    if len(matches) != 1 or not isinstance(matches[0], ast.Constant):
+        raise ValueError(f"{name} must be declared once as a string constant")
+    value = matches[0].value
+    if not isinstance(value, str):
+        raise ValueError(f"{name} must be a string constant")
+    return value
+
+
+def _validate_contract_versions(
+    root: Path, documents: dict[str, Any], report: ValidationReport
+) -> None:
+    """Keep executable contract versions aligned with their JSON Schemas."""
+    runtime_versions: dict[tuple[str, str], str] = {}
+    for runtime_path, constant_name, schema_path, schema_field in CONTRACT_VERSION_BINDINGS:
+        key = (runtime_path, constant_name)
+        if key not in runtime_versions:
+            try:
+                runtime_versions[key] = _python_string_constant(
+                    root / runtime_path, constant_name
+                )
+            except (OSError, SyntaxError, ValueError) as error:
+                report.error(
+                    f"cannot resolve runtime contract version "
+                    f"{runtime_path}:{constant_name}: {error}"
+                )
+                continue
+        schema = documents.get(schema_path)
+        try:
+            schema_version = schema["properties"][schema_field]["const"]
+        except (KeyError, TypeError):
+            report.error(
+                f"schema contract version is unavailable: {schema_path}:{schema_field}"
+            )
+            continue
+        runtime_version = runtime_versions[key]
+        if runtime_version != schema_version:
+            report.error(
+                f"runtime/schema contract version mismatch "
+                f"{runtime_path}:{constant_name} -> {schema_path}:{schema_field}: "
+                f"{runtime_version} != {schema_version}"
+            )
 
 
 def _collect_registry_ids(documents: dict[str, Any], report: ValidationReport) -> tuple[set[str], dict[str, dict[str, Any]]]:
@@ -389,6 +470,7 @@ def validate_repository(root: Path) -> ValidationReport:
     _validate_required(root, report)
     documents = _parse_all(root, report)
     _validate_schemas(root, documents, report)
+    _validate_contract_versions(root, documents, report)
     _validate_references(root, documents, report)
     _validate_authority_and_release(root, documents, report)
     _validate_distribution_controls(root, documents, report)

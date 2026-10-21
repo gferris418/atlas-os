@@ -22,6 +22,7 @@ GOVERNED_RECORD_CLASSES = frozenset({
     "APPROVAL",
     "CONTROL_RECORD",
 })
+SIGNING_KEY_REGISTRY_VERSION = "1.0.0"
 
 
 def _canonical_record(record: Mapping[str, Any]) -> bytes:
@@ -47,7 +48,12 @@ def canonical_record_sha256(record: Mapping[str, Any]) -> str:
 def attest_control_record(
     record: Mapping[str, Any], *, key_id: str, private_key: bytes
 ) -> dict[str, str]:
-    """Sign a complete control record with an operator-managed Ed25519 key."""
+    """Sign a control record with an operator-managed Ed25519 key.
+
+    Production custody and rotation requirements are documented in
+    ``docs/key-management.md``. The raw seed is an in-memory compatibility
+    boundary and must not be stored in source, configuration, or logs.
+    """
     if not re.fullmatch(r"[a-z0-9][a-z0-9._-]{2,63}", key_id):
         raise ValueError("attestation requires a valid key_id")
     try:
@@ -75,7 +81,10 @@ def resolve_trusted_public_key(
     """Resolve one lifecycle-governed ATLAS public key or fail closed."""
     if record_class not in GOVERNED_RECORD_CLASSES:
         raise ValueError("unsupported ATLAS control record class")
-    if registry.get("registry_version") != "1.0.0" or registry.get("issuer") != "ATLAS_OS":
+    if (
+        registry.get("registry_version") != SIGNING_KEY_REGISTRY_VERSION
+        or registry.get("issuer") != "ATLAS_OS"
+    ):
         raise ValueError("unsupported ATLAS signing-key registry")
     keys = registry.get("keys")
     if not isinstance(keys, list):

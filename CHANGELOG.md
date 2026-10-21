@@ -2,6 +2,14 @@
 
 All notable changes follow semantic versioning and preserve release lineage. The authoritative current product version is resolved only from `atlas-os.yaml`.
 
+## Unreleased
+
+- Add operator guidance for Ed25519 signing-key custody, admission, rotation,
+  revocation, and trusted registry distribution.
+- Make repository validation fail when executable handoff, lease, or signing
+  registry contract versions drift from their JSON Schema constants.
+- Add deterministic routing and CLI error-boundary regression coverage.
+
 ## v2.0.1
 
 - Promote the validated `2.0.1-rc.1` control-plane hardening to the stable channel.
