@@ -13,6 +13,7 @@ authority:
 discovery_order:
   - atlas-ai.yaml
   - atlas-os.yaml
+  - governance.yaml
   - spec/core.yaml
   - spec/execution-spine.yaml
   - applicable spec/*.yaml
@@ -22,6 +23,7 @@ discovery_order:
   - integrations/<surface>/release-verification.yaml
 machine_contracts:
   - atlas-os.yaml
+  - governance.yaml
   - spec/core.yaml
   - spec/runtime.yaml
   - spec/execution-spine.yaml
@@ -62,6 +64,7 @@ machine_contracts:
   - integrations/hermes-agent/release-verification.yaml
   - schemas/atlas-os.schema.json
   - schemas/ai-manifest.schema.json
+  - schemas/governance.schema.json
   - schemas/surface-adapter.schema.json
   - schemas/migration.schema.json
   - schemas/release-verification.schema.json
@@ -75,6 +78,7 @@ machine_contracts:
   - schemas/registry.schema.json
 human_guidance:
   - README.md
+  - GOVERNANCE.md
   - docs/ai-host-installation.md
   - integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md
   - integrations/chatgpt/RELEASE-VERIFICATION.md
