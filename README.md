@@ -4,8 +4,8 @@ ATLAS-OS is a **model-agnostic execution-governance architecture for AI agents**
 
 It is **not a desktop operating system** and does not replace the host model, conversation engine, browser, tool runtime, or device OS.
 
-**Current candidate:** `v2.0.2-rc.4`  
-**Control revision:** `atlas-bootstrap-2026-10-22-r8`  
+**Current candidate:** `v2.0.2-rc.5`  
+**Control revision:** `atlas-bootstrap-2026-10-22-r9`  
 **Target stable:** `v2.0.2`  
 **Information classification:** Internal  
 **License:** [MIT](LICENSE)  
@@ -41,7 +41,7 @@ Authoritative machine governance: policy, permissions, collection-mode decision,
 Observability derives read-only events/measurements from authoritative state. Dashboard is the human projection. Dashboard actions never mutate execution directly: they become Mission Control commands evaluated by the Control Plane.
 
 ### Domain Context Services
-ATLAS owns canonical terminology, taxonomy, economic sector context, operator/supplier industry, product/service, procurement, trade/customs and defense-logistics classification plus ontology, law, standards, professional frameworks, benchmarks and evidence precedence. `spec/domain-intelligence.yaml` remains only as a compatibility alias to this layer.
+ATLAS owns canonical terminology, taxonomy, economic sector context, operator/supplier industry, product/service, procurement, trade/customs and defense-logistics classification plus ontology, law, standards, professional frameworks, benchmarks and evidence precedence. `spec/domain-intelligence.yaml` remains only as a deprecated compatibility alias to this layer and is not an active machine authority.
 
 ### Data Plane
 ATLAS performs substantive work: ordinary research, writing, calculation, coding, policy analysis, comparison, strategic analysis, forecasting, scenarios, opportunity qualification and decision support.
@@ -104,7 +104,7 @@ Crosswalks must be explicit (`EXACT`, `CLOSE`, `BROADER`, `NARROWER`, `RELATED`)
 
 ## Machine-readable authority
 
-AI systems begin at `atlas-ai.yaml`; `atlas-os.yaml` remains product/release authority. Key contracts:
+AI systems begin at `atlas-ai.yaml`; `atlas-os.yaml` remains product/release authority. Key active contracts:
 - `spec/mission-control.yaml`
 - `spec/control-plane.yaml`
 - `spec/request-triage.yaml`
@@ -120,4 +120,4 @@ The active ARGUS contract is immutable and commit-pinned in `registries/domain-m
 
 ## Release state
 
-Stable `v2.0.2` remains blocked by external-proof controls `MIG-029` and `MIG-037`. Repository-local conformance does not substitute for independent host evidence.
+Stable `v2.0.2` remains blocked by external-proof controls `MIG-029` and `MIG-037`. Repository-local conformance does not substitute for independent host evidence. Candidate `v2.0.2-rc.5` / `r9` resets the external proof target to the collection-need architecture; prior rc.4/r8 evidence remains historical only.

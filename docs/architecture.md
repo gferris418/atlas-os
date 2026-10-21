@@ -1,112 +1,86 @@
 # Architecture
 
-ATLAS-OS is a normative AI-agent execution-governance layer. It is not a desktop or device operating system. The architecture separates human command, machine authority, specialist intelligence, substantive execution, assurance, and observability so no surface can silently become the source of truth for another.
+ATLAS-OS is the fixed AI-agent execution-governance architecture. ARGUS is a nested, governed intelligence collection subsystem—not a peer operating system.
 
 ```text
-USER
-  |
-  v
+HUMAN / EVENT
+    |
+    v
 MISSION CONTROL
-human command / approval / intervention
-  |
-  v
-REQUEST TRIAGE
-GENERAL_SEARCH | GENERAL_TASK | INTELLIGENCE
-  |
-  +----------------------+----------------------+
-  |                                             |
-  v                                             v
-ATLAS DIRECT PATH                           ARGUS INTELLIGENCE
-search / task execution                    specialist intelligence
-  |                                             |
-  +----------------------+----------------------+
-                         |
-                         v
-                   CONTROL PLANE
-           authority / policy / permissions
-           plan / routing / approvals / state
-                         |
-              +----------+----------+
-              |                     |
-              v                     v
-      DATA-PLANE EXECUTION   ASSURANCE / VERIFICATION
-              |                     |
-              +----------+----------+
-                         |
-                         v
-                 OBSERVABILITY EVENTS
-                         |
-                         v
-                      DASHBOARD
-              progress / metrics / risks
+    |
+    v
+CONTROL PLANE
+    |
+    v
+INTENT + TARGET INTERPRETATION
+    |
+    v
+COLLECTION-NEED GATE
+    |---- NONE -----------------------> ATLAS
+    |---- ATLAS_DIRECT ---------------> ATLAS research/retrieval
+    |---- ARGUS_COLLECTION -----------> ARGUS collection package
+    |---- HYBRID ---------------------> ARGUS collection + ATLAS analysis
+    |
+    v
+DOMAIN CONTEXT SERVICES
+    |
+    v
+ATLAS DATA PLANE
+    |
+    v
+ASSURANCE / VERIFICATION
+    |
+    v
+OUTPUT / PERSISTENCE
+    |
+    v
+OBSERVABILITY -> DASHBOARD
 ```
 
-The core architectural authorities are machine-readable:
+## Authorities
 
-- `spec/mission-control.yaml` — human command and intervention boundary.
-- `spec/control-plane.yaml` — authoritative machine governance, routing, permissions, approvals, and state.
-- `spec/observability.yaml` — measurement and read-only state projection.
-- `spec/domain-intelligence.yaml` — conditional domain semantics, evidence hierarchy, standards, benchmarks, signals, forecasting, scenarios, and calibration.
-- `spec/request-triage.yaml` — first semantic routing gate.
+- **Mission Control** — human objective, approvals/rejections, pause/resume/abort, scope, priority, escalation and collection expansion/reduction requests.
+- **Control Plane** — authoritative policy, permissions, plan/work-unit state, Collection-Need Gate, routing, approvals, leases, lifecycle and persistence authorization.
+- **Domain Context Services** — canonical terminology, taxonomy, economic/industry/product/procurement/trade context, ontology, law, standards, frameworks, benchmarks and evidence precedence.
+- **Data Plane** — substantive ATLAS execution, including policy analysis, strategic analysis, forecasting, scenarios, comparison, opportunity qualification and decision support.
+- **Assurance / Verification** — independent checking of claims, evidence, specialist returns, tests, conflicts and unresolved gaps.
+- **Observability** — read-oriented operational events and measurements.
+- **Dashboard** — human-facing read-only projection. A state-changing Dashboard action becomes a Mission Control command.
 
-## Request triage and fast paths
+`spec/domain-intelligence.yaml` is retained only as a deprecated compatibility alias to `spec/domain-context-services.yaml` and is not active machine authority.
 
-ATLAS performs the smallest useful decision first:
+## Collection-Need Gate
 
-- `GENERAL_SEARCH` — direct factual/current-information retrieval or research in ATLAS.
-- `GENERAL_TASK` — direct production, transformation, calculation, analysis, coding, document, workflow, or other ordinary task execution in ATLAS.
-- `INTELLIGENCE` — governed delegation to ARGUS when the objective requires strategic, market, opportunity, competitive, stakeholder, political-economic, monitoring, forecasting, scenario, probability, or decision intelligence.
+Task intent and collection mechanism are independent. ATLAS asks: **Does this task require structured intelligence collection?**
 
-A government agency, tender, company, market, person, or political topic does not by itself activate ARGUS. A plain tender lookup remains `GENERAL_SEARCH`; qualifying, ranking, forecasting, monitoring, or deciding which opportunities to pursue is `INTELLIGENCE`.
+Collection modes:
+- `NONE`
+- `ATLAS_DIRECT`
+- `ARGUS_COLLECTION`
+- `HYBRID`
 
-This gate occurs before deep taxonomy, classification, framework, or provider work. Direct requests resolve those controls only when they can materially change correctness, authorization, safety, or the requested outcome.
+Representative routing:
+- Bangladesh Bank foreign exchange policy → `ATLAS_DIRECT`
+- ST Engineering → `ARGUS_COLLECTION`
+- coastal patrol vessel for Bangladesh Coast Guard → `ARGUS_COLLECTION`
+- seed cum cleaner for BADC → `ARGUS_COLLECTION`
+- annual procurement plan of Bangladesh Navy → `ARGUS_COLLECTION`
+- explain Bangladesh Navy procurement regulations → `ATLAS_DIRECT`
+- forecast likely Bangladesh Navy procurements over 24 months → `HYBRID`
+- compare ST Engineering vs L3Harris for Bangladesh opportunities → `HYBRID`
 
-## Mission Control
+Legacy `GENERAL_SEARCH`, `GENERAL_TASK`, and `INTELLIGENCE` remain compatibility route labels. They are not the semantic ARGUS activation authority.
 
-Mission Control is the human supervisory command surface. It expresses mission objectives, approvals, rejection, pause/resume/abort requests, scope changes, priorities, escalation, and exception requests.
+## ARGUS boundary
 
-Mission Control does not mutate execution state directly. Every state-changing request is evaluated by the Control Plane against permissions, policy, current state, approvals, and non-waivable constraints.
+ARGUS capability is `intelligence_collection`. Within an ATLAS-authorized mission ARGUS may resolve targets, plan collection, discover/acquire sources, extract/normalize evidence, resolve entities, deduplicate, suggest collection-side classifications, corroborate, reconcile sources, expose gaps/conflicts/coverage and return an `IntelligenceCollectionPackage`.
 
-## Control Plane
+ATLAS retains planning, permissions, approvals, canonical classification, strategic analysis, forecasting/scenarios, opportunity qualification, pursuit decisions, assurance, persistence authorization, observability, Dashboard and final delivery. Public-sector I0–I9 maturity and `PROMOTE_TO_PX` remain specialization semantics, not universal ARGUS output.
 
-The Control Plane is the authoritative machine-governance and orchestration layer. It owns policy evaluation, permissions, plan/work-unit state, routing, approval state, execution leases, lifecycle transitions, external-state reconciliation, persistence authorization, and control receipts.
+## Multi-axial classification
 
-The Control Plane authorizes substantive work but does not become the substantive data plane. It is also distinct from the Dashboard: displayed state is a projection, not authority.
+ATLAS never collapses domain, sector, industry/activity, product/service, procurement category, customs/trade code and capability into one code. Current governed reference schemes include ISIC Rev. 5, NACE Rev. 2.1, NAICS 2022, CPC 3.0, CPA 2.2, UNSPSC, CPV 2008, HS 2022 and NATO Codification when materially applicable. Crosswalks are explicit (`EXACT`, `CLOSE`, `BROADER`, `NARROWER`, `RELATED`). Classification metadata does not prove compliance or eligibility.
 
-## Dashboard and observability
+## Provider independence
 
-The Dashboard is a read-oriented projection over event-driven observability state. It reports progress, active work, blockers, approvals, evidence health, verification state, performance, reliability, and persistence status.
-
-A user action initiated from a dashboard is converted into a Mission Control command and evaluated by the Control Plane. Dashboard state never silently mutates a plan, permission, routing decision, or approval.
-
-## Conditional Domain Intelligence
-
-Domain Intelligence is not universal preflight. For direct ATLAS work it resolves only the domain context that can materially affect the result.
-
-For `INTELLIGENCE`, ATLAS may transfer a governed `READY` or `PARTIAL` domain-context handoff to ARGUS. ARGUS preserves known upstream context and enriches unresolved intelligence-domain context. A `BLOCKED` handoff cannot authorize dependent execution.
-
-The layer distinguishes:
-
-- taxonomy — controlled categories;
-- classification — contextual assignment into those categories;
-- ontology — material relationships among entities and concepts;
-- binding requirements — law, regulation, contract, mandatory technical requirements;
-- standards and recognized professional frameworks;
-- best practices and authoritative guidance;
-- benchmarks and comparison baselines;
-- domain-sensitive evidence hierarchies;
-- signals, trends, forecasting, scenarios, and calibration where the intelligence objective requires them.
-
-## ARGUS specialist boundary
-
-ARGUS is the governed specialist for `intelligence_analysis`. It supports strategic, market, opportunity, competitive, stakeholder, political-economic, monitoring, forecasting, scenario, and decision intelligence. Government/public-sector opportunity intelligence remains an ARGUS specialization rather than its only purpose.
-
-ARGUS never owns the ATLAS execution spine, user authority, permissions, plan, approval state, provider routing authority, independent verification decision, persistence authorization, or final delivery. ATLAS pins ARGUS through an immutable activation contract in `registries/domain-methods.yaml`.
-
-## Provider-independent capabilities
-
-ATLAS registers semantic capabilities rather than embedding provider brands into core semantics. Skills, plugins, models, connectors, specialist methods, and host functions remain providers of capabilities and are subordinate to `spec/capability-admission.yaml`.
-
-Availability is not admission. Installation is not trust. A static security scan is not certification. Provider-specific accuracy, cost, latency, and reliability claims remain unverified until measured in the target runtime.
-
-The executable `atlas_runtime` package is a conformance reference, not a second source of truth. Declarative specifications remain authoritative. Surface adapters may use native host capabilities but cannot redefine core semantics.
+Capabilities are semantic contracts; skills, tools, plugins, models, connectors and specialist methods are providers. Availability is not admission. Installation is not trust. Provider routing remains subordinate to `spec/capability-admission.yaml`, digest-bound routing previews and Control Plane approval policy.

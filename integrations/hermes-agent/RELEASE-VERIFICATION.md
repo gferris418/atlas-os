@@ -1,23 +1,9 @@
-# Hermes Agent release verification
-
-This is the human companion to the authoritative machine verification contract at `integrations/hermes-agent/release-verification.yaml`. Use it in a genuinely fresh Hermes Agent session. Repository-local tests cannot replace independent host evidence. If this document and the YAML contract disagree, the schema-valid YAML contract governs verification execution.
+# Hermes Agent external verification
 
 ## Test identity
 
-- ATLAS version: `2.0.2-rc.4`
-- Control revision: `atlas-bootstrap-2026-10-22-r8`
-- AI discovery manifest: `atlas-ai.yaml`
-- Skill artifact: `.agents/skills/atlas-os/SKILL.md`
+- ATLAS version: `2.0.2-rc.5`
+- Control revision: `atlas-bootstrap-2026-10-22-r9`
+- Machine contract: `integrations/hermes-agent/release-verification.yaml`
 
-## Procedure
-
-1. Start Hermes Agent inside a fresh checkout with no earlier ATLAS conversation context.
-2. Resolve the repository through `atlas-ai.yaml`, review the project skill, and run `hermes skills trust` for the checkout.
-3. Execute every check in `integrations/hermes-agent/release-verification.yaml` and retain all required evidence fields.
-4. Confirm the triage-first behavior explicitly: plain current-tender lookup remains `GENERAL_SEARCH` without ARGUS, while the specified opportunity-assessment/ranking/monitoring prompt resolves to `INTELLIGENCE` with specialist `ARGUS`.
-5. Record unavailable host capabilities as unavailable; do not reinterpret them as successful actions or as failures of unrelated core semantics.
-6. Do not translate checklist publication, local tests, or repository readiness into `PASS` for `MIG-037`.
-
-## Closure rule
-
-Hermes evidence can satisfy only the Hermes-scoped criteria and evidence requirements declared by `MIG-037`. The migration remains blocked until `MIG-029` is closed and independent current-revision evidence exists for every required supported surface.
+Use a fresh trusted checkout/session and run the machine-readable verification contract. Confirm the project-local skill resolves rc.5/r9 and the Collection-Need Gate distinguishes direct policy work, ARGUS collection, and hybrid collection-plus-ATLAS-analysis. This file is not independent external evidence.

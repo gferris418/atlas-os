@@ -13,98 +13,37 @@ acceptance_criteria:
     surfaces: [repository]
     evidence_type: repository-publication-evidence
     status: PASS
-    evidence_ids: [EVID-008]
+    evidence_ids: [EVID-009]
   - id: AC-02
     requirement: Independently demonstrate that ChatGPT, Codex, Work, and Hermes Agent resolve the same current control revision.
     surfaces: [chatgpt, codex, work, hermes-agent]
     evidence_type: independent-host-observation
     status: BLOCKED
-    evidence_ids: [EVID-008]
+    evidence_ids: [EVID-009]
   - id: AC-03
     requirement: Retain independent evidence for each supported surface and reconcile any stale surface state before closure.
     surfaces: [chatgpt, codex, work, hermes-agent]
     evidence_type: independently-reviewed-host-evidence
     status: BLOCKED
-    evidence_ids: [EVID-008]
+    evidence_ids: [EVID-009]
 evidence:
-  - id: EVID-001
-    type: local-control-publication-candidate
-    timestamp: "2026-10-17T23:57:16+06:00"
-    version: 2.0.0-rc.7
-    control_revision: chatgpt-bootstrap-2026-10-17-r1
-    source: integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md
-    independent: false
-    scope: [repository, chatgpt]
-    result: READY_FOR_EXTERNAL_PROOF
-    limitations: Independent resolution by ChatGPT, Codex, and Work was not observed.
-  - id: EVID-002
-    type: operator-release-risk-acceptance
-    timestamp: "2026-10-19T22:00:00+06:00"
-    version: 2.0.0
-    source: docs/releases/v2.0.0.md
-    independent: false
-    scope: [release-governance]
-    result: DEFERRED_POST_GA
-    limitations: Acceptance criteria remain open; this records release-risk acceptance only and is not propagation proof.
-  - id: EVID-003
-    type: stable-control-publication-candidate
-    timestamp: "2026-10-20T16:07:00+06:00"
-    version: 2.0.1
-    control_revision: chatgpt-bootstrap-2026-10-19-r4
-    source: integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md
-    independent: false
-    scope: [repository, chatgpt, codex, work]
-    result: READY_FOR_EXTERNAL_PROOF
-    limitations: Independent resolution evidence was still required and MIG-029 remained open.
-  - id: EVID-004
-    type: expanded-control-publication-candidate
-    timestamp: "2026-10-21T20:15:00+06:00"
-    version: 2.0.2-rc.1
-    control_revision: atlas-bootstrap-2026-10-21-r5
-    source: integrations/hermes-agent/RELEASE-VERIFICATION.md
-    independent: false
-    scope: [repository, chatgpt, codex, work, hermes-agent]
-    result: READY_FOR_EXTERNAL_PROOF
-    limitations: Checklist publication is not live propagation proof and MIG-029 must close first.
-  - id: EVID-005
-    type: taxonomy-first-control-publication-candidate
-    timestamp: "2026-10-21T22:24:16+06:00"
-    version: 2.0.2-rc.2
-    control_revision: atlas-bootstrap-2026-10-21-r6
-    source: integrations/hermes-agent/RELEASE-VERIFICATION.md
-    independent: false
-    scope: [repository, chatgpt, codex, work, hermes-agent]
-    result: READY_FOR_EXTERNAL_PROOF
-    limitations: The taxonomy-first revision still requires independent resolution evidence on every supported surface and remains blocked on MIG-029.
-  - id: EVID-006
-    type: machine-verifiable-control-publication-candidate
-    timestamp: "2026-10-22T00:15:50+06:00"
-    version: 2.0.2-rc.3
-    control_revision: atlas-bootstrap-2026-10-22-r7
-    source: atlas-ai.yaml
-    independent: false
-    scope: [repository, chatgpt, codex, work, hermes-agent]
-    result: READY_FOR_EXTERNAL_PROOF
-    limitations: Machine-readable verification contracts exist for all supported surfaces, but independent propagation observations remain blocked on MIG-029 and have not yet occurred.
-  - id: EVID-007
-    type: repository-control-publication
-    timestamp: "2026-10-22T00:15:50+06:00"
-    version: 2.0.2-rc.3
-    control_revision: atlas-bootstrap-2026-10-22-r7
-    source: atlas-os.yaml
-    independent: false
-    scope: [repository]
-    result: PASS
-    limitations: This proves publication of one provider-neutral machine control revision in the repository only. It does not prove that any external AI host resolved or applied the revision.
-  - id: EVID-008
-    type: triage-first-repository-control-publication
-    timestamp: "2026-10-22T02:07:25+06:00"
-    version: 2.0.2-rc.4
-    control_revision: atlas-bootstrap-2026-10-22-r8
+  - {id: EVID-001, type: local-control-publication-candidate, timestamp: "2026-10-17T23:57:16+06:00", version: 2.0.0-rc.7, control_revision: chatgpt-bootstrap-2026-10-17-r1, source: integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md, independent: false, scope: [repository, chatgpt], result: READY_FOR_EXTERNAL_PROOF, limitations: Historical readiness target.}
+  - {id: EVID-002, type: operator-release-risk-acceptance, timestamp: "2026-10-19T22:00:00+06:00", version: 2.0.0, source: docs/releases/v2.0.0.md, independent: false, scope: [release-governance], result: DEFERRED_POST_GA, limitations: Release-risk acceptance only.}
+  - {id: EVID-003, type: stable-control-publication-candidate, timestamp: "2026-10-20T16:07:00+06:00", version: 2.0.1, control_revision: chatgpt-bootstrap-2026-10-19-r4, source: integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md, independent: false, scope: [repository, chatgpt, codex, work], result: READY_FOR_EXTERNAL_PROOF, limitations: Historical readiness target.}
+  - {id: EVID-004, type: expanded-control-publication-candidate, timestamp: "2026-10-21T20:15:00+06:00", version: 2.0.2-rc.1, control_revision: atlas-bootstrap-2026-10-21-r5, source: integrations/hermes-agent/RELEASE-VERIFICATION.md, independent: false, scope: [repository, chatgpt, codex, work, hermes-agent], result: READY_FOR_EXTERNAL_PROOF, limitations: Historical readiness target.}
+  - {id: EVID-005, type: taxonomy-first-control-publication-candidate, timestamp: "2026-10-21T22:24:16+06:00", version: 2.0.2-rc.2, control_revision: atlas-bootstrap-2026-10-21-r6, source: integrations/hermes-agent/RELEASE-VERIFICATION.md, independent: false, scope: [repository, chatgpt, codex, work, hermes-agent], result: READY_FOR_EXTERNAL_PROOF, limitations: Historical readiness target.}
+  - {id: EVID-006, type: machine-verifiable-control-publication-candidate, timestamp: "2026-10-22T00:15:50+06:00", version: 2.0.2-rc.3, control_revision: atlas-bootstrap-2026-10-22-r7, source: atlas-ai.yaml, independent: false, scope: [repository, chatgpt, codex, work, hermes-agent], result: READY_FOR_EXTERNAL_PROOF, limitations: Historical readiness target.}
+  - {id: EVID-007, type: repository-control-publication, timestamp: "2026-10-22T00:15:50+06:00", version: 2.0.2-rc.3, control_revision: atlas-bootstrap-2026-10-22-r7, source: atlas-os.yaml, independent: false, scope: [repository], result: PASS, limitations: Historical repository-only proof.}
+  - {id: EVID-008, type: triage-first-repository-control-publication, timestamp: "2026-10-22T02:07:25+06:00", version: 2.0.2-rc.4, control_revision: atlas-bootstrap-2026-10-22-r8, source: atlas-os.yaml, independent: false, scope: [repository, chatgpt, codex, work, hermes-agent], result: PASS, limitations: Historical rc.4/r8 repository publication; not rc.5/r9 external proof.}
+  - id: EVID-009
+    type: collection-gate-repository-control-publication
+    timestamp: "2026-10-22T04:59:01+06:00"
+    version: 2.0.2-rc.5
+    control_revision: atlas-bootstrap-2026-10-22-r9
     source: atlas-os.yaml
     independent: false
     scope: [repository, chatgpt, codex, work, hermes-agent]
     result: PASS
-    limitations: This proves publication of the provider-neutral rc.4/r8 control revision and machine verification targets only. It does not prove that ChatGPT, Codex, Work, or Hermes Agent independently resolved or applied the revision; MIG-029 remains open.
+    limitations: This proves publication/readiness of the rc.5/r9 provider-neutral collection-gate control on the repository candidate branch only. It does not prove that external hosts independently resolved or applied it; MIG-029 remains open.
 owner: atlas-maintainers
-notes: Stable v2.0.2 promotion remains blocked. The repository-publication criterion is complete for rc.4/r8; independent cross-surface propagation remains blocked on MIG-029. The provider-neutral generic AI-host contract remains local schema/runtime conformance scope; an unregistered provider becomes an external proof target only when promoted to a documented supported adapter.
+notes: Stable v2.0.2 promotion remains blocked. rc.5/r9 is the current proof target; cross-surface propagation remains blocked on MIG-029.

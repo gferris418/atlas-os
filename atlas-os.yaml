@@ -2,7 +2,7 @@ schema: schemas/atlas-os.schema.json
 product:
   id: atlas-os
   name: ATLAS OS
-  version: 2.0.2-rc.4
+  version: 2.0.2-rc.5
   release_channel: candidate
   schema_version: 2
   status: CANDIDATE
@@ -32,7 +32,7 @@ execution:
   collection_mission: schemas/collection-mission.schema.json
   output: spec/output.yaml
   default_depth: L1
-  control_revision: atlas-bootstrap-2026-10-22-r8
+  control_revision: atlas-bootstrap-2026-10-22-r9
 release:
   target_version: 2.0.2
   blocking_controls: [MIG-029, MIG-037]

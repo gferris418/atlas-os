@@ -1,7 +1,7 @@
 schema: schemas/ai-manifest.schema.json
 id: atlas-os-ai-entrypoint
-product_version: 2.0.2-rc.4
-control_revision: atlas-bootstrap-2026-10-22-r8
+product_version: 2.0.2-rc.5
+control_revision: atlas-bootstrap-2026-10-22-r9
 authority:
   product_manifest: atlas-os.yaml
   core_spec: spec/core.yaml
@@ -110,7 +110,9 @@ machine_contracts:
 human_guidance:
   - README.md
   - GOVERNANCE.md
+  - docs/architecture.md
   - docs/architecture/atlas-argus-collection-boundary.md
+  - docs/runtime.md
   - docs/ai-host-installation.md
   - integrations/README.md
   - integrations/access-asia/README.md
