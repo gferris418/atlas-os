@@ -914,6 +914,12 @@ class ClassificationAndDashboardTests(unittest.TestCase):
         self.assertIn("ANALYSIS", labels)
         self.assertIn("MULTI_STAGE", labels)
 
+    def test_task_classification_uses_term_boundaries(self) -> None:
+        labels = classify_task("Find the latest public sources about ISO 9001")
+
+        self.assertIn("RESEARCH", labels)
+        self.assertNotIn("CODING", labels)
+
     def test_task_intent_classification_recommends_but_does_not_route_providers(self) -> None:
         opportunity = classify_task_intent(
             "Find public procurement opportunities for coastal patrol vessels",

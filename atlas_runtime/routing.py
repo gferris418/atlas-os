@@ -101,11 +101,18 @@ def build_routing_preview(
         "risk_class", "version", "source", "capabilities", "requires", "data_scope",
         "conflicts_with", "fallback",
     }
+    required_domain_method_fields = {
+        "source_commit", "contract_sha256", "activation_authority", "consumer_id",
+        "requires_domain_handoff", "accepted_handoff_states", "blocked_handoff_execution",
+        "owns_execution_spine", "owns_planning", "owns_approvals",
+    }
     seen_provider_ids: dict[str, str] = {}
     for provider_type, records in host_provider_groups:
         for record in records:
             provider_id = str(record.get("id", ""))
             missing = required_host_fields - set(record)
+            if provider_type == "domain-method":
+                missing |= required_domain_method_fields - set(record)
             if missing:
                 raise ValueError(
                     f"host provider {provider_id or '<unknown>'} lacks admission fields: "
@@ -117,6 +124,8 @@ def build_routing_preview(
                 raise ValueError(f"host provider has invalid permission: {provider_id}")
             if record.get("status") not in {"active", "available"}:
                 raise ValueError(f"host provider is not available: {provider_id}")
+            if provider_type == "domain-method":
+                _validate_domain_method(record)
     for provider_type, records in provider_groups:
         for record in records:
             provider_id = str(record.get("id", ""))
@@ -125,67 +134,114 @@ def build_routing_preview(
             if provider_id in seen_provider_ids:
                 raise ValueError(f"provider id is registered more than once: {provider_id}")
             seen_provider_ids[provider_id] = provider_type
+    provider_records = {
+        record["id"]: (provider_type, record)
+        for provider_type, records in provider_groups
+        for record in records
+    }
+
+    def is_proposable(record: Mapping[str, Any]) -> bool:
+        if record.get("status") not in {"active", "available", "required"}:
+            return False
+        if record.get("available", True) is False:
+            return False
+        if record.get("permission") == "denied":
+            return False
+        surfaces = set(record.get("applies_to", []))
+        return not surfaces or f"surface.{surface}" in surfaces
+
+    def preview_provider(
+        provider_type: str,
+        record: Mapping[str, Any],
+        requirement: str,
+        *,
+        dependency_for: str | None = None,
+    ) -> dict[str, Any]:
+        prerequisites = list(record.get("requires", []))
+        accepted_task_classes = list(record.get("task_classes", []))
+        routing_task_class = next(
+            (
+                task_class for task_class in task_class_order
+                if not accepted_task_classes or task_class in accepted_task_classes
+            ),
+            None,
+        )
+        permission = record.get("permission", "read")
+        data_scope = record.get("data_scope")
+        if not data_scope:
+            data_scope = (
+                "Original prompt, governed domain context, and public-source evidence only"
+                if permission == "read"
+                else "Only the resources explicitly approved for this work unit"
+            )
+        return {
+            "id": record["id"],
+            "type": provider_type,
+            "name": record["name"],
+            "requirement": requirement,
+            "dependency_for": dependency_for,
+            "purpose": record["description"],
+            "method": (
+                f"Use {record['name']} after validating "
+                f"{', '.join(prerequisites) if prerequisites else 'its admission record'}; "
+                "return its result to the ATLAS plan for verification."
+            ),
+            "permission": permission,
+            "authority": record.get("authority", "model"),
+            "risk_class": record.get("risk_class", "unknown"),
+            "version": str(record.get("version", "unknown")),
+            "source": record.get("source", "unknown"),
+            "prerequisites": prerequisites,
+            "conflicts_with": list(record.get("conflicts_with", [])),
+            "task_classes": accepted_task_classes,
+            "routing_task_class": routing_task_class,
+            "unresolved_gates": [],
+            "data_scope": data_scope,
+            "fallback": record.get("fallback"),
+        }
+
     if work_unit is None:
         requirements = []
     providers: list[dict[str, Any]] = []
     for requirement in requirements:
         for provider_type, records in provider_groups:
             for record in records:
-                if record.get("status") not in {"active", "available", "required"}:
-                    continue
-                if record.get("permission") == "denied":
-                    continue
                 if requirement not in record.get("capabilities", []):
                     continue
-                surfaces = set(record.get("applies_to", []))
-                if surfaces and f"surface.{surface}" not in surfaces:
+                if not is_proposable(record):
                     continue
-                prerequisites = list(record.get("requires", []))
-                accepted_task_classes = list(record.get("task_classes", []))
-                routing_task_class = next(
-                    (
-                        task_class for task_class in task_class_order
-                        if not accepted_task_classes or task_class in accepted_task_classes
-                    ),
-                    None,
-                )
-                providers.append({
-                    "id": record["id"],
-                    "type": provider_type,
-                    "name": record["name"],
-                    "requirement": requirement,
-                    "purpose": record["description"],
-                    "method": (
-                        f"Use {record['name']} after validating "
-                        f"{', '.join(prerequisites) if prerequisites else 'its admission record'}; "
-                        "return its result to the ATLAS plan for verification."
-                    ),
-                    "permission": record.get("permission", "read"),
-                    "authority": record.get("authority", "model"),
-                    "risk_class": record.get("risk_class", "unknown"),
-                    "version": str(record.get("version", "unknown")),
-                    "source": record.get("source", "unknown"),
-                    "prerequisites": prerequisites,
-                    "conflicts_with": list(record.get("conflicts_with", [])),
-                    "task_classes": accepted_task_classes,
-                    "routing_task_class": routing_task_class,
-                    "unresolved_gates": [],
-                    "data_scope": (
-                        record.get("data_scope")
-                        or "Original prompt, governed domain context, and public-source evidence only"
-                        if record.get("permission", "read") == "read"
-                        else record.get("data_scope")
-                        or "Only the resources explicitly approved for this work unit"
-                    ),
-                    "fallback": record.get("fallback"),
-                })
+                providers.append(preview_provider(provider_type, record, requirement))
+
+    selected_ids = {provider["id"] for provider in providers}
+    provider_index = 0
+    while provider_index < len(providers):
+        parent = providers[provider_index]
+        provider_index += 1
+        for prerequisite in parent["prerequisites"]:
+            if prerequisite in available_capabilities or prerequisite in selected_ids:
+                continue
+            registered = provider_records.get(prerequisite)
+            if registered is None:
+                continue
+            provider_type, record = registered
+            if not is_proposable(record):
+                continue
+            providers.append(preview_provider(
+                provider_type,
+                record,
+                prerequisite,
+                dependency_for=parent["id"],
+            ))
+            selected_ids.add(prerequisite)
 
     candidate_ids = {provider["id"] for provider in providers}
     admitted_ids = set(available_capabilities)
     classification = domain_classification or {}
     alignment = domain_alignment or {}
     domain_records = {
-        record["id"]: record for record in domain_methods.get("items", [])
+        provider_id: record
+        for provider_id, (provider_type, record) in provider_records.items()
+        if provider_type == "domain-method"
     }
     for provider in providers:
         unresolved = [
@@ -322,7 +378,7 @@ def _eligible(
         return False
     if item.get("available", True) is False:
         return False
-    if requirement not in item.get("capabilities", []):
+    if requirement != item.get("id") and requirement not in item.get("capabilities", []):
         return False
     if item.get("permission", "read") == "denied":
         return False

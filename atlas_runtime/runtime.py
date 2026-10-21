@@ -175,11 +175,17 @@ def classify_task(text: str) -> list[str]:
         "DECISION": ("decide", "recommend", "choose"),
     }
     for label, tokens in rules.items():
-        if any(token in lowered for token in tokens):
+        if any(
+            re.search(r"(?<!\w)" + re.escape(token) + r"(?!\w)", lowered)
+            for token in tokens
+        ):
             labels.add(label)
     if not labels:
         labels.add("ANSWER")
-    if len(labels) > 2 or any(token in lowered for token in ("multi-stage", "end-to-end", "then")):
+    if len(labels) > 2 or any(
+        re.search(r"(?<!\w)" + re.escape(token) + r"(?!\w)", lowered)
+        for token in ("multi-stage", "end-to-end", "then")
+    ):
         labels.add("MULTI_STAGE")
     return sorted(labels & TASK_CLASSES)
 

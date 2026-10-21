@@ -271,7 +271,9 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
                     for name in ("skills", "tools", "capabilities")
                     for item in registry_items(name)
                 }
-                for provider_records in envelope.provider_inventory.values():
+                for provider_type, provider_records in envelope.provider_inventory.items():
+                    if provider_type == "domain-method":
+                        continue
                     for item in provider_records:
                         if item["id"] in records:
                             raise ValueError(
@@ -279,6 +281,10 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
                             )
                         records[item["id"]] = item
                 domain_registry = registry_payload("domain-methods")
+                domain_registry["items"] = [
+                    *domain_registry["items"],
+                    *deepcopy(list(envelope.provider_inventory.get("domain-method", ()))),
+                ]
                 domain_records = {
                     item["id"]: item for item in domain_registry["items"]
                 }

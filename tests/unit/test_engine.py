@@ -528,6 +528,169 @@ class ExecutionEngineTests(unittest.TestCase):
         self.assertEqual((), approved.routing_decisions)
         self.assertNotIn("EXECUTION", approved.execution_trace)
 
+    def test_host_provider_prerequisite_is_previewed_and_routed_first(self) -> None:
+        base = {
+            "description": "Performs an admitted host operation.",
+            "status": "available",
+            "authority": "connected",
+            "permission": "read",
+            "data_scope": "Approved task input only",
+            "risk_class": "low",
+            "version": "1",
+            "source": "host:test",
+            "conflicts_with": [],
+            "fallback": "capability.manual-handoff",
+        }
+        request = {
+            "objective": "Run the host operation",
+            "task_id": "TASK-HOST-DEPENDENCY",
+            "plan_id": "plan-host-dependency",
+            "work_units": ({"id": "run", "status": "PENDING", "dependencies": []},),
+            "capability_requirements": ("host_operation",),
+            "provider_inventory": {
+                "function": ({
+                    **base,
+                    "id": "function.host-operation",
+                    "name": "Host operation",
+                    "capabilities": ["host_operation"],
+                    "requires": ["tool.host-dependency"],
+                },),
+                "tool": ({
+                    **base,
+                    "id": "tool.host-dependency",
+                    "name": "Host dependency",
+                    "capabilities": ["host_dependency"],
+                    "requires": [],
+                },),
+            },
+        }
+        proposal = execute(ExecutionEnvelope(**request))
+
+        self.assertEqual(
+            ["tool.host-dependency", "function.host-operation"],
+            proposal.routing_preview["execution_sequence"],
+        )
+        self.assertEqual([], proposal.routing_preview["missing_prerequisite_providers"])
+
+        approved = execute(ExecutionEnvelope(
+            **request,
+            routing_approval_status="APPROVED",
+            routing_preview_digest=proposal.routing_preview["digest"],
+        ))
+
+        self.assertEqual("READY", approved.state)
+        self.assertEqual(
+            ["tool.host-dependency", "function.host-operation"],
+            [decision["provider_id"] for decision in approved.routing_decisions],
+        )
+
+    def test_explicitly_unavailable_host_provider_is_not_proposed(self) -> None:
+        provider = {
+            "id": "function.offline",
+            "name": "Offline provider",
+            "description": "Is registered but currently unavailable.",
+            "status": "available",
+            "available": False,
+            "authority": "connected",
+            "permission": "read",
+            "data_scope": "Approved task input only",
+            "risk_class": "low",
+            "version": "1",
+            "source": "host:function.offline",
+            "capabilities": ["offline_operation"],
+            "requires": [],
+            "conflicts_with": [],
+            "fallback": "capability.manual-handoff",
+        }
+        proposal = execute(ExecutionEnvelope(
+            objective="Run the offline operation",
+            task_id="TASK-OFFLINE",
+            plan_id="plan-offline",
+            work_units=({"id": "run", "status": "PENDING", "dependencies": []},),
+            capability_requirements=("offline_operation",),
+            provider_inventory={"function": (provider,)},
+        ))
+
+        self.assertEqual([], proposal.routing_preview["providers"])
+        self.assertEqual(
+            ["offline_operation"],
+            proposal.routing_preview["unmatched_requirements"],
+        )
+
+        approved = execute(ExecutionEnvelope(
+            objective="Run the offline operation",
+            task_id="TASK-OFFLINE",
+            plan_id="plan-offline",
+            work_units=({"id": "run", "status": "PENDING", "dependencies": []},),
+            capability_requirements=("offline_operation",),
+            provider_inventory={"function": (provider,)},
+            routing_approval_status="APPROVED",
+            routing_preview_digest=proposal.routing_preview["digest"],
+        ))
+
+        self.assertEqual("BLOCKED", approved.state)
+        self.assertEqual("ROUTING", approved.dashboard["active_stage"])
+        self.assertEqual((), approved.routing_decisions)
+
+    def test_host_domain_method_uses_governed_preview_and_handoff(self) -> None:
+        source_commit = "a" * 40
+        method = {
+            "id": "domain-method.host-research",
+            "name": "Host research method",
+            "description": "Performs governed specialist research.",
+            "status": "available",
+            "authority": "specialist-contract",
+            "permission": "read",
+            "data_scope": "Approved task context and public sources only",
+            "risk_class": "medium",
+            "version": "1",
+            "source": f"https://example.invalid/method/{source_commit}/contract.json",
+            "source_commit": source_commit,
+            "contract_sha256": "sha256:" + "b" * 64,
+            "capabilities": ["host_specialist_research"],
+            "requires": [],
+            "conflicts_with": [],
+            "fallback": "capability.manual-handoff",
+            "task_classes": ["RESEARCH"],
+            "activation_authority": "ATLAS_OS",
+            "consumer_id": "HOST-RESEARCH",
+            "requires_domain_handoff": True,
+            "accepted_handoff_states": ["PARTIAL", "READY"],
+            "blocked_handoff_execution": True,
+            "owns_execution_spine": False,
+            "owns_planning": False,
+            "owns_approvals": False,
+        }
+        request = {
+            "objective": "Research the host specialist topic",
+            "task_id": "TASK-HOST-METHOD",
+            "plan_id": "plan-host-method",
+            "work_units": ({"id": "research", "status": "PENDING", "dependencies": []},),
+            "capability_requirements": ("host_specialist_research",),
+            "provider_inventory": {"domain-method": (method,)},
+            "timestamp": "2026-10-21T23:31:00+06:00",
+            "timezone_name": "Asia/Dhaka",
+        }
+        proposal = execute(ExecutionEnvelope(**request))
+
+        self.assertIn(
+            "domain-method.host-research",
+            proposal.routing_preview["execution_sequence"],
+        )
+
+        approved = execute(ExecutionEnvelope(
+            **request,
+            routing_approval_status="APPROVED",
+            routing_preview_digest=proposal.routing_preview["digest"],
+        ))
+
+        self.assertEqual("READY", approved.state)
+        decision = next(
+            item for item in approved.routing_decisions
+            if item["provider_id"] == "domain-method.host-research"
+        )
+        self.assertEqual("ROUTED", decision["status"])
+
     def test_host_tool_inventory_does_not_revalidate_built_in_tools_as_host_records(self) -> None:
         provider = {
             "id": "tool.host-estimator",
