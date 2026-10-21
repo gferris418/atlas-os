@@ -15,6 +15,7 @@ When a verified ATLAS snapshot is installed in ChatGPT Library, use that pinned 
 - **Tool model:** route through the active tool/connector catalog and record actual execution evidence.
 - **Persistence model:** separate conversational task state from explicitly durable library artifacts.
 - **Approval behavior:** require scoped approval for material external writes and high-impact actions.
+- **Routing-preview behavior:** before invoking any function, skill, plugin, tool, subagent, or specialist, display the exact what/how proposal with permission, data scope, prerequisites, fallback, unresolved gates, sequence, and digest; route only the exact approved preview.
 - **Native-first behavior:** use ChatGPT's conversation, language understanding, generation, and exposed tool orchestration directly; ATLAS adds controls only where they materially improve the result.
 - **Startup behavior:** initialize the compact dashboard for every prompt; use one active atomic unit for nontrivial work and resolve domain standards only when material.
 - **Output behavior:** honor explicit user formats, otherwise select the smallest task-fit output profile and validate only material requirements.

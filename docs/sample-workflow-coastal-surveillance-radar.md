@@ -75,7 +75,11 @@ Classification systems and governing requirements remain separate. ISO 3166-1, U
 
 ## 8. Capability audit, plan, evidence, and approvals
 
-The execution plan is built from the selected branch. It names required sources, unresolved dependencies, approval boundaries, verification methods, and deliverables. The required semantic capabilities are then mapped to the smallest admitted set of native host features, skills, plugins, tools, or specialist methods after provenance, permissions, security, dependencies, evidence, overlap, and fallback behavior are checked. Public-source analysis may proceed within the agreed scope. Access to restricted sources, external communications, procurement actions, publication, or other high-impact actions requires the relevant authorization.
+The execution plan is built from the selected branch. It names required sources, unresolved dependencies, approval boundaries, verification methods, and deliverables. The required semantic capabilities are then mapped to the smallest admitted set of native host features, skills, plugins, tools, or specialist methods after provenance, permissions, security, dependencies, evidence, overlap, and fallback behavior are checked.
+
+Before any selected provider is routed, ATLAS shows a digest-bound preview stating what it proposes to do and how. For a public opportunity-intelligence request this can identify ARGUS as the specialist method, Evidence Research as the research method, and Public Research as the read-only retrieval tool, with each provider's exact purpose, prerequisites, data scope, fallback, and unresolved gates. Rejection, omission, a stale digest, or a changed proposal blocks routing. Even an approved ARGUS proposal remains blocked until its Domain Context Handoff is acceptable.
+
+Public-source analysis may proceed within the agreed scope only after the applicable preview and gates pass. Access to restricted sources, external communications, procurement actions, publication, or other high-impact actions requires the relevant authorization.
 
 ## 9. Data plane, assurance, and delivery
 

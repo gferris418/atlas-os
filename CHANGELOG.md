@@ -4,6 +4,13 @@ All notable changes follow semantic versioning and preserve release lineage. The
 
 ## Unreleased
 
+## v2.0.2-rc.3
+
+- Add a mandatory, digest-bound routing preview that shows what ATLAS will do and how before invoking any selected function, skill, tool, or specialist method.
+- Route research providers only after exact-preview approval, reject stale or changed proposals, and preserve provider decisions as a routing receipt.
+- Integrate ARGUS preview approval with the governed Domain Context Handoff so approval cannot bypass blocked domain context.
+- Publish the provider-neutral `atlas-bootstrap-2026-10-21-r7` control revision across ChatGPT and Hermes Agent.
+
 ## v2.0.2-rc.2
 
 - Make the canonical execution spine taxonomy-first, with an explicit Domain -> Sub-Domain -> Vertical -> Artifact Class routing layer, ordered domain classifications, proportional W-matrix completeness, capability audit, data-plane execution, assurance, and verified delivery boundaries.

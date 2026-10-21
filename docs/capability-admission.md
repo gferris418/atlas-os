@@ -17,6 +17,8 @@ A provider may be classified as:
 
 ATLAS does not infer provider trust from installation, connector availability, popularity, or a clean static scan. Static quality review, security review, and measured benchmark evidence are separate evidence classes.
 
+Admission does not itself authorize routing. Before an admitted provider is invoked, ATLAS displays a digest-bound routing preview naming the work unit, semantic requirement, provider purpose and method, read/write permission, data scope, prerequisites, fallback, unresolved gates, and sequence. Rejection, omission, mismatch, or any proposal change blocks routing. The resulting routing decisions are retained as the receipt for what was selected or refused.
+
 ## Current evaluated reference providers
 
 The following provider decisions record the October 2026 architecture review. They are **reference mappings**, not unconditional runtime dependencies.

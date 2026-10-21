@@ -31,6 +31,8 @@ contract:
     - quality_gate
   expanded_fields:
     - objective
+    - routing_preview
+    - routing_decisions
     - execution_layer
     - evidence_health
     - highest_risk
@@ -46,6 +48,7 @@ contract:
   privacy: Summarize input and processing safely; never expose or persist secrets, raw sensitive prompts, private chain-of-thought, or hidden reasoning tokens by default.
   processing_semantics: Processing is a concise public stage-and-action summary, not hidden reasoning.
   plan_identity: Every dashboard binds to a non-empty concrete plan identifier; READY is never inferred from an omitted plan.
+  routing_visibility: When providers are proposed, expand beyond the compact dashboard to show the complete digest-bound what/how routing preview before invocation; after review, expose the resulting routed or blocked provider decisions.
   duration_semantics: Show measured elapsed duration in milliseconds; never fabricate precision.
   library_semantics: Show persistence status, format, and location. SAVED requires durable-write evidence; otherwise show PENDING, READY, BLOCKED, or CAPABILITY_UNAVAILABLE.
 invariants:

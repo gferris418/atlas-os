@@ -1,6 +1,6 @@
 # ATLAS OS
 
-**Current candidate:** `v2.0.2-rc.2`
+**Current candidate:** `v2.0.2-rc.3`
 
 **Information classification:** Internal
 
@@ -30,7 +30,7 @@ RAW INPUT PRESERVATION BOUNDARY
        -> 1. INTENT NORMALIZATION
        -> 2. MATERIAL W-QUESTION MATRIX
        -> 3. CLASSIFICATION AND DOMAIN REQUIREMENTS
-       -> 4. CAPABILITY AUDIT AND EXECUTION PLAN
+       -> 4. CAPABILITY AUDIT, ROUTING PREVIEW, AND EXECUTION PLAN
        -> 5. DATA-PLANE EXECUTION
        -> 6. ASSURANCE AND VERIFICATION
        -> 7. PERSISTENCE AND DELIVERY
@@ -96,7 +96,7 @@ Every dashboard and work-unit selection is bound to a concrete plan identifier. 
 
 ## Evidence and routing
 
-ATLAS distinguishes `VERIFIED`, `SUPPORTED`, `INFERRED`, `ASSUMED`, `SPECULATIVE`, and `UNKNOWN`. Source quality, completeness, confidence, and inference remain separate. Routing selects the best available capability using task fit, authority, permissions, risk, and fallback behavior; the presence of a tool alone is not a reason to call it.
+ATLAS distinguishes `VERIFIED`, `SUPPORTED`, `INFERRED`, `ASSUMED`, `SPECULATIVE`, and `UNKNOWN`. Source quality, completeness, confidence, and inference remain separate. Routing selects the best available capability using task fit, authority, permissions, risk, and fallback behavior; the presence of a tool alone is not a reason to call it. Before invoking a selected provider, ATLAS shows a digest-bound preview of what it will do and how, including purpose, method, permission, data scope, prerequisites, fallback, unresolved gates, and sequence. Rejection, omission, a stale digest, or any changed proposal blocks routing.
 
 Specialist domain methods remain separate systems. ATLAS activates one only from an explicit structured capability requirement, an active registration in [`registries/domain-methods.yaml`](registries/domain-methods.yaml), and any required valid domain-context handoff. A specialist never owns the ATLAS execution spine, plan, or approvals. See the compact [artifact model](docs/artifact-model.md) for the distinction between frameworks, methodologies, playbooks, SOPs, workflows, protocols, schemas, adapters, and related structures.
 

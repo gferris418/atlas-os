@@ -5,6 +5,7 @@ Hermes Agent consumes ATLAS-OS as an AI-host skill, not as a device operating sy
 - **Startup:** start Hermes inside the trusted repository checkout so it discovers the project-local skill.
 - **Native-first behavior:** use Hermes' model, conversation, tools, memory, skills, subagents, terminal backends, and messaging gateway directly when they are actually available.
 - **Planning and evidence:** apply the ATLAS execution spine before tool use and preserve evidence classes, plan state, and verification results.
+- **Routing preview:** before invoking any skill, tool, subagent, or specialist such as ARGUS, show what will be done and how, including purpose, method, permission, data scope, prerequisites, fallback, unresolved gates, and sequence. Route only an approval bound to the exact preview digest; any changed proposal requires a new preview.
 - **Persistence:** Hermes memory or skill storage is not automatically the canonical ATLAS library. Report `CAPABILITY_UNAVAILABLE` unless an authorized durable adapter writes and verifies the required record.
 - **Approvals:** Hermes tool or command approval never weakens ATLAS authorization requirements; both applicable boundaries must pass.
 - **Portability:** do not add a `platforms` restriction to the ATLAS skill. The adapter semantics are identical across local, container, SSH, and remote Hermes runtimes.

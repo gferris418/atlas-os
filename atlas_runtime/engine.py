@@ -10,6 +10,8 @@ from typing import Any, Iterable
 
 import yaml
 
+from .handoff import ExecutionContext, prepare_domain_context_handoff
+from .routing import build_routing_preview, route_capability, route_domain_method
 from .runtime import (
     align_domain_practices,
     assess_completeness,
@@ -34,6 +36,9 @@ class ExecutionEnvelope:
     work_units: Iterable[dict[str, Any]]
     surface: str = "core"
     clarification_status: str = "NOT_REQUIRED"
+    task_id: str | None = None
+    routing_approval_status: str = "PENDING"
+    routing_preview_digest: str | None = None
     timestamp: str | None = None
     timezone_name: str = "UTC"
 
@@ -46,6 +51,8 @@ class ExecutionEnvelope:
         work_units = tuple(deepcopy(list(self.work_units)))
         if not work_units:
             raise ValueError("execution requires at least one work unit")
+        if self.routing_approval_status not in {"PENDING", "APPROVED", "REJECTED"}:
+            raise ValueError("invalid routing approval status")
         object.__setattr__(self, "work_units", work_units)
 
 
@@ -64,6 +71,8 @@ class ExecutionResult:
     domain_classification: dict[str, Any]
     domain_alignment: dict[str, Any]
     capability_audit: dict[str, Any]
+    routing_preview: dict[str, Any]
+    routing_decisions: tuple[dict[str, Any], ...]
     execution_trace: tuple[str, ...]
 
     @property
@@ -96,10 +105,12 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     work_units = deepcopy(list(envelope.work_units))
     repository_root = Path(__file__).resolve().parents[1]
 
-    def registry_items(name: str) -> list[dict[str, Any]]:
+    def registry_payload(name: str) -> dict[str, Any]:
         path = repository_root / "registries" / f"{name}.yaml"
-        payload = yaml.safe_load(path.read_text(encoding="utf-8"))
-        return list(payload["items"])
+        return yaml.safe_load(path.read_text(encoding="utf-8"))
+
+    def registry_items(name: str) -> list[dict[str, Any]]:
+        return list(registry_payload(name)["items"])
 
     taxonomies = registry_items("taxonomies")
     taxonomy_route = route_taxonomy_layer(
@@ -133,8 +144,29 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     )
     plan = tuple(build_plan(work_units))
     capability_audit = audit_capability_providers(registry_items("capabilities"))
+    preview_active_unit = select_next_work_unit(
+        work_units,
+        plan_id=envelope.plan_id,
+        plan_status="READY",
+        clarification_status="RESOLVED",
+    )
+    routing_preview = build_routing_preview(
+        normalized,
+        task_classes=task_classes,
+        taxonomy_route=taxonomy_route,
+        surface=envelope.surface,
+        task_id=envelope.task_id,
+        plan_id=envelope.plan_id,
+        plan=plan,
+        work_unit=preview_active_unit,
+        domain_methods=registry_payload("domain-methods"),
+        skills=registry_items("skills"),
+        tools=registry_items("tools"),
+    )
     blocking_stage: str | None = None
     blocker: str | None = None
+    routing_decisions: list[dict[str, Any]] = []
+    candidate_active_unit: str | None = None
     if substantive and envelope.clarification_status != "RESOLVED":
         if not completeness["complete"]:
             blocking_stage = "MATERIAL_CONTEXT_MATRIX"
@@ -148,17 +180,123 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         elif domain_alignment["status"] == "RESEARCH_REQUIRED":
             blocking_stage = "DOMAIN_FRAMEWORK_ALIGNMENT"
             blocker = domain_alignment["next_action"]
+    if blocking_stage is None and routing_preview["status"] == "PROPOSED":
+        if envelope.routing_approval_status == "PENDING":
+            blocking_stage = "ROUTING_PREVIEW"
+            blocker = routing_preview["approval_prompt"]
+        elif envelope.routing_approval_status == "REJECTED":
+            blocking_stage = "ROUTING_PREVIEW"
+            blocker = "Routing proposal rejected; revise the plan or providers before execution."
+        elif envelope.routing_preview_digest != routing_preview["digest"]:
+            blocking_stage = "ROUTING_PREVIEW"
+            blocker = "Routing approval does not match the current proposal; review the new preview."
+        elif envelope.task_id is None:
+            blocking_stage = "ROUTING_PREVIEW"
+            blocker = "Approved routing requires a concrete task_id."
+        else:
+            candidate_active_unit = routing_preview["work_unit"]
+            if candidate_active_unit is not None:
+                context = ExecutionContext(
+                    task_id=envelope.task_id,
+                    plan_id=envelope.plan_id,
+                    work_unit_id=candidate_active_unit,
+                    task_class=task_classes[0],
+                    available_capabilities=frozenset(capability_audit["admitted"]),
+                )
+                records = {
+                    item["id"]: item
+                    for name in ("skills", "tools")
+                    for item in registry_items(name)
+                }
+                domain_registry = registry_payload("domain-methods")
+                domain_records = {
+                    item["id"]: item for item in domain_registry["items"]
+                }
+                for provider in routing_preview["providers"]:
+                    if provider["type"] == "domain-method":
+                        method_record = domain_records[provider["id"]]
+                        handoff = None
+                        if envelope.timestamp is not None:
+                            handoff = prepare_domain_context_handoff(
+                                {
+                                    "id": envelope.task_id,
+                                    "domain_classification": domain_classification,
+                                    "domain_alignment": domain_alignment,
+                                },
+                                execution_context=context,
+                                consumer=method_record["consumer_id"],
+                                handoff_id=(
+                                    "HANDOFF-"
+                                    + envelope.task_id.removeprefix("TASK-")
+                                    + "-"
+                                    + candidate_active_unit.upper().replace("_", "-")
+                                ),
+                                created_at=envelope.timestamp,
+                            )
+                        decision = route_domain_method(
+                            provider["requirement"],
+                            domain_registry,
+                            execution_context=context,
+                            handoff=handoff,
+                        )
+                        routing_decisions.append({
+                            "status": (
+                                "ROUTED"
+                                if decision["status"] == "ACTIVATE"
+                                else decision["status"]
+                            ),
+                            "provider_id": decision["method_id"],
+                            "provider_type": provider["type"],
+                            "requirement": provider["requirement"],
+                            "reason": decision.get("reason"),
+                            "handoff_id": handoff["handoff_id"] if handoff else None,
+                            "preview_digest": routing_preview["digest"],
+                        })
+                    else:
+                        selected = route_capability(
+                            provider["requirement"],
+                            [records[provider["id"]]],
+                            execution_context=context,
+                        )
+                        routing_decisions.append({
+                            "status": "ROUTED",
+                            "provider_id": selected["id"],
+                            "provider_type": provider["type"],
+                            "requirement": provider["requirement"],
+                            "reason": None,
+                            "preview_digest": routing_preview["digest"],
+                        })
+                rejected = next(
+                    (decision for decision in routing_decisions if decision["status"] != "ROUTED"),
+                    None,
+                )
+                if rejected:
+                    blocking_stage = "ROUTING"
+                    blocker = (
+                        f"{rejected['provider_id']} routing blocked: "
+                        f"{rejected['reason']}"
+                    )
 
     plan_status = "BLOCKED" if blocking_stage else "READY"
-    clarification_status = "PENDING" if blocking_stage else envelope.clarification_status
+    clarification_status = (
+        "PENDING"
+        if blocking_stage in {
+            "MATERIAL_CONTEXT_MATRIX",
+            "DOMAIN_CLASSIFICATION",
+            "DOMAIN_FRAMEWORK_ALIGNMENT",
+        }
+        else envelope.clarification_status
+    )
     active_unit = None
     if not blocking_stage:
-        active_unit = select_next_work_unit(
-            work_units,
-            plan_id=envelope.plan_id,
-            plan_status=plan_status,
-            clarification_status=clarification_status,
-        )
+        active_unit = candidate_active_unit
+        if routing_preview["status"] != "PROPOSED":
+            active_unit = select_next_work_unit(
+                work_units,
+                plan_id=envelope.plan_id,
+                plan_status=plan_status,
+                clarification_status=clarification_status,
+            )
     completed = sum(item.get("status") == "COMPLETED" for item in work_units)
     state = "BLOCKED" if blocking_stage else ("COMPLETED" if active_unit is None else "READY")
     preflight_trace = (
@@ -170,6 +308,10 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         "PLANNING",
         "CAPABILITY_AUDIT",
     )
+    if routing_preview["status"] == "PROPOSED":
+        preflight_trace += ("ROUTING_PREVIEW",)
+    if routing_decisions:
+        preflight_trace += ("ROUTING",)
     if blocking_stage:
         execution_trace = preflight_trace
     else:
@@ -180,6 +322,7 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         f"Taxonomy {taxonomy_route['status']}; context "
         f"{'COMPLETE' if completeness['complete'] else 'PARTIAL'}; classification "
         f"{domain_classification['status']}; capability audit {capability_audit['status']}; "
+        f"routing {envelope.routing_approval_status if routing_decisions else routing_preview['status']}; "
         "plan validated"
     )
     dashboard = create_dashboard(
@@ -191,7 +334,9 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         timezone_name=envelope.timezone_name,
         active_stage=blocking_stage or ("DELIVERY" if active_unit is None else "EXECUTION"),
         active_unit=(
-            "Resolve material clarification"
+            "Review routing proposal"
+            if blocking_stage in {"ROUTING_PREVIEW", "ROUTING"}
+            else "Resolve material clarification"
             if blocking_stage
             else active_unit or "Plan complete"
         ),
@@ -205,6 +350,8 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         ),
         blocker=blocker,
     )
+    dashboard["routing_preview"] = deepcopy(routing_preview)
+    dashboard["routing_decisions"] = deepcopy(routing_decisions)
     dashboard["duration_ms"] = max(0, round((perf_counter_ns() - started) / 1_000_000))
     return ExecutionResult(
         state=state,
@@ -218,5 +365,7 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         domain_classification=domain_classification,
         domain_alignment=domain_alignment,
         capability_audit=capability_audit,
+        routing_preview=routing_preview,
+        routing_decisions=tuple(routing_decisions),
         execution_trace=execution_trace,
     )

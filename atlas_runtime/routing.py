@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import re
 from collections.abc import Mapping
 from copy import deepcopy
@@ -23,6 +25,107 @@ _AUTHORITY = {
     "community": 1,
     "model": 0,
 }
+
+
+def build_routing_preview(
+    text: str,
+    *,
+    task_classes: Iterable[str],
+    taxonomy_route: Mapping[str, Any],
+    surface: str,
+    task_id: str | None,
+    plan_id: str,
+    plan: Iterable[str],
+    work_unit: str | None,
+    domain_methods: Mapping[str, Any],
+    skills: Iterable[dict[str, Any]],
+    tools: Iterable[dict[str, Any]],
+) -> dict[str, Any]:
+    """Describe proposed provider routing without activating a provider."""
+    lowered = " ".join(text.lower().split())
+    classes = set(task_classes)
+    hierarchy = taxonomy_route.get("hierarchy") or {}
+    requirements: list[str] = []
+    if (
+        hierarchy.get("domain") == "government-public-sector"
+        and "opportunit" in lowered
+        and classes & {"RESEARCH", "ANALYSIS", "DECISION", "MONITORING"}
+    ):
+        requirements.append("government_public_sector_opportunity_intelligence")
+    if "RESEARCH" in classes and "public" in lowered:
+        requirements.append("public_research")
+
+    provider_groups = (
+        ("domain-method", domain_methods.get("items", [])),
+        ("skill", skills),
+        ("tool", tools),
+    )
+    providers: list[dict[str, Any]] = []
+    for requirement in requirements:
+        for provider_type, records in provider_groups:
+            for record in records:
+                if record.get("status") not in {"active", "available"}:
+                    continue
+                if record.get("permission") == "denied":
+                    continue
+                if requirement not in record.get("capabilities", []):
+                    continue
+                surfaces = set(record.get("applies_to", []))
+                if surfaces and f"surface.{surface}" not in surfaces:
+                    continue
+                prerequisites = list(record.get("requires", []))
+                providers.append({
+                    "id": record["id"],
+                    "type": provider_type,
+                    "name": record["name"],
+                    "requirement": requirement,
+                    "purpose": record["description"],
+                    "method": (
+                        f"Use {record['name']} after validating "
+                        f"{', '.join(prerequisites) if prerequisites else 'its admission record'}; "
+                        "return its result to the ATLAS plan for verification."
+                    ),
+                    "permission": record.get("permission", "read"),
+                    "data_scope": (
+                        "Original prompt, governed domain context, and public-source evidence only"
+                        if record.get("permission", "read") == "read"
+                        else "Only the resources explicitly approved for this work unit"
+                    ),
+                    "fallback": record.get("fallback"),
+                })
+
+    preview = {
+        "status": "PROPOSED" if providers else "NOT_REQUIRED",
+        "objective": text,
+        "task_id": task_id,
+        "plan_id": plan_id,
+        "surface": surface,
+        "plan": list(plan),
+        "work_unit": work_unit,
+        "requirements": requirements,
+        "providers": providers,
+        "steps": [
+            {
+                "stage": "ROUTING",
+                "description": "Validate each proposed provider against its exact semantic requirement and prerequisites.",
+            },
+            {
+                "stage": "EXECUTION",
+                "description": "Invoke only approved providers for the active atomic work unit.",
+            },
+            {
+                "stage": "VERIFICATION",
+                "description": "Verify provider results and preserve evidence before delivery.",
+            },
+        ],
+        "approval_prompt": (
+            "Review the providers, purpose, method, permissions, data scope, and fallbacks before routing."
+            if providers else None
+        ),
+    }
+    encoded = json.dumps(preview, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    preview["digest"] = "sha256:" + hashlib.sha256(encoded).hexdigest()
+    return preview
 
 
 def _eligible(

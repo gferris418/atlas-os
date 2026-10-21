@@ -11,7 +11,8 @@ Every installation in any AI host must:
 3. Use the host's native model, conversation, tools, storage, and approval mechanisms when available.
 4. Report unavailable capabilities rather than pretending an action, save, or verification occurred.
 5. Identify the host with a lowercase surface slug such as `chatgpt`, `hermes-agent`, or `my-ai-tool`.
-6. Preserve user authorization, evidence, verification, persistence, and specialist-boundary controls.
+6. Display the digest-bound what/how routing preview before invoking any function, skill, plugin, tool, model, subagent, or specialist method, and route only the exact approved proposal.
+7. Preserve user authorization, evidence, verification, persistence, and specialist-boundary controls.
 
 The Python runtime is an optional conformance reference. An AI host can apply ATLAS directly from the specifications even when it cannot execute Python.
 

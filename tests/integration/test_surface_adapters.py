@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+from inspect import signature
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -8,6 +9,12 @@ from atlas_runtime import FileSystemLibraryAdapter, get_surface_adapter
 
 
 class SurfaceAdapterIntegrationTests(unittest.TestCase):
+    def test_adapter_accepts_bound_routing_approval_fields(self) -> None:
+        parameters = signature(get_surface_adapter("chatgpt").start_prompt).parameters
+        self.assertIn("task_id", parameters)
+        self.assertIn("routing_approval_status", parameters)
+        self.assertIn("routing_preview_digest", parameters)
+
     def test_each_supported_surface_starts_through_the_same_plan_gate(self) -> None:
         tasks = [{"id": "answer", "status": "PENDING", "dependencies": []}]
         for surface in ("chatgpt", "codex", "work", "hermes-agent", "custom-ai-tool"):
@@ -43,6 +50,28 @@ class SurfaceAdapterIntegrationTests(unittest.TestCase):
         self.assertEqual("MATERIAL_CONTEXT_MATRIX", dashboard["active_stage"])
         self.assertEqual("BLOCKED", dashboard["quality_gate"])
         self.assertIn("why", dashboard["blocker_or_approval"])
+
+    def test_ai_host_adapter_exposes_provider_routing_preview(self) -> None:
+        dashboard = get_surface_adapter("hermes-agent").start_prompt(
+            (
+                "Find and assess public procurement opportunities for coastal "
+                "surveillance radar for Bangladesh Navy using public sources only"
+            ),
+            [{"id": "research", "status": "PENDING", "dependencies": []}],
+            plan_id="plan-bd-radar-opportunities",
+            clarification_status="RESOLVED",
+            timestamp="2026-10-21T22:45:00+06:00",
+            timezone_name="Asia/Dhaka",
+        )
+
+        self.assertEqual("ROUTING_PREVIEW", dashboard["active_stage"])
+        self.assertIn("routing_preview", dashboard)
+        self.assertEqual("PROPOSED", dashboard["routing_preview"]["status"])
+        self.assertEqual([], dashboard["routing_decisions"])
+        self.assertIn(
+            "domain-method.argus-intelligence",
+            {provider["id"] for provider in dashboard["routing_preview"]["providers"]},
+        )
 
     def test_surface_delivery_uses_real_storage_and_verified_receipt(self) -> None:
         profile = {

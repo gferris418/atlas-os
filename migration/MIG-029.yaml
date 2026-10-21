@@ -45,5 +45,12 @@ evidence:
     source: integrations/chatgpt/RELEASE-VERIFICATION.md
     result: READY_FOR_EXTERNAL_PROOF
     limitations: Fresh ChatGPT New Chat and ChatGPT Work evidence must demonstrate the taxonomy-first bootstrap; this candidate record is not proof of host behavior.
+  - type: routing-preview-candidate-external-proof-target
+    timestamp: "2026-10-21T22:55:00+06:00"
+    version: 2.0.2-rc.3
+    control_revision: atlas-bootstrap-2026-10-21-r7
+    source: integrations/chatgpt/RELEASE-VERIFICATION.md
+    result: READY_FOR_EXTERNAL_PROOF
+    limitations: Fresh ChatGPT New Chat and ChatGPT Work evidence must demonstrate digest-bound routing preview and approval behavior; this candidate record is not proof of host behavior.
 owner: atlas-maintainers
-notes: Earlier operator acceptance allowed v2.0.1 GA without external-only surface proof. For stable v2.0.2 promotion, MIG-029 is release-blocking. The current proof target is ATLAS 2.0.2-rc.2 / atlas-bootstrap-2026-10-21-r6, and the control must close only after independent New Chat and ChatGPT Work evidence satisfies every acceptance criterion.
+notes: Earlier operator acceptance allowed v2.0.1 GA without external-only surface proof. For stable v2.0.2 promotion, MIG-029 is release-blocking. The current proof target is ATLAS 2.0.2-rc.3 / atlas-bootstrap-2026-10-21-r7, and the control must close only after independent New Chat and ChatGPT Work evidence satisfies every acceptance criterion.

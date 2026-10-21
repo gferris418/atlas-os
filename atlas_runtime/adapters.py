@@ -25,6 +25,9 @@ class SurfaceAdapter:
         *,
         plan_id: str,
         clarification_status: str = "NOT_REQUIRED",
+        task_id: str | None = None,
+        routing_approval_status: str = "PENDING",
+        routing_preview_digest: str | None = None,
         timestamp: str | None = None,
         timezone_name: str = "UTC",
     ) -> dict[str, Any]:
@@ -36,6 +39,9 @@ class SurfaceAdapter:
             timestamp=timestamp,
             timezone_name=timezone_name,
             clarification_status=clarification_status,
+            task_id=task_id,
+            routing_approval_status=routing_approval_status,
+            routing_preview_digest=routing_preview_digest,
         )).dashboard
 
     def deliver(

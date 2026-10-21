@@ -75,7 +75,7 @@ A sophisticated forecasting process is not evidence of forecasting accuracy. Acc
 
 ## Specialist-domain boundary
 
-Specialist domain systems remain nested methods, not parallel operating systems. ARGUS, for example, consumes the ATLAS domain-context handoff, performs government/public-sector opportunity intelligence, and returns domain analysis and proposed actions. It does not own the ATLAS execution spine, plan, approval state, or final delivery.
+Specialist domain systems remain nested methods, not parallel operating systems. Before specialist routing, ATLAS displays a digest-bound preview of what will be done, how, by which provider, with what permission and data scope, and under which fallback and unresolved gates. ARGUS, for example, consumes the ATLAS domain-context handoff only after that exact proposal is approved, performs government/public-sector opportunity intelligence, and returns domain analysis and proposed actions. It does not own the ATLAS execution spine, plan, approval state, or final delivery.
 
 Specialists may internally use admitted providers such as research, procurement, company, trade, legal, financial, capture, or proposal systems only within their registered domain contract. Provider identity must never become the canonical identity of an ATLAS or specialist-domain record.
 

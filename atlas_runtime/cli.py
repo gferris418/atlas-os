@@ -57,6 +57,9 @@ def _build_envelope(request: dict[str, Any]) -> ExecutionEnvelope:
         work_units=work_units,
         surface=request.get("surface", "core"),
         clarification_status=request.get("clarification_status", "NOT_REQUIRED"),
+        task_id=request.get("task_id"),
+        routing_approval_status=request.get("routing_approval_status", "PENDING"),
+        routing_preview_digest=request.get("routing_preview_digest"),
         timestamp=request.get("timestamp"),
         timezone_name=request.get("timezone_name", "UTC"),
     )
@@ -66,14 +69,42 @@ def _write_event(stdout: TextIO, event: dict[str, Any]) -> None:
     print(json.dumps(event, sort_keys=True, separators=(",", ":")), file=stdout, flush=True)
 
 
+def _render_routing_preview(preview: dict[str, Any]) -> str:
+    lines = [
+        f"Routing preview · {preview['digest']}",
+        f"Objective: {preview['objective']}",
+        f"Execution: {preview['task_id'] or 'task ID pending'} · {preview['plan_id']} · {preview['surface']}",
+        f"Work unit: {preview['work_unit'] or 'none'}",
+    ]
+    for index, step in enumerate(preview["steps"], start=1):
+        lines.append(f"{index}. {step['stage']}: {step['description']}")
+    lines.append("Proposed providers:")
+    for provider in preview["providers"]:
+        lines.extend((
+            f"- {provider['name']} [{provider['type']}]",
+            f"  What: {provider['purpose']}",
+            f"  How: {provider['method']}",
+            f"  Permission: {provider['permission']} | Data: {provider['data_scope']} | "
+            f"Fallback: {provider['fallback'] or 'none'}",
+        ))
+    lines.append(f"Review: {preview['approval_prompt']}")
+    lines.append(f"Approve this exact preview with digest {preview['digest']}")
+    return "\n".join(lines)
+
+
 def _write_result(stdout: TextIO, result: ExecutionResult, output_format: str) -> None:
     if output_format == "text":
         print(result.compact_status, file=stdout)
+        if result.routing_preview["status"] == "PROPOSED":
+            print(file=stdout)
+            print(_render_routing_preview(result.routing_preview), file=stdout)
         return
     _write_event(stdout, {
         "active_unit": result.active_unit,
         "event": "result",
         "plan": list(result.plan),
+        "routing_decisions": list(result.routing_decisions),
+        "routing_preview": result.routing_preview,
         "state": result.state,
         "task_classes": list(result.task_classes),
     })

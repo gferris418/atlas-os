@@ -9,8 +9,9 @@ An adapter must:
 1. Resolve `atlas-os.yaml` and the active specifications without redefining them.
 2. Map native conversation, reasoning, tools, approvals, and storage to ATLAS contracts.
 3. Create a concrete plan identifier and pass the clarification gate before execution.
-4. Expose capability gaps and failures explicitly.
-5. Verify results and durable writes before reporting completion or `SAVED`.
-6. Keep provider-specific behavior outside the normative core.
+4. Before routing any native function, skill, plugin, tool, model, subagent, or specialist method, display the exact digest-bound routing preview with what will be done, how, permission, data scope, prerequisites, fallback, and unresolved gates. Route only the exact approved proposal.
+5. Expose capability gaps and failures explicitly.
+6. Verify results and durable writes before reporting completion or `SAVED`.
+7. Keep provider-specific behavior outside the normative core.
 
 The shared executable seam is `get_surface_adapter("my-ai-tool")`. Registration documents known hosts and their capabilities, but an unregistered host slug remains valid so provider support does not require a core release.
