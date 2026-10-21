@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os.local/schemas/surface-adapter.schema.json",
+  "title": "ATLAS AI-host surface adapter",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "surface_id",
+    "host_slug",
+    "status",
+    "authority",
+    "capabilities",
+    "limitations",
+    "native_first",
+    "tool_model",
+    "persistence",
+    "approvals",
+    "startup",
+    "output",
+    "unsupported_claims",
+    "executable_seam",
+    "human_companion",
+    "release_verification"
+  ],
+  "properties": {
+    "schema": {"const": "schemas/surface-adapter.schema.json"},
+    "surface_id": {"type": "string", "pattern": "^surface\\.[a-z][a-z0-9._-]*[a-z0-9]$"},
+    "host_slug": {"type": "string", "pattern": "^[a-z](?:[a-z0-9._-]{0,62}[a-z0-9])?$"},
+    "status": {"enum": ["active", "candidate", "deprecated"]},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ai_manifest", "product_manifest", "core_spec"],
+      "properties": {
+        "ai_manifest": {"const": "atlas-ai.yaml"},
+        "product_manifest": {"const": "atlas-os.yaml"},
+        "core_spec": {"const": "spec/core.yaml"}
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "limitations": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "native_first": {"const": true},
+    "tool_model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "requires_execution_evidence"],
+      "properties": {
+        "mode": {"type": "string", "minLength": 1},
+        "requires_execution_evidence": {"const": true}
+      }
+    },
+    "persistence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "saved_requires_verified_receipt"],
+      "properties": {
+        "mode": {"enum": ["CAPABILITY_DEPENDENT", "FILESYSTEM_WHEN_AVAILABLE", "HOST_STORAGE_WHEN_AUTHORIZED"]},
+        "saved_requires_verified_receipt": {"const": true}
+      }
+    },
+    "approvals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["preserve_host_boundaries", "required_for"],
+      "properties": {
+        "preserve_host_boundaries": {"const": true},
+        "required_for": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "external-write",
+              "publication",
+              "destructive-action",
+              "purchase",
+              "permission-change",
+              "credential-operation"
+            ]
+          }
+        }
+      }
+    },
+    "startup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["discovery", "plan_id_required", "compact_dashboard", "single_active_atomic_unit"],
+      "properties": {
+        "discovery": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "plan_id_required": {"const": true},
+        "compact_dashboard": {"const": true},
+        "single_active_atomic_unit": {"const": true}
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["honor_explicit_format", "profile_fallback", "verify_before_delivery"],
+      "properties": {
+        "honor_explicit_format": {"const": true},
+        "profile_fallback": {"const": "smallest-task-fit"},
+        "verify_before_delivery": {"const": true}
+      }
+    },
+    "unsupported_claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "executable_seam": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["function", "surface_argument"],
+      "properties": {
+        "function": {"const": "atlas_runtime.get_surface_adapter"},
+        "surface_argument": {"type": "string", "minLength": 1}
+      }
+    },
+    "human_companion": {"type": "string", "pattern": "^integrations/[A-Za-z0-9._/-]+/README\\.md$"},
+    "release_verification": {
+      "type": ["string", "null"],
+      "pattern": "^integrations/[A-Za-z0-9._/-]+/release-verification\\.yaml$"
+    }
+  }
+}
