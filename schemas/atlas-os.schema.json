@@ -25,9 +25,10 @@
     "authority": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["manifest", "core_spec", "version_pointer"],
+      "required": ["manifest", "ai_manifest", "core_spec", "version_pointer"],
       "properties": {
         "manifest": {"const": "atlas-os.yaml"},
+        "ai_manifest": {"const": "atlas-ai.yaml"},
         "core_spec": {"type": "string"},
         "version_pointer": {"const": "atlas-os.yaml#/product/version"}
       }
@@ -35,7 +36,7 @@
     "execution": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["spine", "runtime", "classification", "domain_practices", "domain_handoff", "output", "default_depth"],
+      "required": ["spine", "runtime", "classification", "domain_practices", "domain_handoff", "output", "default_depth", "control_revision"],
       "properties": {
         "spine": {"type": "string"},
         "runtime": {"type": "string"},
@@ -43,7 +44,11 @@
         "domain_practices": {"const": "spec/domain-practices.yaml"},
         "domain_handoff": {"const": "spec/domain-handoff.yaml"},
         "output": {"const": "spec/output.yaml"},
-        "default_depth": {"enum": ["L0", "L1", "L2", "L3", "L4"]}
+        "default_depth": {"enum": ["L0", "L1", "L2", "L3", "L4"]},
+        "control_revision": {
+          "type": "string",
+          "pattern": "^atlas-bootstrap-[0-9]{4}-[0-9]{2}-[0-9]{2}-r[0-9]+$"
+        }
       }
     },
     "release": {
