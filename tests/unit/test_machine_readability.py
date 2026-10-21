@@ -28,6 +28,28 @@ class MachineReadabilityContractTests(unittest.TestCase):
             self.assertTrue(path.endswith(".md"), path)
             self.assertTrue((ROOT / path).is_file(), path)
 
+    def test_governance_policy_is_machine_authority_and_markdown_is_companion(self) -> None:
+        schema = json.loads((ROOT / "schemas/governance.schema.json").read_text(encoding="utf-8"))
+        policy = yaml.safe_load((ROOT / "governance.yaml").read_text(encoding="utf-8"))
+        jsonschema.validate(policy, schema, format_checker=jsonschema.FormatChecker())
+
+        self.assertEqual("atlas-os.yaml", policy["authority"]["product_manifest"])
+        self.assertEqual("atlas-ai.yaml", policy["authority"]["ai_manifest"])
+        self.assertEqual("GOVERNANCE.md", policy["authority"]["human_companion"])
+        self.assertEqual(
+            ["DRAFT", "CANDIDATE", "VERIFIED", "RELEASED", "SUPERSEDED", "ARCHIVED"],
+            policy["release"]["lifecycle"],
+        )
+        self.assertFalse(policy["release"]["missing_evidence_is_pass"])
+        self.assertTrue(policy["migration"]["blockers_close_only_with_evidence"])
+
+        manifest = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
+        self.assertEqual("governance.yaml", manifest["authority"]["governance"])
+        ai_manifest = yaml.safe_load((ROOT / "atlas-ai.yaml").read_text(encoding="utf-8"))
+        self.assertIn("governance.yaml", ai_manifest["machine_contracts"])
+        self.assertIn("schemas/governance.schema.json", ai_manifest["machine_contracts"])
+        self.assertIn("GOVERNANCE.md", ai_manifest["human_guidance"])
+
     def test_release_verification_contracts_exist_for_every_supported_external_surface(self) -> None:
         schema = json.loads(
             (ROOT / "schemas/release-verification.schema.json").read_text(encoding="utf-8")
