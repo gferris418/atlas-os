@@ -20,7 +20,7 @@ items:
     contract_sha256: sha256:5b082a12c6f0b469cba274a0e43e29032e349e3d377cf6d12ffa58762e8cb307
     triggers:
       - ATLAS collection_mode is ARGUS_COLLECTION or HYBRID
-    task_classes: [ANSWER, RESEARCH, ANALYSIS, DECISION, MONITORING]
+    task_classes: [ANSWER, RESEARCH, ANALYSIS, DECISION, MONITORING, PLANNING, WORKFLOW]
     request_route: INTELLIGENCE
     capabilities: [intelligence_collection, government_public_sector_opportunity_intelligence]
     requires: [capability.domain-alignment, capability.evidence-tracking]
