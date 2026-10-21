@@ -14,8 +14,7 @@ from .runtime import (
     normalize_intent,
     select_next_work_unit,
 )
-
-_SURFACES = {"core", "chatgpt", "codex", "work"}
+from .surfaces import validate_surface_id
 
 
 @dataclass(frozen=True)
@@ -35,8 +34,7 @@ class ExecutionEnvelope:
             raise ValueError("execution objective is required")
         if not self.plan_id.strip():
             raise ValueError("execution plan_id is required")
-        if self.surface not in _SURFACES:
-            raise ValueError(f"unsupported ATLAS surface: {self.surface}")
+        validate_surface_id(self.surface)
         work_units = tuple(deepcopy(list(self.work_units)))
         if not work_units:
             raise ValueError("execution requires at least one work unit")

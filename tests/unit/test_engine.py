@@ -66,6 +66,33 @@ class ExecutionEngineTests(unittest.TestCase):
                 work_units=(),
             )
 
+    def test_execution_accepts_any_valid_ai_host_identifier(self) -> None:
+        for surface in ("hermes-agent", "custom-ai-tool"):
+            with self.subTest(surface=surface):
+                envelope = ExecutionEnvelope(
+                    objective="Answer with ATLAS governance",
+                    plan_id=f"plan-{surface}",
+                    work_units=(
+                        {"id": "answer", "status": "PENDING", "dependencies": []},
+                    ),
+                    surface=surface,
+                )
+                self.assertEqual(surface, execute(envelope).dashboard["surface"])
+
+    def test_execution_rejects_invalid_ai_host_identifiers(self) -> None:
+        for surface in ("Windows 11", "../agent", "", "A" * 65):
+            with self.subTest(surface=surface), self.assertRaisesRegex(
+                ValueError, "surface identifier"
+            ):
+                ExecutionEnvelope(
+                    objective="Answer",
+                    plan_id="plan-answer",
+                    work_units=(
+                        {"id": "answer", "status": "PENDING", "dependencies": []},
+                    ),
+                    surface=surface,
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

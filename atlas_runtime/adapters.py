@@ -7,6 +7,7 @@ from typing import Any, Iterable, Protocol
 
 from .engine import ExecutionEnvelope, execute
 from .runtime import prepare_library_record
+from .surfaces import validate_surface_id
 
 
 class LibraryStorage(Protocol):
@@ -63,14 +64,7 @@ class SurfaceAdapter:
         return storage.save(record, content)
 
 
-_SURFACES = {
-    surface: SurfaceAdapter(surface)
-    for surface in ("chatgpt", "codex", "work")
-}
-
-
 def get_surface_adapter(surface_id: str) -> SurfaceAdapter:
-    try:
-        return _SURFACES[surface_id]
-    except KeyError as error:
-        raise LookupError(f"unsupported ATLAS surface: {surface_id}") from error
+    """Return the shared adapter seam for any valid AI-host identifier."""
+
+    return SurfaceAdapter(validate_surface_id(surface_id))

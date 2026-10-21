@@ -15,6 +15,8 @@ from pathlib import PurePosixPath
 from typing import Any, Iterable
 from zoneinfo import ZoneInfo
 
+from .surfaces import validate_surface_id
+
 TASK_CLASSES = {
     "ANSWER", "RESEARCH", "ANALYSIS", "DECISION", "WRITING", "DOCUMENT",
     "DATA", "CODING", "DEBUGGING", "DESIGN", "PLANNING", "WORKFLOW",
@@ -739,8 +741,7 @@ def create_dashboard(
         raise ValueError("invalid plan status")
     if clarification_status not in {"NOT_REQUIRED", "PENDING", "RESOLVED"}:
         raise ValueError("invalid clarification status")
-    if surface not in {"core", "chatgpt", "codex", "work"}:
-        raise ValueError("unsupported surface")
+    validate_surface_id(surface)
     framework_list = list(dict.fromkeys(frameworks))
     if not framework_list:
         framework_list = ["Not applicable"]

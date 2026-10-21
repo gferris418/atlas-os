@@ -37,10 +37,12 @@ USER INTENT
                              outcome calibration
                 |
                 v
-      +---------+---------+---------+
-      |         |         |         |
-    Codex    ChatGPT     Work     Future
+      +---------+---------+---------+-------------+
+      |         |         |         |             |
+    Codex    ChatGPT     Work   Hermes Agent   Any AI host
 ```
+
+"OS" describes the governed execution layer around an AI agent; it does not describe the host machine's operating system. The core is independent of model provider, agent framework, desktop OS, and deployment location. Known adapters document concrete capability mappings, while the validated generic surface seam permits new AI hosts without changing core semantics.
 
 ## Provider-independent capabilities
 

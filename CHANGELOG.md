@@ -4,6 +4,9 @@ All notable changes follow semantic versioning and preserve release lineage. The
 
 ## Unreleased
 
+- Define ATLAS-OS explicitly as a platform-neutral AI-agent governance layer rather than a device operating system.
+- Add project-local Agent Skills installation for Hermes Agent and compatible AI tools, plus portable setup guidance for ChatGPT and generic hosts.
+- Generalize the executable adapter and dashboard contracts from a fixed provider list to validated AI-host identifiers.
 - Add operator guidance for Ed25519 signing-key custody, admission, rotation,
   revocation, and trusted registry distribution.
 - Make repository validation fail when executable handoff, lease, or signing

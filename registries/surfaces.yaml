@@ -50,4 +50,34 @@ items:
     requires: [capability.context-preservation, capability.evidence-tracking]
     conflicts_with: []
     fallback: capability.manual-handoff
+  - id: surface.hermes-agent
+    name: Hermes Agent
+    description: Skill-based agent adapter using native Hermes capabilities exposed by the active session.
+    status: active
+    authority: canonical
+    permission: write
+    risk_class: high
+    priority: 85
+    version: "1"
+    source: integrations/hermes-agent/README.md
+    path: integrations/hermes-agent/README.md
+    capabilities: [conversation, workflow, execute, external_write]
+    requires: [capability.context-preservation, capability.dependency-planning]
+    conflicts_with: []
+    fallback: capability.manual-handoff
+  - id: surface.generic-ai-host
+    name: Generic AI host
+    description: Provider-neutral adapter contract for any AI assistant or agent with a validated surface identifier.
+    status: active
+    authority: canonical
+    permission: read
+    risk_class: medium
+    priority: 70
+    version: "1"
+    source: integrations/generic-ai-host/README.md
+    path: integrations/generic-ai-host/README.md
+    capabilities: [conversation]
+    requires: [capability.context-preservation]
+    conflicts_with: []
+    fallback: capability.manual-handoff
 
