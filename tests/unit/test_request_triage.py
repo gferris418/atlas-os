@@ -74,6 +74,30 @@ class RequestTriageTests(unittest.TestCase):
         self.assertNotIn("DOMAIN_CLASSIFICATION", result.execution_trace)
         self.assertNotIn("DOMAIN_FRAMEWORK_ALIGNMENT", result.execution_trace)
 
+    def test_direct_route_cannot_be_silently_escalated_to_argus_downstream(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective=(
+                "Research and write a report on public procurement opportunities "
+                "for Bangladesh Navy coastal surveillance radar"
+            ),
+            task_id="TASK-DIRECT-OPPORTUNITY-REPORT",
+            plan_id="plan-direct-opportunity-report",
+            work_units=[{"id": "research", "status": "PENDING", "dependencies": []}],
+            clarification_status="RESOLVED",
+            timestamp="2026-10-22T01:20:00+06:00",
+            timezone_name="Asia/Dhaka",
+        ))
+        self.assertNotEqual("INTELLIGENCE", result.request_route)
+        self.assertNotIn(
+            "domain-method.argus-intelligence",
+            {provider["id"] for provider in result.routing_preview["providers"]},
+        )
+        self.assertNotIn("intelligence_analysis", result.routing_preview["requirements"])
+        self.assertNotIn(
+            "government_public_sector_opportunity_intelligence",
+            result.routing_preview["requirements"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
