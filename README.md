@@ -6,7 +6,17 @@
 
 ATLAS-OS is a model-agnostic execution-governance specification for AI agents. It turns user intent into a controlled execution spine that preserves context, plans dependencies, routes capabilities, tracks evidence and uncertainty, enforces approval boundaries, verifies results, separates task state from canonical knowledge, and produces reproducible outputs.
 
-ATLAS is not an autonomous model or a collection of prompts. The repository is the canonical machine-readable contract; ChatGPT, Codex, Work, and future surfaces implement adapters around the same core semantics.
+Despite its name, ATLAS-OS is not a desktop operating system and is not installed as a replacement for Windows, macOS, Linux, or any other device OS. It is installed into, attached to, or followed by an AI host such as ChatGPT, Hermes Agent, Codex, or another agent tool. The host may itself run locally, in a browser, or on remote infrastructure; the host machine's operating system is irrelevant to the ATLAS contract.
+
+ATLAS is not an autonomous model or a collection of prompts. The repository is the canonical machine-readable contract; ChatGPT, Hermes Agent, Codex, Work, and other AI hosts implement adapters around the same core semantics.
+
+## Install into an AI host
+
+- **ChatGPT:** attach the repository or use the version-bound ChatGPT instructions and verified Library snapshot.
+- **Hermes Agent:** start Hermes in this checkout, run `hermes skills trust`, and invoke the project-local `/atlas-os` skill in [`.agents/skills/atlas-os/SKILL.md`](.agents/skills/atlas-os/SKILL.md).
+- **Other AI tools:** expose the repository's project-local skill, attach the canonical manifest and relevant specifications, or call the optional Python reference runtime through a host adapter.
+
+See the [AI-host installation guide](docs/ai-host-installation.md) for the portable contract and host-specific setup. Installing the Python package is optional and provides reference validation and execution seams; it is not the definition of installing ATLAS into an AI host.
 
 ## Execution spine
 
@@ -47,7 +57,7 @@ python -m atlas_runtime --input examples/execution-request.json --format ndjson
 See [`docs/live-testing.md`](docs/live-testing.md) for stdin, error, and scope
 examples.
 
-ATLAS uses capable host-platform features directly. It does not recreate ChatGPT or another host's language understanding, conversation, generation, reasoning, or tool behavior unless a deterministic fallback is required. ATLAS adds the smallest useful layer of standards, evidence, authority, persistence, interoperability, and verification.
+ATLAS uses capable AI-host features directly. It does not recreate the host's language understanding, conversation, generation, reasoning, or tool behavior unless a deterministic fallback is required. ATLAS adds the smallest useful layer of standards, evidence, authority, persistence, interoperability, and verification.
 
 ## Authority model
 
@@ -113,7 +123,8 @@ See [`docs/chatgpt-library-install.md`](docs/chatgpt-library-install.md) for the
 
 ## Repository map
 
-- `atlas_runtime/` — reference runtime, executable surface seams, and durable persistence adapter.
+- `.agents/skills/atlas-os/` — cross-tool, project-local AI-host installation entry point.
+- `atlas_runtime/` — optional reference runtime, executable surface seams, and durable persistence adapter.
 - `spec/` — normative declarative specifications.
 - `schemas/` — JSON Schemas for state and governance artifacts.
 - `registries/` — governed capabilities and control indexes.

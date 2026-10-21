@@ -25,7 +25,7 @@ Failures are explicit: `BLOCKED`, `PARTIAL`, `UNVERIFIED`, `CAPABILITY_UNAVAILAB
 
 Resumption restores structured task state, then reconciles it with real external systems before continuing.
 
-`atlas_runtime.adapters` provides executable startup and delivery seams for ChatGPT, Codex, and Work configurations. These seams prove shared local behavior; deployment inside each host and independent cross-surface evidence are still required before the related migration controls can close.
+`atlas_runtime.adapters` provides one executable startup and delivery seam for any validated AI-host identifier. ChatGPT, Codex, Work, and Hermes Agent have documented configurations; unlisted tools use the generic AI-host contract. These seams prove shared local behavior only. Deployment inside each host and independent cross-surface evidence are still required before related migration controls can close.
 
 Domain alignment is mandatory for substantive work. The runtime either records current authoritative frameworks and their applicability, documents why none apply, or enters `RESEARCH_REQUIRED`. It never converts a framework mapping into an unsupported compliance claim.
 

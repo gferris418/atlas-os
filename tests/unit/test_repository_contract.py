@@ -108,9 +108,23 @@ class RepositoryContractTests(unittest.TestCase):
             "Verify contract", progress=50, active_unit="validate", completed_units=1, total_units=2,
             timestamp="2026-10-17T23:30:00+06:00",
             timezone_name="Asia/Dhaka",
-            plan_id="plan-verify", plan_status="READY",
+            plan_id="plan-verify", plan_status="READY", surface="hermes-agent",
         )
         jsonschema.validate(dashboard, schema)
+        invalid = dict(dashboard, surface="Microsoft Windows")
+        with self.assertRaises(jsonschema.ValidationError):
+            jsonschema.validate(invalid, schema)
+
+    def test_platform_neutral_ai_host_contract_is_documented(self) -> None:
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        installation = (ROOT / "docs/ai-host-installation.md").read_text(encoding="utf-8")
+        hermes_skill = (ROOT / ".agents/skills/atlas-os/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("not a desktop operating system", readme)
+        self.assertIn("Hermes Agent", installation)
+        self.assertIn("any AI host", installation)
+        self.assertNotIn("platforms:", hermes_skill)
 
     def test_library_record_matches_persistence_schema(self) -> None:
         schema = json.loads((ROOT / "schemas/persistence.schema.json").read_text())

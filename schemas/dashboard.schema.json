@@ -7,7 +7,12 @@
   "required": ["system", "surface", "plan_id", "timestamp", "duration_ms", "input_summary", "processing_summary", "output_summary", "goal", "task", "playbook", "frameworks", "sop", "output_profile", "plan_status", "clarification_status", "objective", "progress", "progress_visual", "active_stage", "active_unit", "completed_units", "total_units", "blocker_or_approval", "library", "quality_gate", "performance_mode"],
   "properties": {
     "system": {"const": "ATLAS"},
-    "surface": {"enum": ["core", "chatgpt", "codex", "work"]},
+    "surface": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"
+    },
     "plan_id": {"type": "string", "minLength": 1},
     "timestamp": {"type": "string", "format": "date-time"},
     "duration_ms": {"type": "integer", "minimum": 0},

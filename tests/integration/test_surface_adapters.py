@@ -10,7 +10,7 @@ from atlas_runtime import FileSystemLibraryAdapter, get_surface_adapter
 class SurfaceAdapterIntegrationTests(unittest.TestCase):
     def test_each_supported_surface_starts_through_the_same_plan_gate(self) -> None:
         tasks = [{"id": "answer", "status": "PENDING", "dependencies": []}]
-        for surface in ("chatgpt", "codex", "work"):
+        for surface in ("chatgpt", "codex", "work", "hermes-agent", "custom-ai-tool"):
             with self.subTest(surface=surface):
                 adapter = get_surface_adapter(surface)
                 dashboard = adapter.start_prompt(
@@ -24,6 +24,10 @@ class SurfaceAdapterIntegrationTests(unittest.TestCase):
                 self.assertEqual(f"plan-{surface}", dashboard["plan_id"])
                 self.assertEqual("answer", dashboard["active_unit"])
                 self.assertEqual("READY", dashboard["plan_status"])
+
+    def test_adapter_rejects_invalid_ai_host_identifier(self) -> None:
+        with self.assertRaisesRegex(ValueError, "surface identifier"):
+            get_surface_adapter("Microsoft Windows")
 
     def test_surface_delivery_uses_real_storage_and_verified_receipt(self) -> None:
         profile = {
