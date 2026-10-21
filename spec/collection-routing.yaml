@@ -31,6 +31,7 @@ contract:
     - plan_and_work_units
     - permissions_and_approvals
     - substantive_analysis
+    - strategic_analysis
     - forecasting_and_scenarios
     - opportunity_qualification
     - access_asia_pursuit_decisions
