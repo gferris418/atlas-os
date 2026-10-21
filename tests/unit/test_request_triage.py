@@ -137,6 +137,20 @@ class RequestTriageTests(unittest.TestCase):
         self.assertEqual("ARGUS_COLLECTION", mission["collection_mode"])
         self.assertEqual([], [gate for gate in result.routing_preview["unresolved_gates"] if "collection_mission" in gate])
 
+    def test_historical_procurement_mission_preserves_requested_period(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective="Find the annual procurement plan of Bangladesh Navy for 2020",
+            plan_id="plan-historical-procurement",
+            task_id="TASK-HISTORICAL-PROCUREMENT",
+            work_units=[{"id": "collect", "status": "PENDING", "dependencies": []}],
+            clarification_status="RESOLVED",
+            timestamp="2026-10-22T05:20:00+06:00",
+            timezone_name="Asia/Dhaka",
+        ))
+        mission = result.routing_preview["collection_mission"]
+        self.assertEqual("2020", mission["time_horizon"])
+        self.assertEqual("HISTORICAL", mission["freshness_requirement"])
+
     def test_sensitive_collection_preserves_risk_classification(self) -> None:
         result = execute(ExecutionEnvelope(
             objective="Assess coastal surveillance radar for Bangladesh Navy",
