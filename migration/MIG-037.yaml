@@ -46,4 +46,4 @@ evidence:
     result: PASS
     limitations: This proves publication/readiness of the rc.5/r9 provider-neutral collection-gate control on the repository candidate branch only. It does not prove that external hosts independently resolved or applied it; MIG-029 remains open.
 owner: atlas-maintainers
-notes: Stable v2.0.2 promotion remains blocked. rc.5/r9 is the current proof target; cross-surface propagation remains blocked on MIG-029.
+notes: Stable v2.0.2 promotion remains blocked. rc.5/r9 is the current proof target; cross-surface propagation remains blocked on MIG-029. Generic AI-host portability remains governed by the same provider-neutral core even though independent release proof is explicitly required for ChatGPT, Codex, Work, and Hermes Agent.
