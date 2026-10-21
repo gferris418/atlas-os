@@ -34,7 +34,7 @@ class CollectionArchitectureTests(unittest.TestCase):
         argus = registry["items"][0]
         self.assertEqual("2.2.0-rc.1", argus["version"])
         self.assertIn("intelligence_collection", argus["capabilities"])
-        self.assertEqual("1d57ccfc6a492b11fabd76639d85cfb8a7898731", argus["source_commit"])
+        self.assertEqual("ba97ace36832cd464351a2078ef3c4d7ff89c8bf", argus["source_commit"])
         self.assertEqual("3.0.0", argus["contract_version"])
         self.assertEqual("sha256:5b082a12c6f0b469cba274a0e43e29032e349e3d377cf6d12ffa58762e8cb307", argus["contract_sha256"])
 
