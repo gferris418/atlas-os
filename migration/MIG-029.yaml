@@ -13,19 +13,19 @@ acceptance_criteria:
     surfaces: [chatgpt]
     evidence_type: independent-host-observation
     status: PENDING
-    evidence_ids: [EVID-006]
+    evidence_ids: [EVID-007]
   - id: AC-02
     requirement: A fresh ChatGPT Work task resolves the same current core authority through its adapter.
     surfaces: [work]
     evidence_type: independent-host-observation
     status: PENDING
-    evidence_ids: [EVID-006]
+    evidence_ids: [EVID-007]
   - id: AC-03
     requirement: Independent evidence is retained with timestamps, surface identifiers, current product identity, current control revision, expected behavior, and reviewer identity.
     surfaces: [chatgpt, work]
     evidence_type: independently-reviewed-host-evidence
     status: PENDING
-    evidence_ids: [EVID-006]
+    evidence_ids: [EVID-007]
 evidence:
   - id: EVID-001
     type: local-automated-readiness
@@ -86,5 +86,15 @@ evidence:
     scope: [repository, chatgpt, work]
     result: READY_FOR_EXTERNAL_PROOF
     limitations: The machine-readable verification contract is ready, but fresh independent ChatGPT and Work observations remain required before any criterion can pass.
+  - id: EVID-007
+    type: triage-first-machine-verifiable-external-proof-target
+    timestamp: "2026-10-22T02:07:25+06:00"
+    version: 2.0.2-rc.4
+    control_revision: atlas-bootstrap-2026-10-22-r8
+    source: integrations/chatgpt/release-verification.yaml
+    independent: false
+    scope: [repository, chatgpt, work]
+    result: READY_FOR_EXTERNAL_PROOF
+    limitations: The rc.4 machine-readable verification contract now covers the triage-first direct path and ARGUS intelligence route, but fresh independent ChatGPT and Work observations remain required before any criterion can pass.
 owner: atlas-maintainers
 notes: Earlier operator acceptance allowed v2.0.1 GA without external-only surface proof. Stable v2.0.2 remains blocked until independent New Chat and ChatGPT Work evidence satisfies every acceptance criterion for the current product and control revision.
