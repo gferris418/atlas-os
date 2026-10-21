@@ -1,0 +1,19 @@
+schema: schemas/release-verification.schema.json
+id: verify.work
+surface_id: surface.work
+version: 2.0.2-rc.2
+control_revision: atlas-bootstrap-2026-10-21-r6
+status: PENDING_EXTERNAL_EVIDENCE
+migration_controls: [MIG-029, MIG-037]
+dependencies: []
+acceptance_criteria:
+  - id: WORK-FRESH-BOOTSTRAP
+    description: A genuinely fresh ChatGPT Work task resolves the canonical ATLAS authority and reports the expected version and control revision.
+    evidence_required: [timestamp, surface_identifier, task_input, public_output]
+  - id: WORK-TAXONOMY-FIRST
+    description: The fresh Work task demonstrates taxonomy-first routing before downstream planning and execution.
+    evidence_required: [public_output, observed_control_revision]
+  - id: WORK-PROPAGATION
+    description: The same published control revision is independently resolved on Work for MIG-037.
+    evidence_required: [timestamp, observed_control_revision, independent_capture]
+evidence: []
