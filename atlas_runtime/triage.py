@@ -44,6 +44,8 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
     opportunity_objective = _has(normalized, (
         r"\bopportunit(?:y|ies)\b.*\b(?:pursue|qualif|prioriti[sz]e|rank|capture|bid|no[- ]bid|win)\b",
         r"\b(?:pursue|qualif|prioriti[sz]e|rank|capture)\b.*\b(?:tender|rfp|procurement|opportunit(?:y|ies))\b",
+        r"\b(?:assess|evaluate|analy[sz]e)\b.*\b(?:public procurement )?opportunit(?:y|ies)\b",
+        r"\bopportunit(?:y|ies)\b.*\b(?:assess|evaluate|analy[sz]e)\b",
         r"\bwin probability\b",
     ))
     if opportunity_objective:
