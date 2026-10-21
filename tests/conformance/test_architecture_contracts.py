@@ -17,15 +17,26 @@ def load_yaml(relative: str) -> dict:
     return value
 
 
-class FourPlaneArchitectureConformance(unittest.TestCase):
+class ExpandedAtlasArchitectureConformance(unittest.TestCase):
     EXPECTED_ARCHITECTURE = {
         "mission_control": "spec/mission-control.yaml",
         "control_plane": "spec/control-plane.yaml",
-        "observability": "spec/observability.yaml",
+        "collection_routing": "spec/collection-routing.yaml",
+        "domain_context_services": "spec/domain-context-services.yaml",
         "domain_intelligence": "spec/domain-intelligence.yaml",
+        "observability": "spec/observability.yaml",
+        "dashboard": "spec/dashboard.yaml",
+    }
+    ACTIVE_AUTHORITIES = {
+        "mission_control",
+        "control_plane",
+        "collection_routing",
+        "domain_context_services",
+        "observability",
+        "dashboard",
     }
 
-    def test_product_manifest_declares_four_architecture_authorities(self) -> None:
+    def test_product_manifest_declares_expanded_architecture_authorities(self) -> None:
         manifest = load_yaml("atlas-os.yaml")
         self.assertIn("architecture", manifest)
         self.assertEqual(self.EXPECTED_ARCHITECTURE, manifest["architecture"])
@@ -36,10 +47,11 @@ class FourPlaneArchitectureConformance(unittest.TestCase):
         self.assertIn("architecture", authority)
         self.assertEqual(self.EXPECTED_ARCHITECTURE, authority["architecture"])
 
-    def test_architecture_specs_are_normative_and_machine_discovered(self) -> None:
+    def test_canonical_architecture_specs_are_active_normative_and_discovered(self) -> None:
         ai_manifest = load_yaml("atlas-ai.yaml")
         machine_contracts = set(ai_manifest.get("machine_contracts", []))
-        for name, relative in self.EXPECTED_ARCHITECTURE.items():
+        for name in self.ACTIVE_AUTHORITIES:
+            relative = self.EXPECTED_ARCHITECTURE[name]
             with self.subTest(authority=name):
                 path = ROOT / relative
                 self.assertTrue(path.is_file(), relative)
@@ -47,6 +59,28 @@ class FourPlaneArchitectureConformance(unittest.TestCase):
                 self.assertTrue(record.get("normative"), relative)
                 self.assertEqual("active", record.get("status"), relative)
                 self.assertIn(relative, machine_contracts)
+
+    def test_domain_intelligence_is_discovered_compatibility_alias_not_active_authority(self) -> None:
+        ai_manifest = load_yaml("atlas-ai.yaml")
+        machine_contracts = set(ai_manifest.get("machine_contracts", []))
+        relative = self.EXPECTED_ARCHITECTURE["domain_intelligence"]
+        record = load_yaml(relative)
+        self.assertTrue(record.get("normative"), relative)
+        self.assertEqual("deprecated", record.get("status"), relative)
+        self.assertEqual(
+            "spec/domain-context-services.yaml",
+            record["contract"]["canonical_replacement"],
+        )
+        self.assertIn(relative, machine_contracts)
+
+    def test_argus_collection_is_nested_under_atlas_control_plane(self) -> None:
+        collection = load_yaml("spec/collection-routing.yaml")["contract"]
+        control = load_yaml("spec/control-plane.yaml")["contract"]
+        self.assertEqual("ATLAS_CONTROL_PLANE", collection["owner"])
+        self.assertEqual("intelligence_collection", collection["argus_capability"])
+        self.assertIn("collection_need_decision", control["owns"])
+        self.assertIn("final_delivery", collection["atlas_retains"])
+        self.assertIn("collection_packaging", collection["argus_does"])
 
 
 if __name__ == "__main__":
