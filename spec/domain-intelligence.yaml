@@ -1,0 +1,52 @@
+schema: schemas/spec.schema.json
+id: spec.domain-intelligence
+title: Conditional domain intelligence and evidence context
+status: active
+normative: true
+contract:
+  purpose: Resolve domain semantics, applicable authorities, evidence precedence, and decision context only when those controls materially improve correctness or when ARGUS performs intelligence-grade work.
+  capabilities:
+    - taxonomy
+    - classification
+    - ontology_and_relationship_context
+    - law_regulation_and_binding_requirements
+    - standards_and_professional_frameworks
+    - best_practices_and_authoritative_guidance
+    - benchmarks_and_comparison_baselines
+    - evidence_hierarchy_and_conflict_resolution
+    - signals_and_trends
+    - forecasting_and_probability
+    - scenario_analysis
+    - calibration_and_longitudinal_learning
+  direct_atlas_rule: GENERAL_SEARCH and GENERAL_TASK use only the domain capabilities materially required by the request. They do not run this complete layer as mandatory preflight.
+  argus_rule: INTELLIGENCE delegates deep intelligence-domain enrichment to ARGUS after ATLAS request triage and governed activation.
+  partial_handoff_rule: ATLAS may supply a PARTIAL classification and alignment snapshot containing known facts, risk flags, unresolved context, and evidence. ARGUS preserves that snapshot, enriches it, and returns correlated specialist results without silently redefining ATLAS-owned authority, permissions, or source facts.
+  taxonomy_rule: Taxonomies organize controlled categories; classification applies those categories to the task; ontology expresses material relationships. These functions must remain distinguishable.
+  authority_precedence:
+    - applicable_law_and_regulation
+    - explicit_binding_contract_or_user_requirements
+    - mandatory_technical_requirements
+    - international_standards
+    - recognized_professional_frameworks
+    - authoritative_domain_guidance
+    - validated_benchmarks
+    - local_or_project_practices
+  evidence_rule: Evidence hierarchies are domain-sensitive. Primary or binding authority normally outranks commentary, but ATLAS or ARGUS must use the hierarchy appropriate to the claim rather than one universal ranking.
+  benchmark_rule: Benchmarks must identify metric, comparison population or baseline, source, period, unit, applicability, and uncertainty when those fields are material to the decision.
+  currency_rule: Regulations, standards, official guidance, benchmarks, and intelligence signals must be rechecked when freshness can materially affect the result.
+  compliance_rule: Neither ATLAS nor ARGUS may claim compliance, certification, accreditation, conformity, or legal status without scope-specific verification evidence.
+  performance_rule: Deep intelligence work is deferred until INTELLIGENCE routing or explicit materiality requires it; ordinary requests should not incur its research, token, or latency cost.
+invariants:
+  - INV-006
+  - INV-016
+  - INV-018
+  - INV-019
+references:
+  - spec/request-triage.yaml
+  - spec/classification.yaml
+  - spec/domain-practices.yaml
+  - spec/domain-handoff.yaml
+  - spec/evidence.yaml
+  - registries/domain-methods.yaml
+  - registries/taxonomies.yaml
+  - registries/frameworks.yaml
