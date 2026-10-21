@@ -22,14 +22,13 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class RepositoryContractTests(unittest.TestCase):
-    def test_execution_spine_uses_taxonomy_first_layered_flow(self) -> None:
+    def test_execution_spine_uses_triage_first_conditional_domain_flow(self) -> None:
         spine = yaml.safe_load((ROOT / "spec/execution-spine.yaml").read_text(encoding="utf-8"))
         self.assertEqual(
             [
-                "TAXONOMY_LAYER",
+                "REQUEST_TRIAGE",
                 "INTENT_NORMALIZATION",
-                "MATERIAL_CONTEXT_MATRIX",
-                "CLASSIFICATION_AND_DOMAIN_REQUIREMENTS",
+                "CONDITIONAL_DOMAIN_CONTEXT",
                 "CAPABILITY_AND_EXECUTION_PLAN",
                 "DATA_PLANE_EXECUTION",
                 "ASSURANCE_AND_VERIFICATION",
