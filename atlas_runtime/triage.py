@@ -90,6 +90,17 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
         r"\bprofile (?:of|on)\b", r"\bdecision maker(?:s)?\b",
     ))
 
+    # Transformations of material already supplied by the user are not collection
+    # missions even if the document subject contains procurement or intelligence terms.
+    supplied_material = _has(normalized, (
+        r"\battached\b", r"\buploaded\b", r"\bprovided\b", r"\bthis (?:document|file|text|plan|report)\b",
+    ))
+    transformation = bool(classes & {"WRITING", "DOCUMENT", "DATA", "CODING", "DEBUGGING"}) or _has(normalized, (
+        r"\b(?:summari[sz]e|rewrite|draft|write|translate|convert|calculate|compute|debug|fix|edit|format|proofread)\b",
+    ))
+    if supplied_material and transformation:
+        return _direct_result("GENERAL_TASK", "NONE", "SUPPLIED_MATERIAL_TRANSFORMATION", 0.99)
+
     # Policy/regulatory subject analysis is ATLAS work unless the request separately
     # asks for a structured target, procurement, landscape, or monitoring mission.
     if policy_or_rules and not explicit_collection_language and not monitor_signal:
@@ -103,6 +114,16 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
     ))
     if procurement_plan:
         collection_types.extend(["PROCUREMENT_PLAN", "PROCUREMENT_DISCOVERY"])
+
+    # Forecasting future procurements needs an evidence-collection leg even though
+    # the forecast itself remains ATLAS analysis.
+    future_procurement = analytical_signal and _has(normalized, (
+        r"\bprocurement(?:s)?\b", r"\bprocure(?:ment|ments)?\b", r"\bacquisition(?:s)?\b",
+    )) and _has(normalized, (
+        r"\bforecast\b", r"\bpredict\b", r"\blikely\b", r"\bnext\b", r"\bover\s+\d+\s+(?:month|year)s?\b",
+    ))
+    if future_procurement:
+        collection_types.append("PROCUREMENT_DISCOVERY")
 
     project_pipeline = _has(normalized, (
         r"\bproject pipeline\b", r"\bprogramme pipeline\b", r"\bprogram pipeline\b",
@@ -122,7 +143,7 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
         r"\bministry\b", r"\bdirectorate\b", r"\bauthority\b", r"\bcorporation\b",
     ))
     product_for_buyer = buyer_cue and _has(
-        normalized, (r".+\bfor\b.+", r"\bsupply\b.+", r"\bprocure\b.+")
+        normalized, (r".+\bfor\b.+", r"\bsupply\b.+", r"\bprocure\b.+", r"\bassess\b.+")
     )
     if product_for_buyer and not policy_or_rules:
         collection_types.extend(["BUYER_REQUIREMENT", "PRODUCT_CAPABILITY", "OPPORTUNITY_DISCOVERY"])
@@ -155,8 +176,8 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
         collection_types.append("MONITORING")
 
     # A bare strategic/commercial target is a collection request even without an
-    # analytical verb. Preserve ordinary explanatory questions and ordinary task
-    # instructions (for example, supplier-letter rewriting) on the direct path.
+    # analytical verb. Digits alone never establish a target; uppercase identifiers
+    # must contain alphabetic characters, and ordinary operation verbs win first.
     explanatory_question = _has(normalized, (
         r"^(?:what|who|when|where|why|how)\b", r"^explain\b", r"^define\b", r"^summari[sz]e\b",
     ))
@@ -167,19 +188,19 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
         r"\bag\b", r"\bsa\b", r"\boy\b", r"\bllc\b", r"\bfzco\b",
     ))
     raw_words = raw.split()
-    upper_or_digit_token = any(
-        (token.isupper() and len(token) > 1) or any(ch.isdigit() for ch in token)
+    uppercase_identifier = any(
+        token.isupper() and len(token) > 1 and any(ch.isalpha() for ch in token)
         for token in raw_words
     )
     no_action_verb = not _has(normalized, (
-        r"\b(?:find|search|explain|write|rewrite|draft|calculate|create|build|implement|fix|translate|discuss)\b",
+        r"\b(?:find|search|explain|write|rewrite|draft|calculate|compute|convert|create|build|implement|fix|debug|update|edit|translate|discuss|summari[sz]e|format|proofread)\b",
     ))
     bare_named_target = (
         1 <= len(raw_words) <= 6
         and not explanatory_question
         and no_action_verb
         and not policy_or_rules
-        and (company_cue or upper_or_digit_token)
+        and (company_cue or uppercase_identifier)
     )
     if bare_named_target:
         collection_types.extend(["TARGET_PROFILE", "ENTITY_DOSSIER"])
