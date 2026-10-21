@@ -26,7 +26,7 @@ release:
   target_version: 2.0.2
   blocking_controls: [MIG-029, MIG-037]
   package_command: python tools/package/build_release.py . dist
-  validation_command: python tools/validate/validate_repository.py .
+  validation_command: python tools/validate/validate_repository.py . && python tools/validate/validate_machine_contracts.py .
 artifacts:
   ai_entrypoint: atlas-ai.yaml
   specifications: spec
