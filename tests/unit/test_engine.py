@@ -34,12 +34,19 @@ class ExecutionEngineTests(unittest.TestCase):
         self.assertEqual(("classify", "assess"), result.plan)
         self.assertEqual("assess", result.active_unit)
         self.assertIn("ANALYSIS", result.task_classes)
+        self.assertEqual("ROUTED", result.taxonomy_route["status"])
+        self.assertEqual("maritime-defense", result.taxonomy_route["hierarchy"]["vertical"])
+        self.assertEqual("PARTIAL", result.domain_classification["status"])
+        self.assertEqual("PASS", result.capability_audit["status"])
+        self.assertEqual("TAXONOMY_ROUTING", result.execution_trace[0])
+        self.assertIn("CAPABILITY_AUDIT", result.execution_trace)
         self.assertEqual("chatgpt", result.dashboard["surface"])
         self.assertEqual(50, result.dashboard["progress"])
         self.assertLessEqual(len(result.compact_status.splitlines()), 4)
         for label in ("Input", "Processing", "Output", "Playbook", "Framework", "SOP"):
             with self.subTest(label=label):
                 self.assertIn(label, result.compact_status)
+        self.assertIn("Taxonomy ROUTED", result.dashboard["processing_summary"])
 
     def test_execute_consumes_work_units_once_and_does_not_mutate_them(self) -> None:
         source = [

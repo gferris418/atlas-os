@@ -4,14 +4,22 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass
+from pathlib import Path
 from time import perf_counter_ns
 from typing import Any, Iterable
 
+import yaml
+
 from .runtime import (
+    align_domain_practices,
+    assess_completeness,
+    audit_capability_providers,
     build_plan,
+    classify_domain_context,
     classify_task,
     create_dashboard,
     normalize_intent,
+    route_taxonomy_layer,
     select_next_work_unit,
 )
 from .surfaces import validate_surface_id
@@ -51,6 +59,12 @@ class ExecutionResult:
     plan: tuple[str, ...]
     active_unit: str | None
     dashboard: dict[str, Any]
+    taxonomy_route: dict[str, Any]
+    completeness: dict[str, Any]
+    domain_classification: dict[str, Any]
+    domain_alignment: dict[str, Any]
+    capability_audit: dict[str, Any]
+    execution_trace: tuple[str, ...]
 
     @property
     def compact_status(self) -> str:
@@ -80,8 +94,45 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
 
     started = perf_counter_ns()
     work_units = deepcopy(list(envelope.work_units))
+    repository_root = Path(__file__).resolve().parents[1]
+
+    def registry_items(name: str) -> list[dict[str, Any]]:
+        path = repository_root / "registries" / f"{name}.yaml"
+        payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+        return list(payload["items"])
+
+    taxonomies = registry_items("taxonomies")
+    taxonomy_route = route_taxonomy_layer(
+        envelope.objective,
+        registry_items("taxonomy-routes"),
+        taxonomies,
+    )
     normalized = normalize_intent(envelope.objective)["normalized"]
+    task_classes = tuple(classify_task(normalized))
+    substantive = taxonomy_route["status"] == "ROUTED"
+    material_dimensions = taxonomy_route["material_dimensions"] or ["what"]
+    completeness = assess_completeness({
+        "what": normalized,
+        "material_dimensions": material_dimensions,
+    })
+    domain_classification = classify_domain_context(
+        normalized,
+        registry_items("classifications"),
+        taxonomies=taxonomies,
+        substantive=substantive,
+        required_facets=taxonomy_route["required_facets"] if substantive else (),
+    )
+    domain_name = (
+        taxonomy_route["hierarchy"]["sub_domain"]
+        if taxonomy_route["hierarchy"] else "general"
+    )
+    domain_alignment = align_domain_practices(
+        domain_name,
+        registry_items("frameworks"),
+        substantive=substantive,
+    )
     plan = tuple(build_plan(work_units))
+    capability_audit = audit_capability_providers(registry_items("capabilities"))
     active_unit = select_next_work_unit(
         work_units,
         plan_id=envelope.plan_id,
@@ -90,6 +141,22 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     )
     completed = sum(item.get("status") == "COMPLETED" for item in work_units)
     state = "COMPLETED" if active_unit is None else "READY"
+    execution_trace = (
+        "TAXONOMY_ROUTING",
+        "INTENT_NORMALIZATION",
+        "MATERIAL_CONTEXT_MATRIX",
+        "DOMAIN_CLASSIFICATION",
+        "DOMAIN_FRAMEWORK_ALIGNMENT",
+        "PLANNING",
+        "CAPABILITY_AUDIT",
+        "EXECUTION" if active_unit is not None else "DELIVERY",
+    )
+    processing_summary = (
+        f"Taxonomy {taxonomy_route['status']}; context "
+        f"{'COMPLETE' if completeness['complete'] else 'PARTIAL'}; classification "
+        f"{domain_classification['status']}; capability audit {capability_audit['status']}; "
+        "plan validated"
+    )
     dashboard = create_dashboard(
         envelope.objective,
         plan_id=envelope.plan_id,
@@ -103,15 +170,21 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         total_units=len(work_units),
         progress=round(100 * completed / len(work_units)),
         clarification_status=envelope.clarification_status,
-        processing_summary="Plan validated; next atomic work unit selected",
+        processing_summary=processing_summary,
         quality_gate="PASS" if state == "COMPLETED" else "PENDING",
     )
     dashboard["duration_ms"] = max(0, round((perf_counter_ns() - started) / 1_000_000))
     return ExecutionResult(
         state=state,
         normalized_intent=normalized,
-        task_classes=tuple(classify_task(normalized)),
+        task_classes=task_classes,
         plan=plan,
         active_unit=active_unit,
         dashboard=dashboard,
+        taxonomy_route=taxonomy_route,
+        completeness=completeness,
+        domain_classification=domain_classification,
+        domain_alignment=domain_alignment,
+        capability_audit=capability_audit,
+        execution_trace=execution_trace,
     )

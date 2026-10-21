@@ -1,6 +1,6 @@
 # ATLAS OS
 
-**Current candidate:** `v2.0.2-rc.1`
+**Current candidate:** `v2.0.2-rc.2`
 
 **Information classification:** Internal
 

@@ -184,10 +184,98 @@ def classify_task(text: str) -> list[str]:
     return sorted(labels & TASK_CLASSES)
 
 
+def _validated_taxonomies(taxonomies: Iterable[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    required = {
+        "id", "status", "authority", "version_policy", "official_source", "classification_scope",
+    }
+    governed: dict[str, dict[str, Any]] = {}
+    for record in taxonomies:
+        if record.get("status") != "active":
+            continue
+        missing = required - set(record)
+        if missing:
+            raise ValueError(
+                f"taxonomy {record.get('id', '<unknown>')} lacks governance fields: "
+                + ", ".join(sorted(missing))
+            )
+        taxonomy_id = str(record["id"])
+        if taxonomy_id in governed:
+            raise ValueError(f"duplicate taxonomy identifier: {taxonomy_id}")
+        governed[taxonomy_id] = record
+    return governed
+
+
+def route_taxonomy_layer(
+    text: str,
+    routes: Iterable[dict[str, Any]],
+    taxonomies: Iterable[dict[str, Any]],
+) -> dict[str, Any]:
+    """Resolve a governed internal hierarchy before intent normalization."""
+    governed = _validated_taxonomies(taxonomies)
+    lowered = " ".join(text.lower().split())
+    matches: list[dict[str, Any]] = []
+    for route in routes:
+        if route.get("status") != "active":
+            continue
+        match_all = [str(term).lower() for term in route.get("match_all", [])]
+        triggers = [str(term).lower() for term in route.get("triggers", [])]
+        if not ((match_all and all(term in lowered for term in match_all)) or
+                (triggers and any(term in lowered for term in triggers))):
+            continue
+        unknown = sorted(set(route.get("candidate_taxonomies", [])) - set(governed))
+        if unknown:
+            raise ValueError(
+                f"taxonomy route {route['id']} references ungoverned taxonomies: "
+                + ", ".join(unknown)
+            )
+        matches.append(route)
+    if not matches:
+        return {
+            "status": "UNRESOLVED",
+            "route_id": None,
+            "hierarchy": None,
+            "candidate_taxonomies": [],
+            "required_facets": [],
+            "material_dimensions": [],
+        }
+    selected = sorted(matches, key=lambda item: (-len(item.get("match_all", [])), item["id"]))[0]
+    return {
+        "status": "ROUTED",
+        "route_id": selected["id"],
+        "hierarchy": {
+            "domain": selected["domain"],
+            "sub_domain": selected["sub_domain"],
+            "vertical": selected["vertical"],
+            "artifact_class": selected["artifact_class"],
+        },
+        "candidate_taxonomies": list(selected.get("candidate_taxonomies", [])),
+        "required_facets": list(selected.get("required_facets", [])),
+        "material_dimensions": list(selected.get("material_dimensions", [])),
+    }
+
+
+def audit_capability_providers(capabilities: Iterable[dict[str, Any]]) -> dict[str, Any]:
+    """Fail closed when a required capability lacks basic admission metadata."""
+    required_fields = {"id", "authority", "permission", "risk_class", "version", "source"}
+    admitted: list[str] = []
+    for record in capabilities:
+        if record.get("status") not in {"required", "available"}:
+            continue
+        missing = required_fields - set(record)
+        if missing:
+            raise ValueError(
+                f"capability {record.get('id', '<unknown>')} lacks admission fields: "
+                + ", ".join(sorted(missing))
+            )
+        admitted.append(str(record["id"]))
+    return {"status": "PASS", "admitted": sorted(admitted)}
+
+
 def classify_domain_context(
     text: str,
     classifications: Iterable[dict[str, Any]],
     *,
+    taxonomies: Iterable[dict[str, Any]],
     substantive: bool = True,
     required_facets: Iterable[str] | None = None,
     active_conditions: Iterable[str] = (),
@@ -213,6 +301,7 @@ def classify_domain_context(
             "next_action": None,
         }
 
+    governed_taxonomies = _validated_taxonomies(taxonomies)
     lowered = " ".join(text.lower().split())
     enabled_conditions = set(active_conditions)
     facets: dict[str, list[dict[str, str]]] = defaultdict(list)
@@ -231,6 +320,13 @@ def classify_domain_context(
         )
         if not lexical_match:
             continue
+
+        taxonomy_id = str(record.get("taxonomy", ""))
+        if taxonomy_id not in governed_taxonomies:
+            raise ValueError(
+                f"classification {record.get('id', '<unknown>')} references "
+                f"ungoverned taxonomy {taxonomy_id or '<missing>'}"
+            )
 
         conditions = set(record.get("conditions", []))
         if not conditions.issubset(enabled_conditions):

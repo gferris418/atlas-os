@@ -93,9 +93,13 @@ class ScenarioRegressionTests(unittest.TestCase):
         registry = yaml.safe_load(
             (ROOT / "registries/classifications.yaml").read_text(encoding="utf-8")
         )
+        taxonomies = yaml.safe_load(
+            (ROOT / "registries/taxonomies.yaml").read_text(encoding="utf-8")
+        )
         result = classify_domain_context(
             "coastal surveillance radar for Bangladesh navy",
             registry["items"],
+            taxonomies=taxonomies["items"],
             required_facets=("jurisdiction", "operator-industry", "capability", "lifecycle-stage"),
         )
         self.assertEqual("PARTIAL", result["status"])

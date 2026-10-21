@@ -40,7 +40,7 @@ class RepositoryContractTests(unittest.TestCase):
 
     def test_manifest_is_only_product_version_authority(self) -> None:
         manifest = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
-        self.assertEqual("2.0.2-rc.1", manifest["product"]["version"])
+        self.assertEqual("2.0.2-rc.2", manifest["product"]["version"])
         self.assertEqual("atlas-os.yaml#/product/version", (ROOT / "VERSION").read_text().strip())
 
     def test_candidate_identity_is_consistent_across_ai_host_profiles(self) -> None:
@@ -49,8 +49,8 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertEqual("CANDIDATE", manifest["product"]["status"])
         self.assertEqual("2.0.2", manifest["release"]["target_version"])
 
-        expected_version = "2.0.2-rc.1"
-        expected_control = "atlas-bootstrap-2026-10-21-r5"
+        expected_version = "2.0.2-rc.2"
+        expected_control = "atlas-bootstrap-2026-10-21-r6"
         chatgpt = (ROOT / "integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md").read_text(
             encoding="utf-8"
         )
@@ -69,8 +69,8 @@ class RepositoryContractTests(unittest.TestCase):
         checklist_path = ROOT / "integrations/hermes-agent/RELEASE-VERIFICATION.md"
         self.assertTrue(checklist_path.is_file())
         checklist = checklist_path.read_text(encoding="utf-8")
-        self.assertIn("2.0.2-rc.1", checklist)
-        self.assertIn("atlas-bootstrap-2026-10-21-r5", checklist)
+        self.assertIn("2.0.2-rc.2", checklist)
+        self.assertIn("atlas-bootstrap-2026-10-21-r6", checklist)
 
     def test_readme_distinguishes_information_classification_from_license(self) -> None:
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
