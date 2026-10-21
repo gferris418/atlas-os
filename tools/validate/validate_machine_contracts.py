@@ -29,6 +29,47 @@ def load(path: Path) -> Any:
         return yaml.safe_load(handle)
 
 
+def _active_normative_specs(root: Path) -> set[str]:
+    result: set[str] = set()
+    for path in sorted((root / "spec").glob("*.yaml")):
+        record = load(path)
+        if isinstance(record, dict) and record.get("status") == "active" and record.get("normative") is True:
+            result.add(path.relative_to(root).as_posix())
+    return result
+
+
+def _machine_catalog(root: Path, directory: str) -> set[str]:
+    base = root / directory
+    return {
+        path.relative_to(root).as_posix()
+        for path in base.iterdir()
+        if path.is_file() and path.suffix in {".yaml", ".yml", ".json"}
+    }
+
+
+def _expected_machine_contracts(root: Path) -> set[str]:
+    integrations = {
+        path.relative_to(root).as_posix()
+        for path in (root / "integrations").glob("*/adapter.yaml")
+    }
+    integrations.update(
+        path.relative_to(root).as_posix()
+        for path in (root / "integrations").glob("*/release-verification.yaml")
+    )
+    migrations = {
+        path.relative_to(root).as_posix()
+        for path in (root / "migration").glob("*.yaml")
+    }
+    return (
+        {"atlas-os.yaml", "governance.yaml"}
+        | _active_normative_specs(root)
+        | _machine_catalog(root, "registries")
+        | _machine_catalog(root, "schemas")
+        | migrations
+        | integrations
+    )
+
+
 def validate(root: Path) -> list[str]:
     root = root.resolve()
     errors: list[str] = []
@@ -90,9 +131,19 @@ def validate(root: Path) -> list[str]:
         errors.append("governance.yaml does not bind atlas-ai.yaml as discovery authority")
 
     machine_contracts = set(ai_manifest.get("machine_contracts", []))
-    for required_machine in ("governance.yaml", "schemas/governance.schema.json"):
-        if required_machine not in machine_contracts:
-            errors.append(f"governance machine contract missing from AI discovery: {required_machine}")
+    expected_machine_contracts = _expected_machine_contracts(root)
+    missing_machine_contracts = expected_machine_contracts - machine_contracts
+    extra_machine_contracts = machine_contracts - expected_machine_contracts
+    if missing_machine_contracts:
+        errors.append(
+            "AI discovery omits machine authority: " + ", ".join(sorted(missing_machine_contracts))
+        )
+    if extra_machine_contracts:
+        errors.append(
+            "AI discovery declares non-authority machine contracts: "
+            + ", ".join(sorted(extra_machine_contracts))
+        )
+
     if "GOVERNANCE.md" not in set(ai_manifest.get("human_guidance", [])):
         errors.append("GOVERNANCE.md must be registered as human guidance, not machine authority")
 
