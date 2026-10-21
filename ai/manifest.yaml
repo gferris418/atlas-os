@@ -29,33 +29,41 @@ authority:
     - spec/planning.yaml
     - spec/routing.yaml
     - spec/runtime.yaml
+    - spec/verification.yaml
+    - spec/versioning.yaml
   registries:
     - registries/capabilities.yaml
-    - registries/tools.yaml
+    - registries/classifications.yaml
+    - registries/controls.yaml
+    - registries/domain-methods.yaml
+    - registries/frameworks.yaml
+    - registries/migrations.yaml
+    - registries/output-profiles.yaml
+    - registries/signing-keys.json
     - registries/skills.yaml
     - registries/surfaces.yaml
-    - registries/controls.yaml
-    - registries/migrations.yaml
-    - registries/frameworks.yaml
     - registries/taxonomies.yaml
     - registries/taxonomy-routes.yaml
-    - registries/classifications.yaml
-    - registries/output-profiles.yaml
-    - registries/domain-methods.yaml
+    - registries/tools.yaml
   schemas:
-    - schemas/atlas-os.schema.json
-    - schemas/ai-manifest.schema.json
     - schemas/ai-host-adapter.schema.json
-    - schemas/release-verification.schema.json
-    - schemas/task.schema.json
-    - schemas/execution.schema.json
-    - schemas/evidence.schema.json
+    - schemas/ai-manifest.schema.json
     - schemas/approval.schema.json
-    - schemas/persistence.schema.json
-    - schemas/migration.schema.json
-    - schemas/registry.schema.json
+    - schemas/atlas-os.schema.json
     - schemas/dashboard.schema.json
+    - schemas/domain-context-handoff.schema.json
+    - schemas/domain-handoff-receipt.schema.json
+    - schemas/evidence.schema.json
+    - schemas/execution-lease.schema.json
+    - schemas/execution.schema.json
+    - schemas/migration.schema.json
     - schemas/output.schema.json
+    - schemas/persistence.schema.json
+    - schemas/registry.schema.json
+    - schemas/release-verification.schema.json
+    - schemas/signing-key-registry.schema.json
+    - schemas/spec.schema.json
+    - schemas/task.schema.json
 adapters:
   - {surface_id: surface.chatgpt, path: integrations/chatgpt/adapter.yaml}
   - {surface_id: surface.codex, path: integrations/codex/adapter.yaml}
