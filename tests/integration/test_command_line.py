@@ -61,6 +61,33 @@ class CommandLineTests(unittest.TestCase):
         self.assertNotIn("Traceback", completed.stderr)
         self.assertEqual("", completed.stdout)
 
+    def test_invalid_request_matrix_fails_without_a_traceback(self) -> None:
+        cases = [
+            ((), "[]", "JSON input must be an object"),
+            (
+                (),
+                json.dumps({"objective": "Assess", "work_units": []}),
+                "missing required field: plan_id",
+            ),
+            (("--input", "no-such-execution-request.json"), None, "no-such-execution-request.json"),
+        ]
+        for arguments, input_text, expected in cases:
+            with self.subTest(arguments=arguments, input_text=input_text):
+                completed = self._run(*arguments, input_text=input_text)
+                self.assertEqual(2, completed.returncode)
+                self.assertIn("ATLAS error:", completed.stderr)
+                self.assertIn(expected, completed.stderr)
+                self.assertNotIn("Traceback", completed.stderr)
+                self.assertEqual("", completed.stdout)
+
+    def test_unknown_output_format_uses_argparse_error_boundary(self) -> None:
+        completed = self._run("--format", "xml", input_text=json.dumps(self.REQUEST))
+
+        self.assertEqual(2, completed.returncode)
+        self.assertIn("invalid choice", completed.stderr)
+        self.assertNotIn("Traceback", completed.stderr)
+        self.assertEqual("", completed.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

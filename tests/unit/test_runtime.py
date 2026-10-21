@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import unittest
+from itertools import permutations
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
@@ -137,6 +138,57 @@ class RoutingTests(unittest.TestCase):
     def test_unavailable_capability_fails_explicitly(self) -> None:
         with self.assertRaises(LookupError):
             route_capability("publish", [])
+
+    def test_routing_is_independent_of_candidate_order(self) -> None:
+        capabilities = [
+            {
+                "id": "connected-slow",
+                "capabilities": ["research"],
+                "authority": "connected",
+                "risk": 1,
+                "latency": 20,
+            },
+            {
+                "id": "connected-fast",
+                "capabilities": ["research"],
+                "authority": "connected",
+                "risk": 1,
+                "latency": 5,
+            },
+            {
+                "id": "connected-risky",
+                "capabilities": ["research"],
+                "authority": "connected",
+                "risk": 2,
+                "latency": 1,
+            },
+        ]
+
+        selected_ids = {
+            route_capability("research", ordering)["id"]
+            for ordering in permutations(capabilities)
+        }
+
+        self.assertEqual({"connected-fast"}, selected_ids)
+
+    def test_routing_has_a_total_identifier_fallback(self) -> None:
+        tied = [
+            {
+                "id": identifier,
+                "capabilities": ["research"],
+                "authority": "official",
+                "risk": 1,
+                "latency": 5,
+            }
+            for identifier in ("alpha", "zeta")
+        ]
+
+        selected_ids = {
+            route_capability("research", ordering)["id"]
+            for ordering in permutations(tied)
+        }
+
+        self.assertEqual({"zeta"}, selected_ids)
 
 
 class EvidenceAndApprovalTests(unittest.TestCase):
