@@ -1,0 +1,16 @@
+schema: schemas/release-verification.schema.json
+id: verify.hermes-agent
+surface_id: surface.hermes-agent
+version: 2.0.2-rc.2
+control_revision: atlas-bootstrap-2026-10-21-r6
+status: PENDING_EXTERNAL_EVIDENCE
+migration_controls: [MIG-037]
+dependencies: [MIG-029]
+acceptance_criteria:
+  - id: HERMES-PROPAGATION
+    description: Hermes Agent independently resolves the same canonical ATLAS version and control revision used by the other supported surfaces.
+    evidence_required: [timestamp, surface_identifier, observed_version, observed_control_revision, independent_capture]
+  - id: HERMES-AUTHORITY
+    description: Hermes resolves the project-local ATLAS skill and machine-readable adapter without redefining core semantics.
+    evidence_required: [resolved_paths, public_output]
+evidence: []
