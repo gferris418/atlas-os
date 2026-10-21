@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os.local/schemas/ai-manifest.schema.json",
+  "title": "ATLAS AI entrypoint manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "product", "policy", "authority", "adapters", "controls", "output"],
+  "properties": {
+    "schema": {"const": "schemas/ai-manifest.schema.json"},
+    "product": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "authority", "control_revision"],
+      "properties": {
+        "id": {"const": "atlas-os"},
+        "version": {"type": "string", "minLength": 1},
+        "authority": {"const": "atlas-os.yaml"},
+        "control_revision": {"type": "string", "minLength": 1}
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authoritative_formats", "markdown_role", "ai_ready", "structured_output_required"],
+      "properties": {
+        "authoritative_formats": {
+          "type": "array",
+          "const": ["yaml", "json"]
+        },
+        "markdown_role": {"const": "documentation-only"},
+        "ai_ready": {"const": true},
+        "structured_output_required": {"const": true}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["core_spec", "execution_spine", "specifications", "registries", "schemas"],
+      "properties": {
+        "core_spec": {"type": "string", "pattern": "^spec/.+\\.yaml$"},
+        "execution_spine": {"type": "string", "pattern": "^spec/.+\\.yaml$"},
+        "specifications": {"type": "array", "items": {"type": "string", "pattern": "^spec/.+\\.yaml$"}, "uniqueItems": true},
+        "registries": {"type": "array", "items": {"type": "string", "pattern": "^registries/.+\\.yaml$"}, "uniqueItems": true},
+        "schemas": {"type": "array", "items": {"type": "string", "pattern": "^schemas/.+\\.json$"}, "uniqueItems": true}
+      }
+    },
+    "adapters": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["surface_id", "path"],
+        "properties": {
+          "surface_id": {"type": "string", "pattern": "^surface\\.[a-z0-9.-]+$"},
+          "path": {"type": "string", "pattern": "^integrations/.+/adapter\\.yaml$"}
+        }
+      }
+    },
+    "controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["migrations", "release_verification"],
+      "properties": {
+        "migrations": {"type": "array", "items": {"type": "string", "pattern": "^migration/.+\\.yaml$"}, "uniqueItems": true},
+        "release_verification": {"type": "array", "items": {"type": "string", "pattern": "^integrations/.+/release-verification\\.yaml$"}, "uniqueItems": true}
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "registry", "canonical_formats", "envelope_required"],
+      "properties": {
+        "schema": {"const": "schemas/output.schema.json"},
+        "registry": {"const": "registries/output-profiles.yaml"},
+        "canonical_formats": {"type": "array", "const": ["json", "yaml"]},
+        "envelope_required": {"const": true}
+      }
+    }
+  }
+}
