@@ -1,0 +1,19 @@
+schema: schemas/ai-host-adapter.schema.json
+adapter_id: adapter.hermes-agent
+surface_id: surface.hermes-agent
+status: active
+version: "1"
+control_revision: atlas-bootstrap-2026-10-21-r6
+authority:
+  product_manifest: atlas-os.yaml
+  ai_manifest: ai/manifest.yaml
+  core_spec: spec/core.yaml
+  execution_spine: spec/execution-spine.yaml
+  output_spec: spec/output.yaml
+capabilities: [conversation, workflow, execute, external_write]
+permission: write
+risk_class: high
+human_docs:
+  - integrations/hermes-agent/README.md
+  - integrations/hermes-agent/RELEASE-VERIFICATION.md
+release_verification: integrations/hermes-agent/release-verification.yaml
