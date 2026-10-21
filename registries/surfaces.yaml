@@ -2,7 +2,7 @@ schema: schemas/registry.schema.json
 registry:
   id: registry.surfaces
   type: surface
-  version: 1
+  version: 2
   status: active
 items:
   - id: surface.chatgpt
@@ -14,8 +14,8 @@ items:
     risk_class: medium
     priority: 80
     version: "1"
-    source: integrations/chatgpt/README.md
-    path: integrations/chatgpt/README.md
+    source: integrations/chatgpt/adapter.yaml
+    path: integrations/chatgpt/adapter.yaml
     capabilities: [conversation, public_research, private_research]
     requires: [capability.context-preservation]
     conflicts_with: []
@@ -29,8 +29,8 @@ items:
     risk_class: high
     priority: 90
     version: "1"
-    source: integrations/codex/README.md
-    path: integrations/codex/README.md
+    source: integrations/codex/adapter.yaml
+    path: integrations/codex/adapter.yaml
     capabilities: [conversation, execute, test, validate, external_write]
     requires: [capability.context-preservation, capability.dependency-planning]
     conflicts_with: []
@@ -44,8 +44,8 @@ items:
     risk_class: high
     priority: 85
     version: "1"
-    source: integrations/work/README.md
-    path: integrations/work/README.md
+    source: integrations/work/adapter.yaml
+    path: integrations/work/adapter.yaml
     capabilities: [conversation, private_research, workflow, external_write]
     requires: [capability.context-preservation, capability.evidence-tracking]
     conflicts_with: []
@@ -59,8 +59,8 @@ items:
     risk_class: high
     priority: 85
     version: "1"
-    source: integrations/hermes-agent/README.md
-    path: integrations/hermes-agent/README.md
+    source: integrations/hermes-agent/adapter.yaml
+    path: integrations/hermes-agent/adapter.yaml
     capabilities: [conversation, workflow, execute, external_write]
     requires: [capability.context-preservation, capability.dependency-planning]
     conflicts_with: []
@@ -74,10 +74,9 @@ items:
     risk_class: medium
     priority: 70
     version: "1"
-    source: integrations/generic-ai-host/README.md
-    path: integrations/generic-ai-host/README.md
+    source: integrations/generic-ai-host/adapter.yaml
+    path: integrations/generic-ai-host/adapter.yaml
     capabilities: [conversation]
     requires: [capability.context-preservation]
     conflicts_with: []
     fallback: capability.manual-handoff
-
