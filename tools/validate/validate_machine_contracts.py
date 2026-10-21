@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate ATLAS machine-discovery, verification, and migration contracts."""
+"""Validate ATLAS machine-discovery, surface, verification, and migration contracts."""
 
 from __future__ import annotations
 
@@ -12,7 +12,8 @@ from typing import Any
 import jsonschema
 import yaml
 
-SURFACES = ("chatgpt", "codex", "work", "hermes-agent")
+EXTERNAL_SURFACES = ("chatgpt", "codex", "work", "hermes-agent")
+ADAPTER_SURFACES = (*EXTERNAL_SURFACES, "generic-ai-host")
 STATUS_MAP = {
     "OPEN": "open",
     "IN_PROGRESS": "in-progress",
@@ -35,10 +36,13 @@ def validate(root: Path) -> list[str]:
     required = (
         "atlas-ai.yaml",
         "schemas/ai-manifest.schema.json",
+        "schemas/surface-adapter.schema.json",
         "schemas/release-verification.schema.json",
         "schemas/migration.schema.json",
+        "registries/surfaces.yaml",
         "registries/migrations.yaml",
-        *(f"integrations/{surface}/release-verification.yaml" for surface in SURFACES),
+        *(f"integrations/{surface}/adapter.yaml" for surface in ADAPTER_SURFACES),
+        *(f"integrations/{surface}/release-verification.yaml" for surface in EXTERNAL_SURFACES),
     )
     for relative in required:
         if not (root / relative).is_file():
@@ -49,6 +53,7 @@ def validate(root: Path) -> list[str]:
     manifest = load(root / "atlas-os.yaml")
     ai_manifest = load(root / "atlas-ai.yaml")
     ai_schema = load(root / "schemas/ai-manifest.schema.json")
+    surface_schema = load(root / "schemas/surface-adapter.schema.json")
     verification_schema = load(root / "schemas/release-verification.schema.json")
     migration_schema = load(root / "schemas/migration.schema.json")
 
@@ -70,7 +75,8 @@ def validate(root: Path) -> list[str]:
     if manifest.get("authority", {}).get("ai_manifest") != "atlas-ai.yaml":
         errors.append("atlas-os.yaml does not bind atlas-ai.yaml as the AI discovery authority")
 
-    for relative in ai_manifest.get("machine_contracts", []):
+    machine_contracts = set(ai_manifest.get("machine_contracts", []))
+    for relative in machine_contracts:
         path = root / relative
         if path.suffix not in {".yaml", ".yml", ".json"}:
             errors.append(f"non-structured file declared as machine contract: {relative}")
@@ -83,13 +89,49 @@ def validate(root: Path) -> list[str]:
         if not (root / relative).is_file():
             errors.append(f"human guidance does not exist: {relative}")
 
-    declared_surfaces = set(ai_manifest.get("external_verification", {}).get("surfaces", []))
-    if declared_surfaces != set(SURFACES):
+    surface_registry = load(root / "registries/surfaces.yaml")
+    registered_surfaces = {item["id"]: item for item in surface_registry.get("items", [])}
+    expected_ids = {f"surface.{surface}" for surface in ADAPTER_SURFACES}
+    if set(registered_surfaces) != expected_ids:
         errors.append(
-            f"AI manifest surface set drift: {sorted(declared_surfaces)} != {sorted(SURFACES)}"
+            f"surface registry set drift: {sorted(registered_surfaces)} != {sorted(expected_ids)}"
+        )
+    for surface in ADAPTER_SURFACES:
+        surface_id = f"surface.{surface}"
+        item = registered_surfaces.get(surface_id)
+        if not item:
+            continue
+        expected_path = f"integrations/{surface}/adapter.yaml"
+        if item.get("source") != expected_path or item.get("path") != expected_path:
+            errors.append(f"surface registry must route {surface_id} to {expected_path}")
+            continue
+        if expected_path not in machine_contracts:
+            errors.append(f"surface adapter missing from AI machine contracts: {expected_path}")
+        adapter = load(root / expected_path)
+        try:
+            jsonschema.validate(adapter, surface_schema, format_checker=jsonschema.FormatChecker())
+        except jsonschema.ValidationError as exc:
+            errors.append(f"{expected_path} schema violation: {exc.message}")
+            continue
+        if adapter.get("surface_id") != surface_id:
+            errors.append(f"surface adapter identity drift: {expected_path}")
+        if set(adapter.get("capabilities", [])) != set(item.get("capabilities", [])):
+            errors.append(f"surface capability drift: {surface_id}")
+        expected_verification = (
+            f"integrations/{surface}/release-verification.yaml"
+            if surface in EXTERNAL_SURFACES
+            else None
+        )
+        if adapter.get("release_verification") != expected_verification:
+            errors.append(f"surface release-verification route drift: {surface_id}")
+
+    declared_surfaces = set(ai_manifest.get("external_verification", {}).get("surfaces", []))
+    if declared_surfaces != set(EXTERNAL_SURFACES):
+        errors.append(
+            f"AI manifest surface set drift: {sorted(declared_surfaces)} != {sorted(EXTERNAL_SURFACES)}"
         )
 
-    for surface in SURFACES:
+    for surface in EXTERNAL_SURFACES:
         path = root / "integrations" / surface / "release-verification.yaml"
         record = load(path)
         try:
