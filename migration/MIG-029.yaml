@@ -3,7 +3,7 @@ id: MIG-029
 title: Independent bootstrap proof
 description: Independently demonstrate correct ATLAS bootstrap behavior in New Chat and ChatGPT Work.
 status: IN_PROGRESS
-release_blocking: false
+release_blocking: true
 opened_at: "2026-10-17T19:51:00+06:00"
 closed_at: null
 dependencies: []
@@ -31,5 +31,12 @@ evidence:
     source: integrations/chatgpt/RELEASE-VERIFICATION.md
     result: READY_FOR_EXTERNAL_PROOF
     limitations: A genuinely fresh ChatGPT New Chat and separate ChatGPT Work task must execute the published checklist; this repository session cannot substitute for those independent host surfaces.
+  - type: candidate-external-proof-target
+    timestamp: "2026-10-21T20:15:00+06:00"
+    version: 2.0.2-rc.1
+    control_revision: atlas-bootstrap-2026-10-21-r5
+    source: integrations/chatgpt/RELEASE-VERIFICATION.md
+    result: READY_FOR_EXTERNAL_PROOF
+    limitations: Fresh ChatGPT New Chat and ChatGPT Work evidence is still required; this candidate record is not proof of host behavior.
 owner: atlas-maintainers
-notes: The repository owner explicitly directed GA release without waiting for external-only surface proof. MIG-029 remains active post-GA. The current proof target is stable ATLAS 2.0.1 / chatgpt-bootstrap-2026-10-19-r4 and the control must be closed only after independent New Chat and ChatGPT Work evidence satisfies every acceptance criterion.
+notes: Earlier operator acceptance allowed v2.0.1 GA without external-only surface proof. For stable v2.0.2 promotion, MIG-029 is release-blocking. The current proof target is ATLAS 2.0.2-rc.1 / atlas-bootstrap-2026-10-21-r5, and the control must close only after independent New Chat and ChatGPT Work evidence satisfies every acceptance criterion.

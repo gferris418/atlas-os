@@ -4,8 +4,8 @@ Use this checklist in a genuinely fresh ChatGPT conversation and, separately, in
 
 ## Test identity
 
-- ATLAS version: `2.0.1`
-- Control revision: `chatgpt-bootstrap-2026-10-19-r4`
+- ATLAS version: `2.0.2-rc.1`
+- Control revision: `atlas-bootstrap-2026-10-21-r5`
 - Instruction artifact: `integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md`
 
 ## Procedure
@@ -33,4 +33,4 @@ For each surface, record:
 - pass/fail result for plan gating, dashboard fields, approval behavior, and save truthfulness;
 - reviewer identity and any deviation.
 
-Attach the evidence references to `MIG-029`. After both surfaces pass, run the control-revision query on ChatGPT, Codex, and Work and attach those independent references to `MIG-037`. Close neither migration until its complete acceptance criteria are evidenced.
+Attach the evidence references to `MIG-029`. After both surfaces pass, run the control-revision query on ChatGPT, Codex, Work, and Hermes Agent and attach those independent references to `MIG-037`. Close neither migration until its complete acceptance criteria are evidenced.
