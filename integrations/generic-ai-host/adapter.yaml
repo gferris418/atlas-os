@@ -1,0 +1,18 @@
+schema: schemas/ai-host-adapter.schema.json
+adapter_id: adapter.generic-ai-host
+surface_id: surface.generic-ai-host
+status: active
+version: "1"
+control_revision: atlas-bootstrap-2026-10-21-r6
+authority:
+  product_manifest: atlas-os.yaml
+  ai_manifest: ai/manifest.yaml
+  core_spec: spec/core.yaml
+  execution_spine: spec/execution-spine.yaml
+  output_spec: spec/output.yaml
+capabilities: [conversation]
+permission: read
+risk_class: medium
+human_docs:
+  - integrations/generic-ai-host/README.md
+release_verification: null
