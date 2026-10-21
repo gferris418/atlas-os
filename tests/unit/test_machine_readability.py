@@ -49,6 +49,21 @@ class MachineReadabilityContractTests(unittest.TestCase):
 
         self.assertEqual(expected_surfaces, observed_surfaces)
 
+    def test_surface_registry_routes_to_machine_readable_adapter_contracts(self) -> None:
+        schema = json.loads(
+            (ROOT / "schemas/surface-adapter.schema.json").read_text(encoding="utf-8")
+        )
+        registry = yaml.safe_load((ROOT / "registries/surfaces.yaml").read_text(encoding="utf-8"))
+        for item in registry["items"]:
+            with self.subTest(surface=item["id"]):
+                self.assertTrue(item["source"].endswith("/adapter.yaml"), item["source"])
+                self.assertEqual(item["source"], item["path"])
+                path = ROOT / item["source"]
+                self.assertTrue(path.is_file(), path.as_posix())
+                adapter = yaml.safe_load(path.read_text(encoding="utf-8"))
+                jsonschema.validate(adapter, schema, format_checker=jsonschema.FormatChecker())
+                self.assertEqual(item["id"], adapter["surface_id"])
+
     def test_migration_controls_use_structured_acceptance_and_evidence(self) -> None:
         schema = json.loads((ROOT / "schemas/migration.schema.json").read_text(encoding="utf-8"))
         for path in sorted((ROOT / "migration").glob("*.yaml")):
