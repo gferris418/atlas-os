@@ -40,7 +40,7 @@ class SurfaceAdapterIntegrationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "surface identifier"):
             get_surface_adapter("Microsoft Windows")
 
-    def test_routed_substantive_prompt_blocks_before_data_plane(self) -> None:
+    def test_hybrid_collection_prompt_blocks_at_routing_preview_before_data_plane(self) -> None:
         tasks = [{"id": "assess", "status": "PENDING", "dependencies": []}]
         dashboard = get_surface_adapter("hermes-agent").start_prompt(
             "Assess coastal surveillance radar for Bangladesh Navy",
@@ -49,10 +49,17 @@ class SurfaceAdapterIntegrationTests(unittest.TestCase):
         )
 
         self.assertEqual("BLOCKED", dashboard["plan_status"])
-        self.assertEqual("PENDING", dashboard["clarification_status"])
-        self.assertEqual("MATERIAL_CONTEXT_MATRIX", dashboard["active_stage"])
+        self.assertEqual("NOT_REQUIRED", dashboard["clarification_status"])
+        self.assertEqual("ROUTING_PREVIEW", dashboard["active_stage"])
         self.assertEqual("BLOCKED", dashboard["quality_gate"])
-        self.assertIn("why", dashboard["blocker_or_approval"])
+        self.assertEqual("HYBRID", dashboard["request_triage"]["collection_mode"])
+        self.assertTrue(dashboard["request_triage"]["collection_required"])
+        self.assertEqual("ARGUS", dashboard["request_triage"]["specialist"])
+        self.assertEqual("PROPOSED", dashboard["routing_preview"]["status"])
+        self.assertIn(
+            "domain-method.argus-intelligence",
+            {provider["id"] for provider in dashboard["routing_preview"]["providers"]},
+        )
 
     def test_ai_host_adapter_exposes_provider_routing_preview(self) -> None:
         dashboard = get_surface_adapter("hermes-agent").start_prompt(
