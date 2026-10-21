@@ -48,7 +48,6 @@ machine_contracts:
   - spec/dashboard.yaml
   - spec/domain-context-services.yaml
   - spec/domain-handoff.yaml
-  - spec/domain-intelligence.yaml
   - spec/domain-practices.yaml
   - spec/evidence.yaml
   - spec/execution-spine.yaml
