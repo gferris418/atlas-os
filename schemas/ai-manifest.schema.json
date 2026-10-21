@@ -23,10 +23,7 @@
       "additionalProperties": false,
       "required": ["authoritative_formats", "markdown_role", "ai_ready", "structured_output_required"],
       "properties": {
-        "authoritative_formats": {
-          "type": "array",
-          "const": ["yaml", "json"]
-        },
+        "authoritative_formats": {"type": "array", "const": ["yaml", "json"]},
         "markdown_role": {"const": "documentation-only"},
         "ai_ready": {"const": true},
         "structured_output_required": {"const": true}
@@ -40,7 +37,7 @@
         "core_spec": {"type": "string", "pattern": "^spec/.+\\.yaml$"},
         "execution_spine": {"type": "string", "pattern": "^spec/.+\\.yaml$"},
         "specifications": {"type": "array", "items": {"type": "string", "pattern": "^spec/.+\\.yaml$"}, "uniqueItems": true},
-        "registries": {"type": "array", "items": {"type": "string", "pattern": "^registries/.+\\.yaml$"}, "uniqueItems": true},
+        "registries": {"type": "array", "items": {"type": "string", "pattern": "^registries/.+\\.(?:yaml|json)$"}, "uniqueItems": true},
         "schemas": {"type": "array", "items": {"type": "string", "pattern": "^schemas/.+\\.json$"}, "uniqueItems": true}
       }
     },
