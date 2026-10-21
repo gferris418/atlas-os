@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os.local/schemas/evidence-governance.schema.json",
+  "title": "ATLAS Evidence Governance Claim",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["claim_id", "claim", "source", "source_type", "publisher", "publication_date", "observation_date", "retrieved_at", "observation", "analyst_inference", "corroborating_sources", "contradicting_sources", "freshness", "source_authority", "confidence", "status", "limitations"],
+  "properties": {
+    "claim_id": {"type": "string", "minLength": 1},
+    "claim": {"type": "string", "minLength": 1},
+    "source": {"type": "string", "minLength": 1},
+    "source_type": {"enum": ["PRIMARY", "OFFICIAL", "AUTHORITATIVE_SECONDARY", "SECONDARY", "TERTIARY", "CONNECTED_INTERNAL", "USER_SUPPLIED"]},
+    "publisher": {"type": ["string", "null"]},
+    "publication_date": {"type": ["string", "null"], "format": "date"},
+    "observation_date": {"type": ["string", "null"], "format": "date"},
+    "retrieved_at": {"type": "string", "format": "date-time"},
+    "observation": {"type": "string", "minLength": 1},
+    "analyst_inference": {"type": ["string", "null"]},
+    "corroborating_sources": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "contradicting_sources": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "freshness": {"enum": ["CURRENT", "RECENT", "HISTORICAL", "STALE", "UNKNOWN"]},
+    "source_authority": {"enum": ["HIGH", "MEDIUM", "LOW", "UNKNOWN"]},
+    "confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+    "status": {"enum": ["CONFIRMED", "PROBABLE", "POSSIBLE", "DISPUTED", "UNVERIFIED", "STALE"]},
+    "limitations": {"type": "array", "items": {"type": "string"}}
+  }
+}
