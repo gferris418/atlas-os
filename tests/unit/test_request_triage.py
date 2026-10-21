@@ -84,6 +84,15 @@ class RequestTriageTests(unittest.TestCase):
         self.assertEqual("NONE", result["collection_mode"])
         self.assertEqual("GENERAL_TASK", result["route"])
 
+    def test_supplied_document_does_not_suppress_independent_monitoring(self) -> None:
+        result = self._triage(
+            "Summarize the attached report, then monitor ST Engineering for new procurement opportunities."
+        )
+        self.assertEqual("ARGUS_COLLECTION", result["collection_mode"])
+        self.assertIn("MONITORING", result["collection_types"])
+        self.assertIn("OPPORTUNITY_DISCOVERY", result["collection_types"])
+        self.assertEqual("C4_MONITOR", result["collection_depth"])
+
     def test_argus_registry_exposes_collection_capability(self) -> None:
         registry = yaml.safe_load((ROOT / "registries/domain-methods.yaml").read_text(encoding="utf-8"))
         method = next(item for item in registry["items"] if item["id"] == "domain-method.argus-intelligence")
