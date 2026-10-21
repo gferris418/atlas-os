@@ -17,39 +17,44 @@ discovery_order:
   - spec/core.yaml
   - spec/execution-spine.yaml
   - applicable spec/*.yaml
-  - applicable registries/*.yaml
+  - applicable registries/*.{yaml,json}
   - integrations/<surface>/adapter.yaml
   - active migration/*.yaml
   - integrations/<surface>/release-verification.yaml
 machine_contracts:
   - atlas-os.yaml
   - governance.yaml
-  - spec/core.yaml
-  - spec/runtime.yaml
-  - spec/execution-spine.yaml
+  - spec/approvals.yaml
+  - spec/capability-admission.yaml
   - spec/classification.yaml
-  - spec/domain-practices.yaml
+  - spec/completeness.yaml
+  - spec/context.yaml
+  - spec/core.yaml
+  - spec/dashboard.yaml
   - spec/domain-handoff.yaml
+  - spec/domain-practices.yaml
+  - spec/evidence.yaml
+  - spec/execution-spine.yaml
   - spec/output.yaml
+  - spec/persistence.yaml
   - spec/planning.yaml
   - spec/routing.yaml
-  - spec/evidence.yaml
-  - spec/approvals.yaml
+  - spec/runtime.yaml
   - spec/verification.yaml
-  - spec/persistence.yaml
   - spec/versioning.yaml
   - registries/capabilities.yaml
-  - registries/tools.yaml
+  - registries/classifications.yaml
+  - registries/controls.yaml
+  - registries/domain-methods.yaml
+  - registries/frameworks.yaml
+  - registries/migrations.yaml
+  - registries/output-profiles.yaml
+  - registries/signing-keys.json
   - registries/skills.yaml
   - registries/surfaces.yaml
-  - registries/controls.yaml
-  - registries/migrations.yaml
-  - registries/frameworks.yaml
   - registries/taxonomies.yaml
   - registries/taxonomy-routes.yaml
-  - registries/classifications.yaml
-  - registries/output-profiles.yaml
-  - registries/domain-methods.yaml
+  - registries/tools.yaml
   - migration/MIG-029.yaml
   - migration/MIG-037.yaml
   - migration/dtif-reconciliation.yaml
@@ -62,20 +67,25 @@ machine_contracts:
   - integrations/codex/release-verification.yaml
   - integrations/work/release-verification.yaml
   - integrations/hermes-agent/release-verification.yaml
-  - schemas/atlas-os.schema.json
   - schemas/ai-manifest.schema.json
-  - schemas/governance.schema.json
-  - schemas/surface-adapter.schema.json
-  - schemas/migration.schema.json
-  - schemas/release-verification.schema.json
-  - schemas/task.schema.json
-  - schemas/execution.schema.json
-  - schemas/evidence.schema.json
   - schemas/approval.schema.json
-  - schemas/persistence.schema.json
+  - schemas/atlas-os.schema.json
   - schemas/dashboard.schema.json
+  - schemas/domain-context-handoff.schema.json
+  - schemas/domain-handoff-receipt.schema.json
+  - schemas/evidence.schema.json
+  - schemas/execution-lease.schema.json
+  - schemas/execution.schema.json
+  - schemas/governance.schema.json
+  - schemas/migration.schema.json
   - schemas/output.schema.json
+  - schemas/persistence.schema.json
   - schemas/registry.schema.json
+  - schemas/release-verification.schema.json
+  - schemas/signing-key-registry.schema.json
+  - schemas/spec.schema.json
+  - schemas/surface-adapter.schema.json
+  - schemas/task.schema.json
 human_guidance:
   - README.md
   - GOVERNANCE.md
