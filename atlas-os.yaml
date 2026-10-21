@@ -25,7 +25,7 @@ release:
   target_version: 2.0.2
   blocking_controls: [MIG-029, MIG-037]
   package_command: python tools/package/build_release.py . dist
-  validation_command: python tools/validate/validate_repository.py .
+  validation_command: python tools/validate/validate_all.py .
 artifacts:
   specifications: spec
   schemas: schemas
