@@ -1,0 +1,56 @@
+schema: schemas/spec.schema.json
+id: spec.domain-context-services
+title: Domain context, semantics, standards and classification services
+status: active
+normative: true
+contract:
+  purpose: Provide ATLAS-owned canonical context for terminology, taxonomy, economic classification, product/service classification, ontology, law, standards, frameworks, benchmarks and evidence precedence.
+  owner: ATLAS_OS
+  services:
+    - terminology_and_concept_definitions
+    - taxonomy_selection
+    - jurisdiction_context
+    - economic_sector_context
+    - operator_and_supplier_industry_classification
+    - product_and_service_classification
+    - procurement_classification
+    - customs_and_trade_classification
+    - defense_logistics_classification_when_applicable
+    - capability_classification
+    - ontology_and_relationship_context
+    - law_regulation_and_binding_requirements
+    - standards_and_professional_frameworks
+    - authoritative_guidance
+    - benchmarks_and_comparison_baselines
+    - evidence_hierarchy_and_conflict_resolution
+  economic_classification_stack:
+    international_activity: taxonomy.un-isic
+    eu_activity: taxonomy.eu-nace
+    north_america_activity: taxonomy.naics
+    international_product_service: taxonomy.un-cpc
+    eu_product_service: taxonomy.eu-cpa
+    procurement_global: taxonomy.unspsc
+    procurement_eu: taxonomy.eu-cpv
+    customs_trade: taxonomy.wco-hs
+    defense_logistics: taxonomy.nato-codification-system
+  semantic_invariants:
+    - DOMAIN_IS_NOT_SECTOR
+    - SECTOR_IS_NOT_INDUSTRY
+    - INDUSTRY_IS_NOT_PRODUCT
+    - PRODUCT_IS_NOT_CAPABILITY
+    - PRODUCT_IS_NOT_PROCUREMENT_CATEGORY
+    - PROCUREMENT_CATEGORY_IS_NOT_HS_CODE
+    - HS_CODE_IS_NOT_PROCUREMENT_ELIGIBILITY
+    - CLASSIFICATION_IS_NOT_COMPLIANCE
+  sector_rule: Economic sector is a broader contextual grouping. Prefer an authoritative sector scheme or an explicit governed mapping from activity classifications; never invent a sector code or present a derived grouping as an ISIC/NACE/NAICS code.
+  crosswalk_rule: Cross-scheme mappings must preserve scheme and version and use explicit mapping relations such as EXACT, CLOSE, BROADER, NARROWER or RELATED. Never assume unlike schemes are equivalent.
+  metadata_rule: Record scheme, version, code, preferred label, definition/source, issuer, classification date, applicability, confidence, provenance and mapping relation when material.
+  argus_boundary: ARGUS may discover evidence and suggest collection-side classifications. ATLAS accepts, rejects or resolves the canonical classification and framework context.
+  direct_rule: Apply only context that can materially change correctness, authorization, evidence selection, requirements or output.
+  currency_rule: Recheck official editions and current requirements whenever freshness is material.
+invariants: [INV-006, INV-016, INV-018, INV-019]
+references:
+  - spec/classification.yaml
+  - registries/taxonomies.yaml
+  - registries/classifications.yaml
+  - registries/frameworks.yaml
