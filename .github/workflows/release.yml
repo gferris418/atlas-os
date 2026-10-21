@@ -27,7 +27,7 @@ jobs:
       - run: python -m unittest discover -s tests/conformance -v
       - run: python -m unittest discover -s tests/regression -v
       - run: python -m unittest discover -s tests/integration -v
-      - run: python tools/validate/validate_repository.py .
+      - run: python tools/validate/validate_all.py .
       - run: python tools/package/build_release.py . dist --tag "${GITHUB_REF_NAME}"
       - name: Create GitHub release and attach deterministic artifacts
         env:
@@ -36,4 +36,3 @@ jobs:
           args=()
           if [[ "${GITHUB_REF_NAME}" == *-* ]]; then args+=(--prerelease); fi
           gh release create "${GITHUB_REF_NAME}" dist/* --verify-tag --generate-notes "${args[@]}"
-
