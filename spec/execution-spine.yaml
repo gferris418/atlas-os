@@ -7,36 +7,34 @@ contract:
   input_boundary: Preserve the untouched prompt, critical literals, and named entities before layer 0. This is a loss-prevention boundary, not a competing execution layer.
   layers:
     - id: 0
-      name: TAXONOMY_LAYER
-      purpose: Route the untouched prompt through the internal Domain -> Sub-Domain -> Vertical -> Artifact Class hierarchy and identify candidate governed classification schemes without assigning unverified external codes.
+      name: REQUEST_TRIAGE
+      purpose: Make the minimum route decision between GENERAL_SEARCH, GENERAL_TASK, and INTELLIGENCE before deep taxonomy, domain, or provider work.
     - id: 1
       name: INTENT_NORMALIZATION
       purpose: Resolve the goal, requested outcome, constraints, exclusions, and implicit expectations without losing original literals; classify the domain-neutral task intent and recommend semantic capability needs without routing a provider.
     - id: 2
-      name: MATERIAL_CONTEXT_MATRIX
-      purpose: Assess Who, What, Where, When, Why, Which, How, and How Much, asking only questions whose answers materially change execution.
+      name: CONDITIONAL_DOMAIN_CONTEXT
+      purpose: For direct ATLAS work, resolve only material completeness, taxonomy, classification, law, standards, or framework context; for INTELLIGENCE, preserve known context and unresolved material in a governed PARTIAL handoff for ARGUS enrichment.
     - id: 3
-      name: CLASSIFICATION_AND_DOMAIN_REQUIREMENTS
-      purpose: Select current authoritative classification schemes, resolve material jurisdiction, industry, product/service, capability, lifecycle, stakeholder, and sensitivity facets, then align applicable law, requirements, and standards.
-    - id: 4
       name: CAPABILITY_AND_EXECUTION_PLAN
       purpose: Build the dependency-aware plan and approval gates, audit the smallest admitted set of host skills, plugins, tools, models, or specialist methods, and show their exact proposed use before routing.
-    - id: 5
+    - id: 4
       name: DATA_PLANE_EXECUTION
-      purpose: Execute one authorized atomic work unit at a time using governed evidence and the selected capabilities.
-    - id: 6
+      purpose: Execute one authorized atomic work unit at a time using governed evidence and the selected capabilities; INTELLIGENCE work may execute through ARGUS under the same ATLAS control plane.
+    - id: 5
       name: ASSURANCE_AND_VERIFICATION
-      purpose: Distinguish generated, executed, and verified results; reconcile evidence, test requirements, and expose unresolved gaps or failures.
-    - id: 7
+      purpose: Distinguish generated, executed, and verified results; reconcile evidence, test requirements, specialist returns, and unresolved gaps or failures.
+    - id: 6
       name: PERSISTENCE_AND_DELIVERY
       purpose: Persist only through an authorized durable-write receipt and deliver the verified output with limitations, evidence state, and remaining decisions.
   stages:
-    - TAXONOMY_ROUTING
+    - REQUEST_TRIAGE
     - NORMALIZATION
-    - COMPLETENESS_CHECK
-    - TASK_CLASSIFICATION
-    - DOMAIN_CLASSIFICATION
-    - DOMAIN_FRAMEWORK_ALIGNMENT
+    - CONDITIONAL_COMPLETENESS_CHECK
+    - CONDITIONAL_TAXONOMY_ROUTING
+    - CONDITIONAL_DOMAIN_CLASSIFICATION
+    - CONDITIONAL_DOMAIN_FRAMEWORK_ALIGNMENT
+    - SPECIALIST_HANDOFF_PREPARATION
     - PLANNING
     - CAPABILITY_AUDIT
     - ROUTING_PREVIEW
@@ -47,15 +45,17 @@ contract:
     - VERIFICATION
     - PERSISTENCE
     - DELIVERY
-  optimization: Implementations may combine or delegate internal operations to native host capabilities when stage responsibilities remain satisfied; the user-facing workflow should stay compact.
-  taxonomy_gate: Layer 0 may propose only an internal domain route and candidate schemes. External industry, product, customs, procurement, defense-logistics, or other codes are assigned only in layer 3 after intent and material context establish applicability.
-  standards_boundary: Classification systems identify context; law, contractual requirements, engineering standards, military standards, and procurement rules govern the work. Never represent a requirements framework as a taxonomy code, and recheck the current official status of jurisdiction-specific instruments such as Bangladesh procurement rules before applying them.
+  optimization: Implementations must prefer the minimum sufficient path. GENERAL_SEARCH and GENERAL_TASK skip deep domain processing unless it can materially change correctness, authorization, safety, or the requested outcome; INTELLIGENCE defers deep intelligence-domain enrichment to ARGUS after governed activation.
+  triage_gate: Layer 0 is semantic routing only. It does not perform web research, taxonomy research, framework alignment, or specialist analysis merely to choose the route.
+  taxonomy_gate: Taxonomy is conditional, not universal preflight. When material, ATLAS may route through Domain -> Sub-Domain -> Vertical -> Artifact Class and identify candidate schemes without assigning unverified external codes. INTELLIGENCE may defer this enrichment to ARGUS through a PARTIAL governed handoff.
+  standards_boundary: Classification systems identify context; law, contractual requirements, engineering standards, military standards, procurement rules, and other binding requirements govern the work. Never represent a requirements framework as a taxonomy code, and recheck current official status when currency matters.
+  intelligence_gate: The canonical specialist capability is intelligence_analysis. Government or public-sector mentions alone do not activate ARGUS; an intelligence objective or explicit admissible ARGUS request is required.
   capability_gate: The plan defines semantic capability needs before any skill or plugin is selected. Installed or available providers remain unaudited until their provenance, permissions, security, dependencies, evidence, overlap, benchmarks when material, and fallback behavior satisfy spec/capability-admission.yaml.
   routing_preview_gate: Before any provider is routed, show what ATLAS intends to do and how it will do it, including the exact work unit, semantic requirements, proposed providers, purpose, method, permission, data scope, prerequisites, fallbacks, unresolved gates, and execution sequence. Approval binds to the preview digest; rejection, omission, or a digest mismatch blocks routing, and any changed proposal requires a new preview.
   visibility: One canonical plan and execution spine must govern user-visible state.
   progress: Every prompt exposes a compact event-driven dashboard with plan, task, method, timing, safe processing summary, output, quality, and persistence state; plans activate and finish one atomic work unit at a time.
   planning_gate: PLANNING creates a concrete plan identifier before EXECUTION. Material questions are resolved before dependent work, while safe independent work may continue.
-  domain_handoff: When ROUTING delegates substantive domain work to a specialist method, ATLAS emits and validates the governed domain-context handoff from spec/domain-handoff.yaml before dependent EXECUTION; return correlation is verified before accepting the specialist result.
+  domain_handoff: When ROUTING delegates INTELLIGENCE or other substantive specialist work, ATLAS emits and validates the governed domain-context handoff from spec/domain-handoff.yaml before dependent EXECUTION. READY or PARTIAL handoffs may be accepted according to the specialist contract; BLOCKED handoffs never authorize dependent execution.
   output: Output-profile selection is integrated into planning and delivery without adding another user-visible stage.
   resume: Reconcile persisted state against actual external state before continuing.
 invariants:
@@ -65,9 +65,12 @@ invariants:
   - INV-009
   - INV-021
 references:
+  - spec/request-triage.yaml
+  - spec/control-plane.yaml
   - spec/context.yaml
   - spec/planning.yaml
   - spec/classification.yaml
+  - spec/domain-intelligence.yaml
   - spec/domain-practices.yaml
   - spec/domain-handoff.yaml
   - spec/output.yaml
