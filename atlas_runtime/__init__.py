@@ -13,6 +13,7 @@ from .runtime import (
     classify_action,
     classify_domain_context,
     classify_task,
+    classify_task_intent,
     confirm_library_save,
     create_dashboard,
     determine_execution_depth,
@@ -40,7 +41,7 @@ from .handoff import (
     verify_domain_handoff_receipt,
 )
 from .lease import prepare_execution_lease, verify_execution_lease
-from .routing import route_capability, route_domain_method
+from .routing import build_routing_preview, route_capability, route_domain_method
 from .engine import ExecutionEnvelope, ExecutionResult, execute
 from .adapters import LibraryStorage, SurfaceAdapter, get_surface_adapter
 from .persistence import FileSystemLibraryAdapter
@@ -61,11 +62,13 @@ __all__ = [
     "audit_capability_providers",
     "assess_completeness",
     "build_plan",
+    "build_routing_preview",
     "can_transition_release",
     "canonical_record_sha256",
     "classify_action",
     "classify_domain_context",
     "classify_task",
+    "classify_task_intent",
     "confirm_library_save",
     "create_dashboard",
     "determine_execution_depth",

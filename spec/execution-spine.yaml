@@ -11,7 +11,7 @@ contract:
       purpose: Route the untouched prompt through the internal Domain -> Sub-Domain -> Vertical -> Artifact Class hierarchy and identify candidate governed classification schemes without assigning unverified external codes.
     - id: 1
       name: INTENT_NORMALIZATION
-      purpose: Resolve the goal, requested outcome, constraints, exclusions, and implicit expectations without losing original literals.
+      purpose: Resolve the goal, requested outcome, constraints, exclusions, and implicit expectations without losing original literals; classify the domain-neutral task intent and recommend semantic capability needs without routing a provider.
     - id: 2
       name: MATERIAL_CONTEXT_MATRIX
       purpose: Assess Who, What, Where, When, Why, Which, How, and How Much, asking only questions whose answers materially change execution.
@@ -20,7 +20,7 @@ contract:
       purpose: Select current authoritative classification schemes, resolve material jurisdiction, industry, product/service, capability, lifecycle, stakeholder, and sensitivity facets, then align applicable law, requirements, and standards.
     - id: 4
       name: CAPABILITY_AND_EXECUTION_PLAN
-      purpose: Build the dependency-aware plan and approval gates, then audit and route the smallest admitted set of host skills, plugins, tools, models, or specialist methods required by that plan.
+      purpose: Build the dependency-aware plan and approval gates, audit the smallest admitted set of host skills, plugins, tools, models, or specialist methods, and show their exact proposed use before routing.
     - id: 5
       name: DATA_PLANE_EXECUTION
       purpose: Execute one authorized atomic work unit at a time using governed evidence and the selected capabilities.
@@ -39,6 +39,7 @@ contract:
     - DOMAIN_FRAMEWORK_ALIGNMENT
     - PLANNING
     - CAPABILITY_AUDIT
+    - ROUTING_PREVIEW
     - ROUTING
     - APPROVAL_GATING
     - EVIDENCE_ACQUISITION
@@ -50,6 +51,7 @@ contract:
   taxonomy_gate: Layer 0 may propose only an internal domain route and candidate schemes. External industry, product, customs, procurement, defense-logistics, or other codes are assigned only in layer 3 after intent and material context establish applicability.
   standards_boundary: Classification systems identify context; law, contractual requirements, engineering standards, military standards, and procurement rules govern the work. Never represent a requirements framework as a taxonomy code, and recheck the current official status of jurisdiction-specific instruments such as Bangladesh procurement rules before applying them.
   capability_gate: The plan defines semantic capability needs before any skill or plugin is selected. Installed or available providers remain unaudited until their provenance, permissions, security, dependencies, evidence, overlap, benchmarks when material, and fallback behavior satisfy spec/capability-admission.yaml.
+  routing_preview_gate: Before any provider is routed, show what ATLAS intends to do and how it will do it, including the exact work unit, semantic requirements, proposed providers, purpose, method, permission, data scope, prerequisites, fallbacks, unresolved gates, and execution sequence. Approval binds to the preview digest; rejection, omission, or a digest mismatch blocks routing, and any changed proposal requires a new preview.
   visibility: One canonical plan and execution spine must govern user-visible state.
   progress: Every prompt exposes a compact event-driven dashboard with plan, task, method, timing, safe processing summary, output, quality, and persistence state; plans activate and finish one atomic work unit at a time.
   planning_gate: PLANNING creates a concrete plan identifier before EXECUTION. Material questions are resolved before dependent work, while safe independent work may continue.
