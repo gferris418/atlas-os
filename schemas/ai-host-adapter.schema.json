@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os.local/schemas/ai-host-adapter.schema.json",
+  "title": "ATLAS AI host adapter",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "adapter_id", "surface_id", "status", "version", "control_revision", "authority", "capabilities", "permission", "risk_class", "human_docs"],
+  "properties": {
+    "schema": {"const": "schemas/ai-host-adapter.schema.json"},
+    "adapter_id": {"type": "string", "pattern": "^adapter\\.[a-z0-9.-]+$"},
+    "surface_id": {"type": "string", "pattern": "^surface\\.[a-z0-9.-]+$"},
+    "status": {"const": "active"},
+    "version": {"type": "string", "minLength": 1},
+    "control_revision": {"type": "string", "minLength": 1},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["product_manifest", "ai_manifest", "core_spec", "execution_spine", "output_spec"],
+      "properties": {
+        "product_manifest": {"const": "atlas-os.yaml"},
+        "ai_manifest": {"const": "ai/manifest.yaml"},
+        "core_spec": {"const": "spec/core.yaml"},
+        "execution_spine": {"const": "spec/execution-spine.yaml"},
+        "output_spec": {"const": "spec/output.yaml"}
+      }
+    },
+    "capabilities": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "permission": {"enum": ["read", "write"]},
+    "risk_class": {"enum": ["low", "medium", "high", "critical"]},
+    "human_docs": {"type": "array", "items": {"type": "string", "pattern": "^.+\\.md$"}, "uniqueItems": true},
+    "release_verification": {"type": ["string", "null"], "pattern": "^integrations/.+/release-verification\\.yaml$"}
+  }
+}
