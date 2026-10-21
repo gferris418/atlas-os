@@ -1,0 +1,38 @@
+schema: schemas/surface-adapter.schema.json
+surface_id: surface.codex
+host_slug: codex
+status: active
+authority:
+  ai_manifest: atlas-ai.yaml
+  product_manifest: atlas-os.yaml
+  core_spec: spec/core.yaml
+capabilities: [conversation, execute, test, validate, external_write]
+limitations:
+  - Network, credentials, sandbox, and external-system access remain environment-specific.
+  - Codex cannot manufacture proof from ChatGPT or Work surfaces.
+native_first: true
+tool_model:
+  mode: repository-commands-and-structured-tools
+  requires_execution_evidence: true
+persistence:
+  mode: FILESYSTEM_WHEN_AVAILABLE
+  saved_requires_verified_receipt: true
+approvals:
+  preserve_host_boundaries: true
+  required_for: [external-write, publication, destructive-action, purchase, permission-change, credential-operation]
+startup:
+  discovery: [atlas-ai.yaml, atlas-os.yaml, spec/core.yaml, registries/surfaces.yaml, integrations/codex/adapter.yaml]
+  plan_id_required: true
+  compact_dashboard: true
+  single_active_atomic_unit: true
+output:
+  honor_explicit_format: true
+  profile_fallback: smallest-task-fit
+  verify_before_delivery: true
+unsupported_claims:
+  - Do not claim command execution, test success, external writes, or durable saves without actual execution evidence.
+executable_seam:
+  function: atlas_runtime.get_surface_adapter
+  surface_argument: codex
+human_companion: integrations/codex/README.md
+release_verification: integrations/codex/release-verification.yaml

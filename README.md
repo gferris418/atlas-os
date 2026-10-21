@@ -1,6 +1,6 @@
 # ATLAS OS
 
-**Current candidate:** `v2.0.2-rc.2`
+**Current candidate:** `v2.0.2-rc.3`
 
 **Information classification:** Internal
 
@@ -14,11 +14,17 @@ Despite its name, ATLAS-OS is not a desktop operating system and is not installe
 
 ATLAS is not an autonomous model or a collection of prompts. The repository is the canonical machine-readable contract; ChatGPT, Hermes Agent, Codex, Work, and other AI hosts implement adapters around the same core semantics.
 
+## Machine entrypoint
+
+AI systems should begin at [`atlas-ai.yaml`](atlas-ai.yaml). It is the deterministic discovery manifest for the current machine contracts, schemas, registries, migrations, surface verification contracts, and human companion guidance. It points to [`atlas-os.yaml`](atlas-os.yaml), which remains the sole product and release authority. Human-readable Markdown is guidance or compatibility material and must not override conflicting machine authority.
+
+The current control revision is machine-readable at `atlas-os.yaml#/execution/control_revision`. External verification procedures are schema-validated under `schemas/release-verification.schema.json` and published per supported surface at `integrations/<surface>/release-verification.yaml`.
+
 ## Install into an AI host
 
-- **ChatGPT:** attach the repository or use the version-bound ChatGPT instructions and verified Library snapshot.
+- **ChatGPT:** attach the repository or use the version-bound ChatGPT instructions and verified Library snapshot. When repository files are available, discover them through `atlas-ai.yaml` first.
 - **Hermes Agent:** start Hermes in this checkout, run `hermes skills trust`, and invoke the project-local `/atlas-os` skill in [`.agents/skills/atlas-os/SKILL.md`](.agents/skills/atlas-os/SKILL.md).
-- **Other AI tools:** expose the repository's project-local skill, attach the canonical manifest and relevant specifications, or call the optional Python reference runtime through a host adapter.
+- **Other AI tools:** expose the repository's project-local skill, attach `atlas-ai.yaml` plus the canonical manifest and relevant specifications, or call the optional Python reference runtime through a host adapter.
 
 See the [AI-host installation guide](docs/ai-host-installation.md) for the portable contract and host-specific setup. Installing the Python package is optional and provides reference validation and execution seams; it is not the definition of installing ATLAS into an AI host.
 
@@ -68,14 +74,15 @@ ATLAS uses capable AI-host features directly. It does not recreate the host's la
 
 ## Authority model
 
-1. [`atlas-os.yaml`](atlas-os.yaml) is the only product/release authority.
-2. [`spec/`](spec/) defines normative core behavior.
-3. [`schemas/`](schemas/) validates machine-readable state.
-4. [`registries/`](registries/) declares capabilities, surfaces, controls, and migrations.
-5. [`integrations/`](integrations/) adapts the core contract to execution surfaces.
-6. [`migration/`](migration/) records open transition controls and evidence.
-7. [`legacy/`](legacy/) contains historical references and is never active authority.
-8. [`library/`](library/) stores authorized, reusable output artifacts by profile-defined collection.
+1. [`atlas-ai.yaml`](atlas-ai.yaml) is the machine discovery entrypoint and contains no competing product-release authority.
+2. [`atlas-os.yaml`](atlas-os.yaml) is the only product/release authority and declares the active control revision.
+3. [`spec/`](spec/) defines normative core behavior.
+4. [`schemas/`](schemas/) validates machine-readable state.
+5. [`registries/`](registries/) declares capabilities, surfaces, controls, and migrations.
+6. [`integrations/`](integrations/) adapts the core contract to execution surfaces and publishes machine verification contracts.
+7. [`migration/`](migration/) records open transition controls, criterion state, evidence links, and closure state.
+8. [`legacy/`](legacy/) contains historical references and is never active authority.
+9. [`library/`](library/) stores authorized, reusable output artifacts by profile-defined collection.
 
 Component revisions may describe compatibility and lineage, but cannot declare a competing product release.
 
@@ -130,15 +137,18 @@ See [`docs/chatgpt-library-install.md`](docs/chatgpt-library-install.md) for the
 
 ## Repository map
 
+- `atlas-ai.yaml` — deterministic machine discovery entrypoint for AI hosts.
 - `.agents/skills/atlas-os/` — cross-tool, project-local AI-host installation entry point.
 - `atlas_runtime/` — optional reference runtime, executable surface seams, and durable persistence adapter.
 - `spec/` — normative declarative specifications.
-- `schemas/` — JSON Schemas for state and governance artifacts.
+- `schemas/` — JSON Schemas for state, verification, and governance artifacts.
 - `registries/` — governed capabilities and control indexes.
+- `migration/` — schema-validated criterion/evidence state for migration and release controls.
+- `integrations/*/release-verification.yaml` — machine-readable external surface verification contracts.
 - `tests/` — unit, conformance, and scenario regression evidence.
-- `tools/validate/` — repository-wide validation.
+- `tools/validate/` — repository and machine-contract validation.
 - `tools/package/` — deterministic release packaging.
-- `docs/` — architecture, operation, and release guidance.
+- `docs/` — human architecture, operation, and release guidance.
 - `library/` — durable, reusable outputs and storage guidance.
 
 ## Validate
@@ -150,7 +160,10 @@ python -m unittest discover -s tests/conformance -v
 python -m unittest discover -s tests/regression -v
 python -m unittest discover -s tests/integration -v
 python tools/validate/validate_repository.py .
+python tools/validate/validate_machine_contracts.py .
 ```
+
+The canonical validation command is declared in `atlas-os.yaml#/release/validation_command`.
 
 ## Build deterministic release archives
 
@@ -162,8 +175,8 @@ The package uses the release identifier from `atlas-os.yaml`, records the source
 
 ## Candidate verification items
 
-- `MIG-029`: independent New Chat and ChatGPT Work bootstrap proof remains to be captured.
-- `MIG-037`: independent latest-control propagation across ChatGPT, Codex, Work, and Hermes Agent remains to be captured after MIG-029.
+- `MIG-029`: independent New Chat and ChatGPT Work bootstrap proof remains to be captured. Its machine state and criterion/evidence links are in `migration/MIG-029.yaml`.
+- `MIG-037`: independent latest-control propagation across ChatGPT, Codex, Work, and Hermes Agent remains blocked on MIG-029. Its machine state is in `migration/MIG-037.yaml`.
 - `DTIF-RECONCILIATION`: **closed 2026-10-20** after authoritative DB-001/DB-002/DB-003 source hashes were verified, the accepted Wave-1 historical state was re-read and fingerprinted, all deferred legacy classes received explicit reverify-before-reuse dispositions, and ARGUS protected CI passed on exact evidence commit `caf8d76045d2d9f1cdb26cbe5b18e88d5862159a`.
 
 `MIG-029` and `MIG-037` remain external-surface proof items and must not be described as completed until their independent host evidence is captured. They block stable `v2.0.2` promotion but do not prevent candidate packaging. DTIF is now archive-only: retained source evidence is not current ARGUS truth and destructive deletion is not authorized by the reconciliation closure.

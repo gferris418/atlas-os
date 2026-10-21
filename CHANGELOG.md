@@ -4,6 +4,15 @@ All notable changes follow semantic versioning and preserve release lineage. The
 
 ## Unreleased
 
+## v2.0.2-rc.3
+
+- Add `atlas-ai.yaml` as a schema-validated machine discovery entrypoint while preserving `atlas-os.yaml` as the sole product/release authority.
+- Move the active provider-neutral control revision into the canonical machine manifest and publish `atlas-bootstrap-2026-10-22-r7`.
+- Add machine-readable external verification contracts for ChatGPT, Codex, ChatGPT Work, and Hermes Agent under one JSON Schema.
+- Replace free-form migration acceptance criteria and unconstrained evidence with typed criterion state, evidence IDs, provenance, independence, scope, and closure rules.
+- Synchronize migration registry lifecycle states with canonical migration records and add CI/release validation for machine-contract drift.
+- Keep `MIG-029` and `MIG-037` open until genuinely independent host evidence is captured; machine-readiness is not represented as external conformance proof.
+
 ## v2.0.2-rc.2
 
 - Make the canonical execution spine taxonomy-first, with an explicit Domain -> Sub-Domain -> Vertical -> Artifact Class routing layer, ordered domain classifications, proportional W-matrix completeness, capability audit, data-plane execution, assurance, and verified delivery boundaries.

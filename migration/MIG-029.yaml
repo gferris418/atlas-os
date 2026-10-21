@@ -8,42 +8,83 @@ opened_at: "2026-10-17T19:51:00+06:00"
 closed_at: null
 dependencies: []
 acceptance_criteria:
-  - A fresh New Chat loads the applicable ATLAS authority and exposes valid startup state.
-  - A fresh ChatGPT Work task loads the same core authority through its adapter.
-  - Evidence is independently captured with timestamps, surface identifiers, and expected behavior.
+  - id: AC-01
+    requirement: A fresh ChatGPT New Chat resolves the current ATLAS authority and exposes valid startup state.
+    surfaces: [chatgpt]
+    evidence_type: independent-host-observation
+    status: PENDING
+    evidence_ids: [EVID-006]
+  - id: AC-02
+    requirement: A fresh ChatGPT Work task resolves the same current core authority through its adapter.
+    surfaces: [work]
+    evidence_type: independent-host-observation
+    status: PENDING
+    evidence_ids: [EVID-006]
+  - id: AC-03
+    requirement: Independent evidence is retained with timestamps, surface identifiers, current product identity, current control revision, expected behavior, and reviewer identity.
+    surfaces: [chatgpt, work]
+    evidence_type: independently-reviewed-host-evidence
+    status: PENDING
+    evidence_ids: [EVID-006]
 evidence:
-  - type: local-automated-readiness
+  - id: EVID-001
+    type: local-automated-readiness
     timestamp: "2026-10-17T23:57:16+06:00"
     version: 2.0.0-rc.7
     control_revision: chatgpt-bootstrap-2026-10-17-r1
     source: tests/integration/test_chatgpt_bootstrap.py
+    independent: false
+    scope: [repository, chatgpt]
     result: PASS
     limitations: Independent fresh-session ChatGPT and ChatGPT Work proof is still required.
-  - type: operator-release-risk-acceptance
+  - id: EVID-002
+    type: operator-release-risk-acceptance
     timestamp: "2026-10-19T22:00:00+06:00"
     version: 2.0.0
+    source: docs/releases/v2.0.0.md
+    independent: false
+    scope: [release-governance]
     result: DEFERRED_POST_GA
-    limitations: Acceptance criteria remain open; this evidence records release-risk acceptance only and is not proof of cross-surface bootstrap behavior.
-  - type: stable-external-proof-target
+    limitations: Acceptance criteria remain open; this records release-risk acceptance only and is not cross-surface bootstrap proof.
+  - id: EVID-003
+    type: stable-external-proof-target
     timestamp: "2026-10-20T16:07:00+06:00"
     version: 2.0.1
     control_revision: chatgpt-bootstrap-2026-10-19-r4
     source: integrations/chatgpt/RELEASE-VERIFICATION.md
+    independent: false
+    scope: [repository, chatgpt, work]
     result: READY_FOR_EXTERNAL_PROOF
-    limitations: A genuinely fresh ChatGPT New Chat and separate ChatGPT Work task must execute the published checklist; this repository session cannot substitute for those independent host surfaces.
-  - type: candidate-external-proof-target
+    limitations: A genuinely fresh ChatGPT New Chat and separate ChatGPT Work task must execute the published verification contract.
+  - id: EVID-004
+    type: candidate-external-proof-target
     timestamp: "2026-10-21T20:15:00+06:00"
     version: 2.0.2-rc.1
     control_revision: atlas-bootstrap-2026-10-21-r5
     source: integrations/chatgpt/RELEASE-VERIFICATION.md
+    independent: false
+    scope: [repository, chatgpt, work]
     result: READY_FOR_EXTERNAL_PROOF
-    limitations: Fresh ChatGPT New Chat and ChatGPT Work evidence is still required; this candidate record is not proof of host behavior.
-  - type: taxonomy-first-candidate-external-proof-target
+    limitations: Checklist publication is readiness evidence and not independent host proof.
+  - id: EVID-005
+    type: taxonomy-first-candidate-external-proof-target
     timestamp: "2026-10-21T22:24:16+06:00"
     version: 2.0.2-rc.2
     control_revision: atlas-bootstrap-2026-10-21-r6
     source: integrations/chatgpt/RELEASE-VERIFICATION.md
+    independent: false
+    scope: [repository, chatgpt, work]
     result: READY_FOR_EXTERNAL_PROOF
-    limitations: Fresh ChatGPT New Chat and ChatGPT Work evidence must demonstrate the taxonomy-first bootstrap; this candidate record is not proof of host behavior.
+    limitations: Fresh ChatGPT New Chat and ChatGPT Work evidence must independently demonstrate the taxonomy-first bootstrap.
+  - id: EVID-006
+    type: machine-verifiable-external-proof-target
+    timestamp: "2026-10-22T00:15:50+06:00"
+    version: 2.0.2-rc.3
+    control_revision: atlas-bootstrap-2026-10-22-r7
+    source: integrations/chatgpt/release-verification.yaml
+    independent: false
+    scope: [repository, chatgpt, work]
+    result: READY_FOR_EXTERNAL_PROOF
+    limitations: The machine-readable verification contract is ready, but fresh independent ChatGPT and Work observations remain required before any criterion can pass.
 owner: atlas-maintainers
-notes: Earlier operator acceptance allowed v2.0.1 GA without external-only surface proof. For stable v2.0.2 promotion, MIG-029 is release-blocking. The current proof target is ATLAS 2.0.2-rc.2 / atlas-bootstrap-2026-10-21-r6, and the control must close only after independent New Chat and ChatGPT Work evidence satisfies every acceptance criterion.
+notes: Earlier operator acceptance allowed v2.0.1 GA without external-only surface proof. Stable v2.0.2 remains blocked until independent New Chat and ChatGPT Work evidence satisfies every acceptance criterion for the current product and control revision.

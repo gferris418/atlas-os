@@ -2,7 +2,7 @@ schema: schemas/registry.schema.json
 registry:
   id: registry.skills
   type: skill
-  version: 1
+  version: 2
   status: active
 items:
   - id: skill.repository-engineering
@@ -13,8 +13,8 @@ items:
     permission: write
     risk_class: medium
     priority: 90
-    version: "1"
-    source: integrations/codex/README.md
+    version: "2"
+    source: integrations/codex/adapter.yaml
     triggers: [coding, debugging, migration]
     applies_to: [surface.codex]
     capabilities: [execute, test, validate]

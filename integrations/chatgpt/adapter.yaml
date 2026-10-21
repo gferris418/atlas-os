@@ -1,0 +1,38 @@
+schema: schemas/surface-adapter.schema.json
+surface_id: surface.chatgpt
+host_slug: chatgpt
+status: active
+authority:
+  ai_manifest: atlas-ai.yaml
+  product_manifest: atlas-os.yaml
+  core_spec: spec/core.yaml
+capabilities: [conversation, public_research, private_research]
+limitations:
+  - Capability availability and durable persistence vary by session.
+  - Repository filesystem access is not assumed.
+native_first: true
+tool_model:
+  mode: host-tools-and-connectors
+  requires_execution_evidence: true
+persistence:
+  mode: HOST_STORAGE_WHEN_AUTHORIZED
+  saved_requires_verified_receipt: true
+approvals:
+  preserve_host_boundaries: true
+  required_for: [external-write, publication, destructive-action, purchase, permission-change, credential-operation]
+startup:
+  discovery: [atlas-ai.yaml, atlas-os.yaml, spec/core.yaml, registries/surfaces.yaml, integrations/chatgpt/adapter.yaml]
+  plan_id_required: true
+  compact_dashboard: true
+  single_active_atomic_unit: true
+output:
+  honor_explicit_format: true
+  profile_fallback: smallest-task-fit
+  verify_before_delivery: true
+unsupported_claims:
+  - Do not claim repository commands, writes, connected-source access, or durable saves unless the active session exposes and executes them.
+executable_seam:
+  function: atlas_runtime.get_surface_adapter
+  surface_argument: chatgpt
+human_companion: integrations/chatgpt/README.md
+release_verification: integrations/chatgpt/release-verification.yaml

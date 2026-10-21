@@ -2,13 +2,13 @@ schema: schemas/registry.schema.json
 registry:
   id: registry.migrations
   type: migration
-  version: 1
+  version: 2
   status: active
 items:
   - id: MIG-029
     name: Independent bootstrap proof
     description: Prove bootstrap behavior on required surfaces independently.
-    status: blocked
+    status: in-progress
     source: migration/MIG-029.yaml
     path: migration/MIG-029.yaml
     release_blocking: true
@@ -24,7 +24,7 @@ items:
   - id: DTIF-RECONCILIATION
     name: DTIF data reconciliation
     description: Closed DTIF reconciliation control retained as historical archive-disposition evidence.
-    status: deprecated
+    status: closed
     source: migration/dtif-reconciliation.yaml
     path: migration/dtif-reconciliation.yaml
     release_blocking: false

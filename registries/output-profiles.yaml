@@ -2,123 +2,123 @@ schema: schemas/registry.schema.json
 registry:
   id: registry.output-profiles
   type: output-profile
-  version: 1
+  version: 2
   status: active
 items:
   - id: output.answer-concise
     name: Concise answer
-    description: Direct answer followed only by essential context.
+    description: Canonical structured answer envelope with an optional concise human rendering.
     status: active
     priority: 10
     task_classes: [ANSWER]
-    format: markdown
-    supported_formats: [markdown]
+    format: json
+    supported_formats: [json, markdown]
     library_collection: answers
-    file_extensions: {markdown: md}
+    file_extensions: {json: json, markdown: md}
     required_fields: [result, verification]
     optional_fields: [evidence, assumptions, next_actions]
     outcome_first: true
     citations: when-material
     visuals: only-when-materially-clearer
     max_initial_sections: 2
-    machine_readable: false
-    validation_checks: [relevance, correctness, clarity]
-    standards: [GitHub-Flavored Markdown, WCAG 2.2 AA when rendered]
+    machine_readable: true
+    validation_checks: [schema-validity, relevance, correctness, clarity]
+    standards: [JSON Schema 2020-12, GitHub-Flavored Markdown when rendered, WCAG 2.2 AA when rendered]
   - id: output.analysis-standard
     name: Standard analysis
-    description: Conclusion-first analysis with material evidence and implications.
+    description: Canonical structured analysis envelope with optional human narrative rendering.
     status: active
     priority: 70
     task_classes: [ANALYSIS]
-    format: markdown
-    supported_formats: [markdown]
+    format: json
+    supported_formats: [json, markdown]
     library_collection: analyses
-    file_extensions: {markdown: md}
+    file_extensions: {json: json, markdown: md}
     required_fields: [result, evidence, verification]
     optional_fields: [assumptions, risks, next_actions]
     outcome_first: true
     citations: when-material
     visuals: only-when-materially-clearer
     max_initial_sections: 4
-    machine_readable: false
-    validation_checks: [correctness, evidence-integrity, clarity, implications]
-    standards: [GitHub-Flavored Markdown, WCAG 2.2 AA when rendered]
+    machine_readable: true
+    validation_checks: [schema-validity, correctness, evidence-integrity, clarity, implications]
+    standards: [JSON Schema 2020-12, GitHub-Flavored Markdown when rendered, WCAG 2.2 AA when rendered]
   - id: output.decision-brief
     name: Decision brief
-    description: Recommendation, evidence, material risks, and next action for a decision-maker.
+    description: Canonical structured decision record with optional Markdown or PDF rendering for decision-makers.
     status: active
     priority: 90
     task_classes: [DECISION, PLANNING]
-    format: markdown
-    supported_formats: [markdown, pdf]
+    format: json
+    supported_formats: [json, markdown, pdf]
     library_collection: decisions
-    file_extensions: {markdown: md, pdf: pdf}
+    file_extensions: {json: json, markdown: md, pdf: pdf}
     required_fields: [result, evidence, risks, next_actions, verification]
     optional_fields: [assumptions, artifacts]
     outcome_first: true
     citations: when-material
     visuals: only-when-materially-clearer
     max_initial_sections: 4
-    machine_readable: false
-    validation_checks: [decision-clarity, evidence-integrity, risk-disclosure, actionability]
-    standards: [GitHub-Flavored Markdown, PDF/UA when exported, PDF/A when archived]
+    machine_readable: true
+    validation_checks: [schema-validity, decision-clarity, evidence-integrity, risk-disclosure, actionability]
+    standards: [JSON Schema 2020-12, GitHub-Flavored Markdown when rendered, PDF/UA when exported, PDF/A when archived]
   - id: output.research-sourced
     name: Sourced research
-    description: Findings with citations, confidence, conflicts, and evidence gaps.
+    description: Canonical structured research record with citations, confidence, conflicts, and evidence gaps.
     status: active
     priority: 100
     task_classes: [RESEARCH]
-    format: markdown
-    supported_formats: [markdown, pdf]
+    format: json
+    supported_formats: [json, markdown, pdf]
     library_collection: research
-    file_extensions: {markdown: md, pdf: pdf}
+    file_extensions: {json: json, markdown: md, pdf: pdf}
     required_fields: [result, evidence, verification]
     optional_fields: [assumptions, risks, next_actions, artifacts]
     outcome_first: true
     citations: required
     visuals: only-when-materially-clearer
     max_initial_sections: 5
-    machine_readable: false
-    validation_checks: [source-quality, citation-coverage, evidence-integrity, uncertainty]
-    standards: [GitHub-Flavored Markdown, W3C PROV when formal provenance is required]
+    machine_readable: true
+    validation_checks: [schema-validity, source-quality, citation-coverage, evidence-integrity, uncertainty]
+    standards: [JSON Schema 2020-12, GitHub-Flavored Markdown when rendered, W3C PROV when formal provenance is required]
   - id: output.execution-progress
     name: Execution progress
-    description: Compact control-plane state followed by completed, active, and next work.
+    description: Canonical structured control-plane state with optional compact human progress rendering.
     status: active
     priority: 95
     task_classes: [WORKFLOW, EXTERNAL_ACTION, MONITORING, MULTI_STAGE]
-    format: markdown
-    supported_formats: [markdown]
+    format: json
+    supported_formats: [json, markdown]
     library_collection: execution
-    file_extensions: {markdown: md}
+    file_extensions: {json: json, markdown: md}
     required_fields: [result, next_actions, verification]
     optional_fields: [evidence, risks, artifacts]
     outcome_first: true
     citations: when-material
     visuals: only-when-materially-clearer
     max_initial_sections: 4
-    machine_readable: false
-    validation_checks: [state-accuracy, atomic-progress, blocker-visibility, actionability]
-    standards: [GitHub-Flavored Markdown]
+    machine_readable: true
+    validation_checks: [schema-validity, state-accuracy, atomic-progress, blocker-visibility, actionability]
+    standards: [JSON Schema 2020-12, GitHub-Flavored Markdown when rendered]
   - id: output.technical-spec
     name: Technical specification
-    description: Scope, requirements, interfaces, constraints, and verification criteria.
+    description: Canonical structured technical specification with optional Markdown or YAML rendering.
     status: active
     priority: 90
     task_classes: [CODING, DEBUGGING, DESIGN]
-    format: markdown
-    supported_formats: [markdown, json, yaml]
+    format: json
+    supported_formats: [json, yaml, markdown]
     library_collection: specifications
-    file_extensions: {markdown: md, json: json, yaml: yaml}
+    file_extensions: {json: json, yaml: yaml, markdown: md}
     required_fields: [result, verification]
     optional_fields: [evidence, assumptions, risks, next_actions, artifacts]
     outcome_first: true
     citations: when-material
     visuals: only-when-materially-clearer
     max_initial_sections: 6
-    machine_readable: false
-    validation_checks: [completeness, consistency, testability, traceability]
-    standards: [GitHub-Flavored Markdown, JSON Schema 2020-12 when structured, OpenAPI 3.1 when applicable]
+    machine_readable: true
+    validation_checks: [schema-validity, completeness, consistency, testability, traceability]
+    standards: [JSON Schema 2020-12, GitHub-Flavored Markdown when rendered, OpenAPI 3.1 when applicable]
   - id: output.data-structured
     name: Structured data
     description: Schema-valid machine-readable data with explicit format and verification.
@@ -140,20 +140,20 @@ items:
     standards: [JSON Schema 2020-12, RFC 4180 with UTF-8 for CSV, RFC 3339 timestamps]
   - id: output.artifact-delivery
     name: Artifact delivery
-    description: Delivered artifacts, verification evidence, and material limitations.
+    description: Canonical structured delivery record that references rendered artifacts and verification evidence.
     status: active
     priority: 85
     task_classes: [DOCUMENT, WRITING]
-    format: mixed
-    supported_formats: [markdown, pdf, html, mixed]
+    format: json
+    supported_formats: [json, markdown, pdf, html, mixed]
     library_collection: artifacts
-    file_extensions: {markdown: md, pdf: pdf, html: html, mixed: zip}
+    file_extensions: {json: json, markdown: md, pdf: pdf, html: html, mixed: zip}
     required_fields: [result, artifacts, verification]
     optional_fields: [evidence, assumptions, risks, next_actions]
     outcome_first: true
     citations: when-material
     visuals: only-when-materially-clearer
     max_initial_sections: 4
-    machine_readable: false
-    validation_checks: [artifact-existence, format-validity, accessibility, delivery-completeness]
-    standards: [WCAG 2.2 AA for web, PDF/UA when applicable, PDF/A when archived]
+    machine_readable: true
+    validation_checks: [schema-validity, artifact-existence, format-validity, accessibility, delivery-completeness]
+    standards: [JSON Schema 2020-12, WCAG 2.2 AA for web, PDF/UA when applicable, PDF/A when archived]

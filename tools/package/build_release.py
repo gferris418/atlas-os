@@ -124,10 +124,19 @@ def _build_zip(root: Path, output: Path, prefix: str, files: list[Path], epoch: 
             archive.writestr(info, path.read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
 
 
+def _validate_release_source(root: Path) -> None:
+    for script in (
+        "tools/validate/validate_repository.py",
+        "tools/validate/validate_machine_contracts.py",
+        "tools/validate/validate_output_contracts.py",
+    ):
+        subprocess.run([sys.executable, script, "."], cwd=root, check=True)
+
+
 def build(root: Path, output_dir: Path, *, release_tag: str | None = None) -> list[Path]:
     root = root.resolve()
     output_dir = (root / output_dir).resolve() if not output_dir.is_absolute() else output_dir.resolve()
-    subprocess.run([sys.executable, "tools/validate/validate_repository.py", "."], cwd=root, check=True)
+    _validate_release_source(root)
 
     manifest = yaml.safe_load((root / "atlas-os.yaml").read_text(encoding="utf-8"))
     if release_tag is not None:
