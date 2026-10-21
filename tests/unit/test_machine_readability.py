@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 import unittest
 from pathlib import Path
 
@@ -117,6 +119,32 @@ class MachineReadabilityContractTests(unittest.TestCase):
             self.assertEqual(record["release_blocking"], item["release_blocking"])
             self.assertEqual(record["dependencies"], item["dependencies"])
             self.assertEqual(path.relative_to(ROOT).as_posix(), item["source"])
+
+    def test_every_active_output_profile_has_canonical_structured_form(self) -> None:
+        registry = yaml.safe_load((ROOT / "registries/output-profiles.yaml").read_text(encoding="utf-8"))
+        for profile in registry["items"]:
+            if profile["status"] != "active":
+                continue
+            with self.subTest(profile=profile["id"]):
+                self.assertIs(profile["machine_readable"], True)
+                self.assertIn(profile["format"], {"json", "yaml"})
+                self.assertIn(profile["format"], profile["supported_formats"])
+                self.assertIn(profile["format"], profile["file_extensions"])
+                self.assertIn("schema-validity", profile["validation_checks"])
+                self.assertTrue(
+                    any("JSON Schema 2020-12" in item for item in profile["standards"]),
+                    profile["standards"],
+                )
+
+    def test_output_contract_validator_passes(self) -> None:
+        completed = subprocess.run(
+            [sys.executable, "tools/validate/validate_output_contracts.py", "."],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(0, completed.returncode, completed.stdout + completed.stderr)
 
 
 if __name__ == "__main__":
