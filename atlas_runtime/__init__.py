@@ -42,6 +42,7 @@ from .handoff import (
 )
 from .lease import prepare_execution_lease, verify_execution_lease
 from .routing import build_routing_preview, route_capability, route_domain_method
+from .triage import triage_request
 from .engine import ExecutionEnvelope, ExecutionResult, execute
 from .adapters import LibraryStorage, SurfaceAdapter, get_surface_adapter
 from .persistence import FileSystemLibraryAdapter
@@ -86,6 +87,7 @@ __all__ = [
     "route_capability",
     "select_output_profile",
     "select_next_work_unit",
+    "triage_request",
     "validate_output_record",
     "verify_domain_context_handoff",
     "verify_domain_handoff_receipt",
