@@ -34,17 +34,18 @@
   ],
   "domain_classification": {
     "status": "PARTIAL",
+    "classification_sequence": [
+      "TAXONOMY_SELECTION",
+      "JURISDICTION_CLASSIFICATION",
+      "OPERATOR_INDUSTRY_CLASSIFICATION",
+      "SUPPLIER_INDUSTRY_CLASSIFICATION",
+      "PRODUCT_OR_SERVICE_CLASSIFICATION",
+      "CAPABILITY_CLASSIFICATION",
+      "LIFECYCLE_STAGE_CLASSIFICATION",
+      "STAKEHOLDER_CLASSIFICATION",
+      "INFORMATION_SENSITIVITY_CLASSIFICATION"
+    ],
     "facets": {
-      "capability": [
-        {
-          "id": "classification.capability.coastal-surveillance-radar",
-          "taxonomy": "taxonomy.atlas-capability-skos",
-          "code": "capability.coastal-surveillance-radar",
-          "label": "Coastal surveillance radar",
-          "version": "current-official",
-          "source": "spec/classification.yaml"
-        }
-      ],
       "jurisdiction": [
         {
           "id": "classification.geo.bd",
@@ -64,6 +65,16 @@
           "version": "current-official",
           "source": "https://unstats.un.org/unsd/classifications/Econ/isic"
         }
+      ],
+      "capability": [
+        {
+          "id": "classification.capability.coastal-surveillance-radar",
+          "taxonomy": "taxonomy.atlas-capability-skos",
+          "code": "capability.coastal-surveillance-radar",
+          "label": "Coastal surveillance radar",
+          "version": "current-official",
+          "source": "spec/classification.yaml"
+        }
       ]
     },
     "taxonomy_references": [
@@ -72,7 +83,7 @@
       "taxonomy.un-isic"
     ],
     "risk_flags": ["defense", "dual-use", "national-security", "operational-security"],
-    "unresolved_facets": ["information-sensitivity", "lifecycle-stage"],
+    "unresolved_facets": ["lifecycle-stage", "information-sensitivity"],
     "conditional_candidates": [
       {
         "id": "classification.industry.navigation-equipment-manufacturing",

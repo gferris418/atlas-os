@@ -22,6 +22,22 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class RepositoryContractTests(unittest.TestCase):
+    def test_execution_spine_uses_taxonomy_first_layered_flow(self) -> None:
+        spine = yaml.safe_load((ROOT / "spec/execution-spine.yaml").read_text(encoding="utf-8"))
+        self.assertEqual(
+            [
+                "TAXONOMY_LAYER",
+                "INTENT_NORMALIZATION",
+                "MATERIAL_CONTEXT_MATRIX",
+                "CLASSIFICATION_AND_DOMAIN_REQUIREMENTS",
+                "CAPABILITY_AND_EXECUTION_PLAN",
+                "DATA_PLANE_EXECUTION",
+                "ASSURANCE_AND_VERIFICATION",
+                "PERSISTENCE_AND_DELIVERY",
+            ],
+            [layer["name"] for layer in spine["contract"].get("layers", [])],
+        )
+
     def test_manifest_is_only_product_version_authority(self) -> None:
         manifest = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
         self.assertEqual("2.0.2-rc.1", manifest["product"]["version"])

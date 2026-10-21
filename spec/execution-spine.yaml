@@ -4,22 +4,52 @@ title: Canonical execution spine
 status: active
 normative: true
 contract:
+  input_boundary: Preserve the untouched prompt, critical literals, and named entities before layer 0. This is a loss-prevention boundary, not a competing execution layer.
+  layers:
+    - id: 0
+      name: TAXONOMY_LAYER
+      purpose: Route the untouched prompt through the internal Domain -> Sub-Domain -> Vertical -> Artifact Class hierarchy and identify candidate governed classification schemes without assigning unverified external codes.
+    - id: 1
+      name: INTENT_NORMALIZATION
+      purpose: Resolve the goal, requested outcome, constraints, exclusions, and implicit expectations without losing original literals.
+    - id: 2
+      name: MATERIAL_CONTEXT_MATRIX
+      purpose: Assess Who, What, Where, When, Why, Which, How, and How Much, asking only questions whose answers materially change execution.
+    - id: 3
+      name: CLASSIFICATION_AND_DOMAIN_REQUIREMENTS
+      purpose: Select current authoritative classification schemes, resolve material jurisdiction, industry, product/service, capability, lifecycle, stakeholder, and sensitivity facets, then align applicable law, requirements, and standards.
+    - id: 4
+      name: CAPABILITY_AND_EXECUTION_PLAN
+      purpose: Build the dependency-aware plan and approval gates, then audit and route the smallest admitted set of host skills, plugins, tools, models, or specialist methods required by that plan.
+    - id: 5
+      name: DATA_PLANE_EXECUTION
+      purpose: Execute one authorized atomic work unit at a time using governed evidence and the selected capabilities.
+    - id: 6
+      name: ASSURANCE_AND_VERIFICATION
+      purpose: Distinguish generated, executed, and verified results; reconcile evidence, test requirements, and expose unresolved gaps or failures.
+    - id: 7
+      name: PERSISTENCE_AND_DELIVERY
+      purpose: Persist only through an authorized durable-write receipt and deliver the verified output with limitations, evidence state, and remaining decisions.
   stages:
-    - INTAKE
-    - CONTEXT_PRESERVATION
+    - TAXONOMY_ROUTING
     - NORMALIZATION
     - COMPLETENESS_CHECK
     - TASK_CLASSIFICATION
     - DOMAIN_CLASSIFICATION
     - DOMAIN_FRAMEWORK_ALIGNMENT
     - PLANNING
+    - CAPABILITY_AUDIT
     - ROUTING
+    - APPROVAL_GATING
     - EVIDENCE_ACQUISITION
     - EXECUTION
     - VERIFICATION
     - PERSISTENCE
     - DELIVERY
   optimization: Implementations may combine or delegate internal operations to native host capabilities when stage responsibilities remain satisfied; the user-facing workflow should stay compact.
+  taxonomy_gate: Layer 0 may propose only an internal domain route and candidate schemes. External industry, product, customs, procurement, defense-logistics, or other codes are assigned only in layer 3 after intent and material context establish applicability.
+  standards_boundary: Classification systems identify context; law, contractual requirements, engineering standards, military standards, and procurement rules govern the work. Never represent a requirements framework as a taxonomy code, and recheck the current official status of jurisdiction-specific instruments such as Bangladesh procurement rules before applying them.
+  capability_gate: The plan defines semantic capability needs before any skill or plugin is selected. Installed or available providers remain unaudited until their provenance, permissions, security, dependencies, evidence, overlap, benchmarks when material, and fallback behavior satisfy spec/capability-admission.yaml.
   visibility: One canonical plan and execution spine must govern user-visible state.
   progress: Every prompt exposes a compact event-driven dashboard with plan, task, method, timing, safe processing summary, output, quality, and persistence state; plans activate and finish one atomic work unit at a time.
   planning_gate: PLANNING creates a concrete plan identifier before EXECUTION. Material questions are resolved before dependent work, while safe independent work may continue.

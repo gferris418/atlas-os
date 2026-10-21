@@ -4,6 +4,8 @@ All notable changes follow semantic versioning and preserve release lineage. The
 
 ## Unreleased
 
+- Make the canonical execution spine taxonomy-first, with an explicit Domain -> Sub-Domain -> Vertical -> Artifact Class routing layer, ordered domain classifications, proportional W-matrix completeness, capability audit, data-plane execution, assurance, and verified delivery boundaries.
+
 ## v2.0.2-rc.1
 
 - Add the MIT license grant and declare it separately from the product's internal information classification.

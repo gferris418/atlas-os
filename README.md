@@ -25,12 +25,15 @@ See the [AI-host installation guide](docs/ai-host-installation.md) for the porta
 ## Execution spine
 
 ```text
-INTAKE -> CONTEXT PRESERVATION -> NORMALIZATION -> COMPLETENESS CHECK
-       -> TASK CLASSIFICATION -> DOMAIN CLASSIFICATION
-       -> DOMAIN FRAMEWORK ALIGNMENT
-       -> DEPENDENCY-AWARE PLANNING
-       -> CAPABILITY ROUTING -> EVIDENCE ACQUISITION -> EXECUTION
-       -> VERIFICATION -> PERSISTENCE -> DELIVERY
+RAW INPUT PRESERVATION BOUNDARY
+       -> 0. TAXONOMY LAYER
+       -> 1. INTENT NORMALIZATION
+       -> 2. MATERIAL W-QUESTION MATRIX
+       -> 3. CLASSIFICATION AND DOMAIN REQUIREMENTS
+       -> 4. CAPABILITY AUDIT AND EXECUTION PLAN
+       -> 5. DATA-PLANE EXECUTION
+       -> 6. ASSURANCE AND VERIFICATION
+       -> 7. PERSISTENCE AND DELIVERY
 ```
 
 Execution depth is proportional: trivial work remains direct, while complex or high-impact work activates stronger planning, evidence, approval, and verification controls.

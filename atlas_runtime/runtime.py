@@ -51,6 +51,22 @@ FRAMEWORK_AUTHORITIES = {
     "official-primary",
 }
 
+CLASSIFICATION_FACET_ORDER = (
+    "jurisdiction",
+    "operator-industry",
+    "supplier-industry",
+    "product-or-service",
+    "capability",
+    "lifecycle-stage",
+    "stakeholder",
+    "information-sensitivity",
+)
+
+CLASSIFICATION_SEQUENCE = (
+    "TAXONOMY_SELECTION",
+    *(f"{facet.replace('-', '_').upper()}_CLASSIFICATION" for facet in CLASSIFICATION_FACET_ORDER),
+)
+
 RELEASE_TRANSITIONS = {
     "DRAFT": {"CANDIDATE"},
     "CANDIDATE": {"VERIFIED"},
@@ -187,6 +203,7 @@ def classify_domain_context(
     if not substantive:
         return {
             "status": "NOT_REQUIRED",
+            "classification_sequence": list(CLASSIFICATION_SEQUENCE),
             "facets": {},
             "taxonomy_references": [],
             "risk_flags": [],
@@ -240,12 +257,16 @@ def classify_domain_context(
         taxonomy_references.add(record["taxonomy"])
         risk_flags.update(record.get("risk_flags", []))
 
+    facet_rank = {facet: index for index, facet in enumerate(CLASSIFICATION_FACET_ORDER)}
     ordered_facets = {
-        facet: sorted(values, key=lambda item: item["id"])
-        for facet, values in sorted(facets.items())
+        facet: sorted(facets[facet], key=lambda item: item["id"])
+        for facet in sorted(facets, key=lambda item: (facet_rank.get(item, len(facet_rank)), item))
     }
     material_policy_known = required_facets is not None
-    unresolved = sorted(set(required_facets or ()) - set(ordered_facets))
+    unresolved = sorted(
+        set(required_facets or ()) - set(ordered_facets),
+        key=lambda item: (facet_rank.get(item, len(facet_rank)), item),
+    )
     conditional_candidates.sort(key=lambda item: item["id"])
 
     if not ordered_facets:
@@ -269,6 +290,7 @@ def classify_domain_context(
 
     return {
         "status": status,
+        "classification_sequence": list(CLASSIFICATION_SEQUENCE),
         "facets": ordered_facets,
         "taxonomy_references": sorted(taxonomy_references),
         "risk_flags": sorted(risk_flags),
@@ -712,7 +734,7 @@ def confirm_library_save(record: dict[str, Any], receipt: PersistenceReceipt) ->
 
 def create_dashboard(
     objective: str, *, plan_id: str, plan_status: str, progress: int = 0,
-    active_stage: str = "INTAKE",
+    active_stage: str = "TAXONOMY_ROUTING",
     active_unit: str | None = None, completed_units: int = 0, total_units: int = 1,
     blocker: str | None = None, library: dict[str, Any] | str | None = None,
     substantive: bool = True, quality_gate: str = "PENDING",

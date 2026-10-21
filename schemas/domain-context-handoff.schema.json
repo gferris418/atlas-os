@@ -45,6 +45,23 @@
       "required": ["status", "facets", "taxonomy_references", "risk_flags", "unresolved_facets", "conditional_candidates", "evidence", "next_action"],
       "properties": {
         "status": {"enum": ["CLASSIFIED", "PARTIAL", "RESEARCH_REQUIRED", "NOT_REQUIRED"]},
+        "classification_sequence": {
+          "type": "array",
+          "minItems": 9,
+          "maxItems": 9,
+          "prefixItems": [
+            {"const": "TAXONOMY_SELECTION"},
+            {"const": "JURISDICTION_CLASSIFICATION"},
+            {"const": "OPERATOR_INDUSTRY_CLASSIFICATION"},
+            {"const": "SUPPLIER_INDUSTRY_CLASSIFICATION"},
+            {"const": "PRODUCT_OR_SERVICE_CLASSIFICATION"},
+            {"const": "CAPABILITY_CLASSIFICATION"},
+            {"const": "LIFECYCLE_STAGE_CLASSIFICATION"},
+            {"const": "STAKEHOLDER_CLASSIFICATION"},
+            {"const": "INFORMATION_SENSITIVITY_CLASSIFICATION"}
+          ],
+          "items": false
+        },
         "facets": {
           "type": "object",
           "additionalProperties": {

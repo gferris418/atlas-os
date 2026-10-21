@@ -12,6 +12,17 @@
   "verification": [],
   "domain_classification": {
     "status": "PARTIAL",
+    "classification_sequence": [
+      "TAXONOMY_SELECTION",
+      "JURISDICTION_CLASSIFICATION",
+      "OPERATOR_INDUSTRY_CLASSIFICATION",
+      "SUPPLIER_INDUSTRY_CLASSIFICATION",
+      "PRODUCT_OR_SERVICE_CLASSIFICATION",
+      "CAPABILITY_CLASSIFICATION",
+      "LIFECYCLE_STAGE_CLASSIFICATION",
+      "STAKEHOLDER_CLASSIFICATION",
+      "INFORMATION_SENSITIVITY_CLASSIFICATION"
+    ],
     "facets": {
       "capability": [{
         "id": "classification.capability.planning",

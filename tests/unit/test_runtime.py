@@ -458,6 +458,62 @@ class DomainPracticeTests(unittest.TestCase):
 
 
 class DomainClassificationTests(unittest.TestCase):
+    def test_taxonomy_selection_precedes_ordered_domain_facets(self) -> None:
+        records = [
+            {
+                "id": "classification.capability.coastal-surveillance-radar",
+                "status": "active",
+                "facet": "capability",
+                "taxonomy": "taxonomy.atlas-capability-skos",
+                "code": "capability.coastal-surveillance-radar",
+                "label": "Coastal surveillance radar",
+                "match_all": ["coastal", "surveillance", "radar"],
+            },
+            {
+                "id": "classification.industry.defence-activities",
+                "status": "active",
+                "facet": "operator-industry",
+                "taxonomy": "taxonomy.un-isic",
+                "code": "8422",
+                "label": "Defence activities",
+                "triggers": ["navy"],
+            },
+            {
+                "id": "classification.geo.bd",
+                "status": "active",
+                "facet": "jurisdiction",
+                "taxonomy": "taxonomy.iso-3166-1",
+                "code": "BD",
+                "label": "Bangladesh",
+                "triggers": ["bangladesh"],
+            },
+        ]
+
+        result = classify_domain_context(
+            "coastal surveillance radar for Bangladesh navy",
+            records,
+            required_facets=("jurisdiction", "operator-industry", "capability"),
+        )
+
+        self.assertEqual(
+            [
+                "TAXONOMY_SELECTION",
+                "JURISDICTION_CLASSIFICATION",
+                "OPERATOR_INDUSTRY_CLASSIFICATION",
+                "SUPPLIER_INDUSTRY_CLASSIFICATION",
+                "PRODUCT_OR_SERVICE_CLASSIFICATION",
+                "CAPABILITY_CLASSIFICATION",
+                "LIFECYCLE_STAGE_CLASSIFICATION",
+                "STAKEHOLDER_CLASSIFICATION",
+                "INFORMATION_SENSITIVITY_CLASSIFICATION",
+            ],
+            result.get("classification_sequence"),
+        )
+        self.assertEqual(
+            ["jurisdiction", "operator-industry", "capability"],
+            list(result["facets"]),
+        )
+
     def test_classification_is_multi_axial_and_exposes_missing_context(self) -> None:
         records = [
             {
@@ -802,6 +858,7 @@ class ClassificationAndDashboardTests(unittest.TestCase):
             plan_id="plan-convert", plan_status="READY",
         )
         self.assertEqual("ATLAS", dashboard["system"])
+        self.assertEqual("TAXONOMY_ROUTING", dashboard["active_stage"])
         self.assertEqual("[####------] 40%", dashboard["progress_visual"])
         rendered = render_dashboard(dashboard)
         self.assertIn("1/2", rendered)

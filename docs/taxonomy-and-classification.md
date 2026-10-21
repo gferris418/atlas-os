@@ -2,6 +2,21 @@
 
 When classification can materially improve a result, ATLAS classifies the relevant context before it chooses standards, frameworks, sources, or execution controls. It uses capable host-language understanding to identify candidates and the governed registry to validate and record them. Classification is multi-axial: a country, operator, supplier, product, capability, lifecycle stage, and information sensitivity answer different questions and must not be collapsed into one code. Facets that cannot change the task create no recordkeeping obligation.
 
+## Mandatory classification sequence
+
+ATLAS starts with taxonomy selection. It first determines which governed classification standards are applicable and verifies their scope, authority, version policy, and official source. Only then does it assign codes or concepts to material domain facets in this order:
+
+1. jurisdiction;
+2. operator industry;
+3. supplier industry;
+4. product or service;
+5. capability;
+6. lifecycle stage;
+7. stakeholder; and
+8. information sensitivity.
+
+Conditional schemes are activated only when their context applies. For example, HS is not selected merely because a physical product is mentioned; customs or cross-border trade must be in scope. Domain-law, standards, framework, evidence, planning, and execution work begins only after this taxonomy-first classification is complete or its unresolved facets are explicitly preserved.
+
 ## Governed baseline
 
 The taxonomy registry includes ISO 704 and ISO 1087 for terminology, ISO 25964 for thesauri and mappings, W3C SKOS for machine-readable concept schemes, ISO/IEC 11179-3 for metadata governance, ISO 3166-1 for countries, UN ISIC for economic activities, UN CPC for products and services, the WCO Harmonized System for customs, UNSPSC for procurement, and the NATO Codification System for defense logistics.
@@ -14,7 +29,7 @@ For each material facet, record the taxonomy identifier, version policy, code, l
 
 ## Example: coastal surveillance radar for Bangladesh Navy
 
-The prompt first produces a partial classification:
+The prompt first selects the applicable taxonomy standards, then produces a partial classification:
 
 | Facet | Initial result | Basis |
 |---|---|---|
