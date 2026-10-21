@@ -43,8 +43,8 @@ evidence:
     timestamp: "2026-10-21T22:24:16+06:00"
     version: 2.0.2-rc.2
     control_revision: atlas-bootstrap-2026-10-21-r6
-    source: integrations/hermes-agent/RELEASE-VERIFICATION.md
+    source: integrations/hermes-agent/release-verification.yaml
     result: READY_FOR_EXTERNAL_PROOF
-    limitations: ChatGPT, Codex, Work, and Hermes Agent still require independent resolution evidence for the taxonomy-first revision. MIG-029 must close first; checklist publication is not live proof.
+    limitations: ChatGPT, Codex, Work, and Hermes Agent still require independent resolution evidence for the taxonomy-first revision. MIG-029 must close first; machine-readable verification definitions are not live proof.
 owner: atlas-maintainers
 notes: Earlier operator acceptance allowed v2.0.1 GA without external-only propagation proof. For stable v2.0.2 promotion, MIG-037 is release-blocking and remains blocked on MIG-029. The active target is ATLAS 2.0.2-rc.2 / atlas-bootstrap-2026-10-21-r6. The provider-neutral generic AI-host contract remains local schema/runtime conformance scope; an unregistered provider becomes an external proof target only when promoted to a documented supported adapter.
