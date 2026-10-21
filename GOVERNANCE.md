@@ -1,38 +1,37 @@
 # ATLAS-OS governance
 
+This file is the human companion to the canonical machine governance policy at [`governance.yaml`](governance.yaml), validated by [`schemas/governance.schema.json`](schemas/governance.schema.json). If this document conflicts with a schema-valid machine contract, the machine contract governs. [`atlas-os.yaml`](atlas-os.yaml) remains the sole product and release authority.
+
 ## Authority
 
-`atlas-os.yaml` is the sole product and release authority. Normative precedence is manifest, active core specifications, schemas and registries, integration contracts, active migration records, documentation, then immutable legacy references. Surface adapters cannot redefine core semantics.
+Machine precedence is declared in `governance.yaml`: product manifest, governance policy, AI discovery, core specifications, schemas, registries, integration contracts, active migration records, human guidance, then immutable legacy material. Surface adapters and human documentation cannot redefine core semantics.
 
 ## Change classification
 
-Changes are classified as `PATCH`, `MINOR`, `MAJOR`, `MIGRATION`, `GOVERNANCE`, `DOCUMENTATION`, `REGISTRY`, or `INTEGRATION`. Changes to runtime semantics, schemas, persistence, compatibility, or release gates require stronger review than documentation-only edits.
+Changes use the governed classes `PATCH`, `MINOR`, `MAJOR`, `MIGRATION`, `GOVERNANCE`, `DOCUMENTATION`, `REGISTRY`, or `INTEGRATION`. Runtime semantics, schemas, persistence, compatibility, release gates, authority, and security require stronger review than documentation-only edits.
 
 ## Release lifecycle
 
 `DRAFT -> CANDIDATE -> VERIFIED -> RELEASED -> SUPERSEDED -> ARCHIVED`
 
-Generation, execution, verification, acceptance, and release are distinct states. Open release-blocking controls prohibit `RELEASED`, and missing evidence cannot be converted into a pass. A candidate may be packaged when its status and blockers are reported truthfully.
+Generation, execution, verification, acceptance, and release are distinct states. Open release-blocking controls prohibit `RELEASED`; missing evidence never becomes a pass. A candidate may be packaged only while blockers and lifecycle state are represented truthfully.
 
 ## Evidence and approval
 
-Material claims identify provenance and evidence class. Destructive or irreversible actions, publication, financial commitments, external communication, permission changes, security-sensitive changes, and major canonical-state writes require scoped approval when appropriate. Existing approval applies only to its recorded scope.
+Material claims require provenance under `spec/evidence.yaml`. Model output alone is not verified evidence. Approval policy is governed by `spec/approvals.yaml`; destructive or irreversible actions, publication, financial commitments, external communications, permission changes, security-sensitive changes, and major canonical-state writes are scoped approval-gated operations.
 
 ## Domain standards and best practices
 
-Every substantive task assesses applicable law, regulation, international standards, recognized professional frameworks, and authoritative domain guidance. Selection uses current official sources and records scope, version, applicability, mapping, and deviations. The framework registry is a maintained baseline, not permission to treat an old edition as current or to ignore an unlisted standard.
-
-Alignment, conformity, certification, and accreditation are distinct claims. ATLAS may report alignment from a documented mapping, but compliance or certification requires scope-specific verification evidence from a competent process.
+`spec/domain-practices.yaml` and `registries/frameworks.yaml` govern framework selection. Current official sources are required where currency matters, binding requirements take precedence, and alignment must not be misrepresented as certification or verified compliance.
 
 ## Dependency protection and retention
 
-Keep the latest three relevant canonical revisions readily available. Older revisions may be archived only after dependents resolve to a valid replacement, migration is complete, and audit requirements permit it. History is never silently overwritten.
+At least three relevant canonical revisions remain readily available. Archival requires dependent replacement, completed migration, and audit permission. Canonical history is never silently overwritten.
 
 ## Migration and deprecation
 
-Migration records have explicit acceptance criteria, evidence, dependencies, owners, and state. Blockers close only with evidence. Deprecated material remains addressable through replacement lineage until dependents migrate.
+Migration state is governed by `schemas/migration.schema.json` and `registries/migrations.yaml`. Blockers close only with evidence, a closed migration requires every acceptance criterion to pass, and deprecated material retains replacement lineage until dependents migrate.
 
 ## Legacy
 
-Files under `legacy/` are immutable historical references. Active references must never resolve ambiguously to legacy paths.
-
+`legacy/` is immutable historical material. Active authority must not resolve to legacy content.
