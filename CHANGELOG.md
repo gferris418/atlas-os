@@ -4,6 +4,8 @@ All notable changes follow semantic versioning and preserve release lineage. The
 
 ## Unreleased
 
+## v2.0.2-rc.1
+
 - Add the MIT license grant and declare it separately from the product's internal information classification.
 - Define ATLAS-OS explicitly as a platform-neutral AI-agent governance layer rather than a device operating system.
 - Add project-local Agent Skills installation for Hermes Agent and compatible AI tools, plus portable setup guidance for ChatGPT and generic hosts.
@@ -13,6 +15,9 @@ All notable changes follow semantic versioning and preserve release lineage. The
 - Make repository validation fail when executable handoff, lease, or signing
   registry contract versions drift from their JSON Schema constants.
 - Add deterministic routing and CLI error-boundary regression coverage.
+- Bind ChatGPT and Hermes Agent to one provider-neutral bootstrap revision and add an independent Hermes verification checklist.
+- Expand latest-control propagation acceptance to Hermes Agent while defining how open-ended generic AI hosts enter conformance scope.
+- Make independent bootstrap and propagation proof release-blocking for stable `v2.0.2` promotion.
 
 ## v2.0.1
 

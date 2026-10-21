@@ -3,14 +3,14 @@ id: MIG-037
 title: Independent latest-control propagation proof
 description: Independently prove that the latest canonical control revisions propagate to all supported surfaces.
 status: BLOCKED
-release_blocking: false
+release_blocking: true
 opened_at: "2026-10-17T19:51:00+06:00"
 closed_at: null
 dependencies:
   - MIG-029
 acceptance_criteria:
   - Publish a uniquely identifiable control revision without redefining core semantics.
-  - Demonstrate the same revision is resolved by ChatGPT, Codex, and Work adapters.
+  - Demonstrate the same revision is resolved by ChatGPT, Codex, Work, and Hermes Agent adapters.
   - Capture independent evidence and reconcile any stale surface state.
 evidence:
   - type: local-control-publication-candidate
@@ -32,5 +32,12 @@ evidence:
     source: integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md
     result: READY_FOR_EXTERNAL_PROOF
     limitations: The same stable revision still requires independent resolution evidence from ChatGPT, Codex, and Work. MIG-029 must close first.
+  - type: expanded-control-publication-candidate
+    timestamp: "2026-10-21T20:15:00+06:00"
+    version: 2.0.2-rc.1
+    control_revision: atlas-bootstrap-2026-10-21-r5
+    source: integrations/hermes-agent/RELEASE-VERIFICATION.md
+    result: READY_FOR_EXTERNAL_PROOF
+    limitations: ChatGPT, Codex, Work, and Hermes Agent still require independent resolution evidence. MIG-029 must close first; checklist publication is not live proof.
 owner: atlas-maintainers
-notes: The repository owner explicitly directed GA release without waiting for external-only propagation proof. MIG-037 remains blocked on MIG-029. The active propagation target is stable ATLAS 2.0.1 / chatgpt-bootstrap-2026-10-19-r4; no older rc7/r1 proof may be used to close this control.
+notes: Earlier operator acceptance allowed v2.0.1 GA without external-only propagation proof. For stable v2.0.2 promotion, MIG-037 is release-blocking and remains blocked on MIG-029. The active target is ATLAS 2.0.2-rc.1 / atlas-bootstrap-2026-10-21-r5. The provider-neutral generic AI-host contract remains local schema/runtime conformance scope; an unregistered provider becomes an external proof target only when promoted to a documented supported adapter.

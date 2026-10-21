@@ -20,7 +20,7 @@ class ChatGPTBootstrapIntegrationTests(unittest.TestCase):
             ROOT / "integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md"
         ).read_text(encoding="utf-8")
         self.assertIn(f"Version: `{version}`", instructions)
-        self.assertRegex(instructions, r"Control revision: `chatgpt-bootstrap-[0-9-]+-r[0-9]+`")
+        self.assertRegex(instructions, r"Control revision: `atlas-bootstrap-[0-9-]+-r[0-9]+`")
         for required in (
             "ATLAS/chatgpt", "Goal", "Task", "Input", "Processing", "Playbook",
             "Framework", "SOP", "Plan", "Clarification", "Output", "Profile",

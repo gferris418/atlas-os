@@ -1,9 +1,12 @@
 # ATLAS OS
 
-**Current release:** `v2.0.1`
-**Classification:** Internal  
+**Current candidate:** `v2.0.2-rc.1`
+
+**Information classification:** Internal
+
 **License:** [MIT](LICENSE)
-**Release status:** **RELEASED / STABLE**.
+
+**Release status:** **CANDIDATE / EXTERNAL VERIFICATION PENDING**.
 
 ATLAS-OS is a model-agnostic execution-governance specification for AI agents. It turns user intent into a controlled execution spine that preserves context, plans dependencies, routes capabilities, tracks evidence and uncertainty, enforces approval boundaries, verifies results, separates task state from canonical knowledge, and produces reproducible outputs.
 
@@ -154,12 +157,12 @@ python tools/package/build_release.py . dist
 
 The package uses the release identifier from `atlas-os.yaml`, records the source commit, emits a manifest, and produces SHA-256 checksums.
 
-## Post-GA verification items
+## Candidate verification items
 
 - `MIG-029`: independent New Chat and ChatGPT Work bootstrap proof remains to be captured.
-- `MIG-037`: independent cross-surface latest-control propagation proof remains to be captured after MIG-029.
+- `MIG-037`: independent latest-control propagation across ChatGPT, Codex, Work, and Hermes Agent remains to be captured after MIG-029.
 - `DTIF-RECONCILIATION`: **closed 2026-10-20** after authoritative DB-001/DB-002/DB-003 source hashes were verified, the accepted Wave-1 historical state was re-read and fingerprinted, all deferred legacy classes received explicit reverify-before-reuse dispositions, and ARGUS protected CI passed on exact evidence commit `caf8d76045d2d9f1cdb26cbe5b18e88d5862159a`.
 
-`MIG-029` and `MIG-037` remain external-surface proof items and must not be described as completed until their independent host evidence is captured. They remain non-blocking for `v2.0.1`. DTIF is now archive-only: retained source evidence is not current ARGUS truth and destructive deletion is not authorized by the reconciliation closure.
+`MIG-029` and `MIG-037` remain external-surface proof items and must not be described as completed until their independent host evidence is captured. They block stable `v2.0.2` promotion but do not prevent candidate packaging. DTIF is now archive-only: retained source evidence is not current ARGUS truth and destructive deletion is not authorized by the reconciliation closure.
 
 See [`GOVERNANCE.md`](GOVERNANCE.md), [`docs/architecture.md`](docs/architecture.md), and [`docs/release-process.md`](docs/release-process.md) for the normative change and release model.

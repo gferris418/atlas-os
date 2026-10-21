@@ -1,8 +1,10 @@
 ---
 name: atlas-os
 description: Apply the ATLAS-OS execution-governance contract to AI-agent work using the current host's native capabilities.
-version: 2.0.1
+version: 2.0.2-rc.1
 metadata:
+  atlas:
+    control_revision: atlas-bootstrap-2026-10-21-r5
   hermes:
     tags: [governance, planning, evidence, verification]
     category: agent-governance
@@ -20,6 +22,7 @@ Use this skill when the user asks to run, install, apply, or govern work with AT
 6. Identify the active host with a stable lowercase slug. Use `hermes-agent` in Hermes and the host's own slug elsewhere.
 7. Run the optional Python reference runtime only when it is available and useful; the specifications remain authoritative when it is unavailable.
 8. Before claiming completion, verify the requested outcome using fresh evidence and report any blocked or unavailable capability explicitly.
+9. When asked for the governing ATLAS identity, report version `2.0.2-rc.1` and control revision `atlas-bootstrap-2026-10-21-r5`.
 
 For installation and host mapping, read `docs/ai-host-installation.md` and the matching file under `integrations/`. For an unlisted host, use `integrations/generic-ai-host/README.md`.
 

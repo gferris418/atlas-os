@@ -11,3 +11,5 @@ Hermes Agent consumes ATLAS-OS as an AI-host skill, not as a device operating sy
 - **Unsupported claims:** do not claim that tools, memory, Python, filesystem access, or external systems exist until the active Hermes session exposes them.
 
 Repository-local tests prove only the shared adapter seam. A live Hermes session is required for independent host-conformance evidence.
+
+Use [`RELEASE-VERIFICATION.md`](RELEASE-VERIFICATION.md) to capture that evidence against the current candidate identity.
