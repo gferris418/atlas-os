@@ -1,0 +1,20 @@
+schema: schemas/ai-host-adapter.schema.json
+adapter_id: adapter.chatgpt
+surface_id: surface.chatgpt
+status: active
+version: "1"
+control_revision: atlas-bootstrap-2026-10-21-r6
+authority:
+  product_manifest: atlas-os.yaml
+  ai_manifest: ai/manifest.yaml
+  core_spec: spec/core.yaml
+  execution_spine: spec/execution-spine.yaml
+  output_spec: spec/output.yaml
+capabilities: [conversation, public_research, private_research]
+permission: read
+risk_class: medium
+human_docs:
+  - integrations/chatgpt/README.md
+  - integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md
+  - integrations/chatgpt/RELEASE-VERIFICATION.md
+release_verification: integrations/chatgpt/release-verification.yaml
