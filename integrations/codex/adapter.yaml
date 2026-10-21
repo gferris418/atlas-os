@@ -1,0 +1,18 @@
+schema: schemas/ai-host-adapter.schema.json
+adapter_id: adapter.codex
+surface_id: surface.codex
+status: active
+version: "1"
+control_revision: atlas-bootstrap-2026-10-21-r6
+authority:
+  product_manifest: atlas-os.yaml
+  ai_manifest: ai/manifest.yaml
+  core_spec: spec/core.yaml
+  execution_spine: spec/execution-spine.yaml
+  output_spec: spec/output.yaml
+capabilities: [conversation, execute, test, validate, external_write]
+permission: write
+risk_class: high
+human_docs:
+  - integrations/codex/README.md
+release_verification: integrations/codex/release-verification.yaml
