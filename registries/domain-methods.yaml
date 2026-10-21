@@ -2,43 +2,28 @@ schema: schemas/registry.schema.json
 registry:
   id: registry.domain-methods
   type: domain-method
-  version: 2
+  version: 3
   status: active
 items:
   - id: domain-method.argus-intelligence
-    name: ARGUS Intelligence
-    description: Governed specialist for strategic, market, opportunity, competitive, stakeholder, political-economic, monitoring, forecasting, scenario, and decision intelligence.
+    name: ARGUS Intelligence Collection
+    description: Governed ATLAS subsystem for structured target, procurement, supplier, competitor, stakeholder, installed-base, market and monitoring collection. Returns evidence packages; ATLAS retains analysis and decisions.
     status: available
     authority: specialist-contract
     permission: read
     risk_class: medium
     priority: 90
-    version: 2.1.0-rc.1
-    source: https://github.com/gferris418/argus-intelligence/blob/58459c2025f404598b13afe4567426b015c3e3eb/contracts/atlas/argus-activation-v1.json
-    source_commit: 58459c2025f404598b13afe4567426b015c3e3eb
-    contract_version: 2.0.0
-    contract_sha256: sha256:1b233e8ae90cc214d0c2146ebeecb7de2a29a83636115c711a42e91a005b49a9
+    version: 2.2.0-rc.1
+    source: https://github.com/gferris418/argus-intelligence/blob/ba97ace36832cd464351a2078ef3c4d7ff89c8bf/contracts/atlas/argus-activation-v1.json
+    source_commit: ba97ace36832cd464351a2078ef3c4d7ff89c8bf
+    contract_version: 3.0.0
+    contract_sha256: sha256:5b082a12c6f0b469cba274a0e43e29032e349e3d377cf6d12ffa58762e8cb307
     triggers:
-      - ATLAS request triage selects INTELLIGENCE with an explicit intelligence objective
-    task_classes: [RESEARCH, ANALYSIS, DECISION, MONITORING]
+      - ATLAS collection_mode is ARGUS_COLLECTION or HYBRID
+    task_classes: [ANSWER, RESEARCH, ANALYSIS, DECISION, MONITORING, PLANNING, WORKFLOW]
     request_route: INTELLIGENCE
-    intelligence_types:
-      - STRATEGIC_INTELLIGENCE
-      - MARKET_INTELLIGENCE
-      - OPPORTUNITY_INTELLIGENCE
-      - COMPETITIVE_INTELLIGENCE
-      - STAKEHOLDER_INTELLIGENCE
-      - POLITICAL_ECONOMIC_INTELLIGENCE
-      - MONITORING_INTELLIGENCE
-      - FORECASTING_INTELLIGENCE
-      - SCENARIO_INTELLIGENCE
-      - DECISION_INTELLIGENCE
-    capabilities:
-      - intelligence_analysis
-      - government_public_sector_opportunity_intelligence
-    requires:
-      - capability.domain-alignment
-      - capability.evidence-tracking
+    capabilities: [intelligence_collection, government_public_sector_opportunity_intelligence]
+    requires: [capability.domain-alignment, capability.evidence-tracking]
     conflicts_with: []
     fallback: capability.manual-handoff
     activation_authority: ATLAS_OS

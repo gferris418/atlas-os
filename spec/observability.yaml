@@ -1,33 +1,31 @@
 schema: schemas/spec.schema.json
 id: spec.observability
-title: Observability, measurement, and dashboard projection
+title: Observability, measurement and dashboard projection
 status: active
 normative: true
 contract:
-  purpose: Provide read-oriented measurement and state projections showing what is happening, what has happened, how execution is performing, and what needs attention.
+  purpose: Provide read-oriented state and measurement showing what is happening, what happened, execution/collection performance and what needs attention.
   owns:
     - telemetry_projection
     - progress_measurement
+    - collection_mode_and_argus_state_projection
+    - collection_coverage_gap_and_conflict_projection
+    - evidence_health_projection
     - performance_and_latency_measurement
     - quality_and_verification_projection
     - reliability_and_degradation_projection
     - persistence_status_projection
-  dashboard_role: spec/dashboard.yaml defines the human presentation contract over observability state; Dashboard is not a source of execution authority.
-  source_of_truth_rule: Metrics and dashboard state must be derived from Control Plane, data-plane, verification, persistence, and specialist events or receipts. A displayed value cannot silently become authoritative state.
-  mutation_rule: A user action initiated from a dashboard is converted into a Mission Control command and evaluated by the Control Plane before any state change.
-  event_rule: Emit or refresh projections only at material state changes such as work-unit start or completion, blocker, approval, routing, verification, persistence, degradation, or delivery; do not poll or emit token-by-token progress.
-  measurement_rule: Measured values must use actual available telemetry; unavailable duration, cost, token, confidence, or performance values remain unavailable rather than fabricated.
-  performance_rule: Observability must remain lightweight, event-driven, and non-blocking relative to substantive execution.
-  privacy_rule: Never expose private chain-of-thought, hidden reasoning tokens, secrets, or unnecessary sensitive payloads as telemetry.
-invariants:
-  - INV-003
-  - INV-004
-  - INV-017
-  - INV-020
-  - INV-021
+  dashboard_role: spec/dashboard.yaml defines the human projection. Dashboard is not a source of execution authority.
+  source_of_truth_rule: Projections derive from Control Plane, data-plane, ARGUS collection receipts/packages, verification and persistence events. Displayed values cannot silently become authoritative state.
+  mutation_rule: A user action from Dashboard becomes a Mission Control command and is evaluated by the Control Plane before state change.
+  event_rule: Refresh only at material changes such as work-unit start/completion, collection activation/return, blocker, approval, routing, verification, persistence, degradation or delivery.
+  measurement_rule: Use actual available telemetry. Unavailable cost, confidence, duration or performance remains unavailable rather than fabricated.
+  privacy_rule: Never expose private chain-of-thought, hidden reasoning tokens, secrets or unnecessary sensitive payloads.
+invariants: [INV-003, INV-004, INV-017, INV-020, INV-021]
 references:
   - spec/dashboard.yaml
   - spec/mission-control.yaml
   - spec/control-plane.yaml
+  - spec/collection-routing.yaml
   - spec/verification.yaml
   - spec/persistence.yaml

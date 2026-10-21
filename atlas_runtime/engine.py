@@ -10,6 +10,7 @@ from typing import Any, Iterable, Mapping
 
 import yaml
 
+from .collection import build_collection_mission
 from .handoff import ExecutionContext, prepare_domain_context_handoff
 from .routing import build_routing_preview, route_capability, route_domain_method
 from .runtime import (
@@ -47,6 +48,12 @@ DOMAIN_CONTEXT_TERMS = (
     "medical",
     "cybersecurity",
 )
+
+_ARGUS_COLLECTION_MODES = {"ARGUS_COLLECTION", "HYBRID"}
+_LEGACY_INTELLIGENCE_REQUIREMENTS = {
+    "intelligence_analysis",
+    "government_public_sector_opportunity_intelligence",
+}
 
 
 @dataclass(frozen=True)
@@ -158,7 +165,7 @@ def _partial_intelligence_classification() -> dict[str, Any]:
         "unresolved_facets": ["intelligence-domain-context"],
         "conditional_candidates": [],
         "evidence": [],
-        "next_action": "ARGUS enriches domain context after governed activation.",
+        "next_action": "ARGUS enriches non-sensitive collection context after governed activation.",
     }
 
 
@@ -169,18 +176,18 @@ def _partial_intelligence_alignment() -> dict[str, Any]:
         "frameworks": [],
         "compliance": "NOT_ASSESSED",
         "deviations": [],
-        "next_action": "ARGUS resolves applicable intelligence-domain requirements and evidence hierarchy.",
+        "next_action": "ARGUS may enrich collection evidence; ATLAS retains canonical framework authority.",
     }
 
 
 def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     """Compile current ATLAS state through one stable public interface.
 
-    Request triage is the first semantic gate. General searches and tasks stay
-    on the direct ATLAS path and avoid deep domain controls unless material.
-    Intelligence-grade work is routed to ARGUS with a governed PARTIAL handoff;
-    ARGUS performs the deeper intelligence-domain enrichment while ATLAS keeps
-    authority, permissions, approvals, state, verification, and delivery.
+    Request triage is the first semantic gate. Ordinary searches and tasks stay
+    on the direct ATLAS path. Structured collection activates ARGUS only through
+    an ATLAS-owned Collection-Need Gate, bounded collection mission, governed
+    domain handoff, and approved provider preview. Sensitive collection retains
+    ATLAS classification and clarification controls before delegation.
     """
 
     started = perf_counter_ns()
@@ -194,18 +201,16 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     def registry_items(name: str) -> list[dict[str, Any]]:
         return list(registry_payload(name)["items"])
 
-    request_triage = triage_request(envelope.objective)
     normalized = normalize_intent(envelope.objective)["normalized"]
     task_classes = tuple(classify_task(normalized))
     request_triage = triage_request(normalized, task_classes=task_classes)
+    collection_route = request_triage["collection_mode"] in _ARGUS_COLLECTION_MODES
     intelligence_route = request_triage["route"] == "INTELLIGENCE"
-    direct_domain_context = (
-        not intelligence_route and _needs_direct_domain_context(normalized)
-    )
+    material_domain_context = _needs_direct_domain_context(normalized)
 
     taxonomies = registry_items("taxonomies")
     taxonomy_route = _deferred_taxonomy_route()
-    if direct_domain_context:
+    if material_domain_context:
         taxonomy_route = route_taxonomy_layer(
             envelope.objective,
             registry_items("taxonomy-routes"),
@@ -217,10 +222,21 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         task_classes=task_classes,
         taxonomy_route=taxonomy_route,
     )
+    candidate_requirements = list(intent_profile["candidate_requirements"])
+    if collection_route:
+        candidate_requirements = [
+            requirement for requirement in candidate_requirements
+            if requirement not in _LEGACY_INTELLIGENCE_REQUIREMENTS
+        ]
     intent_profile = {
         **intent_profile,
+        "candidate_requirements": candidate_requirements,
         "request_route": request_triage["route"],
         "intelligence_types": list(request_triage["intelligence_types"]),
+        "collection_mode": request_triage["collection_mode"],
+        "collection_required": request_triage["collection_required"],
+        "collection_types": list(request_triage["collection_types"]),
+        "collection_depth": request_triage["collection_depth"],
     }
     behavioral_learning_state = {
         "mode": "DISABLED",
@@ -229,7 +245,7 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         "proposed_updates": [],
     }
 
-    if direct_domain_context:
+    if material_domain_context:
         substantive = taxonomy_route["status"] == "ROUTED"
         material_dimensions = taxonomy_route["material_dimensions"] or ["what"]
         completeness = assess_completeness({
@@ -252,6 +268,22 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
             registry_items("frameworks"),
             substantive=substantive,
         )
+        # A bounded collection mission may carry unresolved sensitive facets as a
+        # PARTIAL handoff when no clarification was requested. Explicit PENDING
+        # clarification still blocks. Risks and unresolved facets remain visible.
+        if collection_route and envelope.clarification_status in {"RESOLVED", "NOT_REQUIRED"}:
+            if domain_classification.get("status") == "RESEARCH_REQUIRED":
+                domain_classification = {
+                    **domain_classification,
+                    "status": "PARTIAL",
+                    "next_action": "Carry unresolved sensitive facets and risk flags into the bounded collection mission.",
+                }
+            if domain_alignment.get("status") == "RESEARCH_REQUIRED":
+                domain_alignment = {
+                    **domain_alignment,
+                    "status": "PARTIAL",
+                    "next_action": "Carry unresolved framework questions forward without transferring ATLAS authority.",
+                }
     elif intelligence_route:
         substantive = False
         completeness = assess_completeness({
@@ -277,6 +309,16 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
             "general",
             registry_items("frameworks"),
             substantive=False,
+        )
+
+    collection_mission: dict[str, Any] | None = None
+    if collection_route and envelope.task_id is not None:
+        collection_mission = build_collection_mission(
+            envelope.objective,
+            task_id=envelope.task_id,
+            plan_id=envelope.plan_id,
+            request_triage=request_triage,
+            risk_flags=domain_classification.get("risk_flags", []),
         )
 
     plan = tuple(build_plan(work_units))
@@ -311,19 +353,22 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
             *intent_profile["candidate_requirements"],
         ),
         intent_profile=intent_profile,
+        collection_mission=collection_mission,
     )
     blocking_stage: str | None = None
     blocker: str | None = None
     routing_decisions: list[dict[str, Any]] = []
     candidate_active_unit: str | None = None
 
-    if direct_domain_context and substantive and envelope.clarification_status != "RESOLVED":
+    if (
+        material_domain_context
+        and substantive
+        and envelope.clarification_status != "RESOLVED"
+        and not (collection_route and envelope.clarification_status == "NOT_REQUIRED")
+    ):
         if not completeness["complete"]:
             blocking_stage = "MATERIAL_CONTEXT_MATRIX"
-            blocker = (
-                "Clarify material context: "
-                + ", ".join(completeness["questions"])
-            )
+            blocker = "Clarify material context: " + ", ".join(completeness["questions"])
         elif domain_classification["status"] != "CLASSIFIED":
             blocking_stage = "DOMAIN_CLASSIFICATION"
             blocker = domain_classification["next_action"]
@@ -354,25 +399,16 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
             candidate_active_unit = routing_preview["work_unit"]
             if routing_preview["unmatched_requirements"]:
                 blocking_stage = "ROUTING"
-                blocker = (
-                    "No admitted provider satisfies: "
-                    + ", ".join(routing_preview["unmatched_requirements"])
-                )
+                blocker = "No admitted provider satisfies: " + ", ".join(routing_preview["unmatched_requirements"])
             elif routing_preview["cyclic_provider_ids"]:
                 blocking_stage = "ROUTING"
-                blocker = (
-                    "Provider prerequisite cycle: "
-                    + ", ".join(routing_preview["cyclic_provider_ids"])
-                )
+                blocker = "Provider prerequisite cycle: " + ", ".join(routing_preview["cyclic_provider_ids"])
             elif routing_preview["conflicting_provider_pairs"]:
                 blocking_stage = "ROUTING"
                 blocker = "Conflicting providers cannot be routed together."
             elif routing_preview["missing_prerequisite_providers"]:
                 blocking_stage = "ROUTING"
-                blocker = (
-                    "Provider prerequisites are unavailable: "
-                    + ", ".join(routing_preview["missing_prerequisite_providers"])
-                )
+                blocker = "Provider prerequisites are unavailable: " + ", ".join(routing_preview["missing_prerequisite_providers"])
             elif candidate_active_unit is not None:
                 available_capabilities = frozenset(
                     set(capability_audit["admitted"])
@@ -388,18 +424,14 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
                         continue
                     for item in provider_records:
                         if item["id"] in records:
-                            raise ValueError(
-                                f"provider id is registered more than once: {item['id']}"
-                            )
+                            raise ValueError(f"provider id is registered more than once: {item['id']}")
                         records[item["id"]] = item
                 domain_registry = registry_payload("domain-methods")
                 domain_registry["items"] = [
                     *domain_registry["items"],
                     *deepcopy(list(envelope.provider_inventory.get("domain-method", ()))),
                 ]
-                domain_records = {
-                    item["id"]: item for item in domain_registry["items"]
-                }
+                domain_records = {item["id"]: item for item in domain_registry["items"]}
                 for provider in routing_preview["providers"]:
                     provider_record = (
                         domain_records[provider["id"]]
@@ -446,24 +478,19 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
                             )
                         decision = route_domain_method(
                             provider["requirement"],
-                            {
-                                **domain_registry,
-                                "items": [method_record],
-                            },
+                            {**domain_registry, "items": [method_record]},
                             execution_context=context,
                             handoff=handoff,
+                            collection_mission=routing_preview.get("collection_mission"),
                         )
                         routing_decisions.append({
-                            "status": (
-                                "ROUTED"
-                                if decision["status"] == "ACTIVATE"
-                                else decision["status"]
-                            ),
+                            "status": "ROUTED" if decision["status"] == "ACTIVATE" else decision["status"],
                             "provider_id": decision["method_id"],
                             "provider_type": provider["type"],
                             "requirement": provider["requirement"],
                             "reason": decision.get("reason"),
                             "handoff_id": handoff["handoff_id"] if handoff else None,
+                            "collection_mission_id": decision.get("collection_mission_id"),
                             "preview_digest": routing_preview["digest"],
                         })
                     else:
@@ -480,25 +507,15 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
                             "reason": None,
                             "preview_digest": routing_preview["digest"],
                         })
-                rejected = next(
-                    (decision for decision in routing_decisions if decision["status"] != "ROUTED"),
-                    None,
-                )
+                rejected = next((decision for decision in routing_decisions if decision["status"] != "ROUTED"), None)
                 if rejected:
                     blocking_stage = "ROUTING"
-                    blocker = (
-                        f"{rejected['provider_id']} routing blocked: "
-                        f"{rejected['reason']}"
-                    )
+                    blocker = f"{rejected['provider_id']} routing blocked: {rejected['reason']}"
 
     plan_status = "BLOCKED" if blocking_stage else "READY"
     clarification_status = (
         "PENDING"
-        if blocking_stage in {
-            "MATERIAL_CONTEXT_MATRIX",
-            "DOMAIN_CLASSIFICATION",
-            "DOMAIN_FRAMEWORK_ALIGNMENT",
-        }
+        if blocking_stage in {"MATERIAL_CONTEXT_MATRIX", "DOMAIN_CLASSIFICATION", "DOMAIN_FRAMEWORK_ALIGNMENT"}
         else envelope.clarification_status
     )
     active_unit = None
@@ -514,11 +531,8 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     completed = sum(item.get("status") == "COMPLETED" for item in work_units)
     state = "BLOCKED" if blocking_stage else ("COMPLETED" if active_unit is None else "READY")
 
-    preflight_trace: tuple[str, ...] = (
-        "REQUEST_TRIAGE",
-        "INTENT_NORMALIZATION",
-    )
-    if direct_domain_context:
+    preflight_trace: tuple[str, ...] = ("REQUEST_TRIAGE", "INTENT_NORMALIZATION")
+    if material_domain_context:
         preflight_trace += (
             "TAXONOMY_ROUTING",
             "MATERIAL_CONTEXT_MATRIX",
@@ -527,10 +541,9 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         )
     elif intelligence_route:
         preflight_trace += ("SPECIALIST_HANDOFF_PREPARATION",)
-    preflight_trace += (
-        "PLANNING",
-        "CAPABILITY_AUDIT",
-    )
+    if collection_route:
+        preflight_trace += ("COLLECTION_MISSION",)
+    preflight_trace += ("PLANNING", "CAPABILITY_AUDIT")
     if routing_preview["status"] == "PROPOSED":
         preflight_trace += ("ROUTING_PREVIEW",)
     if routing_decisions or blocking_stage == "ROUTING":
@@ -538,17 +551,13 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     if blocking_stage:
         execution_trace = preflight_trace
     else:
-        execution_trace = preflight_trace + (
-            "EXECUTION" if active_unit is not None else "DELIVERY",
-        )
+        execution_trace = preflight_trace + ("EXECUTION" if active_unit is not None else "DELIVERY",)
 
     processing_summary = (
-        f"Route {request_triage['route']}; "
-        f"domain context {'ON_DEMAND' if not direct_domain_context else taxonomy_route['status']}; "
-        f"intent {intent_profile['category']}; "
-        f"capability audit {capability_audit['status']}; "
-        f"routing {envelope.routing_approval_status if routing_decisions else routing_preview['status']}; "
-        "plan validated"
+        f"Route {request_triage['route']}; collection {request_triage['collection_mode']}; "
+        f"domain context {'ON_DEMAND' if not material_domain_context else taxonomy_route['status']}; "
+        f"intent {intent_profile['category']}; capability audit {capability_audit['status']}; "
+        f"routing {envelope.routing_approval_status if routing_decisions else routing_preview['status']}; plan validated"
     )
     dashboard = create_dashboard(
         envelope.objective,
@@ -561,18 +570,14 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         active_unit=(
             "Review routing proposal"
             if blocking_stage in {"ROUTING_PREVIEW", "ROUTING"}
-            else "Resolve material clarification"
-            if blocking_stage
-            else active_unit or "Plan complete"
+            else "Resolve material clarification" if blocking_stage else active_unit or "Plan complete"
         ),
         completed_units=completed,
         total_units=len(work_units),
         progress=round(100 * completed / len(work_units)),
         clarification_status=clarification_status,
         processing_summary=processing_summary,
-        quality_gate=(
-            "BLOCKED" if state == "BLOCKED" else "PASS" if state == "COMPLETED" else "PENDING"
-        ),
+        quality_gate="BLOCKED" if state == "BLOCKED" else "PASS" if state == "COMPLETED" else "PENDING",
         blocker=blocker,
     )
     dashboard["request_triage"] = deepcopy(request_triage)

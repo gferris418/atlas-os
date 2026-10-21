@@ -1,0 +1,54 @@
+schema: schemas/spec.schema.json
+id: spec.collection-routing
+title: ATLAS collection-need gate and ARGUS mission routing
+status: active
+normative: true
+contract:
+  purpose: Determine whether evidence acquisition is unnecessary, ordinary ATLAS research, structured ARGUS collection, or hybrid collection plus ATLAS analysis.
+  owner: ATLAS_CONTROL_PLANE
+  modes: [NONE, ATLAS_DIRECT, ARGUS_COLLECTION, HYBRID]
+  argus_role: Governed intelligence collection subsystem nested inside ATLAS.
+  argus_capability: intelligence_collection
+  argus_does:
+    - target_resolution
+    - collection_planning_within_authorized_scope
+    - source_discovery
+    - acquisition
+    - extraction
+    - normalization
+    - entity_resolution
+    - deduplication
+    - collection_side_taxonomy_suggestions
+    - corroboration
+    - source_reconciliation
+    - gap_and_conflict_detection
+    - coverage_assessment
+    - collection_packaging
+  atlas_retains:
+    - mission_control
+    - control_plane
+    - canonical_taxonomy_authority
+    - plan_and_work_units
+    - permissions_and_approvals
+    - substantive_analysis
+    - strategic_analysis
+    - forecasting_and_scenarios
+    - opportunity_qualification
+    - access_asia_pursuit_decisions
+    - assurance_and_verification
+    - persistence_authorization
+    - observability_and_dashboard
+    - final_delivery
+  collection_mission: schemas/collection-mission.schema.json
+  handoff_rule: ARGUS activation receives the governed ATLAS domain-context handoff plus a collection mission. READY or PARTIAL context may proceed under the pinned specialist contract; BLOCKED context cannot authorize dependent collection.
+  return_rule: ARGUS returns a collection package/evidence result to ATLAS. The package is not a final user-facing answer, forecast, bid/no-bid decision, or PX promotion decision.
+  dashboard_rule: Collection mode, collection status, ARGUS provider state, evidence health, gaps and blockers are observable projections only; Dashboard cannot activate ARGUS directly.
+  mission_control_rule: A dashboard request to expand, stop or redirect collection becomes a Mission Control command evaluated by the Control Plane.
+  stopping_rule: Stop collection when additional evidence is unlikely to change sufficiency, material uncertainty, identified gaps, risk or the next ATLAS action.
+invariants: [INV-007, INV-008, INV-017, INV-018, INV-021]
+references:
+  - spec/request-triage.yaml
+  - spec/control-plane.yaml
+  - spec/domain-handoff.yaml
+  - spec/observability.yaml
+  - registries/domain-methods.yaml

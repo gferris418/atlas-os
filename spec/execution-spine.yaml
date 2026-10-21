@@ -1,40 +1,43 @@
 schema: schemas/spec.schema.json
 id: spec.execution-spine
-title: Canonical execution spine
+title: Canonical ATLAS execution spine
 status: active
 normative: true
 contract:
-  input_boundary: Preserve the untouched prompt, critical literals, and named entities before layer 0. This is a loss-prevention boundary, not a competing execution layer.
+  input_boundary: Preserve the untouched prompt/event, critical literals, named entities, attachments and relevant upstream context before semantic processing.
   layers:
     - id: 0
-      name: REQUEST_TRIAGE
-      purpose: Make the minimum route decision between GENERAL_SEARCH, GENERAL_TASK, and INTELLIGENCE before deep taxonomy, domain, or provider work.
+      name: INTENT_AND_TARGET_INTERPRETATION
+      purpose: Resolve objective, task intent, target objects, requested outcome, constraints, jurisdiction, time/freshness, sensitivity and required output without losing original literals.
     - id: 1
-      name: INTENT_NORMALIZATION
-      purpose: Resolve the goal, requested outcome, constraints, exclusions, and implicit expectations without losing original literals; classify the domain-neutral task intent and recommend semantic capability needs without routing a provider.
+      name: COLLECTION_NEED_GATE
+      purpose: Select NONE, ATLAS_DIRECT, ARGUS_COLLECTION or HYBRID independently of task intent. ARGUS activation is based on structured collection need, not an analytical keyword.
     - id: 2
       name: CONDITIONAL_DOMAIN_CONTEXT
-      purpose: For direct ATLAS work, resolve only material completeness, taxonomy, classification, law, standards, or framework context; for INTELLIGENCE, preserve known context and unresolved material in a governed PARTIAL handoff for ARGUS enrichment.
+      purpose: Resolve material ATLAS-owned terminology, taxonomy, economic/industry/product/procurement/trade classification, law, standards, frameworks, benchmarks and evidence precedence. ARGUS may enrich unresolved collection context but cannot replace canonical ATLAS authority.
     - id: 3
       name: CAPABILITY_AND_EXECUTION_PLAN
-      purpose: Build the dependency-aware plan and approval gates, audit the smallest admitted set of host skills, plugins, tools, models, or specialist methods, and show their exact proposed use before routing.
+      purpose: Build the dependency-aware plan, approvals, semantic capability needs, provider admission and digest-bound routing preview.
     - id: 4
       name: DATA_PLANE_EXECUTION
-      purpose: Execute one authorized atomic work unit at a time using governed evidence and the selected capabilities; INTELLIGENCE work may execute through ARGUS under the same ATLAS control plane.
+      purpose: Execute authorized ATLAS work units. ARGUS may execute a bounded collection work unit and return an evidence package; ATLAS retains analysis and decision work.
     - id: 5
       name: ASSURANCE_AND_VERIFICATION
-      purpose: Distinguish generated, executed, and verified results; reconcile evidence, test requirements, specialist returns, and unresolved gaps or failures.
+      purpose: Distinguish generated, executed and verified results; reconcile evidence, freshness, conflicts, specialist returns, tests and unresolved gaps.
     - id: 6
-      name: PERSISTENCE_AND_DELIVERY
-      purpose: Persist only through an authorized durable-write receipt and deliver the verified output with limitations, evidence state, and remaining decisions.
+      name: OUTPUT_AND_PERSISTENCE
+      purpose: Produce the selected output profile and persist only through authorized durable-write receipts.
+  cross_cutting:
+    mission_control: Human command, approval, pause/resume/abort, priority, scope and exception requests.
+    control_plane: Authoritative governance, permissions, routing, state, leases, approvals and persistence authorization.
+    observability: Read-oriented events, measurements, evidence health, collection state and execution state.
+    dashboard: Read-only human projection; any state-changing dashboard action becomes a Mission Control command.
   stages:
     - REQUEST_TRIAGE
-    - NORMALIZATION
-    - CONDITIONAL_COMPLETENESS_CHECK
-    - CONDITIONAL_TAXONOMY_ROUTING
-    - CONDITIONAL_DOMAIN_CLASSIFICATION
-    - CONDITIONAL_DOMAIN_FRAMEWORK_ALIGNMENT
-    - SPECIALIST_HANDOFF_PREPARATION
+    - INTENT_AND_TARGET_INTERPRETATION
+    - COLLECTION_NEED_GATE
+    - CONDITIONAL_DOMAIN_CONTEXT
+    - COLLECTION_MISSION_PREPARATION
     - PLANNING
     - CAPABILITY_AUDIT
     - ROUTING_PREVIEW
@@ -42,36 +45,26 @@ contract:
     - APPROVAL_GATING
     - EVIDENCE_ACQUISITION
     - EXECUTION
-    - VERIFICATION
+    - ASSURANCE_AND_VERIFICATION
     - PERSISTENCE
     - DELIVERY
-  optimization: Implementations must prefer the minimum sufficient path. GENERAL_SEARCH and GENERAL_TASK skip deep domain processing unless it can materially change correctness, authorization, safety, or the requested outcome; INTELLIGENCE defers deep intelligence-domain enrichment to ARGUS after governed activation.
-  triage_gate: Layer 0 is semantic routing only. It does not perform web research, taxonomy research, framework alignment, or specialist analysis merely to choose the route.
-  taxonomy_gate: Taxonomy is conditional, not universal preflight. When material, ATLAS may route through Domain -> Sub-Domain -> Vertical -> Artifact Class and identify candidate schemes without assigning unverified external codes. INTELLIGENCE may defer this enrichment to ARGUS through a PARTIAL governed handoff.
-  standards_boundary: Classification systems identify context; law, contractual requirements, engineering standards, military standards, procurement rules, and other binding requirements govern the work. Never represent a requirements framework as a taxonomy code, and recheck current official status when currency matters.
-  intelligence_gate: The canonical specialist capability is intelligence_analysis. Government or public-sector mentions alone do not activate ARGUS; an intelligence objective or explicit admissible ARGUS request is required.
-  capability_gate: The plan defines semantic capability needs before any skill or plugin is selected. Installed or available providers remain unaudited until their provenance, permissions, security, dependencies, evidence, overlap, benchmarks when material, and fallback behavior satisfy spec/capability-admission.yaml.
-  routing_preview_gate: Before any provider is routed, show what ATLAS intends to do and how it will do it, including the exact work unit, semantic requirements, proposed providers, purpose, method, permission, data scope, prerequisites, fallbacks, unresolved gates, and execution sequence. Approval binds to the preview digest; rejection, omission, or a digest mismatch blocks routing, and any changed proposal requires a new preview.
-  visibility: One canonical plan and execution spine must govern user-visible state.
-  progress: Every prompt exposes a compact event-driven dashboard with plan, task, method, timing, safe processing summary, output, quality, and persistence state; plans activate and finish one atomic work unit at a time.
-  planning_gate: PLANNING creates a concrete plan identifier before EXECUTION. Material questions are resolved before dependent work, while safe independent work may continue.
-  domain_handoff: When ROUTING delegates INTELLIGENCE or other substantive specialist work, ATLAS emits and validates the governed domain-context handoff from spec/domain-handoff.yaml before dependent EXECUTION. READY or PARTIAL handoffs may be accepted according to the specialist contract; BLOCKED handoffs never authorize dependent execution.
-  output: Output-profile selection is integrated into planning and delivery without adding another user-visible stage.
+  compatibility: Runtime traces may retain REQUEST_TRIAGE and INTELLIGENCE request-route labels for host compatibility; collection_mode is authoritative for ARGUS activation.
+  optimization: Prefer the minimum sufficient path. Ordinary tasks and policy/rule analysis do not incur ARGUS cost unless structured collection is materially required.
+  collection_gate: The canonical ARGUS capability is intelligence_collection. ARGUS_COLLECTION and HYBRID are the only collection modes that may propose ARGUS routing.
+  taxonomy_gate: Classification is multi-axial and conditional. Domain, sector, industry, product/service, procurement category, customs code and capability are distinct concepts.
+  capability_gate: Availability is not admission. Providers must satisfy capability-admission, permission, provenance, dependency, conflict and fallback controls before routing.
+  routing_preview_gate: Provider invocation requires the digest-bound preview and applicable approval state; changed proposals require a new preview.
+  visibility: One ATLAS plan and execution spine governs all visible state. ARGUS does not create a competing spine.
   resume: Reconcile persisted state against actual external state before continuing.
-invariants:
-  - INV-003
-  - INV-007
-  - INV-008
-  - INV-009
-  - INV-021
+invariants: [INV-003, INV-007, INV-008, INV-009, INV-021]
 references:
   - spec/request-triage.yaml
+  - spec/collection-routing.yaml
+  - spec/mission-control.yaml
   - spec/control-plane.yaml
-  - spec/context.yaml
-  - spec/planning.yaml
-  - spec/classification.yaml
-  - spec/domain-intelligence.yaml
-  - spec/domain-practices.yaml
+  - spec/domain-context-services.yaml
   - spec/domain-handoff.yaml
   - spec/output.yaml
   - spec/verification.yaml
+  - spec/observability.yaml
+  - spec/dashboard.yaml

@@ -1,7 +1,7 @@
 schema: schemas/ai-manifest.schema.json
 id: atlas-os-ai-entrypoint
-product_version: 2.0.2-rc.4
-control_revision: atlas-bootstrap-2026-10-22-r8
+product_version: 2.0.2-rc.5
+control_revision: atlas-bootstrap-2026-10-22-r9
 authority:
   product_manifest: atlas-os.yaml
   core_spec: spec/core.yaml
@@ -11,8 +11,11 @@ authority:
   architecture:
     mission_control: spec/mission-control.yaml
     control_plane: spec/control-plane.yaml
-    observability: spec/observability.yaml
+    collection_routing: spec/collection-routing.yaml
+    domain_context_services: spec/domain-context-services.yaml
     domain_intelligence: spec/domain-intelligence.yaml
+    observability: spec/observability.yaml
+    dashboard: spec/dashboard.yaml
   schema_catalog: schemas
   registry_catalog: registries
   migration_catalog: migration
@@ -22,7 +25,10 @@ discovery_order:
   - governance.yaml
   - spec/core.yaml
   - spec/request-triage.yaml
+  - spec/collection-routing.yaml
+  - spec/mission-control.yaml
   - spec/control-plane.yaml
+  - spec/domain-context-services.yaml
   - spec/execution-spine.yaml
   - applicable spec/*.yaml
   - applicable registries/*.{yaml,json}
@@ -34,13 +40,14 @@ machine_contracts:
   - spec/approvals.yaml
   - spec/capability-admission.yaml
   - spec/classification.yaml
+  - spec/collection-routing.yaml
   - spec/completeness.yaml
   - spec/context.yaml
   - spec/control-plane.yaml
   - spec/core.yaml
   - spec/dashboard.yaml
+  - spec/domain-context-services.yaml
   - spec/domain-handoff.yaml
-  - spec/domain-intelligence.yaml
   - spec/domain-practices.yaml
   - spec/evidence.yaml
   - spec/execution-spine.yaml
@@ -83,6 +90,7 @@ machine_contracts:
   - schemas/ai-manifest.schema.json
   - schemas/approval.schema.json
   - schemas/atlas-os.schema.json
+  - schemas/collection-mission.schema.json
   - schemas/dashboard.schema.json
   - schemas/domain-context-handoff.schema.json
   - schemas/domain-handoff-receipt.schema.json
@@ -102,6 +110,9 @@ machine_contracts:
 human_guidance:
   - README.md
   - GOVERNANCE.md
+  - docs/architecture.md
+  - docs/architecture/atlas-argus-collection-boundary.md
+  - docs/runtime.md
   - docs/ai-host-installation.md
   - integrations/README.md
   - integrations/access-asia/README.md

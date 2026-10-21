@@ -4,6 +4,18 @@ All notable changes follow semantic versioning and preserve release lineage. The
 
 ## Unreleased
 
+## v2.0.2-rc.5
+
+- Preserve ATLAS as the fixed operating architecture with explicit Mission Control, Control Plane, Domain Context Services, Data Plane, Assurance/Verification, Observability, and Dashboard responsibilities.
+- Separate task intent from evidence acquisition through the authoritative Collection-Need Gate: `NONE`, `ATLAS_DIRECT`, `ARGUS_COLLECTION`, and `HYBRID`.
+- Change ARGUS activation from analysis-oriented `intelligence_analysis` semantics to the bounded `intelligence_collection` capability; ARGUS returns collection packages while ATLAS retains strategic analysis, forecasting, opportunity qualification, business decisions, assurance, persistence, and final delivery.
+- Add machine-readable collection mission and collection-package contracts and preserve public-sector I0-I9 / `PROMOTE_TO_PX` semantics only as the Access Asia/public-sector specialization.
+- Replace active Domain Intelligence authority with ATLAS Domain Context Services; retain `spec/domain-intelligence.yaml` only as a deprecated compatibility alias outside the active machine-contract catalog.
+- Expand multi-axial economic/domain classification with governed references for ISIC Rev. 5, NACE Rev. 2.1, NAICS 2022, CPC 3.0, CPA 2.2, UNSPSC, CPV 2008, HS 2022, NATO Codification, ISO terminology/metadata principles, and explicit crosswalk relations.
+- Pin ARGUS Intelligence Collection `2.2.0-rc.1` at commit `1d57ccfc6a492b11fabd76639d85cfb8a7898731` and activation-contract SHA-256 `5b082a12c6f0b469cba274a0e43e29032e349e3d377cf6d12ffa58762e8cb307`.
+- Publish provider-neutral control revision `atlas-bootstrap-2026-10-22-r9` and update ChatGPT, Codex, Work, and Hermes Agent verification contracts to exercise direct, ARGUS collection, and hybrid routes.
+- Reset `MIG-029` and `MIG-037` external-proof targets to rc.5/r9 while retaining rc.4/r8 evidence as historical only.
+
 ## v2.0.2-rc.4
 
 - Add `REQUEST_TRIAGE` as the first semantic execution gate with `GENERAL_SEARCH`, `GENERAL_TASK`, and `INTELLIGENCE` routes.

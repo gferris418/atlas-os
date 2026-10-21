@@ -7,12 +7,7 @@
   "required": ["system", "surface", "plan_id", "timestamp", "duration_ms", "input_summary", "processing_summary", "output_summary", "goal", "task", "playbook", "frameworks", "sop", "output_profile", "plan_status", "clarification_status", "objective", "progress", "progress_visual", "active_stage", "active_unit", "completed_units", "total_units", "blocker_or_approval", "library", "quality_gate", "performance_mode"],
   "properties": {
     "system": {"const": "ATLAS"},
-    "surface": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 64,
-      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"
-    },
+    "surface": {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"},
     "plan_id": {"type": "string", "minLength": 1},
     "timestamp": {"type": "string", "format": "date-time"},
     "duration_ms": {"type": "integer", "minimum": 0},
@@ -38,19 +33,20 @@
     "request_triage": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["route", "confidence", "rationale_code", "specialist", "capability_requirements", "intelligence_types", "domain_context_mode"],
+      "required": ["route", "confidence", "rationale_code", "specialist", "capability_requirements", "intelligence_types", "domain_context_mode", "collection_mode", "collection_required", "collection_types", "collection_depth", "collection_rationale_code"],
       "properties": {
         "route": {"enum": ["GENERAL_SEARCH", "GENERAL_TASK", "INTELLIGENCE"]},
         "confidence": {"type": "number", "minimum": 0, "maximum": 1},
         "rationale_code": {"type": "string", "minLength": 1},
         "specialist": {"type": ["string", "null"]},
         "capability_requirements": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-        "intelligence_types": {
-          "type": "array",
-          "items": {"enum": ["STRATEGIC_INTELLIGENCE", "MARKET_INTELLIGENCE", "OPPORTUNITY_INTELLIGENCE", "COMPETITIVE_INTELLIGENCE", "STAKEHOLDER_INTELLIGENCE", "POLITICAL_ECONOMIC_INTELLIGENCE", "MONITORING_INTELLIGENCE", "FORECASTING_INTELLIGENCE", "SCENARIO_INTELLIGENCE", "DECISION_INTELLIGENCE"]},
-          "uniqueItems": true
-        },
-        "domain_context_mode": {"enum": ["ON_DEMAND", "ARGUS_ENRICHES"]}
+        "intelligence_types": {"type": "array", "items": {"enum": ["STRATEGIC_INTELLIGENCE", "MARKET_INTELLIGENCE", "OPPORTUNITY_INTELLIGENCE", "COMPETITIVE_INTELLIGENCE", "STAKEHOLDER_INTELLIGENCE", "POLITICAL_ECONOMIC_INTELLIGENCE", "MONITORING_INTELLIGENCE", "FORECASTING_INTELLIGENCE", "SCENARIO_INTELLIGENCE", "DECISION_INTELLIGENCE"]}, "uniqueItems": true},
+        "domain_context_mode": {"enum": ["ON_DEMAND", "ARGUS_ENRICHES"]},
+        "collection_mode": {"enum": ["NONE", "ATLAS_DIRECT", "ARGUS_COLLECTION", "HYBRID"]},
+        "collection_required": {"type": "boolean"},
+        "collection_types": {"type": "array", "items": {"enum": ["TARGET_PROFILE", "ENTITY_DOSSIER", "PRODUCT_CAPABILITY", "BUYER_REQUIREMENT", "PROCUREMENT_DISCOVERY", "PROCUREMENT_PLAN", "PROJECT_PIPELINE", "FUNDING_BUDGET", "SUPPLIER_LANDSCAPE", "COMPETITOR_LANDSCAPE", "STAKEHOLDER_NETWORK", "INSTALLED_BASE", "MARKET_LANDSCAPE", "OPPORTUNITY_DISCOVERY", "MONITORING"]}, "uniqueItems": true},
+        "collection_depth": {"type": ["string", "null"], "enum": ["C0_IDENTITY", "C1_PROFILE", "C2_DOSSIER", "C3_OPPORTUNITY", "C4_MONITOR", null]},
+        "collection_rationale_code": {"type": "string", "minLength": 1}
       }
     },
     "evidence_health": {"enum": ["GREEN", "AMBER", "RED", "UNKNOWN"]},
@@ -84,11 +80,11 @@
         "candidate_requirements": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "routing_authority": {"const": "RECOMMEND_ONLY"},
         "request_route": {"enum": ["GENERAL_SEARCH", "GENERAL_TASK", "INTELLIGENCE"]},
-        "intelligence_types": {
-          "type": "array",
-          "items": {"enum": ["STRATEGIC_INTELLIGENCE", "MARKET_INTELLIGENCE", "OPPORTUNITY_INTELLIGENCE", "COMPETITIVE_INTELLIGENCE", "STAKEHOLDER_INTELLIGENCE", "POLITICAL_ECONOMIC_INTELLIGENCE", "MONITORING_INTELLIGENCE", "FORECASTING_INTELLIGENCE", "SCENARIO_INTELLIGENCE", "DECISION_INTELLIGENCE"]},
-          "uniqueItems": true
-        }
+        "intelligence_types": {"type": "array", "items": {"enum": ["STRATEGIC_INTELLIGENCE", "MARKET_INTELLIGENCE", "OPPORTUNITY_INTELLIGENCE", "COMPETITIVE_INTELLIGENCE", "STAKEHOLDER_INTELLIGENCE", "POLITICAL_ECONOMIC_INTELLIGENCE", "MONITORING_INTELLIGENCE", "FORECASTING_INTELLIGENCE", "SCENARIO_INTELLIGENCE", "DECISION_INTELLIGENCE"]}, "uniqueItems": true},
+        "collection_mode": {"enum": ["NONE", "ATLAS_DIRECT", "ARGUS_COLLECTION", "HYBRID"]},
+        "collection_required": {"type": "boolean"},
+        "collection_types": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "collection_depth": {"type": ["string", "null"]}
       }
     },
     "behavioral_learning_state": {
@@ -105,7 +101,7 @@
     "routing_preview": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "objective", "task_id", "plan_id", "surface", "plan", "work_unit", "requirements", "intent_profile", "providers", "unmatched_requirements", "cyclic_provider_ids", "conflicting_provider_pairs", "missing_prerequisite_providers", "unresolved_gates", "execution_sequence", "steps", "approval_prompt", "digest"],
+      "required": ["status", "objective", "task_id", "plan_id", "surface", "plan", "work_unit", "requirements", "intent_profile", "collection_mission", "providers", "unmatched_requirements", "cyclic_provider_ids", "conflicting_provider_pairs", "missing_prerequisite_providers", "unresolved_gates", "execution_sequence", "steps", "approval_prompt", "digest"],
       "properties": {
         "status": {"enum": ["NOT_REQUIRED", "PROPOSED"]},
         "objective": {"type": "string", "minLength": 1},
@@ -125,13 +121,14 @@
             "candidate_requirements": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
             "routing_authority": {"const": "RECOMMEND_ONLY"},
             "request_route": {"enum": ["GENERAL_SEARCH", "GENERAL_TASK", "INTELLIGENCE"]},
-            "intelligence_types": {
-              "type": "array",
-              "items": {"enum": ["STRATEGIC_INTELLIGENCE", "MARKET_INTELLIGENCE", "OPPORTUNITY_INTELLIGENCE", "COMPETITIVE_INTELLIGENCE", "STAKEHOLDER_INTELLIGENCE", "POLITICAL_ECONOMIC_INTELLIGENCE", "MONITORING_INTELLIGENCE", "FORECASTING_INTELLIGENCE", "SCENARIO_INTELLIGENCE", "DECISION_INTELLIGENCE"]},
-              "uniqueItems": true
-            }
+            "intelligence_types": {"type": "array", "items": {"enum": ["STRATEGIC_INTELLIGENCE", "MARKET_INTELLIGENCE", "OPPORTUNITY_INTELLIGENCE", "COMPETITIVE_INTELLIGENCE", "STAKEHOLDER_INTELLIGENCE", "POLITICAL_ECONOMIC_INTELLIGENCE", "MONITORING_INTELLIGENCE", "FORECASTING_INTELLIGENCE", "SCENARIO_INTELLIGENCE", "DECISION_INTELLIGENCE"]}, "uniqueItems": true},
+            "collection_mode": {"enum": ["NONE", "ATLAS_DIRECT", "ARGUS_COLLECTION", "HYBRID"]},
+            "collection_required": {"type": "boolean"},
+            "collection_types": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+            "collection_depth": {"type": ["string", "null"]}
           }
         },
+        "collection_mission": {"type": ["object", "null"]},
         "unresolved_gates": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "execution_sequence": {"type": "array", "items": {"type": "string"}},
         "providers": {
@@ -164,10 +161,7 @@
         },
         "unmatched_requirements": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "cyclic_provider_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-        "conflicting_provider_pairs": {
-          "type": "array",
-          "items": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string"}, "uniqueItems": true}
-        },
+        "conflicting_provider_pairs": {"type": "array", "items": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string"}, "uniqueItems": true}},
         "missing_prerequisite_providers": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "steps": {
           "type": "array",
@@ -187,10 +181,7 @@
     },
     "routing_decisions": {
       "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["status", "provider_id", "provider_type", "requirement", "reason", "preview_digest"]
-      }
+      "items": {"type": "object", "required": ["status", "provider_id", "provider_type", "requirement", "reason", "preview_digest"]}
     }
   }
 }

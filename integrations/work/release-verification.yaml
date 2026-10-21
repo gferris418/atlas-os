@@ -1,8 +1,8 @@
 schema: schemas/release-verification.schema.json
 id: verification.work
 surface: work
-product_version: 2.0.2-rc.4
-control_revision: atlas-bootstrap-2026-10-22-r8
+product_version: 2.0.2-rc.5
+control_revision: atlas-bootstrap-2026-10-22-r9
 status: READY_FOR_EXTERNAL_PROOF
 fresh_session_required: true
 independent_evidence_required: true
@@ -15,96 +15,48 @@ checks:
     kind: prompt
     input: What ATLAS version and control revision govern this Work task?
     assertions:
-      - id: AST-01
-        property: product_version
-        operator: equals
-        expected: 2.0.2-rc.4
-      - id: AST-02
-        property: control_revision
-        operator: equals
-        expected: atlas-bootstrap-2026-10-22-r8
+      - {id: AST-01, property: product_version, operator: equals, expected: 2.0.2-rc.5}
+      - {id: AST-02, property: control_revision, operator: equals, expected: atlas-bootstrap-2026-10-22-r9}
     required_evidence: [session_id, timestamp, response]
     controls: [MIG-029, MIG-037]
   - id: CHK-02
     kind: prompt
-    input: Convert 10 kilometres to miles and show the ATLAS dashboard.
+    input: Bangladesh Bank foreign exchange policy
     assertions:
-      - id: AST-01
-        property: plan_id
-        operator: present
-        expected: true
-      - id: AST-02
-        property: active_work_units
-        operator: equals
-        expected: 1
-      - id: AST-03
-        property: verification_state
-        operator: equals
-        expected: VERIFIED
+      - {id: AST-01, property: collection_mode, operator: equals, expected: ATLAS_DIRECT}
+      - {id: AST-02, property: specialist, operator: absent, expected: true}
     required_evidence: [session_id, timestamp, prompt, response]
-    controls: [MIG-029]
+    controls: [MIG-029, MIG-037]
   - id: CHK-03
     kind: prompt
-    input: coastal surveillance radar for Bangladesh Navy
+    input: ST Engineering
     assertions:
-      - id: AST-01
-        property: taxonomy_route
-        operator: contains
-        expected: Domain -> Sub-Domain -> Vertical -> Artifact Class
-      - id: AST-02
-        property: unverified_external_codes
-        operator: absent
-        expected: true
+      - {id: AST-01, property: collection_mode, operator: equals, expected: ARGUS_COLLECTION}
+      - {id: AST-02, property: specialist, operator: equals, expected: ARGUS}
     required_evidence: [session_id, timestamp, prompt, response]
-    controls: [MIG-029]
+    controls: [MIG-029, MIG-037]
   - id: CHK-04
-    kind: action
-    input: Save this answer in the ATLAS library.
+    kind: prompt
+    input: Share the annual procurement plan of Bangladesh Navy
     assertions:
-      - id: AST-01
-        property: saved_claim
-        operator: one-of
-        expected: [SAVED_WITH_RECEIPT, CAPABILITY_UNAVAILABLE, BLOCKED]
-    required_evidence: [session_id, timestamp, prompt, response, persistence_state]
-    controls: [MIG-029]
+      - {id: AST-01, property: collection_mode, operator: equals, expected: ARGUS_COLLECTION}
+      - {id: AST-02, property: collection_type, operator: contains, expected: PROCUREMENT_PLAN}
+    required_evidence: [session_id, timestamp, prompt, response]
+    controls: [MIG-029, MIG-037]
   - id: CHK-05
     kind: prompt
-    input: Find the current Bangladesh Railway tenders.
+    input: Compare ST Engineering and L3Harris for Bangladesh opportunities
     assertions:
-      - id: AST-01
-        property: request_route
-        operator: equals
-        expected: GENERAL_SEARCH
-      - id: AST-02
-        property: specialist
-        operator: absent
-        expected: true
+      - {id: AST-01, property: collection_mode, operator: equals, expected: HYBRID}
+      - {id: AST-02, property: final_analysis_owner, operator: equals, expected: ATLAS}
     required_evidence: [session_id, timestamp, prompt, response]
     controls: [MIG-029, MIG-037]
   - id: CHK-06
-    kind: prompt
-    input: Find and assess Bangladesh Railway opportunities we should pursue, rank them by win probability, identify competitors and decision makers, and monitor material developments.
+    kind: action
+    input: Save this answer in the ATLAS library.
     assertions:
-      - id: AST-01
-        property: request_route
-        operator: equals
-        expected: INTELLIGENCE
-      - id: AST-02
-        property: specialist
-        operator: equals
-        expected: ARGUS
-    required_evidence: [session_id, timestamp, prompt, response]
-    controls: [MIG-029, MIG-037]
-evidence_requirements:
-  - session_id
-  - timestamp
-  - timezone
-  - product_version
-  - control_revision
-  - prompt
-  - response
-  - available_connectors
-  - persistence_state
-  - result
-  - reviewer
+      - {id: AST-01, property: saved_claim, operator: one-of, expected: [SAVED_WITH_RECEIPT, CAPABILITY_UNAVAILABLE, BLOCKED]}
+    required_evidence: [session_id, timestamp, prompt, response, persistence_state]
+    controls: [MIG-029]
+evidence_requirements: [session_id, timestamp, timezone, product_version, control_revision, prompt, response, available_connectors, persistence_state, result, reviewer]
 controls: [MIG-029, MIG-037]

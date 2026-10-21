@@ -1,30 +1,45 @@
 schema: schemas/spec.schema.json
 id: spec.request-triage
-title: Request triage and fast-path routing
+title: Intent interpretation and collection-need triage
 status: active
 normative: true
 contract:
-  purpose: Make the minimum first-stage routing decision before deep domain processing or provider selection.
-  routes:
-    GENERAL_SEARCH: Retrieve or research information directly through ATLAS without activating a specialist intelligence method.
-    GENERAL_TASK: Produce, transform, calculate, analyze, or execute ordinary work directly through ATLAS.
-    INTELLIGENCE: Delegate intelligence-grade analysis to ARGUS while ATLAS retains authority, permissions, approvals, state, verification, and delivery.
-  first_semantic_gate: Request triage occurs immediately after the lossless raw-input boundary and before taxonomy routing, deep classification, framework alignment, or provider routing.
-  general_search_rule: A government, company, industry, tender, person, or place mention alone does not make a request intelligence-grade.
-  intelligence_threshold: INTELLIGENCE requires an intelligence objective such as strategic assessment, opportunity qualification, competitive or stakeholder analysis, political-economic assessment, monitoring, forecasting, scenarios, probability estimation, or decision intelligence.
-  argus_capability: intelligence_analysis
-  argus_rule: ARGUS is activated only when route is INTELLIGENCE or when the user explicitly requests ARGUS and the request is admissible.
-  direct_path_rule: GENERAL_SEARCH and GENERAL_TASK skip deep taxonomy, classification, and framework alignment unless those controls can materially change correctness, authorization, safety, or the requested outcome.
-  partial_handoff_rule: INTELLIGENCE may be handed to ARGUS with governed PARTIAL domain context. ARGUS enriches intelligence-domain context after activation and cannot replace ATLAS authority or permissions.
-  performance_rule: Triage must be deterministic or host-native, local to the request, and constant-cost relative to downstream task size; it must not perform web research, taxonomy research, or specialist execution merely to choose the route.
-  fallback_rule: When confidence is insufficient to distinguish a direct route from INTELLIGENCE, prefer the direct ATLAS route unless specialist intelligence is materially required; escalate only when ambiguity changes execution or risk.
-invariants:
-  - INV-001
-  - INV-002
-  - INV-017
-  - INV-018
+  purpose: Separate task intent from evidence-collection mode before provider selection or deep domain work.
+  first_semantic_gate: Preserve raw input first, then interpret objective, targets, requested outcome, constraints, time/freshness, sensitivity and output need.
+  task_intent_rule: ANSWER, RESEARCH, ANALYSIS, DECISION, WRITING, DOCUMENT, DATA, CODING, PLANNING, MONITORING and other task classes describe what ATLAS must do; they do not by themselves select ARGUS.
+  collection_modes:
+    NONE: No external collection is required.
+    ATLAS_DIRECT: Ordinary lookup or research remains inside ATLAS.
+    ARGUS_COLLECTION: Structured intelligence collection is delegated to ARGUS and returned to ATLAS as evidence.
+    HYBRID: ARGUS performs collection while ATLAS retains substantive analysis, forecasting, comparison, qualification or decision work.
+  authoritative_activation_field: collection_mode
+  argus_activation_modes: [ARGUS_COLLECTION, HYBRID]
+  argus_capability: intelligence_collection
+  compatibility_routes:
+    GENERAL_SEARCH: Direct ATLAS factual/current-information retrieval or research.
+    GENERAL_TASK: Direct ATLAS production, transformation, calculation, analysis or execution.
+    INTELLIGENCE: Legacy provider-routing projection emitted only when collection_mode is ARGUS_COLLECTION or HYBRID; it is not the semantic activation authority.
+  direct_policy_rule: Policy, regulation, law, circular or framework explanation/analysis remains ATLAS_DIRECT unless a separate structured collection mission is materially required.
+  collection_examples:
+    - request: Bangladesh Bank foreign exchange policy
+      collection_mode: ATLAS_DIRECT
+    - request: ST Engineering
+      collection_mode: ARGUS_COLLECTION
+    - request: coastal patrol vessel for Bangladesh Coast Guard
+      collection_mode: ARGUS_COLLECTION
+    - request: seed cum cleaner for BADC
+      collection_mode: ARGUS_COLLECTION
+    - request: share the annual procurement plan of Bangladesh Navy
+      collection_mode: ARGUS_COLLECTION
+    - request: compare ST Engineering and L3Harris for Bangladesh opportunities
+      collection_mode: HYBRID
+  government_mention_rule: A government/public-sector mention alone does not activate ARGUS. A buyer-product, procurement-plan, opportunity, installed-base, landscape, target-profile or monitoring collection requirement may do so.
+  performance_rule: The gate is local and proportional; do not perform web research merely to decide collection mode.
+  fallback_rule: When structured collection need is not materially established, prefer direct ATLAS execution.
+invariants: [INV-001, INV-002, INV-017, INV-018]
 references:
+  - spec/collection-routing.yaml
   - spec/control-plane.yaml
-  - spec/domain-intelligence.yaml
-  - spec/routing.yaml
+  - spec/domain-context-services.yaml
+  - spec/execution-spine.yaml
   - registries/domain-methods.yaml

@@ -1,58 +1,46 @@
 schema: schemas/spec.schema.json
 id: spec.classification
-title: Taxonomy and industry classification
+title: Multi-axial domain and economic classification
 status: active
 normative: true
 contract:
-  purpose: Classify substantive work before selecting domain frameworks, requirements, or evidence sources.
-  sequence:
-    - TAXONOMY_SELECTION
-    - JURISDICTION_CLASSIFICATION
-    - OPERATOR_INDUSTRY_CLASSIFICATION
-    - SUPPLIER_INDUSTRY_CLASSIFICATION
-    - PRODUCT_OR_SERVICE_CLASSIFICATION
-    - CAPABILITY_CLASSIFICATION
-    - LIFECYCLE_STAGE_CLASSIFICATION
-    - STAKEHOLDER_CLASSIFICATION
-    - INFORMATION_SENSITIVITY_CLASSIFICATION
-    - DOMAIN_FRAMEWORK_ALIGNMENT
-  sequence_rule: Select and validate the applicable taxonomy or classification standard before assigning any domain facet code. Resolve only material facets, in the declared order, before domain-framework alignment or substantive planning.
-  available_facets:
-    - jurisdiction
-    - operator-industry
-    - supplier-industry
-    - product-or-service
-    - capability
-    - lifecycle-stage
-    - stakeholder
-    - information-sensitivity
-  materiality: Resolve only facets that can change the answer, requirements, controls, routing, evidence, or authorization; unused facets create no recordkeeping obligation.
+  purpose: Classify material facets without collapsing domain, economic sector, industry, product, procurement, trade and capability into one code.
+  sequence: [TAXONOMY_SELECTION, JURISDICTION_CLASSIFICATION, OPERATOR_INDUSTRY_CLASSIFICATION, SUPPLIER_INDUSTRY_CLASSIFICATION, PRODUCT_OR_SERVICE_CLASSIFICATION, CAPABILITY_CLASSIFICATION, LIFECYCLE_STAGE_CLASSIFICATION, STAKEHOLDER_CLASSIFICATION, INFORMATION_SENSITIVITY_CLASSIFICATION, DOMAIN_FRAMEWORK_ALIGNMENT]
+  available_facets: [jurisdiction, operator-industry, supplier-industry, product-or-service, capability, lifecycle-stage, stakeholder, information-sensitivity]
+  economic_sector_context: Sector is a broader contextual grouping recorded through Domain Context Services when material; it is not silently substituted for operator/supplier industry codes.
+  reference_stack:
+    international_activity: taxonomy.un-isic
+    eu_activity: taxonomy.eu-nace
+    north_america_activity: taxonomy.naics
+    international_products_services: taxonomy.un-cpc
+    eu_products_services: taxonomy.eu-cpa
+    procurement_global: taxonomy.unspsc
+    procurement_eu: taxonomy.eu-cpv
+    customs_trade: taxonomy.wco-hs
+    defense_logistics: taxonomy.nato-codification-system
+  materiality: Resolve only facets that can change answer, requirements, controls, routing, evidence or authorization.
   method:
-    - Start by selecting applicable governed taxonomies and confirming their scope, authority, version policy, and current official source.
-    - Preserve separate facets instead of forcing the whole prompt into one industry or product code.
-    - Prefer international reference classifications and current official sources.
-    - Record taxonomy identifier, version policy, code, label, provenance, applicability, and confidence.
-    - Distinguish operator industry, supplier industry, product or service, and capability.
-    - Apply conditional schemes such as customs, procurement, and defense logistics only when their context is material.
-    - Use explicit crosswalks; never assume that codes from different schemes are equivalent.
-    - Mark missing or unverified codes as unresolved instead of guessing.
-    - Recheck classification editions and code status when currency could affect the result.
-  handoff: When a specialist domain method is routed, the resolved classification snapshot is transferred unchanged through spec/domain-handoff.yaml; specialist enrichment must not silently redefine this ATLAS-owned classification.
+    - Select applicable governed schemes and verify scope, issuer, edition and official source.
+    - Preserve separate facets rather than forcing the whole task into one code.
+    - Prefer international reference classifications and authoritative current editions.
+    - Distinguish operator industry, supplier industry, sector context, product/service, procurement category, customs/trade code and capability.
+    - Apply conditional schemes such as HS, CPV/UNSPSC and NATO codification only when their context is material.
+    - Use explicit crosswalk relations EXACT, CLOSE, BROADER, NARROWER or RELATED; never assume codes from unlike schemes are equivalent.
+    - Record scheme/version, code/label, provenance, applicability and confidence.
+    - Mark unavailable or unverified codes unresolved instead of guessing.
+  semantic_invariants: [DOMAIN_IS_NOT_SECTOR, SECTOR_IS_NOT_INDUSTRY, INDUSTRY_IS_NOT_PRODUCT, PRODUCT_IS_NOT_CAPABILITY, PRODUCT_IS_NOT_PROCUREMENT_CATEGORY, PROCUREMENT_CATEGORY_IS_NOT_HS_CODE, HS_CODE_IS_NOT_PROCUREMENT_ELIGIBILITY, CLASSIFICATION_IS_NOT_COMPLIANCE]
+  handoff: Resolved ATLAS context transfers unchanged to a specialist; ARGUS may enrich evidence and suggest mappings but cannot silently redefine canonical classification.
   result_states:
-    CLASSIFIED: All facets material to the task are resolved with governed taxonomy references.
-    PARTIAL: At least one useful facet is resolved but material context remains unresolved.
-    RESEARCH_REQUIRED: No adequate authoritative classification has been established.
-    NOT_REQUIRED: A proportionality assessment found that classification cannot materially affect the result.
-  sensitive_domain_rule: Defense, national-security, dual-use, operational-security, and export-control flags require scope, authorization, and information-sensitivity checks before detailed work.
-  claims_rule: Classification is contextual metadata; it does not establish legal status, export classification, procurement eligibility, compliance, or authorization.
-  example_rule: A Bangladesh Navy coastal-surveillance-radar prompt must separate Bangladesh jurisdiction, defense operator activity, surveillance-radar capability, supplier activity, product code, lifecycle, and sensitivity.
-invariants:
-  - INV-006
-  - INV-016
-  - INV-019
+    CLASSIFIED: All material facets are resolved with governed references.
+    PARTIAL: Useful context exists but material facets remain unresolved.
+    RESEARCH_REQUIRED: No adequate authoritative classification is established.
+    NOT_REQUIRED: Classification cannot materially affect the result.
+  sensitive_domain_rule: Defense, national-security, dual-use, operational-security and export-control flags require scope, authorization and sensitivity checks before detailed work.
+  claims_rule: Classification metadata does not establish legal status, export classification, procurement eligibility, compliance or authorization.
+invariants: [INV-006, INV-016, INV-019]
 references:
+  - spec/domain-context-services.yaml
   - registries/taxonomies.yaml
   - registries/classifications.yaml
   - schemas/task.schema.json
-  - spec/domain-practices.yaml
   - spec/domain-handoff.yaml

@@ -9,6 +9,7 @@ from collections.abc import Mapping
 from copy import deepcopy
 from typing import Any, Iterable
 
+from .collection import validate_collection_mission
 from .handoff import (
     ExecutionContext,
     execution_context_mismatches,
@@ -32,8 +33,10 @@ _PROVIDER_TYPES = {
 
 _INTELLIGENCE_REQUIREMENTS = {
     "intelligence_analysis",
+    "intelligence_collection",
     "government_public_sector_opportunity_intelligence",
 }
+_ARGUS_COLLECTION_MODES = {"ARGUS_COLLECTION", "HYBRID"}
 
 
 def build_routing_preview(
@@ -57,31 +60,46 @@ def build_routing_preview(
     additional_provider_groups: Mapping[str, Iterable[dict[str, Any]]] | None = None,
     requested_requirements: Iterable[str] = (),
     intent_profile: Mapping[str, Any] | None = None,
+    collection_mission: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Describe proposed provider routing without activating a provider."""
     lowered = " ".join(text.lower().split())
     task_class_order = list(dict.fromkeys(task_classes))
     classes = set(task_class_order)
     hierarchy = taxonomy_route.get("hierarchy") or {}
-    request_route = (intent_profile or {}).get("request_route")
+    profile = intent_profile or {}
+    request_route = profile.get("request_route")
+    collection_mode = profile.get("collection_mode")
     requirements = [
         str(requirement).strip()
         for requirement in requested_requirements
         if str(requirement).strip()
     ]
-    if request_route in {"GENERAL_SEARCH", "GENERAL_TASK"}:
+
+    # Collection capability is subordinate to the authoritative Collection-Need Gate.
+    # Explicit capability requests cannot bypass a direct/NONE collection decision.
+    if collection_mode not in _ARGUS_COLLECTION_MODES:
         requirements = [
             requirement
             for requirement in requirements
             if requirement not in _INTELLIGENCE_REQUIREMENTS
         ]
+    elif request_route in {"GENERAL_SEARCH", "GENERAL_TASK"}:
+        # Compatibility route labels are never sufficient to activate ARGUS by themselves.
+        requirements = [
+            requirement
+            for requirement in requirements
+            if requirement not in {"intelligence_analysis", "government_public_sector_opportunity_intelligence"}
+        ]
+
     if (
         request_route is None
+        and collection_mode in _ARGUS_COLLECTION_MODES
         and hierarchy.get("domain") == "government-public-sector"
         and "opportunit" in lowered
-        and classes & {"RESEARCH", "ANALYSIS", "DECISION", "MONITORING"}
+        and classes & {"RESEARCH", "ANALYSIS", "DECISION", "MONITORING", "PLANNING", "WORKFLOW"}
     ):
-        requirements.append("government_public_sector_opportunity_intelligence")
+        requirements.append("intelligence_collection")
     if "RESEARCH" in classes and "public" in lowered:
         requirements.append("public_research")
     if classes & {"CODING", "DEBUGGING"}:
@@ -90,6 +108,15 @@ def build_routing_preview(
         requirements.append("external_write")
 
     requirements = list(dict.fromkeys(requirements))
+
+    mission_record: dict[str, Any] | None = None
+    if collection_mission is not None:
+        mission_record = validate_collection_mission(
+            collection_mission,
+            task_id=task_id,
+            plan_id=plan_id,
+            allowed_modes=_ARGUS_COLLECTION_MODES,
+        )
 
     built_in_provider_groups: list[tuple[str, list[dict[str, Any]]]] = [
         ("domain-method", list(domain_methods.get("items", []))),
@@ -265,6 +292,8 @@ def build_routing_preview(
                 unresolved.append("task_id:REQUIRED")
             if timestamp is None:
                 unresolved.append("domain_handoff_timestamp:REQUIRED")
+            if provider["requirement"] == "intelligence_collection" and mission_record is None:
+                unresolved.append("collection_mission:REQUIRED")
             if classification.get("status") == "RESEARCH_REQUIRED" or alignment.get("status") == "RESEARCH_REQUIRED":
                 handoff_state = "BLOCKED"
             elif classification.get("status") == "CLASSIFIED" and alignment.get("status") in {"ALIGNED", "NOT_APPLICABLE"}:
@@ -275,10 +304,15 @@ def build_routing_preview(
                 domain_records[provider["id"]].get("accepted_handoff_states", [])
             ):
                 unresolved.append(f"domain_handoff_state:{handoff_state}")
+            unresolved_facets = list(classification.get("unresolved_facets", []))
             unresolved.extend(
                 f"domain_classification:{facet}"
-                for facet in classification.get("unresolved_facets", [])
+                for facet in unresolved_facets
             )
+            # Preserve the former generic handoff gate as a compatibility projection
+            # while exposing the precise unresolved facets that now drive governance.
+            if request_route == "INTELLIGENCE" and unresolved_facets:
+                unresolved.append("domain_classification:intelligence-domain-context")
         provider["unresolved_gates"] = list(dict.fromkeys(unresolved))
 
     conflicting_provider_pairs = sorted({
@@ -343,7 +377,8 @@ def build_routing_preview(
         "plan": list(plan),
         "work_unit": work_unit,
         "requirements": requirements,
-        "intent_profile": deepcopy(intent_profile or {}),
+        "intent_profile": deepcopy(profile),
+        "collection_mission": deepcopy(mission_record),
         "providers": providers,
         "unmatched_requirements": unmatched_requirements,
         "cyclic_provider_ids": cyclic_provider_ids,
@@ -367,7 +402,7 @@ def build_routing_preview(
         ],
         "approval_prompt": (
             "Review the providers, purpose, method, permissions, data scope, prerequisites, "
-            "unresolved gates, execution sequence, and fallbacks before routing."
+            "collection mission, unresolved gates, execution sequence, and fallbacks before routing."
             if requirements else None
         ),
     }
@@ -448,6 +483,7 @@ def route_domain_method(
     *,
     execution_context: ExecutionContext,
     handoff: dict[str, Any] | None = None,
+    collection_mission: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Select a governed specialist for the current correlated work unit."""
     metadata = registry.get("registry")
@@ -495,6 +531,20 @@ def route_domain_method(
     if handoff.get("state") == "BLOCKED" or handoff.get("state") not in method.get("accepted_handoff_states", []):
         return {"status": "BLOCKED", "reason": "HANDOFF_STATE_NOT_ACCEPTED", "method_id": method_id}
 
+    mission_record: dict[str, Any] | None = None
+    if requirement == "intelligence_collection":
+        if collection_mission is None:
+            return {"status": "BLOCKED", "reason": "COLLECTION_MISSION_REQUIRED", "method_id": method_id}
+        try:
+            mission_record = validate_collection_mission(
+                collection_mission,
+                task_id=execution_context.task_id,
+                plan_id=execution_context.plan_id,
+                allowed_modes=_ARGUS_COLLECTION_MODES,
+            )
+        except ValueError:
+            return {"status": "BLOCKED", "reason": "COLLECTION_MISSION_INVALID", "method_id": method_id}
+
     return {
         "status": "ACTIVATE",
         "method_id": method_id,
@@ -503,5 +553,6 @@ def route_domain_method(
         "plan_id": execution_context.plan_id,
         "work_unit_id": execution_context.work_unit_id,
         "handoff_id": handoff["handoff_id"],
+        "collection_mission_id": mission_record["mission_id"] if mission_record else None,
         "unresolved_material": deepcopy(handoff.get("unresolved_material", [])),
     }

@@ -2,7 +2,7 @@ schema: schemas/atlas-os.schema.json
 product:
   id: atlas-os
   name: ATLAS OS
-  version: 2.0.2-rc.4
+  version: 2.0.2-rc.5
   release_channel: candidate
   schema_version: 2
   status: CANDIDATE
@@ -17,8 +17,11 @@ authority:
 architecture:
   mission_control: spec/mission-control.yaml
   control_plane: spec/control-plane.yaml
-  observability: spec/observability.yaml
+  collection_routing: spec/collection-routing.yaml
+  domain_context_services: spec/domain-context-services.yaml
   domain_intelligence: spec/domain-intelligence.yaml
+  observability: spec/observability.yaml
+  dashboard: spec/dashboard.yaml
 execution:
   request_triage: spec/request-triage.yaml
   spine: spec/execution-spine.yaml
@@ -26,9 +29,10 @@ execution:
   classification: spec/classification.yaml
   domain_practices: spec/domain-practices.yaml
   domain_handoff: spec/domain-handoff.yaml
+  collection_mission: schemas/collection-mission.schema.json
   output: spec/output.yaml
   default_depth: L1
-  control_revision: atlas-bootstrap-2026-10-22-r8
+  control_revision: atlas-bootstrap-2026-10-22-r9
 release:
   target_version: 2.0.2
   blocking_controls: [MIG-029, MIG-037]
