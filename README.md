@@ -1,157 +1,178 @@
-# ATLAS OS
+# ATLAS-OS
 
-**Current candidate:** `v2.0.2-rc.3`
+ATLAS-OS is a **model-agnostic execution-governance specification for AI agents**. It sits between user intent and verified delivery, giving different AI hosts one machine-readable contract for routing, planning, permissions, approvals, evidence, verification, persistence, observability, and specialist delegation.
 
-**Information classification:** Internal
+It is **not a desktop operating system** and does not replace the host model, conversation engine, browser, tool runtime, or device OS.
 
-**License:** [MIT](LICENSE)
+**Current candidate:** `v2.0.2-rc.4`  
+**Control revision:** `atlas-bootstrap-2026-10-22-r8`  
+**Target stable:** `v2.0.2`  
+**Information classification:** Internal  
+**License:** [MIT](LICENSE)  
+**Release status:** **CANDIDATE / EXTERNAL VERIFICATION PENDING**
 
-**Release status:** **CANDIDATE / EXTERNAL VERIFICATION PENDING**.
+Stable `v2.0.2` remains blocked by external-proof controls `MIG-029` and `MIG-037`. Repository-local tests and machine-readiness do not substitute for independent host evidence.
 
-ATLAS-OS is a model-agnostic execution-governance specification for AI agents. It turns user intent into a controlled execution spine that preserves context, plans dependencies, routes capabilities, tracks evidence and uncertainty, enforces approval boundaries, verifies results, separates task state from canonical knowledge, and produces reproducible outputs.
+## Machine-readable authority
 
-Despite its name, ATLAS-OS is not a desktop operating system and is not installed as a replacement for Windows, macOS, Linux, or any other device OS. It is installed into, attached to, or followed by an AI host such as ChatGPT, Hermes Agent, Codex, or another agent tool. The host may itself run locally, in a browser, or on remote infrastructure; the host machine's operating system is irrelevant to the ATLAS contract.
+AI systems begin at [`atlas-ai.yaml`](atlas-ai.yaml), the deterministic discovery entrypoint. [`atlas-os.yaml`](atlas-os.yaml) remains the sole product/release authority. Active machine authority is YAML/JSON and schema-validated; Markdown is human guidance or compatibility material.
 
-ATLAS is not an autonomous model or a collection of prompts. The repository is the canonical machine-readable contract; ChatGPT, Hermes Agent, Codex, Work, and other AI hosts implement adapters around the same core semantics.
+Current first-class architecture contracts:
 
-## Machine entrypoint
+- [`spec/mission-control.yaml`](spec/mission-control.yaml) — human command and intervention.
+- [`spec/control-plane.yaml`](spec/control-plane.yaml) — authority, governance, routing, permissions, approvals, and state.
+- [`spec/observability.yaml`](spec/observability.yaml) — measurement and read-only operational projection.
+- [`spec/domain-intelligence.yaml`](spec/domain-intelligence.yaml) — conditional domain semantics, standards, benchmarks, evidence hierarchy, signals, forecasting, and scenarios.
+- [`spec/request-triage.yaml`](spec/request-triage.yaml) — first semantic route decision.
+- [`spec/execution-spine.yaml`](spec/execution-spine.yaml) — canonical execution lifecycle after triage.
 
-AI systems should begin at [`atlas-ai.yaml`](atlas-ai.yaml). It is the deterministic discovery manifest for the current machine contracts, schemas, registries, migrations, surface verification contracts, and human companion guidance. It points to [`atlas-os.yaml`](atlas-os.yaml), which remains the sole product and release authority. Human-readable Markdown is guidance or compatibility material and must not override conflicting machine authority.
+## Fast request triage
 
-The current control revision is machine-readable at `atlas-os.yaml#/execution/control_revision`. External verification procedures are schema-validated under `schemas/release-verification.schema.json` and published per supported surface at `integrations/<surface>/release-verification.yaml`.
-
-## Install into an AI host
-
-- **ChatGPT:** attach the repository or use the version-bound ChatGPT instructions and verified Library snapshot. When repository files are available, discover them through `atlas-ai.yaml` first.
-- **Hermes Agent:** start Hermes in this checkout, run `hermes skills trust`, and invoke the project-local `/atlas-os` skill in [`.agents/skills/atlas-os/SKILL.md`](.agents/skills/atlas-os/SKILL.md).
-- **Other AI tools:** expose the repository's project-local skill, attach `atlas-ai.yaml` plus the canonical manifest and relevant specifications, or call the optional Python reference runtime through a host adapter.
-
-See the [AI-host installation guide](docs/ai-host-installation.md) for the portable contract and host-specific setup. Installing the Python package is optional and provides reference validation and execution seams; it is not the definition of installing ATLAS into an AI host.
-
-## Execution spine
-
-```text
-RAW INPUT PRESERVATION BOUNDARY
-       -> 0. TAXONOMY LAYER
-       -> 1. INTENT NORMALIZATION
-       -> 2. MATERIAL W-QUESTION MATRIX
-       -> 3. CLASSIFICATION AND DOMAIN REQUIREMENTS
-       -> 4. CAPABILITY AUDIT AND EXECUTION PLAN
-       -> 5. DATA-PLANE EXECUTION
-       -> 6. ASSURANCE AND VERIFICATION
-       -> 7. PERSISTENCE AND DELIVERY
-```
-
-Execution depth is proportional: trivial work remains direct, while complex or high-impact work activates stronger planning, evidence, approval, and verification controls.
-
-The executable reference runtime exposes one preferred startup interface. Existing low-level functions remain available for compatibility:
-
-```python
-from atlas_runtime import ExecutionEnvelope, execute
-
-result = execute(ExecutionEnvelope(
-    objective="Assess the opportunity",
-    plan_id="plan-opportunity",
-    work_units=({"id": "assess", "status": "PENDING", "dependencies": []},),
-    surface="chatgpt",
-))
-print(result.compact_status)
-```
-
-The same public interface is directly testable from a shell. Compact text is
-the low-overhead default; use NDJSON only when a machine consumer needs
-flushable events:
-
-```bash
-python -m atlas_runtime --input examples/execution-request.json
-python -m atlas_runtime --input examples/execution-request.json --format ndjson
-```
-
-See [`docs/live-testing.md`](docs/live-testing.md) for stdin, error, and scope
-examples.
-
-ATLAS uses capable AI-host features directly. It does not recreate the host's language understanding, conversation, generation, reasoning, or tool behavior unless a deterministic fallback is required. ATLAS adds the smallest useful layer of standards, evidence, authority, persistence, interoperability, and verification.
-
-## Authority model
-
-1. [`atlas-ai.yaml`](atlas-ai.yaml) is the machine discovery entrypoint and contains no competing product-release authority.
-2. [`atlas-os.yaml`](atlas-os.yaml) is the only product/release authority and declares the active control revision.
-3. [`spec/`](spec/) defines normative core behavior.
-4. [`schemas/`](schemas/) validates machine-readable state.
-5. [`registries/`](registries/) declares capabilities, surfaces, controls, and migrations.
-6. [`integrations/`](integrations/) adapts the core contract to execution surfaces and publishes machine verification contracts.
-7. [`migration/`](migration/) records open transition controls, criterion state, evidence links, and closure state.
-8. [`legacy/`](legacy/) contains historical references and is never active authority.
-9. [`library/`](library/) stores authorized, reusable output artifacts by profile-defined collection.
-
-Component revisions may describe compatibility and lineage, but cannot declare a competing product release.
-
-## Lightweight control plane
-
-Every prompt exposes compact operational state without private reasoning. Nontrivial work is split into atomic units with one active completion target; the display updates only at meaningful state changes:
+ATLAS makes one lightweight decision before deep domain processing:
 
 ```text
-ATLAS/core [####------] 40% | 2026-10-17T23:30:00+06:00 | 420 ms | Goal update repository | Task 1/3 · EXECUTION: implement current work unit
-Input requested repository update | Processing validating the active unit | Output implementation pending
-Playbook test-first change | Framework ATLAS execution spine | SOP plan → execute → verify → persist → deliver
-Plan plan-change:READY | Profile output.technical-spec | Library READY | Quality PENDING | Blocker None
+USER REQUEST
+   |
+   v
+ATLAS REQUEST TRIAGE
+   |
+   +--> GENERAL_SEARCH --> ATLAS direct research/search
+   |
+   +--> GENERAL_TASK ----> ATLAS direct execution
+   |
+   +--> INTELLIGENCE ----> governed ARGUS delegation
 ```
 
-The text-only visual is deterministic and constant-cost. Input and processing are safe summaries, never private chain-of-thought. Safe operations may be batched within the active unit, but a unit is not marked complete until its completion criteria are verified.
+### `GENERAL_SEARCH`
 
-Every dashboard and work-unit selection is bound to a concrete plan identifier. The machine-readable dashboard contract is in [`spec/dashboard.yaml`](spec/dashboard.yaml) and [`schemas/dashboard.schema.json`](schemas/dashboard.schema.json).
+Use for ordinary factual/current-information retrieval or research.
 
-## Evidence and routing
+```text
+Find the current Bangladesh Railway tenders.
+```
 
-ATLAS distinguishes `VERIFIED`, `SUPPORTED`, `INFERRED`, `ASSUMED`, `SPECULATIVE`, and `UNKNOWN`. Source quality, completeness, confidence, and inference remain separate. Routing selects the best available capability using task fit, authority, permissions, risk, and fallback behavior; the presence of a tool alone is not a reason to call it.
+ATLAS searches directly. ARGUS is not activated merely because the subject is government, public sector, a tender, a company, a market, a person, or politics.
 
-Specialist domain methods remain separate systems. ATLAS activates one only from an explicit structured capability requirement, an active registration in [`registries/domain-methods.yaml`](registries/domain-methods.yaml), and any required valid domain-context handoff. A specialist never owns the ATLAS execution spine, plan, or approvals. See the compact [artifact model](docs/artifact-model.md) for the distinction between frameworks, methodologies, playbooks, SOPs, workflows, protocols, schemas, adapters, and related structures.
+### `GENERAL_TASK`
 
-## Output standards
+Use for ordinary production, transformation, calculation, analysis, coding, document, workflow, or external-action preparation.
 
-ATLAS lets the host generate naturally, then selects the smallest task-fit [output profile](registries/output-profiles.yaml). Eight baseline profiles cover concise answers, analysis, decisions, sourced research, execution progress, technical specifications, structured data, and artifact delivery. Explicit user formats take precedence.
+```text
+Rewrite this supplier letter in a formal tone.
+```
 
-Outputs use progressive disclosure and material-only validation. Ordinary conversation avoids schema overhead; machine-readable data, citations, APIs, and artifacts use applicable standards such as JSON Schema 2020-12, RFC 4180, RFC 3339, OpenAPI 3.1, WCAG 2.2 AA, and accessible or archival PDF profiles. Visuals are used only when they make a material relationship clearer. See [output standards and profiles](docs/output-standards.md).
+ATLAS plans only as much as needed and executes through the smallest admitted host capability set.
 
-## International standards and domain practices
+### `INTELLIGENCE`
 
-When classification could materially change the result, ATLAS uses governed taxonomies to separate relevant jurisdiction, actor, product, capability, lifecycle, and sensitivity facets. It does not require unused facets. The baseline [taxonomy registry](registries/taxonomies.yaml) covers international terminology, knowledge-organization, metadata, geography, economic-activity, product, customs, procurement, and defense-logistics schemes. Conditional schemes are not applied outside their intended context, and missing codes remain unresolved.
+Use when the objective requires intelligence methodology: strategic assessment, market intelligence, opportunity qualification, competitor/stakeholder analysis, political-economic assessment, monitoring, forecasting, probability estimation, scenarios, or decision intelligence.
 
-ATLAS then assesses and applies relevant current international standards, recognized professional frameworks, and authoritative domain best practices. It records the framework, issuer, official source, version or edition policy, applicability, implementation mapping, and justified deviations. Applicable law, regulation, and binding requirements take precedence.
+```text
+Find and assess Bangladesh Railway opportunities we should pursue,
+rank them by win probability, identify competitors and decision makers,
+and monitor material developments.
+```
 
-The baseline [framework registry](registries/frameworks.yaml) is deliberately extensible rather than exhaustive. If no adequate current framework is known, ATLAS reports `RESEARCH_REQUIRED` and consults official sources instead of silently falling back to generic advice. Alignment does not imply certification or compliance; those claims require scope-specific verification evidence.
+ATLAS routes the canonical `intelligence_analysis` capability to ARGUS after governed routing and approval gates.
 
-See [taxonomy and classification](docs/taxonomy-and-classification.md) for the multi-axial model and the [sample Bangladesh Navy coastal-surveillance-radar workflow](docs/sample-workflow-coastal-surveillance-radar.md) for a complete stage-by-stage example.
+## ATLAS / ARGUS boundary
 
-## Persistence
+ARGUS is the governed specialist for intelligence-grade work. It supports strategic, market, opportunity, competitive, stakeholder, political-economic, monitoring, forecasting, scenario, and decision intelligence. Government/public-sector opportunity intelligence remains an ARGUS specialization rather than its only purpose.
 
-Task execution state and durable canonical library state are separate namespaces. Every delivered output is routed by its output profile to `answers`, `analyses`, `decisions`, `research`, `execution`, `specifications`, `data`, or `artifacts` in the correct supported format. The filesystem adapter contains paths beneath the configured library, writes atomically, syncs, reads back, and returns a SHA-256 receipt before `SAVED` is allowed. Unavailable or unauthorized persistence remains visibly blocked. Canonical revisions carry identifiers, versions, timestamps, provenance, status, dependencies, and replacement lineage. A revision with active dependents cannot be archived or removed.
+ATLAS retains user and Mission Control authority, permissions and policy, plan/work-unit state, routing and approvals, execution leases and lifecycle state, independent verification, persistence authorization, and final delivery.
 
-## ChatGPT Library distribution
+For an `INTELLIGENCE` route, ATLAS may send ARGUS a governed `READY` or `PARTIAL` domain-context handoff. ARGUS preserves known upstream context and enriches unresolved intelligence-domain context. A `BLOCKED` handoff cannot authorize dependent ARGUS execution.
 
-For ChatGPT installs and updates, a successful push to `main` publishes a deterministic GitHub Actions artifact named `atlas-os-main-snapshot`. It contains the versioned repository ZIP/TAR, package manifest, and `SHA256SUMS` generated by `tools/package/build_release.py` after the validation suites pass.
+The active ARGUS contract is immutably pinned in [`registries/domain-methods.yaml`](registries/domain-methods.yaml).
 
-A verified ChatGPT Library installation should be used as the normal runtime cache so ATLAS startup does not refetch GitHub on every prompt. GitHub is consulted when the user explicitly asks to install, update, or synchronize ATLAS-OS. Updates must verify the artifact checksums and require the package manifest `source_commit` to match the selected workflow run head SHA before replacing the Library snapshot.
+## Four architectural responsibilities
 
-See [`docs/chatgpt-library-install.md`](docs/chatgpt-library-install.md) for the complete installation, update, failure-handling, and provenance contract. Main-branch snapshot artifacts are transport packages, not releases, and do not change lifecycle state.
+```text
+                         HUMAN
+                           |
+                           v
+                    MISSION CONTROL
+               command / approval / intervention
+                           |
+                           v
+                     CONTROL PLANE
+        authority / policy / permissions / routing / state
+                           |
+            +--------------+---------------+
+            |                              |
+            v                              v
+       DATA PLANE                  DOMAIN INTELLIGENCE
+     substantive work              conditional context
+            |                              |
+            +--------------+---------------+
+                           |
+                           v
+                ASSURANCE / VERIFICATION
+                           |
+                           v
+                      OBSERVABILITY
+                           |
+                           v
+                       DASHBOARD
+```
 
-## Repository map
+### Mission Control
 
-- `atlas-ai.yaml` — deterministic machine discovery entrypoint for AI hosts.
-- `.agents/skills/atlas-os/` — cross-tool, project-local AI-host installation entry point.
-- `atlas_runtime/` — optional reference runtime, executable surface seams, and durable persistence adapter.
-- `spec/` — normative declarative specifications.
-- `schemas/` — JSON Schemas for state, verification, and governance artifacts.
-- `registries/` — governed capabilities and control indexes.
-- `migration/` — schema-validated criterion/evidence state for migration and release controls.
-- `integrations/*/release-verification.yaml` — machine-readable external surface verification contracts.
-- `tests/` — unit, conformance, and scenario regression evidence.
-- `tools/validate/` — repository and machine-contract validation.
-- `tools/package/` — deterministic release packaging.
-- `docs/` — human architecture, operation, and release guidance.
-- `library/` — durable, reusable outputs and storage guidance.
+Mission Control is the human supervisory boundary for mission objectives, approvals/rejections, pause/resume/abort, scope changes, priorities, escalation, risk acknowledgement, and permitted exception requests.
 
-## Validate
+Mission Control does not directly mutate machine state. The Control Plane evaluates every state-changing request against permissions, policy, current state, approvals, and non-waivable restrictions.
+
+### Control Plane
+
+The Control Plane is authoritative machine governance. It owns policy evaluation, permissions, plan/work-unit state, routing, provider admission, approval state, execution leases, lifecycle transitions, external-state reconciliation, persistence authorization, and control receipts.
+
+It authorizes substantive execution but is not itself the data plane.
+
+### Dashboard / Observability
+
+The Dashboard is not the Control Plane. It is a derived, read-only observability projection showing route, plan, progress, current work, blockers/approvals, evidence/verification state, performance, and persistence status without exposing private chain-of-thought.
+
+A user action initiated from a Dashboard becomes a Mission Control command and must be admitted by the Control Plane before state changes.
+
+### Conditional Domain Intelligence
+
+ATLAS no longer requires full taxonomy/classification/framework processing before every request.
+
+`GENERAL_SEARCH` and `GENERAL_TASK` resolve taxonomy, classification, ontology, law, standards, frameworks, evidence hierarchy, or benchmarks only when those controls can materially change correctness, authorization, safety, or the requested outcome.
+
+For `INTELLIGENCE`, deep intelligence-domain enrichment is normally deferred until ARGUS activation. This keeps ordinary requests fast without weakening governed specialist analysis.
+
+## Canonical execution spine
+
+After the lossless raw-input boundary:
+
+1. `REQUEST_TRIAGE`
+2. `INTENT_NORMALIZATION`
+3. `CONDITIONAL_DOMAIN_CONTEXT`
+4. `CAPABILITY_AND_EXECUTION_PLAN`
+5. `DATA_PLANE_EXECUTION`
+6. `ASSURANCE_AND_VERIFICATION`
+7. `PERSISTENCE_AND_DELIVERY`
+
+Implementations may use native host capabilities internally when these responsibilities remain satisfied.
+
+## Provider-independent capabilities
+
+ATLAS registers semantic capabilities, not provider brands. Skills, plugins, tools, models, connectors, host functions, subagents, and specialist methods remain replaceable providers governed by [`spec/capability-admission.yaml`](spec/capability-admission.yaml).
+
+Availability is not admission. Installation is not trust. Provider-specific accuracy, latency, cost, or reliability claims require evidence from the target runtime.
+
+Downstream intent/provider logic cannot silently override a `GENERAL_SEARCH` or `GENERAL_TASK` triage decision into ARGUS activation.
+
+## Output contract
+
+Every completed ATLAS output has a canonical schema-valid structured envelope. Markdown, HTML, PDF, CSV, or other user-facing forms are renderings or payload artifacts rather than competing sources of state.
+
+Output profiles are defined in [`registries/output-profiles.yaml`](registries/output-profiles.yaml) and governed by [`spec/output.yaml`](spec/output.yaml).
+
+## Runtime
+
+The executable Python package is a conformance/reference implementation, not a second normative authority.
 
 ```bash
 python -m pip install --require-hashes -r requirements.lock
@@ -161,24 +182,67 @@ python -m unittest discover -s tests/regression -v
 python -m unittest discover -s tests/integration -v
 python tools/validate/validate_repository.py .
 python tools/validate/validate_machine_contracts.py .
+python tools/validate/validate_output_contracts.py .
 ```
 
-The canonical validation command is declared in `atlas-os.yaml#/release/validation_command`.
-
-## Build deterministic release archives
+Run the local executable seam:
 
 ```bash
-python tools/package/build_release.py . dist
+python -m atlas_runtime --input examples/execution-request.json
 ```
 
-The package uses the release identifier from `atlas-os.yaml`, records the source commit, emits a manifest, and produces SHA-256 checksums.
+For machine streaming:
 
-## Candidate verification items
+```bash
+python -m atlas_runtime --format ndjson < examples/execution-request.json
+```
 
-- `MIG-029`: independent New Chat and ChatGPT Work bootstrap proof remains to be captured. Its machine state and criterion/evidence links are in `migration/MIG-029.yaml`.
-- `MIG-037`: independent latest-control propagation across ChatGPT, Codex, Work, and Hermes Agent remains blocked on MIG-029. Its machine state is in `migration/MIG-037.yaml`.
-- `DTIF-RECONCILIATION`: **closed 2026-10-20** after authoritative DB-001/DB-002/DB-003 source hashes were verified, the accepted Wave-1 historical state was re-read and fingerprinted, all deferred legacy classes received explicit reverify-before-reuse dispositions, and ARGUS protected CI passed on exact evidence commit `caf8d76045d2d9f1cdb26cbe5b18e88d5862159a`.
+See [`docs/runtime.md`](docs/runtime.md) and [`docs/live-testing.md`](docs/live-testing.md).
 
-`MIG-029` and `MIG-037` remain external-surface proof items and must not be described as completed until their independent host evidence is captured. They block stable `v2.0.2` promotion but do not prevent candidate packaging. DTIF is now archive-only: retained source evidence is not current ARGUS truth and destructive deletion is not authorized by the reconciliation closure.
+## AI-host integrations
 
-See [`GOVERNANCE.md`](GOVERNANCE.md), [`docs/architecture.md`](docs/architecture.md), and [`docs/release-process.md`](docs/release-process.md) for the normative change and release model.
+Documented surfaces include:
+
+- ChatGPT — [`integrations/chatgpt/`](integrations/chatgpt/)
+- ChatGPT Work — [`integrations/work/`](integrations/work/)
+- Codex — [`integrations/codex/`](integrations/codex/)
+- Hermes Agent — [`integrations/hermes-agent/`](integrations/hermes-agent/)
+- Generic AI hosts — [`integrations/generic-ai-host/`](integrations/generic-ai-host/)
+
+External conformance is governed by machine-readable `integrations/<surface>/release-verification.yaml` contracts.
+
+## Persistence
+
+Task execution state and durable canonical-library state remain separate namespaces. A `SAVED` claim requires an authorized write and verified receipt. If durable storage is unavailable, ATLAS reports `CAPABILITY_UNAVAILABLE`; if authorization or policy blocks it, ATLAS reports `BLOCKED`.
+
+## Repository map
+
+- `atlas-ai.yaml` — machine discovery entrypoint.
+- `atlas-os.yaml` — sole product/release authority.
+- `.agents/skills/atlas-os/` — project-local AI-host skill entrypoint.
+- `atlas_runtime/` — optional reference runtime and adapter seam.
+- `spec/` — normative machine specifications.
+- `schemas/` — JSON Schemas for governed state.
+- `registries/` — capabilities, providers, surfaces, outputs, taxonomies, frameworks, and controls.
+- `migration/` — schema-validated migration/release-control evidence.
+- `integrations/` — host adapters and external verification contracts.
+- `tests/` — unit, conformance, regression, and integration evidence.
+- `tools/validate/` — repository/machine/output validation.
+- `tools/package/` — deterministic candidate/release packaging.
+- `library/` — durable reusable outputs and storage guidance.
+
+## Release state
+
+The last stable release remains `v2.0.1`.
+
+`v2.0.2-rc.4` is a candidate. It introduces the triage-first fast path, four-responsibility architecture, conditional Domain Intelligence, generalized ARGUS intelligence routing, and provider-neutral control revision `atlas-bootstrap-2026-10-22-r8`.
+
+Candidate verification items:
+
+- `MIG-029` — independent New Chat and ChatGPT Work bootstrap proof for rc.4/r8 remains pending.
+- `MIG-037` — repository publication is proven for rc.4/r8, but independent propagation across ChatGPT, Codex, Work, and Hermes Agent remains blocked on `MIG-029`.
+- `DTIF-RECONCILIATION` — closed and archive-only; retained historical evidence is not current ARGUS truth.
+
+Stable `v2.0.2` must not be promoted until genuine independent evidence satisfies the current external-proof criteria.
+
+See [`GOVERNANCE.md`](GOVERNANCE.md), [`docs/architecture.md`](docs/architecture.md), and [`docs/release-process.md`](docs/release-process.md).
