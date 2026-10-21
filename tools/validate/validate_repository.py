@@ -17,6 +17,7 @@ import yaml
 
 REQUIRED_PATHS = (
     "README.md",
+    "LICENSE",
     "atlas-os.yaml",
     "VERSION",
     "CHANGELOG.md",

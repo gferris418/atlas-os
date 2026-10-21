@@ -4,6 +4,7 @@ All notable changes follow semantic versioning and preserve release lineage. The
 
 ## Unreleased
 
+- Add the MIT license grant and declare it separately from the product's internal information classification.
 - Define ATLAS-OS explicitly as a platform-neutral AI-agent governance layer rather than a device operating system.
 - Add project-local Agent Skills installation for Hermes Agent and compatible AI tools, plus portable setup guidance for ChatGPT and generic hosts.
 - Generalize the executable adapter and dashboard contracts from a fixed provider list to validated AI-host identifiers.
