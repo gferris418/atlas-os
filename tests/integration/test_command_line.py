@@ -38,7 +38,8 @@ class CommandLineTests(unittest.TestCase):
 
         self.assertEqual(0, completed.returncode, completed.stderr)
         self.assertIn("ATLAS/chatgpt", completed.stdout)
-        self.assertIn("State READY", completed.stdout)
+        self.assertIn("State BLOCKED", completed.stdout)
+        self.assertIn("MATERIAL_CONTEXT_MATRIX", completed.stdout)
         self.assertIn("Task 1/2", completed.stdout)
         self.assertLessEqual(len(completed.stdout.strip().splitlines()), 4)
         self.assertEqual("", completed.stderr)
@@ -50,8 +51,8 @@ class CommandLineTests(unittest.TestCase):
         events = [json.loads(line) for line in completed.stdout.splitlines()]
         self.assertEqual(["accepted", "result"], [event["event"] for event in events])
         self.assertEqual("plan-radar", events[0]["plan_id"])
-        self.assertEqual("READY", events[1]["state"])
-        self.assertEqual("assess", events[1]["active_unit"])
+        self.assertEqual("BLOCKED", events[1]["state"])
+        self.assertIsNone(events[1]["active_unit"])
 
     def test_invalid_json_fails_without_a_traceback(self) -> None:
         completed = self._run(input_text="not-json")

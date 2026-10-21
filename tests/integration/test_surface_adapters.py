@@ -30,6 +30,20 @@ class SurfaceAdapterIntegrationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "surface identifier"):
             get_surface_adapter("Microsoft Windows")
 
+    def test_routed_substantive_prompt_blocks_before_data_plane(self) -> None:
+        tasks = [{"id": "assess", "status": "PENDING", "dependencies": []}]
+        dashboard = get_surface_adapter("hermes-agent").start_prompt(
+            "Assess coastal surveillance radar for Bangladesh Navy",
+            tasks,
+            plan_id="plan-radar",
+        )
+
+        self.assertEqual("BLOCKED", dashboard["plan_status"])
+        self.assertEqual("PENDING", dashboard["clarification_status"])
+        self.assertEqual("MATERIAL_CONTEXT_MATRIX", dashboard["active_stage"])
+        self.assertEqual("BLOCKED", dashboard["quality_gate"])
+        self.assertIn("why", dashboard["blocker_or_approval"])
+
     def test_surface_delivery_uses_real_storage_and_verified_receipt(self) -> None:
         profile = {
             "id": "output.answer-concise", "format": "markdown",

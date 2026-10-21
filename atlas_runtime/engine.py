@@ -133,15 +133,35 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     )
     plan = tuple(build_plan(work_units))
     capability_audit = audit_capability_providers(registry_items("capabilities"))
-    active_unit = select_next_work_unit(
-        work_units,
-        plan_id=envelope.plan_id,
-        plan_status="READY",
-        clarification_status=envelope.clarification_status,
-    )
+    blocking_stage: str | None = None
+    blocker: str | None = None
+    if substantive and envelope.clarification_status != "RESOLVED":
+        if not completeness["complete"]:
+            blocking_stage = "MATERIAL_CONTEXT_MATRIX"
+            blocker = (
+                "Clarify material context: "
+                + ", ".join(completeness["questions"])
+            )
+        elif domain_classification["status"] != "CLASSIFIED":
+            blocking_stage = "DOMAIN_CLASSIFICATION"
+            blocker = domain_classification["next_action"]
+        elif domain_alignment["status"] == "RESEARCH_REQUIRED":
+            blocking_stage = "DOMAIN_FRAMEWORK_ALIGNMENT"
+            blocker = domain_alignment["next_action"]
+
+    plan_status = "BLOCKED" if blocking_stage else "READY"
+    clarification_status = "PENDING" if blocking_stage else envelope.clarification_status
+    active_unit = None
+    if not blocking_stage:
+        active_unit = select_next_work_unit(
+            work_units,
+            plan_id=envelope.plan_id,
+            plan_status=plan_status,
+            clarification_status=clarification_status,
+        )
     completed = sum(item.get("status") == "COMPLETED" for item in work_units)
-    state = "COMPLETED" if active_unit is None else "READY"
-    execution_trace = (
+    state = "BLOCKED" if blocking_stage else ("COMPLETED" if active_unit is None else "READY")
+    preflight_trace = (
         "TAXONOMY_ROUTING",
         "INTENT_NORMALIZATION",
         "MATERIAL_CONTEXT_MATRIX",
@@ -149,8 +169,13 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         "DOMAIN_FRAMEWORK_ALIGNMENT",
         "PLANNING",
         "CAPABILITY_AUDIT",
-        "EXECUTION" if active_unit is not None else "DELIVERY",
     )
+    if blocking_stage:
+        execution_trace = preflight_trace
+    else:
+        execution_trace = preflight_trace + (
+            "EXECUTION" if active_unit is not None else "DELIVERY",
+        )
     processing_summary = (
         f"Taxonomy {taxonomy_route['status']}; context "
         f"{'COMPLETE' if completeness['complete'] else 'PARTIAL'}; classification "
@@ -160,18 +185,25 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     dashboard = create_dashboard(
         envelope.objective,
         plan_id=envelope.plan_id,
-        plan_status="READY",
+        plan_status=plan_status,
         surface=envelope.surface,
         timestamp=envelope.timestamp,
         timezone_name=envelope.timezone_name,
-        active_stage="DELIVERY" if active_unit is None else "EXECUTION",
-        active_unit=active_unit or "Plan complete",
+        active_stage=blocking_stage or ("DELIVERY" if active_unit is None else "EXECUTION"),
+        active_unit=(
+            "Resolve material clarification"
+            if blocking_stage
+            else active_unit or "Plan complete"
+        ),
         completed_units=completed,
         total_units=len(work_units),
         progress=round(100 * completed / len(work_units)),
-        clarification_status=envelope.clarification_status,
+        clarification_status=clarification_status,
         processing_summary=processing_summary,
-        quality_gate="PASS" if state == "COMPLETED" else "PENDING",
+        quality_gate=(
+            "BLOCKED" if state == "BLOCKED" else "PASS" if state == "COMPLETED" else "PENDING"
+        ),
+        blocker=blocker,
     )
     dashboard["duration_ms"] = max(0, round((perf_counter_ns() - started) / 1_000_000))
     return ExecutionResult(

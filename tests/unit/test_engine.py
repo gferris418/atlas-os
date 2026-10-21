@@ -29,10 +29,10 @@ class ExecutionEngineTests(unittest.TestCase):
 
         result = execute(envelope)
 
-        self.assertEqual("READY", result.state)
+        self.assertEqual("BLOCKED", result.state)
         self.assertEqual("Assess coastal surveillance radar", result.normalized_intent)
         self.assertEqual(("classify", "assess"), result.plan)
-        self.assertEqual("assess", result.active_unit)
+        self.assertIsNone(result.active_unit)
         self.assertIn("ANALYSIS", result.task_classes)
         self.assertEqual("ROUTED", result.taxonomy_route["status"])
         self.assertEqual("maritime-defense", result.taxonomy_route["hierarchy"]["vertical"])
@@ -40,13 +40,35 @@ class ExecutionEngineTests(unittest.TestCase):
         self.assertEqual("PASS", result.capability_audit["status"])
         self.assertEqual("TAXONOMY_ROUTING", result.execution_trace[0])
         self.assertIn("CAPABILITY_AUDIT", result.execution_trace)
+        self.assertNotIn("EXECUTION", result.execution_trace)
         self.assertEqual("chatgpt", result.dashboard["surface"])
+        self.assertEqual("BLOCKED", result.dashboard["plan_status"])
+        self.assertEqual("MATERIAL_CONTEXT_MATRIX", result.dashboard["active_stage"])
+        self.assertEqual("PENDING", result.dashboard["clarification_status"])
+        self.assertEqual("BLOCKED", result.dashboard["quality_gate"])
+        self.assertIn("how", result.dashboard["blocker_or_approval"])
         self.assertEqual(50, result.dashboard["progress"])
         self.assertLessEqual(len(result.compact_status.splitlines()), 4)
         for label in ("Input", "Processing", "Output", "Playbook", "Framework", "SOP"):
             with self.subTest(label=label):
                 self.assertIn(label, result.compact_status)
         self.assertIn("Taxonomy ROUTED", result.dashboard["processing_summary"])
+
+    def test_explicitly_resolved_clarification_unlocks_routed_execution(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective="Assess coastal surveillance radar",
+            plan_id="plan-radar-resolved",
+            work_units=(
+                {"id": "assess", "status": "PENDING", "dependencies": []},
+            ),
+            clarification_status="RESOLVED",
+        ))
+
+        self.assertEqual("READY", result.state)
+        self.assertEqual("assess", result.active_unit)
+        self.assertEqual("READY", result.dashboard["plan_status"])
+        self.assertEqual("RESOLVED", result.dashboard["clarification_status"])
+        self.assertEqual("EXECUTION", result.execution_trace[-1])
 
     def test_execute_consumes_work_units_once_and_does_not_mutate_them(self) -> None:
         source = [
