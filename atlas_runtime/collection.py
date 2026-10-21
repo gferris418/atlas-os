@@ -43,6 +43,29 @@ def validate_collection_mission(
     return record
 
 
+def _temporal_scope(objective: str) -> tuple[str | None, str]:
+    normalized = " ".join(objective.split())
+    explicit_years = re.findall(r"\b(?:19|20)\d{2}\b", normalized)
+    if explicit_years:
+        unique_years = list(dict.fromkeys(explicit_years))
+        horizon = unique_years[0] if len(unique_years) == 1 else f"{unique_years[0]}-{unique_years[-1]}"
+        return horizon, "HISTORICAL"
+
+    horizon_match = re.search(
+        r"\b(?:over|within|next)\s+(\d+\s+(?:day|week|month|year)s?)\b",
+        normalized,
+        re.IGNORECASE,
+    )
+    if horizon_match:
+        return horizon_match.group(1), "CURRENT"
+
+    if re.search(r"\b(?:historical|archive|archived|previous|past)\b", normalized, re.IGNORECASE):
+        return None, "HISTORICAL"
+    if re.search(r"\b(?:latest|current|today|present)\b", normalized, re.IGNORECASE):
+        return None, "CURRENT"
+    return None, "CURRENT"
+
+
 def build_collection_mission(
     objective: str,
     *,
@@ -69,12 +92,7 @@ def build_collection_mission(
         jurisdictions.append("Bangladesh")
     if re.search(r"\bsingapore\b", normalized, re.IGNORECASE):
         jurisdictions.append("Singapore")
-    horizon_match = re.search(
-        r"\b(?:over|within|next)\s+(\d+\s+(?:day|week|month|year)s?)\b",
-        normalized,
-        re.IGNORECASE,
-    )
-    time_horizon = horizon_match.group(1) if horizon_match else None
+    time_horizon, freshness_requirement = _temporal_scope(normalized)
 
     mission = {
         "mission_id": "COLLECTION-" + task_id.removeprefix("TASK-"),
@@ -90,7 +108,7 @@ def build_collection_mission(
         ],
         "jurisdictions": jurisdictions,
         "time_horizon": time_horizon,
-        "freshness_requirement": "CURRENT",
+        "freshness_requirement": freshness_requirement,
         "collection_depth": depth,
         "source_priorities": ["official", "primary", "authoritative-secondary"],
         "source_exclusions": [],
