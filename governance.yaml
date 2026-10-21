@@ -1,0 +1,56 @@
+schema: schemas/governance.schema.json
+id: atlas-os-governance
+version: 1
+authority:
+  product_manifest: atlas-os.yaml
+  ai_manifest: atlas-ai.yaml
+  core_spec: spec/core.yaml
+  precedence:
+    - product-manifest
+    - governance-policy
+    - ai-discovery
+    - core-specifications
+    - schemas
+    - registries
+    - integration-contracts
+    - active-migrations
+    - human-guidance
+    - legacy
+  human_companion: GOVERNANCE.md
+change:
+  classes: [PATCH, MINOR, MAJOR, MIGRATION, GOVERNANCE, DOCUMENTATION, REGISTRY, INTEGRATION]
+  strong_review_for: [runtime-semantics, schemas, persistence, compatibility, release-gates, authority, security]
+release:
+  lifecycle: [DRAFT, CANDIDATE, VERIFIED, RELEASED, SUPERSEDED, ARCHIVED]
+  distinct_states: [generation, execution, verification, acceptance, release]
+  released_requires_no_open_blockers: true
+  missing_evidence_is_pass: false
+  candidate_packaging_allowed_with_truthful_blockers: true
+evidence:
+  spec: spec/evidence.yaml
+  material_claims_require_provenance: true
+  model_output_is_verified_evidence: false
+approvals:
+  spec: spec/approvals.yaml
+  scoped: true
+  gated_actions: [destructive-action, irreversible-action, publication, financial-commitment, external-communication, permission-change, security-sensitive-change, major-canonical-write]
+domain:
+  practices_spec: spec/domain-practices.yaml
+  framework_registry: registries/frameworks.yaml
+  current_official_sources_required: true
+  alignment_is_not_certification: true
+  binding_requirements_take_precedence: true
+retention:
+  readily_available_revisions: 3
+  archive_requires: [dependent-replacement, migration-complete, audit-permission]
+  silent_overwrite: false
+migration:
+  schema: schemas/migration.schema.json
+  registry: registries/migrations.yaml
+  blockers_close_only_with_evidence: true
+  closed_requires_all_criteria_pass: true
+  deprecated_material_requires_replacement_lineage: true
+legacy:
+  root: legacy
+  immutable: true
+  active_resolution_to_legacy: false
