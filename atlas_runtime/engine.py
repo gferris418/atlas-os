@@ -262,15 +262,9 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
                     + ", ".join(routing_preview["missing_prerequisite_providers"])
                 )
             elif candidate_active_unit is not None:
-                context = ExecutionContext(
-                    task_id=envelope.task_id,
-                    plan_id=envelope.plan_id,
-                    work_unit_id=candidate_active_unit,
-                    task_class=task_classes[0],
-                    available_capabilities=frozenset(
-                        set(capability_audit["admitted"])
-                        | {provider["id"] for provider in routing_preview["providers"]}
-                    ),
+                available_capabilities = frozenset(
+                    set(capability_audit["admitted"])
+                    | {provider["id"] for provider in routing_preview["providers"]}
                 )
                 records = {
                     item["id"]: item
@@ -289,8 +283,31 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
                     item["id"]: item for item in domain_registry["items"]
                 }
                 for provider in routing_preview["providers"]:
+                    provider_record = (
+                        domain_records[provider["id"]]
+                        if provider["type"] == "domain-method"
+                        else records[provider["id"]]
+                    )
+                    routing_class = provider["routing_task_class"]
+                    if routing_class is None:
+                        routing_decisions.append({
+                            "status": "BLOCKED",
+                            "provider_id": provider["id"],
+                            "provider_type": provider["type"],
+                            "requirement": provider["requirement"],
+                            "reason": "TASK_CLASS_INCOMPATIBLE",
+                            "preview_digest": routing_preview["digest"],
+                        })
+                        continue
+                    context = ExecutionContext(
+                        task_id=envelope.task_id,
+                        plan_id=envelope.plan_id,
+                        work_unit_id=candidate_active_unit,
+                        task_class=routing_class,
+                        available_capabilities=available_capabilities,
+                    )
                     if provider["type"] == "domain-method":
-                        method_record = domain_records[provider["id"]]
+                        method_record = provider_record
                         handoff = None
                         if envelope.timestamp is not None:
                             handoff = prepare_domain_context_handoff(

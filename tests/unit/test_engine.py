@@ -569,6 +569,85 @@ class ExecutionEngineTests(unittest.TestCase):
         self.assertEqual("NOT_REQUIRED", result.routing_preview["status"])
         self.assertNotIn("ROUTING_PREVIEW", result.execution_trace)
 
+    def test_multilabel_task_uses_provider_compatible_routing_class(self) -> None:
+        request = {
+            "objective": (
+                "Research and write a report on public procurement opportunities "
+                "for Bangladesh Navy coastal surveillance radar"
+            ),
+            "task_id": "TASK-MULTILABEL-RADAR-RESEARCH",
+            "plan_id": "plan-multilabel-radar-research",
+            "work_units": ({"id": "research", "status": "PENDING", "dependencies": []},),
+            "surface": "chatgpt",
+            "clarification_status": "RESOLVED",
+            "timestamp": "2026-10-21T23:31:00+06:00",
+            "timezone_name": "Asia/Dhaka",
+        }
+        proposal = execute(ExecutionEnvelope(**request))
+        result = execute(ExecutionEnvelope(
+            **request,
+            routing_approval_status="APPROVED",
+            routing_preview_digest=proposal.routing_preview["digest"],
+        ))
+
+        argus = next(
+            decision
+            for decision in result.routing_decisions
+            if decision["provider_id"] == "domain-method.argus-intelligence"
+        )
+        self.assertIn("RESEARCH", result.task_classes)
+        self.assertEqual("BLOCKED", argus["status"])
+        self.assertEqual("HANDOFF_STATE_NOT_ACCEPTED", argus["reason"])
+        self.assertNotIn("EXECUTION", result.execution_trace)
+
+    def test_provider_task_class_change_invalidates_preview_approval(self) -> None:
+        provider = {
+            "id": "function.class-bound",
+            "name": "Class-bound provider",
+            "description": "Runs under an explicitly selected task class.",
+            "status": "available",
+            "authority": "connected",
+            "permission": "read",
+            "data_scope": "Approved task input only",
+            "risk_class": "low",
+            "version": "1",
+            "source": "host:function.class-bound@1",
+            "capabilities": ["class_bound_operation"],
+            "requires": [],
+            "conflicts_with": [],
+            "fallback": "capability.manual-handoff",
+            "task_classes": ["DOCUMENT"],
+        }
+        request = {
+            "objective": "Research and write a report using the class-bound operation",
+            "task_id": "TASK-CLASS-BOUND",
+            "plan_id": "plan-class-bound",
+            "work_units": ({"id": "run", "status": "PENDING", "dependencies": []},),
+            "capability_requirements": ("class_bound_operation",),
+        }
+        proposal = execute(ExecutionEnvelope(
+            **request,
+            provider_inventory={"function": (provider,)},
+        ))
+        proposed_provider = proposal.routing_preview["providers"][0]
+        self.assertEqual(["DOCUMENT"], proposed_provider["task_classes"])
+        self.assertEqual("DOCUMENT", proposed_provider["routing_task_class"])
+
+        changed = {**provider, "task_classes": ["RESEARCH"]}
+        result = execute(ExecutionEnvelope(
+            **request,
+            provider_inventory={"function": (changed,)},
+            routing_approval_status="APPROVED",
+            routing_preview_digest=proposal.routing_preview["digest"],
+        ))
+
+        self.assertNotEqual(
+            proposal.routing_preview["digest"],
+            result.routing_preview["digest"],
+        )
+        self.assertEqual("BLOCKED", result.state)
+        self.assertEqual("ROUTING_PREVIEW", result.dashboard["active_stage"])
+
     def test_exact_preview_approval_routes_research_providers_before_execution(self) -> None:
         request = {
             "objective": "Find current public sources about ISO 9001",

@@ -94,6 +94,8 @@ def _render_routing_preview(preview: dict[str, Any]) -> str:
             f"Fallback: {provider['fallback'] or 'none'}",
             f"  Identity: {provider['source']} @ {provider['version']} | "
             f"Authority: {provider['authority']} | Risk: {provider['risk_class']}",
+            f"  Task classes: {', '.join(provider['task_classes']) or 'any'} | "
+            f"Selected: {provider['routing_task_class'] or 'none'}",
             f"  Prerequisites: {', '.join(provider['prerequisites']) or 'none'}",
             f"  Conflicts: {', '.join(provider['conflicts_with']) or 'none'}",
             f"  Unresolved gates: {', '.join(provider['unresolved_gates']) or 'none'}",

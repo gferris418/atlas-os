@@ -109,7 +109,7 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["id", "type", "name", "requirement", "purpose", "method", "permission", "authority", "risk_class", "version", "source", "prerequisites", "conflicts_with", "unresolved_gates", "data_scope", "fallback"],
+            "required": ["id", "type", "name", "requirement", "purpose", "method", "permission", "authority", "risk_class", "version", "source", "prerequisites", "conflicts_with", "task_classes", "routing_task_class", "unresolved_gates", "data_scope", "fallback"],
             "properties": {
               "id": {"type": "string", "minLength": 1},
               "type": {"enum": ["capability", "domain-method", "function", "model", "plugin", "skill", "subagent", "tool"]},
@@ -124,6 +124,8 @@
               "source": {"type": "string", "minLength": 1},
               "prerequisites": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
               "conflicts_with": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+              "task_classes": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+              "routing_task_class": {"type": ["string", "null"]},
               "unresolved_gates": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
               "data_scope": {"type": "string", "minLength": 1},
               "fallback": {"type": ["string", "null"]}

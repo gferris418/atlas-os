@@ -55,7 +55,8 @@ def build_routing_preview(
 ) -> dict[str, Any]:
     """Describe proposed provider routing without activating a provider."""
     lowered = " ".join(text.lower().split())
-    classes = set(task_classes)
+    task_class_order = list(dict.fromkeys(task_classes))
+    classes = set(task_class_order)
     hierarchy = taxonomy_route.get("hierarchy") or {}
     requirements = [
         str(requirement).strip()
@@ -140,6 +141,14 @@ def build_routing_preview(
                 if surfaces and f"surface.{surface}" not in surfaces:
                     continue
                 prerequisites = list(record.get("requires", []))
+                accepted_task_classes = list(record.get("task_classes", []))
+                routing_task_class = next(
+                    (
+                        task_class for task_class in task_class_order
+                        if not accepted_task_classes or task_class in accepted_task_classes
+                    ),
+                    None,
+                )
                 providers.append({
                     "id": record["id"],
                     "type": provider_type,
@@ -158,6 +167,8 @@ def build_routing_preview(
                     "source": record.get("source", "unknown"),
                     "prerequisites": prerequisites,
                     "conflicts_with": list(record.get("conflicts_with", [])),
+                    "task_classes": accepted_task_classes,
+                    "routing_task_class": routing_task_class,
                     "unresolved_gates": [],
                     "data_scope": (
                         record.get("data_scope")
@@ -182,6 +193,8 @@ def build_routing_preview(
             for prerequisite in provider["prerequisites"]
             if prerequisite not in admitted_ids and prerequisite not in candidate_ids
         ]
+        if provider["routing_task_class"] is None:
+            unresolved.append("task_class:INCOMPATIBLE")
         if provider["type"] == "domain-method":
             if task_id is None:
                 unresolved.append("task_id:REQUIRED")
