@@ -33,7 +33,8 @@ class SurfaceAdapterIntegrationTests(unittest.TestCase):
                 self.assertEqual(f"plan-{surface}", dashboard["plan_id"])
                 self.assertEqual("answer", dashboard["active_unit"])
                 self.assertEqual("READY", dashboard["plan_status"])
-                self.assertIn("Taxonomy UNRESOLVED", dashboard["processing_summary"])
+                self.assertIn("Route GENERAL_SEARCH", dashboard["processing_summary"])
+                self.assertIn("domain context ON_DEMAND", dashboard["processing_summary"])
 
     def test_adapter_rejects_invalid_ai_host_identifier(self) -> None:
         with self.assertRaisesRegex(ValueError, "surface identifier"):
