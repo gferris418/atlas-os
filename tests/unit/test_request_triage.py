@@ -41,6 +41,16 @@ class RequestTriageTests(unittest.TestCase):
         self.assertIn("COMPETITIVE_INTELLIGENCE", result["intelligence_types"])
         self.assertIn("MONITORING_INTELLIGENCE", result["intelligence_types"])
 
+    def test_assessing_opportunities_is_intelligence_but_plain_tender_lookup_is_not(self) -> None:
+        assessment = self._triage(
+            "Find and assess public procurement opportunities for coastal surveillance radar "
+            "for Bangladesh Navy using public sources only."
+        )
+        lookup = self._triage("Find the current Bangladesh Navy tenders.")
+        self.assertEqual("INTELLIGENCE", assessment["route"])
+        self.assertIn("OPPORTUNITY_INTELLIGENCE", assessment["intelligence_types"])
+        self.assertEqual("GENERAL_SEARCH", lookup["route"])
+
     def test_government_mention_alone_does_not_activate_argus(self) -> None:
         result = self._triage("What is Bangladesh Parjatan Corporation?")
         self.assertEqual("GENERAL_SEARCH", result["route"])
