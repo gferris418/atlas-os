@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import unittest
 from inspect import signature
 
@@ -118,16 +120,266 @@ class ExecutionEngineTests(unittest.TestCase):
                 self.assertTrue(provider["purpose"])
                 self.assertTrue(provider["method"])
                 self.assertIn(provider["permission"], {"read", "write"})
+                self.assertIn("prerequisites", provider)
+                self.assertIn("unresolved_gates", provider)
                 self.assertIn("fallback", provider)
+        argus = next(
+            provider
+            for provider in result.routing_preview["providers"]
+            if provider["id"] == "domain-method.argus-intelligence"
+        )
+        self.assertEqual(
+            ["capability.domain-alignment", "capability.evidence-tracking"],
+            argus["prerequisites"],
+        )
+        self.assertIn("domain_handoff_state:BLOCKED", argus["unresolved_gates"])
+        self.assertIn(
+            "domain-method.argus-intelligence:domain_handoff_state:BLOCKED",
+            result.routing_preview["unresolved_gates"],
+        )
+        digest_payload = {
+            key: value
+            for key, value in result.routing_preview.items()
+            if key != "digest"
+        }
+        encoded = json.dumps(
+            digest_payload,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        self.assertEqual(
+            "sha256:" + hashlib.sha256(encoded).hexdigest(),
+            result.routing_preview["digest"],
+        )
         self.assertTrue(result.routing_preview["digest"].startswith("sha256:"))
         self.assertEqual("ROUTING_PREVIEW", result.execution_trace[-1])
         self.assertNotIn("EXECUTION", result.execution_trace)
 
+    def test_repository_engineering_provider_is_previewed_before_routing(self) -> None:
+        request = {
+            "objective": "Implement and test a repository change",
+            "task_id": "TASK-REPOSITORY-CHANGE",
+            "plan_id": "plan-repository-change",
+            "work_units": (
+                {"id": "implement", "status": "PENDING", "dependencies": []},
+            ),
+            "surface": "codex",
+        }
+        result = execute(ExecutionEnvelope(**request))
+
+        self.assertEqual("BLOCKED", result.state)
+        self.assertIsNone(result.active_unit)
+        self.assertEqual("ROUTING_PREVIEW", result.dashboard["active_stage"])
+        self.assertEqual("PROPOSED", result.routing_preview["status"])
+        self.assertIn("execute", result.routing_preview["requirements"])
+        self.assertEqual(
+            {"skill.repository-engineering", "tool.execution"},
+            {provider["id"] for provider in result.routing_preview["providers"]},
+        )
+        self.assertEqual(
+            ["tool.execution", "skill.repository-engineering"],
+            result.routing_preview["execution_sequence"],
+        )
+        self.assertEqual((), result.routing_decisions)
+        self.assertNotIn("EXECUTION", result.execution_trace)
+
+        approved = execute(ExecutionEnvelope(
+            **request,
+            routing_approval_status="APPROVED",
+            routing_preview_digest=result.routing_preview["digest"],
+        ))
+
+        self.assertEqual("READY", approved.state)
+        self.assertEqual("implement", approved.active_unit)
+        self.assertEqual(
+            ["tool.execution", "skill.repository-engineering"],
+            [decision["provider_id"] for decision in approved.routing_decisions],
+        )
+        self.assertTrue(all(
+            decision["status"] == "ROUTED"
+            for decision in approved.routing_decisions
+        ))
+        self.assertLess(
+            approved.execution_trace.index("ROUTING"),
+            approved.execution_trace.index("EXECUTION"),
+        )
+
+    def test_domain_method_preview_discloses_missing_handoff_timestamp(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective=(
+                "Find and assess public procurement opportunities for coastal "
+                "surveillance radar for Bangladesh Navy using public sources only"
+            ),
+            task_id="TASK-BD-RADAR-OPPORTUNITIES",
+            plan_id="plan-bd-radar-opportunities",
+            work_units=(
+                {"id": "research", "status": "PENDING", "dependencies": []},
+            ),
+            surface="chatgpt",
+            clarification_status="RESOLVED",
+        ))
+
+        argus = next(
+            provider
+            for provider in result.routing_preview["providers"]
+            if provider["id"] == "domain-method.argus-intelligence"
+        )
+        self.assertIn("domain_handoff_timestamp:REQUIRED", argus["unresolved_gates"])
+
     def test_execution_envelope_exposes_bound_routing_approval_fields(self) -> None:
         parameters = signature(ExecutionEnvelope).parameters
         self.assertIn("task_id", parameters)
+        self.assertIn("capability_requirements", parameters)
+        self.assertIn("provider_inventory", parameters)
         self.assertIn("routing_approval_status", parameters)
         self.assertIn("routing_preview_digest", parameters)
+
+    def test_host_function_uses_public_preview_approval_and_routing_seam(self) -> None:
+        request = {
+            "objective": "Calculate the governed route estimate",
+            "task_id": "TASK-ROUTE-ESTIMATE",
+            "plan_id": "plan-route-estimate",
+            "work_units": (
+                {"id": "calculate", "status": "PENDING", "dependencies": []},
+            ),
+            "surface": "custom-ai-tool",
+            "capability_requirements": ("calculate_route_estimate",),
+            "provider_inventory": {
+                "function": ({
+                    "id": "function.route-estimator",
+                    "name": "Route estimator",
+                    "description": "Calculates a route estimate from approved inputs.",
+                    "status": "available",
+                    "authority": "connected",
+                    "permission": "read",
+                    "data_scope": "Approved route origin and destination only",
+                    "risk_class": "low",
+                    "version": "1",
+                    "source": "host:function.route-estimator",
+                    "capabilities": ["calculate_route_estimate"],
+                    "requires": ["capability.evidence-tracking"],
+                    "conflicts_with": [],
+                    "fallback": "capability.manual-handoff",
+                },),
+            },
+        }
+        proposal = execute(ExecutionEnvelope(**request))
+
+        self.assertEqual("BLOCKED", proposal.state)
+        self.assertEqual("ROUTING_PREVIEW", proposal.dashboard["active_stage"])
+        self.assertEqual(
+            ["function.route-estimator"],
+            proposal.routing_preview["execution_sequence"],
+        )
+        self.assertEqual((), proposal.routing_decisions)
+
+        approved = execute(ExecutionEnvelope(
+            **request,
+            routing_approval_status="APPROVED",
+            routing_preview_digest=proposal.routing_preview["digest"],
+        ))
+
+        self.assertEqual("READY", approved.state)
+        self.assertEqual("calculate", approved.active_unit)
+        self.assertEqual("function", approved.routing_decisions[0]["provider_type"])
+        self.assertEqual("function.route-estimator", approved.routing_decisions[0]["provider_id"])
+
+    def test_unmatched_explicit_capability_requirement_blocks_execution(self) -> None:
+        request = {
+            "objective": "Calculate the governed route estimate",
+            "task_id": "TASK-ROUTE-ESTIMATE",
+            "plan_id": "plan-route-estimate",
+            "work_units": (
+                {"id": "calculate", "status": "PENDING", "dependencies": []},
+            ),
+            "capability_requirements": ("calculate_route_estimate",),
+        }
+        proposal = execute(ExecutionEnvelope(**request))
+
+        self.assertEqual("BLOCKED", proposal.state)
+        self.assertEqual(
+            ["calculate_route_estimate"],
+            proposal.routing_preview["unmatched_requirements"],
+        )
+        self.assertIn(
+            "requirement:calculate_route_estimate:NO_ADMITTED_PROVIDER",
+            proposal.routing_preview["unresolved_gates"],
+        )
+
+        approved = execute(ExecutionEnvelope(
+            **request,
+            routing_approval_status="APPROVED",
+            routing_preview_digest=proposal.routing_preview["digest"],
+        ))
+
+        self.assertEqual("BLOCKED", approved.state)
+        self.assertIsNone(approved.active_unit)
+        self.assertEqual("ROUTING", approved.dashboard["active_stage"])
+        self.assertNotIn("EXECUTION", approved.execution_trace)
+
+    def test_cyclic_provider_prerequisites_fail_closed(self) -> None:
+        provider = {
+            "description": "Performs one half of a cyclic operation.",
+            "status": "available",
+            "authority": "connected",
+            "permission": "read",
+            "data_scope": "Approved task input only",
+            "risk_class": "low",
+            "version": "1",
+            "source": "host:test",
+            "capabilities": ["cyclic_operation"],
+            "conflicts_with": [],
+            "fallback": "capability.manual-handoff",
+        }
+        request = {
+            "objective": "Run the governed cyclic operation",
+            "task_id": "TASK-CYCLIC-OPERATION",
+            "plan_id": "plan-cyclic-operation",
+            "work_units": (
+                {"id": "operate", "status": "PENDING", "dependencies": []},
+            ),
+            "capability_requirements": ("cyclic_operation",),
+            "provider_inventory": {
+                "function": (
+                    {
+                        **provider,
+                        "id": "function.cycle-a",
+                        "name": "Cycle A",
+                        "requires": ["function.cycle-b"],
+                    },
+                    {
+                        **provider,
+                        "id": "function.cycle-b",
+                        "name": "Cycle B",
+                        "requires": ["function.cycle-a"],
+                    },
+                ),
+            },
+        }
+        proposal = execute(ExecutionEnvelope(**request))
+
+        self.assertEqual("BLOCKED", proposal.state)
+        self.assertEqual(
+            ["function.cycle-a", "function.cycle-b"],
+            proposal.routing_preview["cyclic_provider_ids"],
+        )
+        self.assertEqual([], proposal.routing_preview["execution_sequence"])
+        self.assertIn(
+            "provider_dependency_cycle:function.cycle-a,function.cycle-b",
+            proposal.routing_preview["unresolved_gates"],
+        )
+
+        approved = execute(ExecutionEnvelope(
+            **request,
+            routing_approval_status="APPROVED",
+            routing_preview_digest=proposal.routing_preview["digest"],
+        ))
+
+        self.assertEqual("BLOCKED", approved.state)
+        self.assertIsNone(approved.active_unit)
+        self.assertEqual("ROUTING", approved.dashboard["active_stage"])
+        self.assertEqual((), approved.routing_decisions)
+        self.assertNotIn("EXECUTION", approved.execution_trace)
 
     def test_exact_preview_approval_routes_research_providers_before_execution(self) -> None:
         request = {

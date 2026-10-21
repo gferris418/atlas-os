@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Iterable, Protocol
+from typing import Any, Iterable, Mapping, Protocol
 
 from .engine import ExecutionEnvelope, execute
 from .runtime import prepare_library_record
@@ -26,6 +26,8 @@ class SurfaceAdapter:
         plan_id: str,
         clarification_status: str = "NOT_REQUIRED",
         task_id: str | None = None,
+        capability_requirements: Iterable[str] = (),
+        provider_inventory: Mapping[str, Iterable[dict[str, Any]]] | None = None,
         routing_approval_status: str = "PENDING",
         routing_preview_digest: str | None = None,
         timestamp: str | None = None,
@@ -40,6 +42,8 @@ class SurfaceAdapter:
             timezone_name=timezone_name,
             clarification_status=clarification_status,
             task_id=task_id,
+            capability_requirements=capability_requirements,
+            provider_inventory=provider_inventory,
             routing_approval_status=routing_approval_status,
             routing_preview_digest=routing_preview_digest,
         )).dashboard

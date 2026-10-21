@@ -23,5 +23,5 @@ When a verified ATLAS snapshot is installed in ChatGPT Library, use that pinned 
 - **Update behavior:** for private-repository updates, prefer the latest successful `main` workflow artifact named `atlas-os-main-snapshot`, verify its checksums and source commit, then replace the Library snapshot with read-back evidence.
 - **Unsupported behavior:** do not claim repository commands, writes, or connected-source access unless the surface exposes and executes them.
 - **Conformance:** candidate; independent bootstrap and propagation proof remain open.
-- **Executable seam:** `get_surface_adapter("chatgpt")` validates a concrete plan, initializes dashboard state, and reports unavailable persistence unless the host supplies an authorized durable adapter.
+- **Executable seam:** `get_surface_adapter("chatgpt")` validates a concrete plan, accepts explicit `capability_requirements` and an admitted `provider_inventory` for digest-bound preview/routing, initializes dashboard state, and reports unavailable persistence unless the host supplies an authorized durable adapter.
 

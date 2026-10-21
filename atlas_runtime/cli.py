@@ -58,6 +58,8 @@ def _build_envelope(request: dict[str, Any]) -> ExecutionEnvelope:
         surface=request.get("surface", "core"),
         clarification_status=request.get("clarification_status", "NOT_REQUIRED"),
         task_id=request.get("task_id"),
+        capability_requirements=request.get("capability_requirements", ()),
+        provider_inventory=request.get("provider_inventory"),
         routing_approval_status=request.get("routing_approval_status", "PENDING"),
         routing_preview_digest=request.get("routing_preview_digest"),
         timestamp=request.get("timestamp"),
@@ -75,6 +77,8 @@ def _render_routing_preview(preview: dict[str, Any]) -> str:
         f"Objective: {preview['objective']}",
         f"Execution: {preview['task_id'] or 'task ID pending'} · {preview['plan_id']} · {preview['surface']}",
         f"Work unit: {preview['work_unit'] or 'none'}",
+        "Execution sequence: " + (" -> ".join(preview["execution_sequence"]) or "no provider routing"),
+        "Unresolved gates: " + (", ".join(preview["unresolved_gates"]) or "none"),
     ]
     for index, step in enumerate(preview["steps"], start=1):
         lines.append(f"{index}. {step['stage']}: {step['description']}")
@@ -86,6 +90,8 @@ def _render_routing_preview(preview: dict[str, Any]) -> str:
             f"  How: {provider['method']}",
             f"  Permission: {provider['permission']} | Data: {provider['data_scope']} | "
             f"Fallback: {provider['fallback'] or 'none'}",
+            f"  Prerequisites: {', '.join(provider['prerequisites']) or 'none'}",
+            f"  Unresolved gates: {', '.join(provider['unresolved_gates']) or 'none'}",
         ))
     lines.append(f"Review: {preview['approval_prompt']}")
     lines.append(f"Approve this exact preview with digest {preview['digest']}")

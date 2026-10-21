@@ -14,4 +14,4 @@ An adapter must:
 6. Verify results and durable writes before reporting completion or `SAVED`.
 7. Keep provider-specific behavior outside the normative core.
 
-The shared executable seam is `get_surface_adapter("my-ai-tool")`. Registration documents known hosts and their capabilities, but an unregistered host slug remains valid so provider support does not require a core release.
+The shared executable seam is `get_surface_adapter("my-ai-tool")`. Pass the plan's semantic needs through `capability_requirements` and the host's admitted function, plugin, model, subagent, skill, tool, capability, or domain-method records through `provider_inventory`; both are digest-bound, and an unmatched requirement blocks execution. Registration documents known hosts and their capabilities, but an unregistered host slug remains valid so provider support does not require a core release.

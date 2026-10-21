@@ -6,7 +6,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from time import perf_counter_ns
-from typing import Any, Iterable
+from typing import Any, Iterable, Mapping
 
 import yaml
 
@@ -37,6 +37,8 @@ class ExecutionEnvelope:
     surface: str = "core"
     clarification_status: str = "NOT_REQUIRED"
     task_id: str | None = None
+    capability_requirements: Iterable[str] = ()
+    provider_inventory: Mapping[str, Iterable[dict[str, Any]]] | None = None
     routing_approval_status: str = "PENDING"
     routing_preview_digest: str | None = None
     timestamp: str | None = None
@@ -53,7 +55,18 @@ class ExecutionEnvelope:
             raise ValueError("execution requires at least one work unit")
         if self.routing_approval_status not in {"PENDING", "APPROVED", "REJECTED"}:
             raise ValueError("invalid routing approval status")
+        requirements = tuple(dict.fromkeys(
+            requirement.strip()
+            for requirement in self.capability_requirements
+            if requirement.strip()
+        ))
+        provider_inventory = {
+            str(provider_type): tuple(deepcopy(list(records)))
+            for provider_type, records in (self.provider_inventory or {}).items()
+        }
         object.__setattr__(self, "work_units", work_units)
+        object.__setattr__(self, "capability_requirements", requirements)
+        object.__setattr__(self, "provider_inventory", provider_inventory)
 
 
 @dataclass(frozen=True)
@@ -159,9 +172,16 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         plan_id=envelope.plan_id,
         plan=plan,
         work_unit=preview_active_unit,
+        timestamp=envelope.timestamp,
         domain_methods=registry_payload("domain-methods"),
         skills=registry_items("skills"),
         tools=registry_items("tools"),
+        capabilities=registry_items("capabilities"),
+        available_capabilities=capability_audit["admitted"],
+        domain_classification=domain_classification,
+        domain_alignment=domain_alignment,
+        additional_provider_groups=envelope.provider_inventory,
+        requested_requirements=envelope.capability_requirements,
     )
     blocking_stage: str | None = None
     blocker: str | None = None
@@ -195,19 +215,41 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
             blocker = "Approved routing requires a concrete task_id."
         else:
             candidate_active_unit = routing_preview["work_unit"]
-            if candidate_active_unit is not None:
+            if routing_preview["unmatched_requirements"]:
+                blocking_stage = "ROUTING"
+                blocker = (
+                    "No admitted provider satisfies: "
+                    + ", ".join(routing_preview["unmatched_requirements"])
+                )
+            elif routing_preview["cyclic_provider_ids"]:
+                blocking_stage = "ROUTING"
+                blocker = (
+                    "Provider prerequisite cycle: "
+                    + ", ".join(routing_preview["cyclic_provider_ids"])
+                )
+            elif candidate_active_unit is not None:
                 context = ExecutionContext(
                     task_id=envelope.task_id,
                     plan_id=envelope.plan_id,
                     work_unit_id=candidate_active_unit,
                     task_class=task_classes[0],
-                    available_capabilities=frozenset(capability_audit["admitted"]),
+                    available_capabilities=frozenset(
+                        set(capability_audit["admitted"])
+                        | {provider["id"] for provider in routing_preview["providers"]}
+                    ),
                 )
                 records = {
                     item["id"]: item
-                    for name in ("skills", "tools")
+                    for name in ("skills", "tools", "capabilities")
                     for item in registry_items(name)
                 }
+                for provider_records in envelope.provider_inventory.values():
+                    for item in provider_records:
+                        if item["id"] in records:
+                            raise ValueError(
+                                f"provider id is registered more than once: {item['id']}"
+                            )
+                        records[item["id"]] = item
                 domain_registry = registry_payload("domain-methods")
                 domain_records = {
                     item["id"]: item for item in domain_registry["items"]
@@ -310,7 +352,7 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     )
     if routing_preview["status"] == "PROPOSED":
         preflight_trace += ("ROUTING_PREVIEW",)
-    if routing_decisions:
+    if routing_decisions or blocking_stage == "ROUTING":
         preflight_trace += ("ROUTING",)
     if blocking_stage:
         execution_trace = preflight_trace

@@ -59,7 +59,7 @@
     "routing_preview": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "objective", "task_id", "plan_id", "surface", "plan", "work_unit", "requirements", "providers", "steps", "approval_prompt", "digest"],
+      "required": ["status", "objective", "task_id", "plan_id", "surface", "plan", "work_unit", "requirements", "providers", "unmatched_requirements", "cyclic_provider_ids", "unresolved_gates", "execution_sequence", "steps", "approval_prompt", "digest"],
       "properties": {
         "status": {"enum": ["NOT_REQUIRED", "PROPOSED"]},
         "objective": {"type": "string", "minLength": 1},
@@ -69,25 +69,31 @@
         "plan": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "work_unit": {"type": ["string", "null"]},
         "requirements": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "unresolved_gates": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "execution_sequence": {"type": "array", "items": {"type": "string"}},
         "providers": {
           "type": "array",
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["id", "type", "name", "requirement", "purpose", "method", "permission", "data_scope", "fallback"],
+            "required": ["id", "type", "name", "requirement", "purpose", "method", "permission", "prerequisites", "unresolved_gates", "data_scope", "fallback"],
             "properties": {
               "id": {"type": "string", "minLength": 1},
-              "type": {"enum": ["domain-method", "skill", "tool"]},
+              "type": {"enum": ["capability", "domain-method", "function", "model", "plugin", "skill", "subagent", "tool"]},
               "name": {"type": "string", "minLength": 1},
               "requirement": {"type": "string", "minLength": 1},
               "purpose": {"type": "string", "minLength": 1},
               "method": {"type": "string", "minLength": 1},
               "permission": {"enum": ["read", "write"]},
+              "prerequisites": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+              "unresolved_gates": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
               "data_scope": {"type": "string", "minLength": 1},
               "fallback": {"type": ["string", "null"]}
             }
           }
         },
+        "unmatched_requirements": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "cyclic_provider_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "steps": {
           "type": "array",
           "items": {

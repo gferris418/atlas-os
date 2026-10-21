@@ -12,6 +12,8 @@ class SurfaceAdapterIntegrationTests(unittest.TestCase):
     def test_adapter_accepts_bound_routing_approval_fields(self) -> None:
         parameters = signature(get_surface_adapter("chatgpt").start_prompt).parameters
         self.assertIn("task_id", parameters)
+        self.assertIn("capability_requirements", parameters)
+        self.assertIn("provider_inventory", parameters)
         self.assertIn("routing_approval_status", parameters)
         self.assertIn("routing_preview_digest", parameters)
 
