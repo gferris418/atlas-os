@@ -40,7 +40,7 @@ class RepositoryContractTests(unittest.TestCase):
 
     def test_manifest_is_only_product_version_authority(self) -> None:
         manifest = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))
-        self.assertEqual("2.0.2-rc.2", manifest["product"]["version"])
+        self.assertEqual("2.0.2-rc.3", manifest["product"]["version"])
         self.assertEqual("atlas-os.yaml#/product/version", (ROOT / "VERSION").read_text().strip())
 
     def test_candidate_identity_is_consistent_across_ai_host_profiles(self) -> None:
@@ -49,8 +49,9 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertEqual("CANDIDATE", manifest["product"]["status"])
         self.assertEqual("2.0.2", manifest["release"]["target_version"])
 
-        expected_version = "2.0.2-rc.2"
-        expected_control = "atlas-bootstrap-2026-10-21-r6"
+        expected_version = "2.0.2-rc.3"
+        expected_control = "atlas-bootstrap-2026-10-22-r7"
+        self.assertEqual(expected_control, manifest["execution"]["control_revision"])
         chatgpt = (ROOT / "integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md").read_text(
             encoding="utf-8"
         )
@@ -62,15 +63,16 @@ class RepositoryContractTests(unittest.TestCase):
 
     def test_cross_surface_proof_scope_includes_hermes_agent(self) -> None:
         migration = yaml.safe_load((ROOT / "migration/MIG-037.yaml").read_text(encoding="utf-8"))
-        criteria = " ".join(migration["acceptance_criteria"])
+        criteria = " ".join(item["requirement"] for item in migration["acceptance_criteria"])
         self.assertIn("Hermes Agent", criteria)
         self.assertIn("generic AI-host", migration["notes"])
 
-        checklist_path = ROOT / "integrations/hermes-agent/RELEASE-VERIFICATION.md"
+        checklist_path = ROOT / "integrations/hermes-agent/release-verification.yaml"
         self.assertTrue(checklist_path.is_file())
-        checklist = checklist_path.read_text(encoding="utf-8")
-        self.assertIn("2.0.2-rc.2", checklist)
-        self.assertIn("atlas-bootstrap-2026-10-21-r6", checklist)
+        checklist = yaml.safe_load(checklist_path.read_text(encoding="utf-8"))
+        self.assertEqual("2.0.2-rc.3", checklist["product_version"])
+        self.assertEqual("atlas-bootstrap-2026-10-22-r7", checklist["control_revision"])
+        self.assertEqual("READY_FOR_EXTERNAL_PROOF", checklist["status"])
 
     def test_readme_distinguishes_information_classification_from_license(self) -> None:
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
