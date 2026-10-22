@@ -13,19 +13,19 @@ acceptance_criteria:
     surfaces: [chatgpt]
     evidence_type: independent-host-observation
     status: PENDING
-    evidence_ids: [EVID-008]
+    evidence_ids: [EVID-009]
   - id: AC-02
     requirement: A fresh ChatGPT Work task resolves the same current core authority through its adapter.
     surfaces: [work]
     evidence_type: independent-host-observation
     status: PENDING
-    evidence_ids: [EVID-008]
+    evidence_ids: [EVID-009]
   - id: AC-03
     requirement: Independent evidence is retained with timestamps, surface identifiers, current product identity, current control revision, expected behavior, and reviewer identity.
     surfaces: [chatgpt, work]
     evidence_type: independently-reviewed-host-evidence
     status: PENDING
-    evidence_ids: [EVID-008]
+    evidence_ids: [EVID-009]
 evidence:
   - {id: EVID-001, type: local-automated-readiness, timestamp: "2026-10-17T23:57:16+06:00", version: 2.0.0-rc.7, control_revision: chatgpt-bootstrap-2026-10-17-r1, source: tests/integration/test_chatgpt_bootstrap.py, independent: false, scope: [repository, chatgpt], result: PASS, limitations: Independent fresh-session ChatGPT and ChatGPT Work proof is still required.}
   - {id: EVID-002, type: operator-release-risk-acceptance, timestamp: "2026-10-19T22:00:00+06:00", version: 2.0.0, source: docs/releases/v2.0.0.md, independent: false, scope: [release-governance], result: DEFERRED_POST_GA, limitations: Acceptance criteria remain open; this is not cross-surface proof.}
@@ -33,7 +33,7 @@ evidence:
   - {id: EVID-004, type: candidate-external-proof-target, timestamp: "2026-10-21T20:15:00+06:00", version: 2.0.2-rc.1, control_revision: atlas-bootstrap-2026-10-21-r5, source: integrations/chatgpt/RELEASE-VERIFICATION.md, independent: false, scope: [repository, chatgpt, work], result: READY_FOR_EXTERNAL_PROOF, limitations: Checklist publication is readiness evidence only.}
   - {id: EVID-005, type: taxonomy-first-candidate-external-proof-target, timestamp: "2026-10-21T22:24:16+06:00", version: 2.0.2-rc.2, control_revision: atlas-bootstrap-2026-10-21-r6, source: integrations/chatgpt/RELEASE-VERIFICATION.md, independent: false, scope: [repository, chatgpt, work], result: READY_FOR_EXTERNAL_PROOF, limitations: Independent host proof remained required.}
   - {id: EVID-006, type: machine-verifiable-external-proof-target, timestamp: "2026-10-22T00:15:50+06:00", version: 2.0.2-rc.3, control_revision: atlas-bootstrap-2026-10-22-r7, source: integrations/chatgpt/release-verification.yaml, independent: false, scope: [repository, chatgpt, work], result: READY_FOR_EXTERNAL_PROOF, limitations: Fresh independent host observations remained required.}
-  - {id: EVID-007, type: triage-first-machine-verifiable-external-proof-target, timestamp: "2026-10-22T02:07:25+06:00", version: 2.0.2-rc.4, control_revision: atlas-bootstrap-2026-10-22-r8, source: integrations/chatgpt/release-verification.yaml, independent: false, scope: [repository, chatgpt, work], result: READY_FOR_EXTERNAL_PROOF, limitations: Historical rc.4/r8 readiness target; it does not satisfy rc.5/r9 proof.}
+  - {id: EVID-007, type: triage-first-machine-verifiable-external-proof-target, timestamp: "2026-10-22T02:07:25+06:00", version: 2.0.2-rc.4, control_revision: atlas-bootstrap-2026-10-22-r8, source: integrations/chatgpt/release-verification.yaml, independent: false, scope: [repository, chatgpt, work], result: READY_FOR_EXTERNAL_PROOF, limitations: Historical rc.4/r8 readiness target; it does not satisfy later proof.}
   - id: EVID-008
     type: collection-gate-machine-verifiable-external-proof-target
     timestamp: "2026-10-22T04:59:01+06:00"
@@ -43,6 +43,16 @@ evidence:
     independent: false
     scope: [repository, chatgpt, work]
     result: READY_FOR_EXTERNAL_PROOF
-    limitations: The rc.5/r9 contracts verify the Collection-Need Gate and ARGUS collection boundary, but fresh independent ChatGPT and Work observations are still required before any criterion can pass.
+    limitations: Historical rc.5/r9 proof target for the Collection-Need Gate and ARGUS collection boundary; it does not satisfy rc.6/r10 capability-layer proof.
+  - id: EVID-009
+    type: capability-layer-machine-verifiable-external-proof-target
+    timestamp: "2026-10-22T06:20:00+06:00"
+    version: 2.0.2-rc.6
+    control_revision: atlas-bootstrap-2026-10-22-r10
+    source: integrations/chatgpt/release-verification.yaml
+    independent: false
+    scope: [repository, chatgpt, work]
+    result: READY_FOR_EXTERNAL_PROOF
+    limitations: The rc.6/r10 contracts verify canonical capability planning, kernel governance services and the existing Collection-Need/ARGUS boundary, but fresh independent ChatGPT and Work observations are still required before any criterion can pass.
 owner: atlas-maintainers
-notes: Earlier candidate evidence remains historical. Stable v2.0.2 remains blocked until independent New Chat and ChatGPT Work evidence satisfies every criterion for rc.5/r9.
+notes: Earlier candidate evidence remains historical. Stable v2.0.2 remains blocked until independent New Chat and ChatGPT Work evidence satisfies every criterion for rc.6/r10.
