@@ -1,0 +1,29 @@
+schema: schemas/spec.schema.json
+id: spec.host-adapters
+title: Portable AI host adapter contract
+status: active
+normative: true
+contract:
+  purpose: Allow ATLAS-OS to run consistently inside ChatGPT, Hermes, Claude, Codex or another compatible AI system without transferring governance authority to the host.
+  host_role: Hosts supply model execution, conversation context, UI surfaces, files, tools, plugins, MCP servers, external connectors and other capabilities.
+  atlas_role: ATLAS supplies Mission Control semantics, Control Plane governance, task lifecycle, routing, approvals, evidence governance, provider admission, verification, persistence policy and delivery semantics.
+  initialization: A host adapter must enter through the portable ATLAS orchestration seam and initialize task/control/dashboard state before substantive execution.
+  capability_negotiation:
+    rule: Hosts expose available semantic capabilities and provider metadata; ATLAS selects and admits providers through its routing/security controls.
+    capability_examples: [WEB_SEARCH, FILE_READ, FILE_WRITE, CODE_EXECUTION, DATABASE_QUERY, EXTERNAL_ACTION, PERSISTENCE, SPECIALIST_METHOD]
+    product_independence: ATLAS policies should request semantic capabilities rather than hard-code a specific vendor/tool unless a task explicitly requires that implementation.
+  rendering_rule: Hosts may render Mission Control and Dashboard state differently but must preserve objective, task/plan identity, stage, progress, blocker/approval, evidence health, persistence state and next action semantics.
+  argus_rule: Host adapters may not infer ARGUS consent. For ARGUS_COLLECTION or HYBRID they must obtain or receive an explicit user approval event, bind it to the current task/routing preview, and pass argus_approval_status explicitly.
+  combined_approval_rule: A host may present one approval interaction for the exact routing preview plus ARGUS mission and record both routing_approval_status and argus_approval_status as APPROVED against the same digest.
+  tool_rule: Tools, plugins, MCP servers and subagents are replaceable execution providers subject to ATLAS admission, permissions, provenance, scope and verification controls.
+  fallback_rule: When a host lacks a requested capability, report CAPABILITY_UNAVAILABLE or use an admitted fallback; never claim an unavailable action occurred.
+  hidden_reasoning_rule: Hosts must not expose private chain-of-thought as Dashboard state. Project only safe summaries, decisions, evidence and control state.
+  conformance_rule: A host implementation is ATLAS-conformant only when it preserves the canonical preprocessing, authorization, routing, evidence and lifecycle semantics; matching visual appearance is not required.
+invariants: [INV-003, INV-007, INV-011, INV-015, INV-020]
+references:
+  - spec/runtime.yaml
+  - spec/control-plane.yaml
+  - spec/mission-control.yaml
+  - spec/dashboard.yaml
+  - spec/agent-security.yaml
+  - spec/routing.yaml
