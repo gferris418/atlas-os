@@ -8,13 +8,13 @@ import sys
 from pathlib import Path
 from typing import Any, Sequence, TextIO
 
-from .engine import ExecutionEnvelope, ExecutionResult, execute
+from .orchestration import ExecutionEnvelope, ExecutionResult, execute
 
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m atlas_runtime",
-        description="Select the next atomic ATLAS work unit from a JSON execution request.",
+        description="Run one portable, governed ATLAS execution step from a JSON request.",
     )
     parser.add_argument(
         "--input",
@@ -62,6 +62,7 @@ def _build_envelope(request: dict[str, Any]) -> ExecutionEnvelope:
         provider_inventory=request.get("provider_inventory"),
         routing_approval_status=request.get("routing_approval_status", "PENDING"),
         routing_preview_digest=request.get("routing_preview_digest"),
+        argus_approval_status=request.get("argus_approval_status", "PENDING"),
         timestamp=request.get("timestamp"),
         timezone_name=request.get("timezone_name", "UTC"),
     )
@@ -72,6 +73,9 @@ def _write_event(stdout: TextIO, event: dict[str, Any]) -> None:
 
 
 def _render_routing_preview(preview: dict[str, Any]) -> str:
+    contract = preview["activation_contract"]
+    argus = contract.get("argus", {})
+    authorization = argus.get("authorization", {})
     lines = [
         f"Routing preview · {preview['digest']}",
         f"Objective: {preview['objective']}",
@@ -79,8 +83,14 @@ def _render_routing_preview(preview: dict[str, Any]) -> str:
         f"({preview['intent_profile']['routing_authority'].lower().replace('_', ' ')})",
         f"Execution: {preview['task_id'] or 'task ID pending'} · {preview['plan_id']} · {preview['surface']}",
         f"Work unit: {preview['work_unit'] or 'none'}",
+        f"Collection mode: {contract.get('collection_mode', 'NONE')}",
+        "ARGUS authorization: " + (
+            str(authorization.get("status", "NOT_REQUIRED"))
+            if argus.get("required") else "NOT_REQUIRED"
+        ),
         "Execution sequence: " + (" -> ".join(preview["execution_sequence"]) or "no provider routing"),
         "Unresolved gates: " + (", ".join(preview["unresolved_gates"]) or "none"),
+        "Activation blockers: " + (", ".join(contract.get("blockers", [])) or "none"),
     ]
     for index, step in enumerate(preview["steps"], start=1):
         lines.append(f"{index}. {step['stage']}: {step['description']}")
@@ -100,8 +110,11 @@ def _render_routing_preview(preview: dict[str, Any]) -> str:
             f"  Conflicts: {', '.join(provider['conflicts_with']) or 'none'}",
             f"  Unresolved gates: {', '.join(provider['unresolved_gates']) or 'none'}",
         ))
-    lines.append(f"Review: {preview['approval_prompt']}")
-    lines.append(f"Approve this exact preview with digest {preview['digest']}")
+    if preview["approval_prompt"]:
+        lines.append(f"Review: {preview['approval_prompt']}")
+        if argus.get("required"):
+            lines.append("ARGUS may not be activated until explicit user authorization is recorded for this task.")
+        lines.append(f"Approve this exact preview with digest {preview['digest']}")
     return "\n".join(lines)
 
 
