@@ -106,6 +106,7 @@ def plan_canonical_capabilities(
     contract_action = _has(
         lowered,
         r"\breview\b",
+        r"\banaly[sz](?:e|ing|is)\b",
         r"\bredline(?:s|d)?\b",
         r"\bnegotiat(?:e|ion|ing)\b",
         r"\bpreferred position\b",
@@ -116,6 +117,15 @@ def plan_canonical_capabilities(
     if contract_subject and contract_action:
         add_routed("atlas.commercial-contract-review", "commercial_contract_semantics")
 
+    public_equity_research = _has(
+        lowered,
+        r"\bpublic[- ]equity\b",
+        r"\bpublic equities\b",
+        r"\bequity investment(?:s)?\b",
+        r"\bsecurities research\b",
+        r"\bstock research\b",
+        r"\bcompare\b.*\bstocks?\b",
+    )
     finance_signal = _has(
         lowered,
         r"\bprofit and loss\b",
@@ -133,7 +143,7 @@ def plan_canonical_capabilities(
         r"\bproject economics\b",
         r"\bpricing\b",
     )
-    if finance_signal:
+    if finance_signal and not public_equity_research:
         add_routed("atlas.corporate-finance", "corporate_finance_semantics")
 
     if collection_mode in _ARGUS_MODES:
