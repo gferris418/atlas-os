@@ -6,20 +6,26 @@ normative: true
 contract:
   purpose: Provide ATLAS-owned canonical context for terminology, taxonomy, economic classification, product/service classification, ontology, law, standards, frameworks, benchmarks and evidence precedence.
   owner: ATLAS_OS
+  semantic_normalization_contract: spec/semantic-normalization.yaml
   services:
     - terminology_and_concept_definitions
+    - context_preserving_semantic_normalization
     - taxonomy_selection
     - jurisdiction_context
     - economic_sector_context
+    - buyer_end_user_sector_context
+    - supply_side_sector_context
     - operator_and_supplier_industry_classification
     - product_and_service_classification
     - procurement_classification
     - customs_and_trade_classification
     - defense_logistics_classification_when_applicable
     - capability_classification
+    - platform_system_and_operating_environment_context
     - ontology_and_relationship_context
     - law_regulation_and_binding_requirements
     - standards_and_professional_frameworks
+    - international_best_practice_context
     - authoritative_guidance
     - benchmarks_and_comparison_baselines
     - evidence_hierarchy_and_conflict_resolution
@@ -33,6 +39,10 @@ contract:
     procurement_eu: taxonomy.eu-cpv
     customs_trade: taxonomy.wco-hs
     defense_logistics: taxonomy.nato-codification-system
+  sector_context:
+    buyer/end-user sector: Record the broader economic or public-service sector of the buyer, operator or end user when material.
+    supply-side sector: Record the broader economic sector of suppliers, manufacturers, contractors or service providers separately.
+    rule: Never silently substitute sector context for industry, product/service, capability, procurement or customs classification.
   semantic_invariants:
     - DOMAIN_IS_NOT_SECTOR
     - SECTOR_IS_NOT_INDUSTRY
@@ -42,15 +52,20 @@ contract:
     - PROCUREMENT_CATEGORY_IS_NOT_HS_CODE
     - HS_CODE_IS_NOT_PROCUREMENT_ELIGIBILITY
     - CLASSIFICATION_IS_NOT_COMPLIANCE
+    - BEST_PRACTICE_CONTEXT_IS_NOT_REQUIREMENT
   sector_rule: Economic sector is a broader contextual grouping. Prefer an authoritative sector scheme or an explicit governed mapping from activity classifications; never invent a sector code or present a derived grouping as an ISIC/NACE/NAICS code.
-  crosswalk_rule: Cross-scheme mappings must preserve scheme and version and use explicit mapping relations such as EXACT, CLOSE, BROADER, NARROWER or RELATED. Never assume unlike schemes are equivalent.
+  crosswalk_rule: Cross-scheme mappings must preserve scheme and version and use explicit mapping relations such as EXACT, CLOSE, BROADER, NARROWER, RELATED or CANDIDATE. Never assume unlike schemes are equivalent.
   metadata_rule: Record scheme, version, code, preferred label, definition/source, issuer, classification date, applicability, confidence, provenance and mapping relation when material.
-  argus_boundary: ARGUS may discover evidence and suggest collection-side classifications. ATLAS accepts, rejects or resolves the canonical classification and framework context.
+  normalization_rule: Preserve the original input and meaning; record material corrections; do not invent project, procurement, budget, quantity, authority, supplier or lifecycle facts while normalizing context.
+  best_practice_rule: International best-practice lenses provide domain framing only. Applicability must be assessed before any lens is treated as a requirement, control or compliance obligation.
+  argus_boundary: ARGUS may discover evidence and suggest collection-side classifications. ATLAS accepts, rejects or resolves the canonical classification, semantic context and framework context.
   direct_rule: Apply only context that can materially change correctness, authorization, evidence selection, requirements or output.
   currency_rule: Recheck official editions and current requirements whenever freshness is material.
 invariants: [INV-006, INV-016, INV-018, INV-019]
 references:
+  - spec/semantic-normalization.yaml
   - spec/classification.yaml
+  - spec/domain-practices.yaml
   - registries/taxonomies.yaml
   - registries/classifications.yaml
   - registries/frameworks.yaml
