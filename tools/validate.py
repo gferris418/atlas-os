@@ -79,7 +79,8 @@ def _validate_classification(root: Path, errors: list[str]) -> None:
         errors.append("classification standards must preserve historical versions")
     standards = standards_payload.get("standards", [])
     standard_ids = [record.get("standard_id") for record in standards]
-    if len(standard_ids) != len(set(standard_ids)):
+    standard_id_set = set(standard_ids)
+    if len(standard_ids) != len(standard_id_set):
         errors.append("classification standard IDs must be unique")
 
     versions: dict[str, dict] = {}
@@ -99,6 +100,9 @@ def _validate_classification(root: Path, errors: list[str]) -> None:
                 continue
             versions[version_id] = version
             version_owner[version_id] = standard_id
+            official_version = version.get("official_version")
+            if not isinstance(official_version, str) or not official_version.strip():
+                errors.append(f"classification official version must be a non-empty string: {version_id}")
             if version.get("lifecycle") not in LIFECYCLES:
                 errors.append(f"invalid classification lifecycle: {version_id}")
             if version.get("evidence_status") not in EVIDENCE_STATUSES:
@@ -151,10 +155,21 @@ def _validate_classification(root: Path, errors: list[str]) -> None:
             errors.append(f"invalid crosswalk evidence status: {crosswalk_id}")
         if not str(crosswalk.get("source_url", "")).startswith("https://"):
             errors.append(f"crosswalk lacks provenance URL: {crosswalk_id}")
+        source_standard = crosswalk.get("source_standard_id")
+        target_standard = crosswalk.get("target_standard_id")
         source_version = crosswalk.get("source_version_id")
         target_version = crosswalk.get("target_version_id")
+        if source_standard not in standard_id_set:
+            errors.append(f"crosswalk references unknown source standard: {crosswalk_id}")
+        if target_standard not in standard_id_set:
+            errors.append(f"crosswalk references unknown target standard: {crosswalk_id}")
         if source_version not in versions or target_version not in versions:
             errors.append(f"crosswalk references unknown version: {crosswalk_id}")
+        else:
+            if version_owner[source_version] != source_standard:
+                errors.append(f"crosswalk source version does not belong to source standard: {crosswalk_id}")
+            if version_owner[target_version] != target_standard:
+                errors.append(f"crosswalk target version does not belong to target standard: {crosswalk_id}")
         if crosswalk.get("relationship") == "CANDIDATE" and crosswalk.get("evidence_status") == "CONFIRMED":
             errors.append(f"CANDIDATE crosswalk cannot be treated as confirmed equivalence: {crosswalk_id}")
 

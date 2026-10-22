@@ -186,7 +186,7 @@ standards:
     jurisdiction: United States, Canada, and Mexico
     versions:
       - version_id: VER-US-NAICS-2017
-        official_version: 2017
+        official_version: '2017'
         hierarchy_available: true
         source_url: https://www.census.gov/naics/
         lifecycle: SUPERSEDED
@@ -194,7 +194,7 @@ standards:
         redistribution_status: UNKNOWN
         dataset_storage: METADATA_ONLY
       - version_id: VER-US-NAICS-2022
-        official_version: 2022
+        official_version: '2022'
         supersedes_version_id: VER-US-NAICS-2017
         hierarchy_available: true
         source_url: https://www.census.gov/naics/
