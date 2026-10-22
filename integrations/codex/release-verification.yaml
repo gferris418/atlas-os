@@ -1,8 +1,8 @@
 schema: schemas/release-verification.schema.json
 id: verification.codex
 surface: codex
-product_version: 2.0.2-rc.6
-control_revision: atlas-bootstrap-2026-10-22-r10
+product_version: 2.0.2-rc.7
+control_revision: atlas-bootstrap-2026-10-22-r11
 status: READY_FOR_EXTERNAL_PROOF
 fresh_session_required: true
 independent_evidence_required: true
@@ -15,8 +15,8 @@ checks:
     kind: inspection
     input: Resolve atlas-ai.yaml, atlas-os.yaml, and the Codex adapter in documented discovery order.
     assertions:
-      - {id: AST-01, property: product_version, operator: equals, expected: 2.0.2-rc.6}
-      - {id: AST-02, property: control_revision, operator: equals, expected: atlas-bootstrap-2026-10-22-r10}
+      - {id: AST-01, property: product_version, operator: equals, expected: 2.0.2-rc.7}
+      - {id: AST-02, property: control_revision, operator: equals, expected: atlas-bootstrap-2026-10-22-r11}
       - {id: AST-03, property: product_authority, operator: equals, expected: atlas-os.yaml}
     required_evidence: [session_id, timestamp, source_commit, resolved_authority]
     controls: [MIG-037]
@@ -70,6 +70,33 @@ checks:
     assertions:
       - {id: AST-01, property: collection_mode, operator: equals, expected: HYBRID}
       - {id: AST-02, property: final_analysis_owner, operator: equals, expected: ATLAS}
+    required_evidence: [session_id, timestamp, response]
+    controls: [MIG-037]
+  - id: CHK-08
+    kind: prompt
+    input: What capability gaps could Bangladesh Coast Guard address with foreign technology?
+    assertions:
+      - {id: AST-01, property: collection_mode, operator: equals, expected: ARGUS_COLLECTION}
+      - {id: AST-02, property: collection_type, operator: contains, expected: NEED_GAP}
+      - {id: AST-03, property: capability_plan, operator: contains, expected: argus.collection}
+    required_evidence: [session_id, timestamp, response]
+    controls: [MIG-037]
+  - id: CHK-09
+    kind: prompt
+    input: Where could ST Engineering coastal surveillance technology fit in Bangladesh government?
+    assertions:
+      - {id: AST-01, property: collection_mode, operator: equals, expected: ARGUS_COLLECTION}
+      - {id: AST-02, property: collection_type, operator: contains, expected: OPPORTUNITY_MATCHING}
+      - {id: AST-03, property: capability_plan, operator: contains, expected: argus.collection}
+    required_evidence: [session_id, timestamp, response]
+    controls: [MIG-037]
+  - id: CHK-10
+    kind: prompt
+    input: A Bangladesh Coast Guard patrol vessel tender is published and closes in 7 days; find eligible international OEMs.
+    assertions:
+      - {id: AST-01, property: collection_mode, operator: equals, expected: ARGUS_COLLECTION}
+      - {id: AST-02, property: collection_type, operator: contains, expected: RAPID_TENDER}
+      - {id: AST-03, property: capability_plan, operator: contains, expected: atlas.procurement-intelligence}
     required_evidence: [session_id, timestamp, response]
     controls: [MIG-037]
 evidence_requirements: [session_id, timestamp, timezone, source_commit, product_version, control_revision, resolved_authority, command, exit_status, response, result, reviewer]
