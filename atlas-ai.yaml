@@ -68,6 +68,7 @@ human_guidance:
   - docs/sop.md
   - docs/capabilities-routing.md
   - docs/evidence-verification.md
+  - docs/classification-standards.md
   - docs/argus-interface.md
   - docs/host-integration.md
   - docs/implementation-guide.md

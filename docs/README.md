@@ -1,10 +1,10 @@
 ---
-description: ATLAS-OS v3 documentation: architecture, framework, playbook, SOP, routing, evidence, ARGUS boundary, and host integration.
+description: ATLAS-OS v3 documentation: architecture, framework, playbook, SOP, routing, evidence, classification standards, ARGUS boundary, and host integration.
 ---
 
 # ATLAS OS
 
-ATLAS-OS is a portable operating framework for AI work. It sits between user intent and host capabilities, keeps the user in control of consequential actions, chooses the next execution mechanism, reconciles every provider return, and verifies outcomes before delivery.
+ATLAS-OS is a portable operating framework for AI work. It sits between user intent and host capabilities, keeps the user in control of consequential actions, chooses the next execution mechanism, reconciles every provider return, governs classification reference data, and verifies outcomes before delivery.
 
 **Version:** `3.0.0`
 
@@ -20,6 +20,7 @@ ATLAS-OS is a portable operating framework for AI work. It sits between user int
 - [Standard Operating Procedure](sop.md)
 - [Capabilities and Routing](capabilities-routing.md)
 - [Evidence and Verification](evidence-verification.md)
+- [Classification Standards Registry](classification-standards.md)
 - [ARGUS Interface](argus-interface.md)
 - [Host Integration](host-integration.md)
 - [Implementation Guide](implementation-guide.md)

@@ -26,8 +26,8 @@ EXPECTED_CLASSIFICATION_REGISTRIES = {
 EXPECTED_INTEGRATIONS = {"access-asia.yaml", "argus.yaml", "chatgpt.yaml", "generic-host.yaml", "hermes-agent.yaml"}
 EXPECTED_DOCS = {
     "README.md", "SUMMARY.md", "architecture.md", "framework.md", "playbook.md", "sop.md",
-    "capabilities-routing.md", "evidence-verification.md", "argus-interface.md", "host-integration.md",
-    "implementation-guide.md", "examples.md",
+    "capabilities-routing.md", "evidence-verification.md", "classification-standards.md",
+    "argus-interface.md", "host-integration.md", "implementation-guide.md", "examples.md",
 }
 BANNED = {"legacy", "migration", "library", "docs/releases", "docs/plans"}
 APPROVED_FAMILIES = {

@@ -36,6 +36,14 @@ Examples:
 
 ATLAS selects the capability first, then the provider.
 
+## Classification invariant
+
+Classification is governed reference data, not an implicit decision engine. `DOMAIN`, `SECTOR`, `INDUSTRY`, `ECONOMIC_ACTIVITY`, `PRODUCT`, `CAPABILITY`, `PROCUREMENT_CATEGORY`, `TRADE_CLASSIFICATION`, `OCCUPATION`, `GEOGRAPHY`, and `COMPLIANCE_REGULATORY` are separate families and must not be collapsed merely because two codes appear related.
+
+Standards and editions are versioned. Historical editions remain addressable. Crosswalks are directional and explicitly graded as `EXACT`, `CLOSE`, `BROADER`, `NARROWER`, `RELATED`, or `CANDIDATE`; a candidate relation is not canonical equivalence. Newly discovered standards or mappings do not promote themselves. ATLAS validates provenance, evidence, version, licensing/storage constraints, and intended use before canonical adoption.
+
+Classification alone never proves customs treatment, legal or regulatory compliance, procurement eligibility, licensing, sanctions status, or approval.
+
 ## Approval invariant
 
 Need and permission are separate states. Routing to ARGUS, an external write, publication, purchase, permission change, credential operation, or destructive action does not imply authorization. Approval is explicit, scoped, and invalidated by material scope change.
@@ -43,6 +51,10 @@ Need and permission are separate states. Routing to ARGUS, an external write, pu
 ## Evidence invariant
 
 Canonical evidence states are `CONFIRMED`, `PROBABLE`, `POSSIBLE`, `DISPUTED`, `UNVERIFIED`, and `STALE`. Providers may collect evidence and propose interpretations; ATLAS owns final evidence acceptance and decision use.
+
+## Persistence invariant
+
+Persistence follows workload, not convenience. Versioned reference data belongs in an authorized reviewed/version-controlled store; operational relational state belongs in an authorized transactional store; document content belongs in an appropriate document store; relationship and engagement state belongs in the authorized CRM. Deployment profiles select concrete products without changing the provider-neutral core rule.
 
 ## Completion invariant
 
