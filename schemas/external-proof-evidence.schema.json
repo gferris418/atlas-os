@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os.local/schemas/external-proof-evidence.schema.json",
+  "title": "ATLAS external proof evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "id",
+    "verification_id",
+    "surface",
+    "session_id",
+    "timestamp",
+    "timezone",
+    "source_commit",
+    "product_version",
+    "control_revision",
+    "resolved_authority",
+    "fresh_session",
+    "independent",
+    "reviewer",
+    "checks",
+    "overall_result",
+    "limitations"
+  ],
+  "properties": {
+    "schema": {"const": "schemas/external-proof-evidence.schema.json"},
+    "id": {"type": "string", "pattern": "^external-proof\\.[a-z0-9.-]+$"},
+    "verification_id": {"type": "string", "pattern": "^verification\\.[a-z0-9.-]+$"},
+    "surface": {"enum": ["chatgpt", "codex", "work", "hermes-agent"]},
+    "session_id": {"type": "string", "minLength": 1},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "timezone": {"type": "string", "minLength": 1},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "product_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"},
+    "control_revision": {"type": "string", "pattern": "^atlas-bootstrap-[0-9]{4}-[0-9]{2}-[0-9]{2}-r[0-9]+$"},
+    "resolved_authority": {"type": "string", "minLength": 1},
+    "fresh_session": {"type": "boolean"},
+    "independent": {"type": "boolean"},
+    "reviewer": {"type": "string", "minLength": 1},
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["check_id", "result", "evidence", "observed"],
+        "properties": {
+          "check_id": {"type": "string", "pattern": "^CHK-[0-9]{2}$"},
+          "result": {"enum": ["PASS", "FAIL", "BLOCKED"]},
+          "evidence": {"type": "object"},
+          "observed": {"type": "object"}
+        }
+      }
+    },
+    "overall_result": {"enum": ["PASS", "FAIL", "BLOCKED"]},
+    "limitations": {"type": "string"}
+  }
+}
