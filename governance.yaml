@@ -1,5 +1,5 @@
 id: atlas-governance
-version: 3.0.0
+version: 3.0.1
 status: active
 authority_chain: [USER, MISSION_CONTROL, CONTROL_PLANE, CAPABILITY_PROVIDER]
 principles:
