@@ -4,6 +4,7 @@ import re
 from typing import Any, Iterable
 
 from .models import RouteDecision
+from .quality import determine_required_quality_tier, quality_requirements
 
 
 PRE_EXECUTION_FLOW = (
@@ -20,7 +21,7 @@ def normalize_objective(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def minimal_domain_framing(text: str) -> dict[str, Any]:
+def minimal_domain_framing(text: str, requested_quality_floor: str | None = None) -> dict[str, Any]:
     lower = text.lower()
     risk_flags: list[str] = []
     if any(token in lower for token in ("navy", "military", "defence", "defense", "radar", "weapon")):
@@ -28,11 +29,15 @@ def minimal_domain_framing(text: str) -> dict[str, Any]:
     if any(token in lower for token in ("contract", "agreement", "legal")):
         risk_flags.append("legal_or_commercial")
     jurisdiction = "Bangladesh" if "bangladesh" in lower else None
+    required_quality_tier = determine_required_quality_tier(text, requested_floor=requested_quality_floor)
     return {
         "jurisdiction": jurisdiction,
         "risk_flags": risk_flags,
         "unresolved": [],
         "principle": "minimal_sufficient_context",
+        "required_quality_tier": required_quality_tier,
+        "quality_requirements": list(quality_requirements(required_quality_tier)),
+        "quality_policy": "quality_first_performance_second",
     }
 
 
