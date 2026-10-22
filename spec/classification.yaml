@@ -5,9 +5,10 @@ status: active
 normative: true
 contract:
   purpose: Classify material facets without collapsing domain, economic sector, industry, product, procurement, trade and capability into one code.
+  semantic_normalization: spec/semantic-normalization.yaml
   sequence: [TAXONOMY_SELECTION, JURISDICTION_CLASSIFICATION, OPERATOR_INDUSTRY_CLASSIFICATION, SUPPLIER_INDUSTRY_CLASSIFICATION, PRODUCT_OR_SERVICE_CLASSIFICATION, CAPABILITY_CLASSIFICATION, LIFECYCLE_STAGE_CLASSIFICATION, STAKEHOLDER_CLASSIFICATION, INFORMATION_SENSITIVITY_CLASSIFICATION, DOMAIN_FRAMEWORK_ALIGNMENT]
   available_facets: [jurisdiction, operator-industry, supplier-industry, product-or-service, capability, lifecycle-stage, stakeholder, information-sensitivity]
-  economic_sector_context: Sector is a broader contextual grouping recorded through Domain Context Services when material; it is not silently substituted for operator/supplier industry codes.
+  economic_sector_context: Sector is a broader contextual grouping recorded through Domain Context Services when material; buyer/end-user sector and supply-side sector remain separate and are not silently substituted for operator/supplier industry codes.
   reference_stack:
     international_activity: taxonomy.un-isic
     eu_activity: taxonomy.eu-nace
@@ -20,16 +21,17 @@ contract:
     defense_logistics: taxonomy.nato-codification-system
   materiality: Resolve only facets that can change answer, requirements, controls, routing, evidence or authorization.
   method:
+    - Begin from the context-preserving semantic normalization snapshot; classification must not rewrite user intent or introduce unsupported facts.
     - Select applicable governed schemes and verify scope, issuer, edition and official source.
     - Preserve separate facets rather than forcing the whole task into one code.
     - Prefer international reference classifications and authoritative current editions.
-    - Distinguish operator industry, supplier industry, sector context, product/service, procurement category, customs/trade code and capability.
+    - Distinguish buyer/end-user sector, supply-side sector, operator industry, supplier industry, product/service, procurement category, customs/trade code and capability.
     - Apply conditional schemes such as HS, CPV/UNSPSC and NATO codification only when their context is material.
-    - Use explicit crosswalk relations EXACT, CLOSE, BROADER, NARROWER or RELATED; never assume codes from unlike schemes are equivalent.
-    - Record scheme/version, code/label, provenance, applicability and confidence.
+    - Use explicit crosswalk relations EXACT, CLOSE, BROADER, NARROWER, RELATED or CANDIDATE; never assume codes from unlike schemes are equivalent.
+    - Record scheme/version, code/label, provenance, applicability, mapping relation, confidence and resolution status.
     - Mark unavailable or unverified codes unresolved instead of guessing.
   semantic_invariants: [DOMAIN_IS_NOT_SECTOR, SECTOR_IS_NOT_INDUSTRY, INDUSTRY_IS_NOT_PRODUCT, PRODUCT_IS_NOT_CAPABILITY, PRODUCT_IS_NOT_PROCUREMENT_CATEGORY, PROCUREMENT_CATEGORY_IS_NOT_HS_CODE, HS_CODE_IS_NOT_PROCUREMENT_ELIGIBILITY, CLASSIFICATION_IS_NOT_COMPLIANCE]
-  handoff: Resolved ATLAS context transfers unchanged to a specialist; ARGUS may enrich evidence and suggest mappings but cannot silently redefine canonical classification.
+  handoff: Resolved ATLAS semantic normalization and classification context transfers unchanged to a specialist; ARGUS may enrich evidence and suggest mappings but cannot silently redefine canonical classification.
   result_states:
     CLASSIFIED: All material facets are resolved with governed references.
     PARTIAL: Useful context exists but material facets remain unresolved.
@@ -39,6 +41,7 @@ contract:
   claims_rule: Classification metadata does not establish legal status, export classification, procurement eligibility, compliance or authorization.
 invariants: [INV-006, INV-016, INV-019]
 references:
+  - spec/semantic-normalization.yaml
   - spec/domain-context-services.yaml
   - registries/taxonomies.yaml
   - registries/classifications.yaml
