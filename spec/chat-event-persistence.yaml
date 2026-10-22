@@ -1,0 +1,63 @@
+id: atlas.chat-event-persistence
+version: 3.0.3
+status: active
+normative: true
+contract:
+  owner: ATLAS_CONTROL_PLANE
+  event_boundary: COMPLETED_USER_ASSISTANT_TURN
+  storage_model: ONE_IMMUTABLE_MARKDOWN_FILE_PER_COMPLETED_TURN
+  per_token_persistence_prohibited: true
+  retries_must_be_idempotent: true
+  required_content:
+    - complete_user_visible_prompt
+    - complete_final_user_visible_response
+  required_metadata:
+    - conversation_id
+    - turn_id
+    - event_id
+    - timestamp_utc
+    - task_id_when_available
+    - route
+    - required_quality_tier
+    - achieved_quality_tier_when_available
+    - quality_gate_state
+    - provider_manifest
+    - completion_status
+    - canonical_artifact_pointers
+    - prompt_sha256
+    - response_sha256
+  prohibited_content:
+    - hidden_chain_of_thought
+    - system_instructions
+    - developer_instructions
+    - credentials_or_tokens
+    - temporary_signed_urls
+    - raw_secret_bearing_tool_payloads
+  persistence_states: [NOT_REQUIRED, PENDING, VERIFIED, FAILED, UNAVAILABLE]
+  verification:
+    verified_requires_durable_write_receipt: true
+    content_integrity_should_be_checked_by_hash_when_supported: true
+  host_boundary:
+    no_post_turn_write_hook_means_no_continuous_persistence_claim: true
+    verified_requires_durable_write_receipt: true
+    unavailable_or_pending_must_be_reported_truthfully: true
+    repository_code_cannot_force_capture_when_atlas_is_not_loaded_or_selected: true
+  long_running_work:
+    completed_turn_event_remains_canonical: true
+    sparse_checkpoint_events_allowed: true
+    checkpoint_trigger: material_milestone_only
+  failed_or_interrupted_output:
+    may_be_recorded_as_separate_event: true
+    may_not_be_labeled_completed: true
+  conversation_reconstruction:
+    model: ordered_immutable_events
+    rollups_are_derived_views: true
+  tool_activity:
+    archive_raw_payloads: false
+    compact_manifest_fields: [provider, operation, status, timestamp, canonical_pointer, relevant_id, integrity_hash]
+  attachments:
+    default: persist_pointer_and_metadata_not_duplicate_bytes
+  authority:
+    provider_may_return_artifact_or_receipt: true
+    provider_may_not_choose_canonical_storage: true
+    atlas_authorizes_and_verifies_persistence: true
