@@ -10,9 +10,14 @@ contract:
   argus_role: Governed intelligence collection subsystem nested inside ATLAS.
   argus_capability: intelligence_collection
   argus_does:
+    - institutional_hierarchy_resolution
+    - internal_registry_reconciliation
+    - opportunity_identity_resolution
     - target_resolution
     - collection_planning_within_authorized_scope
     - source_discovery
+    - official_procurement_collection
+    - authorized_internal_customer_intelligence_collection
     - acquisition
     - extraction
     - normalization
@@ -23,6 +28,8 @@ contract:
     - source_reconciliation
     - gap_and_conflict_detection
     - coverage_assessment
+    - adaptive_360_collection
+    - supplier_product_competitor_research
     - collection_packaging
   atlas_retains:
     - mission_control
@@ -40,11 +47,35 @@ contract:
     - observability_and_dashboard
     - final_delivery
   collection_mission: schemas/collection-mission.schema.json
-  handoff_rule: ARGUS activation receives the governed ATLAS domain-context handoff plus a collection mission. READY or PARTIAL context may proceed under the pinned specialist contract; BLOCKED context cannot authorize dependent collection.
-  return_rule: ARGUS returns a collection package/evidence result to ATLAS. The package is not a final user-facing answer, forecast, bid/no-bid decision, or PX promotion decision.
+  handoff_pattern: ONE_HANDOFF_ONE_RETURN
+  autonomy_rule: >-
+    After ATLAS activates ARGUS with a validated mission, ARGUS may follow evidence leads,
+    select lawful source routes, reconcile identity, search official procurement and authorized
+    internal intelligence, and execute materially relevant 360-degree collection without routine
+    ATLAS callbacks while remaining inside the mission and execution lease.
+  startup_sequence:
+    - RESOLVE_INSTITUTIONAL_HIERARCHY
+    - CHECK_INTERNAL_CANONICAL_REGISTRY
+    - RECONCILE_OPPORTUNITY_IDENTITY
+    - CHECK_OFFICIAL_PROCUREMENT_SOURCES
+    - CHECK_INTERNAL_CUSTOMER_INTELLIGENCE
+    - BUILD_RESEARCH_FRONTIER
+    - EXECUTE_ADAPTIVE_360_COLLECTION
+  identity_confirmation_rule: >-
+    EXACT and HIGH_CONFIDENCE_MATCH continue on the existing canonical object; DISTINCT continues
+    as a new candidate; PROBABLE_MATCH or UNRESOLVED identity is the user-confirmation escalation seam.
+  escalation_conditions:
+    - MATERIAL_SCOPE_CHANGE
+    - AUTHORIZATION_REQUIRED
+    - POLICY_OR_SECURITY_CONFLICT
+    - MATERIAL_AMBIGUITY
+  persistence_rule: ARGUS proposes one batched mutation set; ATLAS remains the persistence authority and commits/verifies canonical mutations.
+  mission_context_rule: ARGUS mission working context is transient execution state and must not create a new canonical record type merely to coordinate research.
+  handoff_rule: ARGUS activation receives the governed ATLAS domain-context handoff plus one collection mission. READY or PARTIAL context may proceed under the pinned specialist contract; BLOCKED context cannot authorize dependent collection.
+  return_rule: ARGUS normally returns one collection package/evidence result to ATLAS. The package is not a final user-facing answer, forecast, bid/no-bid decision, or PX promotion decision.
   dashboard_rule: Collection mode, collection status, ARGUS provider state, evidence health, gaps and blockers are observable projections only; Dashboard cannot activate ARGUS directly.
   mission_control_rule: A dashboard request to expand, stop or redirect collection becomes a Mission Control command evaluated by the Control Plane.
-  stopping_rule: Stop collection when additional evidence is unlikely to change sufficiency, material uncertainty, identified gaps, risk or the next ATLAS action.
+  stopping_rule: Stop collection when additional evidence is unlikely to change sufficiency, material uncertainty, identity/merge outcome, lifecycle interpretation, supplier strategy, risk or the next ATLAS action.
 invariants: [INV-007, INV-008, INV-017, INV-018, INV-021]
 references:
   - spec/request-triage.yaml
