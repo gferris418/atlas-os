@@ -1,0 +1,86 @@
+schema: schemas/spec.schema.json
+id: spec.domain-capabilities
+title: Routed and hybrid domain capability contracts
+status: active
+normative: true
+contract:
+  purpose: Define trigger, input, processing, output and collection-dependency semantics for ATLAS routed and hybrid domain capabilities.
+  common_input: schemas/capability-request.schema.json
+  common_output: schemas/capability-result.schema.json
+  capabilities:
+    atlas.deep-research:
+      trigger:
+        - explicit deep, comprehensive or in-depth research objective
+        - multi-facet synthesis where contradiction review and open questions are material
+      process:
+        - question and scope definition
+        - research-facet decomposition
+        - source strategy
+        - direct retrieval or governed collection handoff
+        - evidence-governance handoff
+        - synthesis
+        - contradiction review
+        - open questions and unresolved issues
+      outputs: [research_facets, findings, evidence_map, contradictory_evidence, open_questions, synthesis, confidence]
+      collection_rule: Does not imply ARGUS. Use ARGUS only when the Collection-Need Gate selects ARGUS_COLLECTION or HYBRID.
+    atlas.procurement-intelligence:
+      trigger:
+        - annual procurement plan or APP
+        - procurement or tender pipeline
+        - buyer-product or buyer-capability requirement
+        - tender, acquisition, programme or project procurement analysis
+        - opportunity qualification or procurement forecast
+      argus_collection_scope:
+        - APP and procurement-plan discovery
+        - tender and project discovery
+        - buyer and requirement resolution
+        - eligibility and disqualifying-condition extraction
+        - technical and commercial requirement extraction
+        - deadlines and evaluation criteria
+        - funding and budget evidence
+        - incumbent, competitor and supplier ecosystem evidence
+        - procurement chronology and material monitoring triggers
+      atlas_analysis_scope:
+        - commercial relevance
+        - eligibility assessment
+        - opportunity qualification
+        - probability and risk
+        - bid or no-bid decision
+        - partner and positioning strategy
+        - pricing and response strategy
+        - submission governance
+      outputs: [buyer, programme, project, procurement, requirements, eligibility, evaluation, budget_funding, timeline, incumbents, competitors, collection_gaps, opportunity_assessment, recommended_action]
+      decision_rule: recommended_action is an ATLAS conclusion; ARGUS cannot issue final pursuit decisions.
+    atlas.commercial-contract-review:
+      trigger:
+        - supplied contract or agreement review
+        - clause analysis, negotiation playbook, fallback position or redline request
+      inputs: [contract, represented_party, transaction_type, jurisdiction, commercial_context, negotiation_playbook, preferred_positions, fallback_positions, risk_tolerance]
+      outputs: [clause, current_position, preferred_position, deviation, commercial_impact, legal_risk, operational_risk, severity, fallback_position, suggested_redline, escalation_required]
+      collection_rule: Reviewing supplied contract text does not activate ARGUS. Structured counterparty, project or market collection requires a separate Collection-Need Gate decision.
+    atlas.corporate-finance:
+      trigger:
+        - P&L, cash flow or working-capital analysis
+        - project economics, gross or net margin, commission economics or pricing
+        - FX exposure, receivables, payables, landed cost, budget-vs-actual or project cash requirement
+      scope: [P&L, cash_flow, working_capital, project_economics, gross_margin, net_margin, commission_economics, FX_exposure, receivables, payables, budget_vs_actual, scenario_analysis, pricing, landed_cost, project_cash_requirement, management_reporting]
+      collection_rule: Supplied or internal financial data is analyzed directly. External market, funding or supplier evidence may create HYBRID collection only through the Collection-Need Gate.
+      separation_rule: Corporate finance is distinct from public-equity investing and securities research.
+    atlas.economic-policy-intelligence:
+      trigger:
+        - monetary, fiscal, foreign-exchange, trade or economic regulatory policy
+        - central-bank instrument, circular, rule or transmission analysis
+      process: [authority_resolution, current_instrument, effective_date, economic_mechanism, transmission_channel, sector_exposure, business_implications, scenarios, monitoring_indicators]
+      outputs: [policy_instrument, authority, effective_date, mechanism, affected_channels, sector_effects, business_implications, scenarios, monitoring_indicators, evidence, uncertainty]
+      collection_rule: Policy explanation and analysis remain ATLAS_DIRECT by default. Entity, programme, procurement, buyer or opportunity mapping may create HYBRID collection through the Collection-Need Gate.
+  routing_invariants:
+    - Capability selection never overrides collection_mode.
+    - A capability may require external evidence without requiring ARGUS when authoritative direct retrieval is sufficient.
+    - Supplied-document transformation does not become collection solely because the document concerns procurement, policy, finance or a named company.
+    - Mixed requests preserve independent collection legs rather than suppressing them because another leg is direct transformation.
+invariants: [INV-001, INV-002, INV-016, INV-018, INV-020]
+references:
+  - spec/capability-layer.yaml
+  - spec/collection-routing.yaml
+  - spec/evidence-governance.yaml
+  - registries/canonical-capabilities.yaml
