@@ -6,21 +6,26 @@ normative: true
 contract:
   minimum_fields: [system, surface, plan_id, timestamp, duration_ms, input_summary, processing_summary, output_summary, goal, task, playbook, frameworks, sop, output_profile, plan_status, clarification_status, progress, active_stage, active_unit, completed_units, total_units, blocker_or_approval, library, quality_gate]
   expanded_fields: [objective, request_triage, collection_mode, collection_status, argus_status, collection_coverage, collection_gaps, routing_preview, routing_decisions, execution_layer, evidence_health, highest_risk, pending_decision, outputs, next_milestone, next_action]
-  trigger: Initialize a compact dashboard for every prompt, including direct L0 work.
+  trigger: Initialize a compact dashboard for every substantive prompt before substantive execution; direct L0 work may use the same lightweight surface.
+  startup_projection: The initial dashboard must make the objective/task identity, current stage, progress, blocker-or-approval state, evidence health, persistence/library state and next action visible without exposing hidden reasoning.
   authority_rule: Dashboard is a read-only projection over Observability/Control Plane state. It never owns routing, approvals or collection activation.
-  collection_visibility: When material, show ATLAS collection_mode, ARGUS state, evidence/coverage health, gaps, blockers and returned-package status without exposing hidden reasoning.
-  dashboard_action_rule: Any user action that would expand, redirect, stop or restart collection is emitted as a Mission Control command and must be admitted by the Control Plane.
-  visual_rule: Use lightweight text progress and concise state labels; do not require expensive rendering.
+  collection_visibility: When material, show ATLAS collection_mode, explicit ARGUS authorization state, ARGUS activation state, evidence/coverage health, gaps, blockers and returned-package status without exposing hidden reasoning.
+  approval_visibility: If collection_mode is ARGUS_COLLECTION or HYBRID and explicit authorization is pending, surface AWAITING_APPROVAL / ARGUS_APPROVAL and ask for explicit approval before handoff. Do not imply that the route itself constitutes consent.
+  dashboard_action_rule: Any user action that would approve/reject ARGUS, expand, redirect, stop or restart collection is emitted as a Mission Control command and must be admitted by the Control Plane.
+  visual_rule: Use lightweight text progress and concise state labels; do not require expensive rendering or host-specific UI controls.
+  host_independence: Each host may render the dashboard differently, but must preserve the underlying ATLAS state semantics and approval boundary.
   realtime_rule: Update at meaningful events only; never poll or emit token-by-token status.
   performance: Dashboard generation remains deterministic, local and constant-cost relative to task size.
   privacy: Summarize safely and never expose secrets, raw sensitive prompts, private chain-of-thought or hidden reasoning tokens.
-  routing_visibility: Before provider invocation show the digest-bound routing preview, including its deterministic activation_contract projection for host integrations; after review expose routed/blocked decisions.
-  activation_contract_semantics: The activation_contract summarizes provider readiness, ATLAS activation authority, approval requirement, collection mode, ARGUS activation need, bound collection mission, provider sequence, handoff providers and blocking gates without becoming a separate routing authority.
+  routing_visibility: Before provider invocation show the digest-bound routing preview and activation contract; after review expose routed/blocked decisions.
+  activation_contract_semantics: The activation contract separates route/need, explicit ARGUS authorization and activation readiness while preserving provider sequence, handoff providers and blockers. It is a projection of authoritative Control Plane state, not a separate routing authority.
   duration_semantics: Show measured elapsed duration only.
   library_semantics: SAVED requires durable-write evidence; otherwise show PENDING, READY, BLOCKED or CAPABILITY_UNAVAILABLE.
-invariants: [INV-003, INV-004, INV-017, INV-020, INV-021]
+invariants: [INV-003, INV-004, INV-011, INV-017, INV-020, INV-021]
 references:
   - schemas/dashboard.schema.json
+  - schemas/activation-contract.schema.json
   - spec/observability.yaml
   - spec/mission-control.yaml
   - spec/control-plane.yaml
+  - spec/task-lifecycle.yaml
