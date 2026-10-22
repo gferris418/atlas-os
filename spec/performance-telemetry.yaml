@@ -1,0 +1,24 @@
+id: atlas.performance-telemetry
+version: 3.0.3
+status: active
+normative: true
+contract:
+  normative: true
+  objective: Measure and improve runtime efficiency only inside the assurance boundary established by quality governance.
+  may_select_or_lower_quality_tier: false
+  may_bypass_quality_gate: false
+  may_bypass_evidence_verification_governance_or_approval: false
+  metrics:
+    - latency_ms
+    - tool_calls
+    - provider_calls
+    - cache_hits
+    - verified_state_reuse
+    - delta_refresh_count
+    - duplicate_retrieval_avoided
+    - persistence_latency_ms
+    - quality_gate_loops
+  optimization_rule: Minimize latency, token use, tool calls, compute, and duplicate retrieval only after preserving the required quality tier and all mandatory gates.
+  collection_rule: Telemetry is observational and must not become a second control plane or authority source.
+  privacy_rule: Do not record hidden reasoning, credentials, secret-bearing payloads, or sensitive content merely to measure performance.
+  reuse_rule: Prefer verified-state reuse and delta refresh when the Quality Ledger permits them; otherwise recollect to satisfy quality requirements.
