@@ -58,17 +58,35 @@ def _semantic_context_for(task: dict[str, Any]) -> dict[str, Any]:
     supplied = task.get("semantic_context")
     if isinstance(supplied, dict):
         return deepcopy(supplied)
+
     original = _source_input(task)
     normalized = " ".join(original.split())
     classification = task.get("domain_classification") or {}
+    facets = classification.get("facets") or {}
+    unresolved = list(dict.fromkeys(classification.get("unresolved_facets", [])))
+    has_resolved_facet = any(bool(values) for values in facets.values())
+
+    meaning_ambiguities: list[str] = []
+    status = "READY"
+    if not normalized:
+        status = "AMBIGUOUS"
+        meaning_ambiguities.append(
+            "No source input or explicit semantic context is available to establish meaning."
+        )
+    elif classification.get("status") == "RESEARCH_REQUIRED" and not has_resolved_facet:
+        status = "AMBIGUOUS"
+        meaning_ambiguities.append(
+            "Semantic clarity was not established for this legacy task; explicit semantic context is required before specialist activation."
+        )
+
     return {
-        "status": "READY",
+        "status": status,
         "original_input": original,
         "normalized_input": normalized,
         "whole_context_summary": normalized or None,
         "normalization_notes": [],
-        "meaning_ambiguities": [],
-        "unresolved_context": list(dict.fromkeys(classification.get("unresolved_facets", []))),
+        "meaning_ambiguities": meaning_ambiguities,
+        "unresolved_context": unresolved,
     }
 
 
