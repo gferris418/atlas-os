@@ -22,7 +22,11 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     original = enter_mission_control(envelope)
     normalized = normalize_objective(original)
     task_id = _task_id(envelope, normalized)
-    framing = minimal_domain_framing(normalized)
+    requested_quality_floor = envelope.context.get("required_quality_floor")
+    framing = minimal_domain_framing(
+        normalized,
+        requested_quality_floor=requested_quality_floor if isinstance(requested_quality_floor, str) else None,
+    )
     route = choose_route(normalized, envelope.approvals)
 
     approval_blocked = route.approval_required and route.approval_status != "APPROVED"
@@ -56,6 +60,7 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         "active_stage": active_stage,
         "blocker_or_approval": blocker,
         "evidence_health": "UNKNOWN",
+        "quality_tier": framing["required_quality_tier"],
         "persistence_state": "NOT_REQUIRED",
         "next_action": next_action,
         "route": route.mechanism,
