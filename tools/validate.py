@@ -9,9 +9,9 @@ import sys
 import yaml
 
 EXPECTED_SPECS = {
-    "approvals.yaml", "context.yaml", "control-plane.yaml", "core.yaml", "evidence.yaml",
-    "execution.yaml", "mission-control.yaml", "observability.yaml", "persistence.yaml",
-    "routing.yaml", "verification.yaml",
+    "approvals.yaml", "chat-event-persistence.yaml", "context.yaml", "control-plane.yaml", "core.yaml", "evidence.yaml",
+    "execution.yaml", "mission-control.yaml", "observability.yaml", "performance-telemetry.yaml", "persistence.yaml",
+    "quality-governance.yaml", "routing.yaml", "verification.yaml",
 }
 EXPECTED_SCHEMAS = {
     "approval.schema.json", "evidence.schema.json", "execution-envelope.schema.json",
@@ -235,7 +235,7 @@ def validate(root: Path) -> list[str]:
         return [f"cannot parse root machine contract: {exc}"]
 
     version = manifest.get("product", {}).get("version")
-    if version != "3.0.2":
+    if version != "3.0.3":
         errors.append(f"unexpected product version: {version}")
     if ai.get("product_version") != version:
         errors.append("atlas-ai product_version does not match atlas-os")
