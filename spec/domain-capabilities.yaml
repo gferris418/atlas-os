@@ -27,30 +27,43 @@ contract:
       trigger:
         - annual procurement plan or APP
         - procurement or tender pipeline
-        - buyer-product or buyer-capability requirement
-        - tender, acquisition, programme or project procurement analysis
-        - opportunity qualification or procurement forecast
+        - formal tender, solicitation or acquisition analysis
+        - eligibility, evaluation or bid/no-bid analysis
+        - procurement forecast
+        - Rapid Tender recovery after live solicitation discovery
+      exclusions:
+        - government need or capability-gap discovery without procurement semantics
+        - legitimate pre-procurement opportunity development without procurement semantics
+        - supply-first technology-to-government matching without procurement semantics
       argus_collection_scope:
         - APP and procurement-plan discovery
-        - tender and project discovery
-        - buyer and requirement resolution
+        - tender and procurement-package discovery
+        - buyer and procurement requirement resolution
         - eligibility and disqualifying-condition extraction
         - technical and commercial requirement extraction
         - deadlines and evaluation criteria
-        - funding and budget evidence
+        - funding and budget evidence material to procurement
         - incumbent, competitor and supplier ecosystem evidence
         - procurement chronology and material monitoring triggers
+        - Rapid Tender supplier-universe and eligibility recovery
       atlas_analysis_scope:
         - commercial relevance
-        - eligibility assessment
-        - opportunity qualification
-        - probability and risk
+        - procurement eligibility assessment
+        - authoritative opportunity priority when procurement semantics are material
+        - procurement probability and risk
         - bid or no-bid decision
         - partner and positioning strategy
         - pricing and response strategy
         - submission governance
+      argus_advisory_inputs:
+        - pre_px_opportunity_identity_and_lifecycle
+        - supplier_universe
+        - supplier_partnerability
+        - supplier_matches
+        - opportunity_qualification_recommendation
+        - detection_metrics
       outputs: [buyer, programme, project, procurement, requirements, eligibility, evaluation, budget_funding, timeline, incumbents, competitors, collection_gaps, opportunity_assessment, recommended_action]
-      decision_rule: recommended_action is an ATLAS conclusion; ARGUS cannot issue final pursuit decisions.
+      decision_rule: recommended_action is an ATLAS conclusion; ARGUS may calculate and recommend qualification or supplier matching but cannot issue final pursuit, PX promotion or bid/no-bid decisions.
     atlas.commercial-contract-review:
       trigger:
         - supplied contract or agreement review
@@ -72,12 +85,14 @@ contract:
         - central-bank instrument, circular, rule or transmission analysis
       process: [authority_resolution, current_instrument, effective_date, economic_mechanism, transmission_channel, sector_exposure, business_implications, scenarios, monitoring_indicators]
       outputs: [policy_instrument, authority, effective_date, mechanism, affected_channels, sector_effects, business_implications, scenarios, monitoring_indicators, evidence, uncertainty]
-      collection_rule: Policy explanation and analysis remain ATLAS_DIRECT by default. Entity, programme, procurement, buyer or opportunity mapping may create HYBRID collection through the Collection-Need Gate.
+      collection_rule: Policy explanation and analysis remain ATLAS_DIRECT by default. Entity, programme, project, government-need, supplier, procurement or opportunity mapping may create HYBRID collection through the Collection-Need Gate.
   routing_invariants:
     - Capability selection never overrides collection_mode.
     - A capability may require external evidence without requiring ARGUS when authoritative direct retrieval is sufficient.
     - Supplied-document transformation does not become collection solely because the document concerns procurement, policy, finance or a named company.
     - Mixed requests preserve independent collection legs rather than suppressing them because another leg is direct transformation.
+    - ARGUS may calculate advisory opportunity qualification and supplier matching; ATLAS retains authoritative commercial state and consequential business decisions.
+    - Early commercial opportunity collection is not equivalent to procurement intelligence.
 invariants: [INV-001, INV-002, INV-016, INV-018, INV-020]
 references:
   - spec/capability-layer.yaml
