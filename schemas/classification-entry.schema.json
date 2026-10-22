@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os/schemas/classification-entry.schema.json",
+  "title": "ATLAS Classification Entry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["standard_id", "version_id", "code", "label", "evidence_status", "source_url"],
+  "properties": {
+    "standard_id": {"type": "string", "minLength": 1},
+    "version_id": {"type": "string", "minLength": 1},
+    "code": {"type": "string", "minLength": 1},
+    "label": {"type": "string", "minLength": 1},
+    "parent_code": {"type": ["string", "null"]},
+    "level": {"type": ["string", "integer", "null"]},
+    "source_url": {"type": "string", "pattern": "^https://"},
+    "evidence_status": {
+      "enum": ["CONFIRMED", "PROBABLE", "POSSIBLE", "DISPUTED", "UNVERIFIED", "STALE"]
+    },
+    "effective_from": {"type": ["string", "null"]},
+    "effective_to": {"type": ["string", "null"]},
+    "notes": {"type": "string"}
+  }
+}

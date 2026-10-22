@@ -27,6 +27,7 @@ registries:
   - registries/capabilities.yaml
   - registries/providers.yaml
   - registries/surfaces.yaml
+  - registries/classification
 integrations:
   - integrations/argus.yaml
   - integrations/chatgpt.yaml

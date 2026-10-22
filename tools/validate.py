@@ -16,8 +16,11 @@ EXPECTED_SPECS = {
 EXPECTED_SCHEMAS = {
     "approval.schema.json", "evidence.schema.json", "execution-envelope.schema.json",
     "handoff.schema.json", "output.schema.json", "routing-decision.schema.json",
+    "classification-standard.schema.json", "classification-entry.schema.json",
+    "classification-crosswalk.schema.json",
 }
 EXPECTED_REGISTRIES = {"capabilities.yaml", "providers.yaml", "surfaces.yaml"}
+EXPECTED_CLASSIFICATION_REGISTRIES = {"families.yaml", "authorities.yaml"}
 EXPECTED_INTEGRATIONS = {"access-asia.yaml", "argus.yaml", "chatgpt.yaml", "generic-host.yaml", "hermes-agent.yaml"}
 EXPECTED_DOCS = {
     "README.md", "SUMMARY.md", "architecture.md", "framework.md", "playbook.md", "sop.md",
@@ -35,6 +38,8 @@ def _load(path: Path):
 
 def _names(root: Path, directory: str, suffixes: tuple[str, ...]) -> set[str]:
     base = root / directory
+    if not base.is_dir():
+        return set()
     return {path.name for path in base.iterdir() if path.is_file() and path.suffix in suffixes}
 
 
@@ -58,6 +63,13 @@ def validate(root: Path) -> list[str]:
         if actual != expected:
             errors.append(f"{directory} surface drift: {sorted(actual)} != {sorted(expected)}")
 
+    classification_actual = _names(root, "registries/classification", (".yaml",))
+    if classification_actual != EXPECTED_CLASSIFICATION_REGISTRIES:
+        errors.append(
+            "classification registry surface drift: "
+            f"{sorted(classification_actual)} != {sorted(EXPECTED_CLASSIFICATION_REGISTRIES)}"
+        )
+
     required_root = ["atlas-ai.yaml", "atlas-os.yaml", "governance.yaml", "README.md", "LICENSE"]
     for relative in required_root:
         if not (root / relative).is_file():
@@ -70,8 +82,13 @@ def validate(root: Path) -> list[str]:
         for name in sorted(expected):
             try:
                 _load(root / directory / name)
-            except Exception as exc:  # validation boundary intentionally reports parse failures
+            except Exception as exc:
                 errors.append(f"cannot parse {directory}/{name}: {exc}")
+    for name in sorted(EXPECTED_CLASSIFICATION_REGISTRIES):
+        try:
+            _load(root / "registries" / "classification" / name)
+        except Exception as exc:
+            errors.append(f"cannot parse registries/classification/{name}: {exc}")
 
     try:
         manifest = _load(root / "atlas-os.yaml")
@@ -94,6 +111,7 @@ def validate(root: Path) -> list[str]:
         *(f"spec/{name}" for name in EXPECTED_SPECS),
         *(f"schemas/{name}" for name in EXPECTED_SCHEMAS),
         *(f"registries/{name}" for name in EXPECTED_REGISTRIES),
+        *(f"registries/classification/{name}" for name in EXPECTED_CLASSIFICATION_REGISTRIES),
         *(f"integrations/{name}" for name in EXPECTED_INTEGRATIONS),
     }
     if set(machine_contracts) != expected_contracts:
@@ -103,6 +121,27 @@ def validate(root: Path) -> list[str]:
             errors.append(f"machine contract missing: {relative}")
         if relative.startswith(("migration/", "legacy/")) or "release-verification" in relative:
             errors.append(f"historical contract leaked into machine authority: {relative}")
+
+    if "registries/classification" not in manifest.get("registries", []):
+        errors.append("atlas-os registries must include registries/classification")
+
+    families = _load(root / "registries/classification/families.yaml").get("families", [])
+    family_ids = [entry.get("id") for entry in families]
+    approved_families = {
+        "DOMAIN", "SECTOR", "INDUSTRY", "ECONOMIC_ACTIVITY", "PRODUCT", "CAPABILITY",
+        "PROCUREMENT_CATEGORY", "TRADE_CLASSIFICATION", "OCCUPATION", "GEOGRAPHY",
+        "COMPLIANCE_REGULATORY",
+    }
+    if set(family_ids) != approved_families or len(family_ids) != len(set(family_ids)):
+        errors.append("classification families must exactly match the approved unique family set")
+
+    authorities = _load(root / "registries/classification/authorities.yaml").get("authorities", [])
+    authority_ids = [entry.get("id") for entry in authorities]
+    if len(authority_ids) != len(set(authority_ids)):
+        errors.append("classification authority IDs must be unique")
+    for authority in authorities:
+        if not authority.get("official_name") or not str(authority.get("source_url", "")).startswith("https://"):
+            errors.append(f"invalid classification authority: {authority.get('id')}")
 
     core = _load(root / "spec/core.yaml")["contract"]
     if core.get("pre_execution_flow") != ["UNDERSTAND_AND_NORMALIZE", "MINIMAL_DOMAIN_FRAMING", "ROUTE"]:

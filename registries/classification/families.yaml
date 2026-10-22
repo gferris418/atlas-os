@@ -1,0 +1,26 @@
+id: atlas.classification.families
+version: 1
+status: active
+families:
+  - id: DOMAIN
+    definition: Broad knowledge or operating domain; not an industry or product code.
+  - id: SECTOR
+    definition: High-level sector grouping used for analysis or policy; not automatically an economic-activity code.
+  - id: INDUSTRY
+    definition: Industry grouping describing producers or establishments.
+  - id: ECONOMIC_ACTIVITY
+    definition: Classification of productive activities carried out by economic units.
+  - id: PRODUCT
+    definition: Classification of goods or services as outputs or transaction objects.
+  - id: CAPABILITY
+    definition: Functional or solution capability used for supplier and requirement matching.
+  - id: PROCUREMENT_CATEGORY
+    definition: Procurement-oriented grouping of works, goods, services, or categories.
+  - id: TRADE_CLASSIFICATION
+    definition: Customs or trade-statistics classification of internationally traded goods.
+  - id: OCCUPATION
+    definition: Classification of jobs or occupations.
+  - id: GEOGRAPHY
+    definition: Geographic or administrative-area classification.
+  - id: COMPLIANCE_REGULATORY
+    definition: Regulatory or compliance classification; never treated as an eligibility conclusion by itself.
