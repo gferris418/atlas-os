@@ -62,9 +62,10 @@ jobs:
             | tee plugin-release-result.json
           python - <<'PY'
           import json
+          import os
           from pathlib import Path
           payload = json.loads(Path("plugin-release-metadata.json").read_text())
-          with open("$GITHUB_OUTPUT", "a", encoding="utf-8") as handle:
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
               handle.write(f"release_required={str(payload['release_required']).lower()}\n")
               handle.write(f"review_required={str(payload['review_required']).lower()}\n")
           PY
