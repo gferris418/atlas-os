@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os.local/schemas/execution-envelope.schema.json",
+  "title": "ATLAS execution envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["objective"],
+  "properties": {
+    "objective": {"type": "string", "minLength": 1},
+    "task_id": {"type": ["string", "null"]},
+    "host": {"type": "string", "minLength": 1},
+    "context": {"type": "object"},
+    "approvals": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "provider_result": {"type": ["object", "null"]}
+  }
+}

@@ -1,0 +1,16 @@
+id: integration.generic-host
+version: 3.0.0
+host: generic-host
+status: active
+role: host_adapter
+bootstrap:
+  mission_control: required
+  control_plane: required
+  compact_dashboard: required
+  pre_execution_flow: [UNDERSTAND_AND_NORMALIZE, MINIMAL_DOMAIN_FRAMING, ROUTE]
+required_host_contract:
+  - expose_actual_capabilities
+  - preserve_user_approval_boundaries
+  - return_provider_results_to_ATLAS
+  - never_claim_unavailable_actions
+rule: Host-specific UI, tool names, storage, and approval mechanics are adapter concerns and must not alter core semantics.

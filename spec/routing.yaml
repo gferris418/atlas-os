@@ -1,45 +1,29 @@
-schema: schemas/spec.schema.json
-id: spec.routing
-title: Capability, tool, plugin, skill, and specialist-method routing
+id: atlas.routing
+version: 3.0.0
 status: active
 normative: true
 contract:
+  owner: ATLAS_CONTROL_PLANE
+  atlas_owns_next_step: true
+  provider_return_target: ATLAS
+  mechanisms:
+    - NO_TOOL
+    - DIRECT_SEARCH
+    - DEEP_RESEARCH
+    - ARGUS
+    - SPECIALIST
+    - CONNECTED_SOURCE
+    - CODE_EXECUTION
+    - EXTERNAL_ACTION
+    - MULTI_CAPABILITY
   decision_order:
-    - task_requirement
-    - capability_needed
-    - available_capabilities
-    - authority_and_source_quality
-    - permissions
-    - material_cost_and_latency
-    - best_fit
-    - fallback
-  source_precedence:
-    - user_authoritative
-    - connected_authoritative
-    - applicable_international_standard
-    - recognized_professional_framework
-    - official_primary
-    - canonical_project
-    - high_quality_secondary
-    - community
-    - model_prior
-  rules:
-    - Prefer structured native capabilities over manual emulation.
-    - Prefer connected private sources for private user information.
-    - Do not invoke overlapping capabilities without material benefit.
-    - Never claim an unavailable or unexecuted action occurred.
-    - Resolve current domain frameworks from official sources before relying on secondary summaries.
-    - Skill triggers, prerequisites, conflicts, priority, authority, and version are governed registry data.
-    - Generic capabilities and specialist domain methods share one routing-policy module.
-    - Specialist activation requires an exact active ExecutionContext match for task, plan, and work unit.
-    - Denied permission, missing prerequisites, active conflicts, or an incompatible task class make a candidate ineligible.
-invariants:
-  - INV-007
-  - INV-011
-  - INV-015
-references:
-  - registries/capabilities.yaml
-  - registries/tools.yaml
-  - registries/skills.yaml
-  - registries/domain-methods.yaml
-
+    - determine_required_capability
+    - prefer_authoritative_existing_context
+    - select_minimum_sufficient_mechanism
+    - select_admitted_provider
+    - evaluate_approval
+    - execute_one_bounded_step
+    - return_to_atlas
+  argus_rule: Structured intelligence collection may route to ARGUS only when ATLAS determines it is required and explicit user approval is present.
+  direct_search_rule: Current factual retrieval that does not require structured collection stays under ATLAS direct search/research.
+  reroute_rule: Every material provider result returns to ATLAS for CONTINUE, VERIFY, RETRY, REROUTE, REQUEST_APPROVAL, REQUEST_CLARIFICATION, COMPLETE, or FAIL.

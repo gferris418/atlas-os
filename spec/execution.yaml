@@ -1,0 +1,15 @@
+id: atlas.execution
+version: 3.0.0
+status: active
+normative: true
+contract:
+  atomicity: Execute one bounded work unit at a time unless the Control Plane explicitly authorizes safe parallel work.
+  host_neutral: true
+  provider_contract:
+    input: BOUNDED_HANDOFF
+    output: PROVIDER_RESULT
+    return_to: ATLAS
+  side_effect_classes: [READ_ONLY, REVERSIBLE_WRITE, CONSEQUENTIAL_WRITE, DESTRUCTIVE]
+  approval_required_for: [CONSEQUENTIAL_WRITE, DESTRUCTIVE, ARGUS_ACTIVATION]
+  retry_rule: Retries remain inside original scope and must not bypass approval or evidence controls.
+  completion_rule: Provider success is not ATLAS completion; ATLAS must reconcile and verify the returned result.

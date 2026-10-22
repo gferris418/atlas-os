@@ -1,52 +1,10 @@
-schema: schemas/spec.schema.json
-id: spec.persistence
-title: Task and canonical persistence
+id: atlas.persistence
+version: 3.0.0
 status: active
 normative: true
 contract:
-  namespaces:
-    task_state: Temporary execution state for an active task.
-    canonical_library: Durable knowledge, decisions, configuration, specifications, and reusable artifacts.
-  required_metadata:
-    - identifier
-    - version
-    - timestamp
-    - timezone
-    - provenance
-    - status
-    - dependencies
-    - replacement_lineage
-    - output_profile
-    - format
-    - collection
-    - location
-    - delivery_status
-    - persistence_evidence
-  output_policy: Every delivered output is routed to a task-fit canonical library collection and format when an authorized durable persistence capability is available.
-  collections:
-    answers: Concise conversational answers in Markdown.
-    analyses: Structured analyses in Markdown.
-    decisions: Decision records in Markdown or archival PDF.
-    research: Sourced research in Markdown or archival PDF.
-    execution: Execution summaries and receipts in Markdown.
-    specifications: Technical specifications in Markdown, JSON, or YAML.
-    data: Machine-readable outputs in JSON, CSV, or YAML.
-    artifacts: Documents and bundled artifacts in their requested format.
-  delivery_states:
-    READY: A validated target is available, but the durable write is not yet proven.
-    SAVED: Durable-write evidence exists for the declared location.
-    BLOCKED: Authorization, sensitivity, or policy prevents persistence.
-    CAPABILITY_UNAVAILABLE: No durable persistence capability is available.
-  save_claim: Never claim SAVED without a validated adapter receipt containing the exact location, SHA-256 checksum, byte count, and verification timestamp after durable write and read-back.
-  filesystem_adapter: Resolve and contain every target beneath the configured library root, write atomically, fsync, read back, checksum, allow idempotent repeats, and refuse conflicting overwrites.
-  privacy: Minimize stored input and processing summaries, redact secrets and sensitive data, and require an approved location for restricted content.
-  retention: Keep the latest three relevant canonical revisions unless dependencies, audit, migration, or governance require more.
-  protection: Before archive or removal, migrate dependents, validate replacements, and retain lineage.
-  resume: Reconcile persisted state with actual systems before acting.
-invariants:
-  - INV-012
-  - INV-013
-  - INV-021
-references:
-  - schemas/persistence.schema.json
-
+  owner: ATLAS_CONTROL_PLANE
+  states: [NOT_REQUIRED, PENDING, READY, SAVED, BLOCKED, CAPABILITY_UNAVAILABLE]
+  save_rule: SAVED requires an authorized durable write and a verifiable receipt.
+  provider_rule: Providers may propose mutations or return artifacts; ATLAS decides whether and where canonical persistence occurs.
+  deployment_profiles: Host or organization integrations may define storage targets without becoming core architectural authority.

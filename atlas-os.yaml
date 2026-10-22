@@ -1,59 +1,46 @@
-schema: schemas/atlas-os.schema.json
+schema_version: 3
 product:
   id: atlas-os
   name: ATLAS OS
-  version: 2.0.2-rc.6
-  release_channel: candidate
-  schema_version: 2
-  status: CANDIDATE
-  classification: internal
+  version: 3.0.0
+  release_channel: stable
+  status: RELEASED
   license: MIT
 authority:
-  manifest: atlas-os.yaml
   ai_manifest: atlas-ai.yaml
   governance: governance.yaml
-  core_spec: spec/core.yaml
-  version_pointer: atlas-os.yaml#/product/version
-architecture:
-  mission_control: spec/mission-control.yaml
-  control_plane: spec/control-plane.yaml
-  collection_routing: spec/collection-routing.yaml
-  semantic_normalization: spec/semantic-normalization.yaml
-  domain_context_services: spec/domain-context-services.yaml
-  domain_intelligence: spec/domain-intelligence.yaml
-  observability: spec/observability.yaml
-  dashboard: spec/dashboard.yaml
-execution:
-  request_triage: spec/request-triage.yaml
-  spine: spec/execution-spine.yaml
-  runtime: spec/runtime.yaml
-  classification: spec/classification.yaml
-  domain_practices: spec/domain-practices.yaml
-  domain_handoff: spec/domain-handoff.yaml
-  collection_mission: schemas/collection-mission.schema.json
-  capability_layer: spec/capability-layer.yaml
-  evidence_governance: spec/evidence-governance.yaml
-  execution_governance: spec/execution-governance.yaml
-  agent_security: spec/agent-security.yaml
-  classification_crosswalk: spec/classification-crosswalk.yaml
-  domain_capabilities: spec/domain-capabilities.yaml
-  canonical_capability_registry: registries/canonical-capabilities.yaml
-  output: spec/output.yaml
-  default_depth: L1
-  control_revision: atlas-bootstrap-2026-10-22-r10
+  core: spec/core.yaml
+  routing: spec/routing.yaml
+specifications:
+  - spec/core.yaml
+  - spec/mission-control.yaml
+  - spec/control-plane.yaml
+  - spec/context.yaml
+  - spec/routing.yaml
+  - spec/execution.yaml
+  - spec/evidence.yaml
+  - spec/approvals.yaml
+  - spec/verification.yaml
+  - spec/persistence.yaml
+  - spec/observability.yaml
+registries:
+  - registries/capabilities.yaml
+  - registries/providers.yaml
+  - registries/surfaces.yaml
+integrations:
+  - integrations/argus.yaml
+  - integrations/chatgpt.yaml
+  - integrations/hermes-agent.yaml
+  - integrations/generic-host.yaml
+  - integrations/access-asia.yaml
+runtime:
+  package: atlas_runtime
+  command: python -m atlas_runtime
+  validation: python tools/validate.py .
+documentation:
+  root: docs/README.md
+  navigation: docs/SUMMARY.md
 release:
-  target_version: 2.0.2
-  blocking_controls: [MIG-029, MIG-037]
-  package_command: python tools/package/build_release.py . dist
-  validation_command: python tools/validate/validate_repository.py . && python tools/validate/validate_machine_contracts.py . && python tools/validate/validate_output_contracts.py .
-artifacts:
-  ai_entrypoint: atlas-ai.yaml
-  governance: governance.yaml
-  specifications: spec
-  schemas: schemas
-  registries: registries
-  integrations: integrations
-  migrations: migration
-  tests: tests
-  library: library
-  release_verification_schema: schemas/release-verification.schema.json
+  history_system: git_and_github_releases
+  active_migration_diaries: false
+  compatibility_aliases: false

@@ -1,0 +1,38 @@
+id: integration.access-asia
+version: 3.0.0
+status: active
+role: deployment_profile
+scope: Access Asia storage and system-of-record routing. This profile is not ATLAS core architecture.
+authority:
+  atlas_github: execution_and_governance
+  argus_github: ARGUS schemas, methods, migrations, and versioned release baselines
+  sharepoint: documents, working files, and current mutable ARGUS operational database
+  hubspot: CRM identity, relationships, interactions, deals, and pipeline
+argus_operational_store:
+  format: SQLite
+  logical_path: General/Business Intelligence/30_OPERATIONS/ARGUS_Master_Registry.sqlite
+  writer_authority: ATLAS
+  concurrent_writers: prohibited
+  open_in_place_over_sharepoint_sync: prohibited
+  protocol:
+    - fetch_latest_sharepoint_file
+    - verify_target_version_and_integrity
+    - resolve_identity_before_creation
+    - mutate_locally_in_single_transaction
+    - preserve_source_provenance
+    - record_mutation_log
+    - run_integrity_and_foreign_key_checks
+    - recheck_sharepoint_target_before_replace
+    - replace_same_sharepoint_file
+    - verify_uploaded_target_and_version
+persistence_routing:
+  CRM: HUBSPOT
+  SOURCE_DOCUMENT: SHAREPOINT
+  WORKING_DOCUMENT: SHAREPOINT
+  OPPORTUNITY_FOLDER: SHAREPOINT
+  PROJECT_DOCUMENT: SHAREPOINT
+  ARGUS_CURRENT_STRUCTURED_STATE: SHAREPOINT_SQLITE
+  ARGUS_SCHEMA_AND_IDENTITY_RULES: ARGUS_GITHUB
+  ATLAS_POLICY_AND_RUNTIME: ATLAS_GITHUB
+security:
+  never_commit: [credentials, tokens, sharepoint_native_ids, hubspot_native_ids, personal_contact_data, restricted_source_payloads]

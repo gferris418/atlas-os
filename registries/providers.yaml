@@ -1,0 +1,47 @@
+version: 3.0.0
+items:
+  - id: host.native
+    capability: direct_answer
+    mechanism: NO_TOOL
+    authority: host
+    approval: NOT_REQUIRED
+  - id: host.search
+    capability: direct_search
+    mechanism: DIRECT_SEARCH
+    authority: host
+    approval: NOT_REQUIRED
+  - id: host.research
+    capability: deep_research
+    mechanism: DEEP_RESEARCH
+    authority: host
+    approval: NOT_REQUIRED
+  - id: argus
+    capability: intelligence_collection
+    mechanism: ARGUS
+    authority: specialist
+    approval: ARGUS_ACTIVATION
+    return_to: ATLAS
+  - id: host.specialist
+    capability: specialist_execution
+    mechanism: SPECIALIST
+    authority: host
+    approval: TASK_DEPENDENT
+    return_to: ATLAS
+  - id: host.connected-source
+    capability: connected_source
+    mechanism: CONNECTED_SOURCE
+    authority: connector
+    approval: TASK_DEPENDENT
+    return_to: ATLAS
+  - id: host.code
+    capability: code_execution
+    mechanism: CODE_EXECUTION
+    authority: host
+    approval: TASK_DEPENDENT
+    return_to: ATLAS
+  - id: host.external-action
+    capability: external_action
+    mechanism: EXTERNAL_ACTION
+    authority: host
+    approval: EXTERNAL_ACTION
+    return_to: ATLAS

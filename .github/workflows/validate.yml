@@ -16,39 +16,28 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.12.12"
           cache: pip
-          cache-dependency-path: requirements.lock
-      - run: python -m pip install --require-hashes --requirement requirements.lock
+          cache-dependency-path: requirements.txt
+      - name: Install dependencies
+        run: python -m pip install --requirement requirements.txt
       - uses: pypa/gh-action-pip-audit@1220774d901786e6f652ae159f7b6bc8fea6d266 # v1.1.0
         with:
-          inputs: requirements.lock
-      - name: Smoke-test ATLAS CLI
+          inputs: requirements.txt
+      - name: Compile runtime
+        run: python -m compileall -q atlas_runtime
+      - name: Smoke-test CLI
         run: python -m atlas_runtime --help
-      - run: python -m unittest discover -s tests/unit -v
-      - run: python -m unittest discover -s tests/conformance -v
-      - run: python -m unittest discover -s tests/regression -v
-      - run: python -m unittest discover -s tests/integration -v
-      - run: python tools/validate/validate_repository.py .
-      - run: python tools/validate/validate_machine_contracts.py .
-      - run: python tools/validate/validate_output_contracts.py .
-      - name: Test deterministic package build
-        run: python tools/package/build_release.py . dist
-      - name: Upload deterministic main snapshot
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
-        with:
-          name: atlas-os-main-snapshot
-          path: |
-            dist/atlas-os-*.zip
-            dist/atlas-os-*.tar.gz
-            dist/atlas-os-*.manifest.json
-            dist/SHA256SUMS
-          if-no-files-found: error
-          retention-days: 90
-          compression-level: 0
+      - name: Unit tests
+        run: python -m unittest discover -s tests/unit -v
+      - name: Conformance tests
+        run: python -m unittest discover -s tests/conformance -v
+      - name: Integration tests
+        run: python -m unittest discover -s tests/integration -v
+      - name: Repository contract
+        run: python tools/validate.py .

@@ -1,34 +1,13 @@
-schema: schemas/spec.schema.json
-id: spec.verification
-title: Verification and completion states
+id: atlas.verification
+version: 3.0.0
 status: active
 normative: true
 contract:
-  states:
-    generated: Output exists but has not necessarily run.
-    executed: The relevant operation ran but may not be correct.
-    verified: Proportional checks demonstrate required behavior.
-    accepted: The authorized party accepted the verified result.
-    released: Release gates passed and publication completed.
-  methods:
-    - tests
-    - schema_validation
-    - source_reconciliation
-    - calculations
-    - file_existence
-    - output_comparison
-    - requirement_coverage
-    - command_status
-    - integration_checks
-    - regression_tests
-  rule: Verification must be proportional and must exercise the intended behavior.
-  cross_system_authenticity: ATLAS control records crossing a trust boundary use detached Ed25519 attestations verified against operator-pinned public keys; an unkeyed digest alone is not producer authentication.
-invariants:
-  - INV-006
-  - INV-007
-  - INV-008
-  - INV-009
-  - INV-016
-references:
-  - schemas/execution.schema.json
-
+  proportionality: Verification depth follows risk, consequence, uncertainty, and user requirement.
+  minimum_checks:
+    - requested_outcome_met
+    - provider_result_reconciled
+    - material_claims_supported
+    - unresolved_gaps_exposed
+    - consequential_actions_have_receipts
+  completion_rule: No success or completion claim without fresh verification evidence appropriate to the task.

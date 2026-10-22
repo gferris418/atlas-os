@@ -1,162 +1,32 @@
-schema: schemas/registry.schema.json
-registry:
-  id: registry.capabilities
-  type: capability
-  version: 2
-  status: active
+version: 3.0.0
 items:
-  - id: capability.context-preservation
-    name: Context preservation
-    description: Preserve original intent, constraints, entities, and critical literals.
-    status: required
-    authority: canonical
-    permission: read
-    risk_class: low
-    priority: 100
-    version: "1"
-    source: spec/context.yaml
-    capabilities: [normalize_intent]
-    requires: []
-    conflicts_with: []
-    fallback: null
-  - id: capability.dependency-planning
-    name: Dependency-aware planning
-    description: Produce a minimal acyclic execution graph.
-    status: required
-    authority: canonical
-    permission: read
-    risk_class: medium
-    priority: 90
-    version: "1"
-    source: spec/planning.yaml
-    capabilities: [plan_tasks]
-    requires: [capability.context-preservation]
-    conflicts_with: []
-    fallback: null
-  - id: capability.evidence-tracking
-    name: Evidence tracking
-    description: Preserve provenance and semantic evidence classes.
-    status: required
-    authority: canonical
-    permission: read
-    risk_class: medium
-    priority: 90
-    version: "1"
-    source: spec/evidence.yaml
-    capabilities: [track_evidence, assess_evidence_health]
-    requires: []
-    conflicts_with: []
-    fallback: null
-  - id: capability.domain-alignment
-    name: Domain standards and framework alignment
-    description: Resolve applicable current international standards, professional frameworks, and authoritative domain guidance.
-    status: required
-    authority: canonical
-    permission: read
-    risk_class: medium
-    priority: 95
-    version: "1"
-    source: spec/domain-practices.yaml
-    capabilities: [align_domain_practices]
-    requires: [capability.evidence-tracking]
-    conflicts_with: []
-    fallback: capability.manual-handoff
-  - id: capability.capability-admission
-    name: Capability admission governance
-    description: Evaluate and govern external capability providers without transferring ATLAS core authority to a provider.
-    status: required
-    authority: canonical
-    permission: read
-    risk_class: medium
-    priority: 96
-    version: "1"
-    source: spec/capability-admission.yaml
-    capabilities: [assess_provider, govern_provider_state, route_provider]
-    requires: [capability.evidence-tracking]
-    conflicts_with: []
-    fallback: capability.manual-handoff
-  - id: capability.untrusted-content-assurance
-    name: Untrusted-content assurance
-    description: Assess retrieved or provider-supplied content and tool paths for injection, authority confusion, data exposure, and unsafe action propagation.
-    status: available
-    authority: canonical
-    permission: read
-    risk_class: high
-    priority: 94
-    version: "1"
-    source: spec/capability-admission.yaml
-    capabilities: [assess_untrusted_content, assess_tool_boundary]
-    requires: [capability.capability-admission, capability.evidence-tracking]
-    conflicts_with: []
-    fallback: capability.manual-handoff
-  - id: capability.memory-integrity
-    name: Canonical memory integrity
-    description: Verify provenance, supersession, ambiguity, and authority state before remembered information is relied upon as current canonical context.
-    status: available
-    authority: canonical
-    permission: read
-    risk_class: medium
-    priority: 92
-    version: "1"
-    source: spec/capability-admission.yaml
-    capabilities: [verify_memory_integrity, trace_supersession]
-    requires: [capability.evidence-tracking]
-    conflicts_with: []
-    fallback: capability.manual-handoff
-  - id: capability.forecast-governance
-    name: Forecasting and foresight governance
-    description: Govern structured horizon scanning, evidence, scenarios, adversarial review, forecast vintages, updates, and outcome calibration.
-    status: available
-    authority: canonical
-    permission: read
-    risk_class: medium
-    priority: 91
-    version: "1"
-    source: spec/capability-admission.yaml
-    capabilities: [scan_horizon, govern_forecast, update_forecast, score_forecast]
-    requires: [capability.evidence-tracking, capability.capability-admission]
-    conflicts_with: []
-    fallback: capability.manual-handoff
-  - id: capability.learning-calibration
-    name: Learning and calibration
-    description: Measure provider, workflow, forecast, and decision outcomes without converting sparse or biased evidence into unsupported performance claims.
-    status: available
-    authority: canonical
-    permission: read
-    risk_class: medium
-    priority: 89
-    version: "1"
-    source: spec/capability-admission.yaml
-    capabilities: [measure_outcomes, calibrate_forecasts, attribute_errors]
-    requires: [capability.evidence-tracking]
-    conflicts_with: []
-    fallback: capability.manual-handoff
-  - id: capability.external-action
-    name: Governed external action
-    description: Execute authorized writes while respecting approval boundaries.
-    status: available
-    authority: connected
-    permission: write
-    risk_class: high
-    priority: 80
-    version: "1"
-    source: spec/approvals.yaml
-    capabilities: [external_write]
-    requires: [capability.evidence-tracking]
-    conflicts_with: []
-    fallback: capability.manual-handoff
-  - id: capability.manual-handoff
-    name: Manual handoff
-    description: Report a precise user action when automated execution is unavailable.
-    status: available
-    authority: user
-    permission: read
-    risk_class: low
-    priority: 10
-    version: "1"
-    source: spec/runtime.yaml
-    capabilities: [handoff]
-    requires: []
-    conflicts_with: []
-    fallback: null
-
+  - id: direct_answer
+    class: core
+    purpose: Answer from supplied or already-authoritative context without external collection.
+  - id: direct_search
+    class: routed
+    purpose: Retrieve current factual information directly under ATLAS control.
+  - id: deep_research
+    class: routed
+    purpose: Perform broader evidence-backed research and synthesis under ATLAS control.
+  - id: intelligence_collection
+    class: specialist
+    purpose: Collect structured multi-source intelligence through ARGUS.
+  - id: specialist_execution
+    class: routed
+    purpose: Invoke a task-fit specialist capability while retaining ATLAS orchestration.
+  - id: connected_source
+    class: routed
+    purpose: Read or act on an authorized connected system.
+  - id: code_execution
+    class: routed
+    purpose: Execute code or deterministic computation in an admitted environment.
+  - id: external_action
+    class: consequential
+    purpose: Perform an external side effect after required approval.
+  - id: evidence_verification
+    class: kernel
+    purpose: Verify material claims, provider returns, and completion evidence.
+  - id: persistence
+    class: kernel
+    purpose: Persist authorized state or artifacts with a receipt.

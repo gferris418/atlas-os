@@ -1,56 +1,28 @@
-schema: schemas/governance.schema.json
-id: atlas-os-governance
-version: 1
-authority:
-  product_manifest: atlas-os.yaml
-  ai_manifest: atlas-ai.yaml
-  core_spec: spec/core.yaml
-  precedence:
-    - product-manifest
-    - governance-policy
-    - ai-discovery
-    - core-specifications
-    - schemas
-    - registries
-    - integration-contracts
-    - active-migrations
-    - human-guidance
-    - legacy
-  human_companion: GOVERNANCE.md
-change:
-  classes: [PATCH, MINOR, MAJOR, MIGRATION, GOVERNANCE, DOCUMENTATION, REGISTRY, INTEGRATION]
-  strong_review_for: [runtime-semantics, schemas, persistence, compatibility, release-gates, authority, security]
-release:
-  lifecycle: [DRAFT, CANDIDATE, VERIFIED, RELEASED, SUPERSEDED, ARCHIVED]
-  distinct_states: [generation, execution, verification, acceptance, release]
-  released_requires_no_open_blockers: true
-  missing_evidence_is_pass: false
-  candidate_packaging_allowed_with_truthful_blockers: true
-evidence:
-  spec: spec/evidence.yaml
-  material_claims_require_provenance: true
-  model_output_is_verified_evidence: false
+id: atlas-governance
+version: 3.0.0
+status: active
+authority_chain: [USER, MISSION_CONTROL, CONTROL_PLANE, CAPABILITY_PROVIDER]
+principles:
+  - user_authority_over_consequential_actions
+  - atlas_owns_orchestration_and_next_step
+  - provider_neutral_core
+  - explicit_state_and_fail_closed_controls
+  - evidence_before_completion_claims
+  - history_belongs_in_version_control_not_active_contracts
+changes:
+  core_semantics:
+    requires: [tests, conformance_validation, documentation_update]
+  provider_addition:
+    requires: [capability_mapping, permission_review, routing_tests]
+  host_addition:
+    requires: [surface_registration, adapter_contract, conformance_test]
+  deployment_profile:
+    may_narrow_storage_or_workflow: true
+    may_override_core_authority: false
 approvals:
-  spec: spec/approvals.yaml
-  scoped: true
-  gated_actions: [destructive-action, irreversible-action, publication, financial-commitment, external-communication, permission-change, security-sensitive-change, major-canonical-write]
-domain:
-  practices_spec: spec/domain-practices.yaml
-  framework_registry: registries/frameworks.yaml
-  current_official_sources_required: true
-  alignment_is_not_certification: true
-  binding_requirements_take_precedence: true
-retention:
-  readily_available_revisions: 3
-  archive_requires: [dependent-replacement, migration-complete, audit-permission]
-  silent_overwrite: false
-migration:
-  schema: schemas/migration.schema.json
-  registry: registries/migrations.yaml
-  blockers_close_only_with_evidence: true
-  closed_requires_all_criteria_pass: true
-  deprecated_material_requires_replacement_lineage: true
-legacy:
-  root: legacy
-  immutable: true
-  active_resolution_to_legacy: false
+  need_and_permission_are_separate: true
+  material_scope_change_invalidates_prior_approval: true
+  reusable_by_default: false
+security:
+  provider_output_is_untrusted_input: true
+  secrets_in_repository: prohibited

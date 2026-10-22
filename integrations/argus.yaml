@@ -1,0 +1,32 @@
+id: integration.argus
+version: 3.0.0
+status: active
+role: bounded_intelligence_collection_provider
+capability: intelligence_collection
+activation_authority: ATLAS
+next_step_authority: ATLAS
+explicit_user_approval_required: true
+handoff:
+  input: schemas/handoff.schema.json
+  return_to: ATLAS
+  normal_return: IntelligenceCollectionPackage
+autonomy_within_mission:
+  allowed: true
+  rule: ARGUS may adapt collection strategy inside the ATLAS-authorized mission, scope, permissions, and execution lease without routine callbacks.
+  may:
+    - derive_PIR_and_EEI
+    - plan_collection
+    - select_lawful_sources
+    - resolve_entities_and_identity
+    - acquire_and_normalize_evidence
+    - corroborate_and_reconcile_sources
+    - detect_gaps_conflicts_and_coverage
+    - stop_when_additional_collection_is_unlikely_to_change_the_result
+  may_not:
+    - expand_scope_without_ATLAS
+    - change_permissions
+    - self_activate
+    - self_route_after_return
+    - make_final_business_decisions
+    - persist_canonical_state_without_ATLAS_authorization
+mission_method: PIR -> EEI -> Collection Plan -> Source Plan -> Collect -> Resolve -> Grade -> Competing Hypotheses -> Gaps -> Package

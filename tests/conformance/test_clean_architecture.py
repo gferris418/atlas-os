@@ -32,10 +32,9 @@ class CleanArchitectureContractTests(unittest.TestCase):
 
     def test_pre_execution_flow_has_exactly_three_steps(self) -> None:
         core = yaml.safe_load((ROOT / "spec/core.yaml").read_text(encoding="utf-8"))
-        flow = core["contract"]["pre_execution_flow"]
         self.assertEqual(
             ["UNDERSTAND_AND_NORMALIZE", "MINIMAL_DOMAIN_FRAMING", "ROUTE"],
-            flow,
+            core["contract"]["pre_execution_flow"],
         )
 
     def test_atlas_owns_every_next_step_after_provider_return(self) -> None:
@@ -71,6 +70,14 @@ class CleanArchitectureContractTests(unittest.TestCase):
         self.assertFalse(any(path.startswith("migration/") for path in machine_contracts))
         self.assertFalse(any(path.startswith("legacy/") for path in machine_contracts))
         self.assertFalse(any("release-verification" in path for path in machine_contracts))
+
+    def test_docs_surface_is_deliberately_small(self) -> None:
+        allowed = {
+            "README.md", "SUMMARY.md", "architecture.md", "framework.md", "playbook.md", "sop.md",
+            "capabilities-routing.md", "evidence-verification.md", "argus-interface.md", "host-integration.md",
+            "implementation-guide.md", "examples.md",
+        }
+        self.assertEqual(allowed, {path.name for path in (ROOT / "docs").iterdir() if path.is_file()})
 
 
 if __name__ == "__main__":
