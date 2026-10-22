@@ -48,6 +48,23 @@ Handoff readiness is semantic:
 
 **Classification or framework incompleteness alone never makes a clear ARGUS handoff `BLOCKED`.**
 
+## Integration activation contract
+
+The routing preview contains a single machine-readable `activation_contract` so host adapters and external integrations do not have to independently combine collection mode, collection mission, provider order, handoff requirements and unresolved gates.
+
+The contract is a projection of authoritative ATLAS state, not a new authority. It identifies:
+
+- whether specialist activation is not required, ready for approval, or blocked;
+- that activation authority remains `ATLAS_OS`;
+- whether routing approval is required;
+- the authoritative `collection_mode` and whether ARGUS activation is required;
+- the bound collection-mission identifier, when present;
+- the deterministic provider sequence;
+- providers requiring governed domain handoff; and
+- the blocking gates, if any.
+
+The activation contract is included in the digest-bound routing preview. Any material change to it therefore invalidates stale approval automatically.
+
 ## Separation of responsibilities
 
 - Mission Control: human objectives, approvals/rejections, pause/resume/abort, priorities, scope, collection expansion/reduction and exceptions.
