@@ -6,6 +6,11 @@ from .models import ExecutionEnvelope, ExecutionResult
 from .router import PRE_EXECUTION_FLOW, choose_route, minimal_domain_framing, normalize_objective
 
 
+def enter_mission_control(envelope: ExecutionEnvelope) -> str:
+    """Enter the ATLAS governance gate and return the raw objective for preprocessing."""
+    return envelope.objective
+
+
 def _task_id(envelope: ExecutionEnvelope, normalized: str) -> str:
     if envelope.task_id:
         return envelope.task_id
@@ -14,7 +19,7 @@ def _task_id(envelope: ExecutionEnvelope, normalized: str) -> str:
 
 
 def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
-    original = envelope.objective
+    original = enter_mission_control(envelope)
     normalized = normalize_objective(original)
     task_id = _task_id(envelope, normalized)
     framing = minimal_domain_framing(normalized)
