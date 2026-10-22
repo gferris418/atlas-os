@@ -294,9 +294,12 @@ def build_routing_preview(
                 unresolved.append("domain_handoff_timestamp:REQUIRED")
             if provider["requirement"] == "intelligence_collection" and mission_record is None:
                 unresolved.append("collection_mission:REQUIRED")
-            if classification.get("status") == "RESEARCH_REQUIRED" or alignment.get("status") == "RESEARCH_REQUIRED":
-                handoff_state = "BLOCKED"
-            elif classification.get("status") == "CLASSIFIED" and alignment.get("status") in {"ALIGNED", "NOT_APPLICABLE"}:
+
+            # Routing preview must never convert downstream classification/framework
+            # incompleteness into a blocked semantic handoff. Without an explicit
+            # semantic-context ambiguity signal at this preview seam, incomplete
+            # classification/alignment is represented as executable PARTIAL context.
+            if classification.get("status") == "CLASSIFIED" and alignment.get("status") in {"ALIGNED", "NOT_APPLICABLE"}:
                 handoff_state = "READY"
             else:
                 handoff_state = "PARTIAL"
@@ -304,15 +307,6 @@ def build_routing_preview(
                 domain_records[provider["id"]].get("accepted_handoff_states", [])
             ):
                 unresolved.append(f"domain_handoff_state:{handoff_state}")
-            unresolved_facets = list(classification.get("unresolved_facets", []))
-            unresolved.extend(
-                f"domain_classification:{facet}"
-                for facet in unresolved_facets
-            )
-            # Preserve the former generic handoff gate as a compatibility projection
-            # while exposing the precise unresolved facets that now drive governance.
-            if request_route == "INTELLIGENCE" and unresolved_facets:
-                unresolved.append("domain_classification:intelligence-domain-context")
         provider["unresolved_gates"] = list(dict.fromkeys(unresolved))
 
     conflicting_provider_pairs = sorted({

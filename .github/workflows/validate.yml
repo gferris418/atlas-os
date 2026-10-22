@@ -1,6 +1,7 @@
 name: Validate ATLAS-OS
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches: [main]
@@ -8,9 +9,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   validate:
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
@@ -22,6 +28,8 @@ jobs:
       - uses: pypa/gh-action-pip-audit@1220774d901786e6f652ae159f7b6bc8fea6d266 # v1.1.0
         with:
           inputs: requirements.lock
+      - name: Smoke-test ATLAS CLI
+        run: python -m atlas_runtime --help
       - run: python -m unittest discover -s tests/unit -v
       - run: python -m unittest discover -s tests/conformance -v
       - run: python -m unittest discover -s tests/regression -v
@@ -29,8 +37,7 @@ jobs:
       - run: python tools/validate/validate_repository.py .
       - run: python tools/validate/validate_machine_contracts.py .
       - run: python tools/validate/validate_output_contracts.py .
-      - name: Build deterministic main snapshot
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Test deterministic package build
         run: python tools/package/build_release.py . dist
       - name: Upload deterministic main snapshot
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -45,4 +52,3 @@ jobs:
           if-no-files-found: error
           retention-days: 90
           compression-level: 0
-

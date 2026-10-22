@@ -4,10 +4,13 @@ title: Multi-axial domain and economic classification
 status: active
 normative: true
 contract:
-  purpose: Classify material facets without collapsing domain, economic sector, industry, product, procurement, trade and capability into one code.
+  purpose: Classify material facets from the already-understood whole context without collapsing domain, economic sector, industry, product, procurement, trade and capability into one code.
+  semantic_normalization: spec/semantic-normalization.yaml
+  whole_context_precondition: Classification begins only after the complete available context has been understood and normalized as one semantic unit.
   sequence: [TAXONOMY_SELECTION, JURISDICTION_CLASSIFICATION, OPERATOR_INDUSTRY_CLASSIFICATION, SUPPLIER_INDUSTRY_CLASSIFICATION, PRODUCT_OR_SERVICE_CLASSIFICATION, CAPABILITY_CLASSIFICATION, LIFECYCLE_STAGE_CLASSIFICATION, STAKEHOLDER_CLASSIFICATION, INFORMATION_SENSITIVITY_CLASSIFICATION, DOMAIN_FRAMEWORK_ALIGNMENT]
+  sequence_rule: The sequence is a governed facet order when those facets are material; it is not a requirement to resolve every facet before downstream handoff.
   available_facets: [jurisdiction, operator-industry, supplier-industry, product-or-service, capability, lifecycle-stage, stakeholder, information-sensitivity]
-  economic_sector_context: Sector is a broader contextual grouping recorded through Domain Context Services when material; it is not silently substituted for operator/supplier industry codes.
+  economic_sector_context: Sector is a broader contextual grouping recorded through Domain Context Services when material; buyer/end-user sector and supply-side sector remain separate and are not silently substituted for operator/supplier industry codes.
   reference_stack:
     international_activity: taxonomy.un-isic
     eu_activity: taxonomy.eu-nace
@@ -18,27 +21,29 @@ contract:
     procurement_eu: taxonomy.eu-cpv
     customs_trade: taxonomy.wco-hs
     defense_logistics: taxonomy.nato-codification-system
-  materiality: Resolve only facets that can change answer, requirements, controls, routing, evidence or authorization.
+  materiality: Resolve only facets that can be determined quickly and reliably and materially improve downstream framing, controls, routing, evidence or authorization.
   method:
-    - Select applicable governed schemes and verify scope, issuer, edition and official source.
+    - Begin from the whole context-preserving semantic normalization snapshot; never classify isolated terms in a way that overrides their contextual relationship.
+    - Select applicable governed schemes and verify scope, issuer, edition and official source when those details are immediately material.
     - Preserve separate facets rather than forcing the whole task into one code.
     - Prefer international reference classifications and authoritative current editions.
-    - Distinguish operator industry, supplier industry, sector context, product/service, procurement category, customs/trade code and capability.
+    - Distinguish buyer/end-user sector, supply-side sector, operator industry, supplier industry, product/service, procurement category, customs/trade code and capability.
     - Apply conditional schemes such as HS, CPV/UNSPSC and NATO codification only when their context is material.
-    - Use explicit crosswalk relations EXACT, CLOSE, BROADER, NARROWER or RELATED; never assume codes from unlike schemes are equivalent.
-    - Record scheme/version, code/label, provenance, applicability and confidence.
-    - Mark unavailable or unverified codes unresolved instead of guessing.
-  semantic_invariants: [DOMAIN_IS_NOT_SECTOR, SECTOR_IS_NOT_INDUSTRY, INDUSTRY_IS_NOT_PRODUCT, PRODUCT_IS_NOT_CAPABILITY, PRODUCT_IS_NOT_PROCUREMENT_CATEGORY, PROCUREMENT_CATEGORY_IS_NOT_HS_CODE, HS_CODE_IS_NOT_PROCUREMENT_ELIGIBILITY, CLASSIFICATION_IS_NOT_COMPLIANCE]
-  handoff: Resolved ATLAS context transfers unchanged to a specialist; ARGUS may enrich evidence and suggest mappings but cannot silently redefine canonical classification.
+    - Use explicit crosswalk relations EXACT, CLOSE, BROADER, NARROWER, RELATED or CANDIDATE; never assume codes from unlike schemes are equivalent.
+    - Record scheme/version, code/label, provenance, applicability, mapping relation, confidence and resolution status for classifications actually resolved.
+    - Mark unavailable or unverified codes unresolved instead of guessing or delaying the handoff for research.
+  semantic_invariants: [WHOLE_CONTEXT_PRECEDES_CLASSIFICATION, DOMAIN_IS_NOT_SECTOR, SECTOR_IS_NOT_INDUSTRY, INDUSTRY_IS_NOT_PRODUCT, PRODUCT_IS_NOT_CAPABILITY, PRODUCT_IS_NOT_PROCUREMENT_CATEGORY, PROCUREMENT_CATEGORY_IS_NOT_HS_CODE, HS_CODE_IS_NOT_PROCUREMENT_ELIGIBILITY, CLASSIFICATION_IS_NOT_COMPLIANCE, UNRESOLVED_CLASSIFICATION_IS_NOT_HANDOFF_BLOCKER]
+  handoff: ATLAS transfers whole semantic context first, followed by high-confidence classification and explicit unresolved classification context. ARGUS may enrich evidence and suggest mappings but cannot silently redefine canonical meaning or classification. Classification completeness is not a prerequisite for a semantically clear handoff.
   result_states:
-    CLASSIFIED: All material facets are resolved with governed references.
-    PARTIAL: Useful context exists but material facets remain unresolved.
-    RESEARCH_REQUIRED: No adequate authoritative classification is established.
-    NOT_REQUIRED: Classification cannot materially affect the result.
-  sensitive_domain_rule: Defense, national-security, dual-use, operational-security and export-control flags require scope, authorization and sensitivity checks before detailed work.
+    CLASSIFIED: All classification facets ATLAS chose as immediately material are resolved with governed references.
+    PARTIAL: Useful classification context exists but one or more downstream facets remain unresolved; this state is handoff-safe when semantic meaning is clear.
+    RESEARCH_REQUIRED: No adequate authoritative classification is established for a requested classification question; this does not by itself make the whole semantic handoff BLOCKED.
+    NOT_REQUIRED: Classification cannot materially improve the immediate semantic frame.
+  sensitive_domain_rule: Defense, national-security, dual-use, operational-security and export-control flags remain visible for downstream scope, authorization and sensitivity controls; their presence does not require ATLAS to research lifecycle or specifications before handoff.
   claims_rule: Classification metadata does not establish legal status, export classification, procurement eligibility, compliance or authorization.
-invariants: [INV-006, INV-016, INV-019]
+invariants: [INV-001, INV-002, INV-006, INV-016, INV-019]
 references:
+  - spec/semantic-normalization.yaml
   - spec/domain-context-services.yaml
   - registries/taxonomies.yaml
   - registries/classifications.yaml

@@ -21,6 +21,20 @@
     "approvals": {"type": "array"},
     "verification": {"type": "array"},
     "assumptions": {"type": "array"},
+    "semantic_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "original_input", "normalized_input", "meaning_ambiguities", "unresolved_context"],
+      "properties": {
+        "status": {"enum": ["READY", "AMBIGUOUS"]},
+        "original_input": {"type": "string"},
+        "normalized_input": {"type": "string"},
+        "whole_context_summary": {"type": ["string", "null"]},
+        "normalization_notes": {"type": "array"},
+        "meaning_ambiguities": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "unresolved_context": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+      }
+    },
     "domain_classification": {
       "type": "object",
       "additionalProperties": false,
@@ -96,4 +110,3 @@
     "then": {"required": ["domain_classification", "domain_alignment"]}
   }]
 }
-

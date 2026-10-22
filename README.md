@@ -32,6 +32,20 @@ Human / Event
   -> Dashboard
 ```
 
+### Canonical pre-execution flow
+
+**Understand + Normalize -> Minimal Domain Framing -> Route**
+
+1. **Understand + Normalize** — read the whole context first, preserve intent and critical literals, and normalize only supported spelling, grammar, terminology and canonical naming without adding facts.
+2. **Minimal Domain Framing** — add only material high-confidence jurisdiction/entity, domain, sector, industry, product/service, capability, classification, standards and best-practice context needed for correct routing or downstream work.
+3. **Route** — `ARGUS_COLLECTION` and `HYBRID` go to ARGUS; `NONE` and `ATLAS_DIRECT` continue to normal ATLAS execution.
+
+Internal control-plane, approval, provider-admission and execution mechanics remain governed implementation details; they do not create additional preprocessing steps.
+
+ATLAS resolves only what can be determined quickly and reliably from the supplied context and local governed registries. It does not enter a research loop merely to complete lifecycle stage, procurement route, budget, quantity, technical specification, exact classification codes, exact standards applicability, funding, supplier/OEM or delivery timing before routing.
+
+**Unknown downstream facts are not semantic blockers.** Material ambiguity in the meaning itself is the normal semantic reason to block routing.
+
 ### Mission Control
 Human supervisory command: objectives, approvals, rejection, pause/resume/abort, priorities, scope, collection expansion/reduction and permitted exceptions.
 
@@ -54,7 +68,7 @@ ATLAS exposes ten canonical capabilities. They are **capabilities, not ten indep
 | `atlas.economic-policy-intelligence` | ROUTED | ATLAS |
 | `atlas.classification-crosswalk` | KERNEL | ATLAS |
 
-The four kernel services are always active. Routed capabilities are selected proportionately after task intent and collection mode are known. A capability can declare collection dependency but **cannot self-activate ARGUS**; only the Collection-Need Gate may do so.
+The four kernel services are always active. Routed capabilities are selected proportionately after task intent and collection mode are known. A capability can declare collection dependency but **cannot self-activate ARGUS**; only the Route step may do so through `collection_mode`.
 
 Third-party skills, plugins, MCP servers, connectors and models are implementations or source material. Agent Security admits them as `ADOPT`, `ADAPT`, `MERGE`, `REWRITE` or `REJECT`; they never become ATLAS architectural authority.
 
@@ -97,7 +111,7 @@ The Access Asia commercial identity is assigned only after ATLAS-authorized prom
 
 Task intent and collection mechanism are independent. Early commercial opportunity intelligence is also distinct from procurement intelligence.
 
-| Request | ATLAS capability/task | Collection mode | ARGUS |
+| Request | ATLAS capability/task | Collection mode | Route |
 | --- | --- | --- | --- |
 | Bangladesh Bank foreign exchange policy | economic-policy-intelligence | ATLAS_DIRECT | No |
 | ST Engineering | target collection | ARGUS_COLLECTION | Yes |
@@ -124,37 +138,19 @@ ATLAS uses a multi-axial model and never collapses unlike concepts:
 
 `DOMAIN != SECTOR != INDUSTRY != ECONOMIC ACTIVITY != PRODUCT != CAPABILITY != PROCUREMENT CATEGORY != TRADE CLASSIFICATION != COMPLIANCE`
 
-Core governed schemes include:
-- ISO 704 / ISO 1087 terminology principles;
-- ISO 25964 and W3C SKOS vocabulary interoperability;
-- ISO/IEC 11179 metadata/provenance concepts;
-- ISO 3166 jurisdiction codes;
-- UN ISIC Rev. 5 for international economic activity;
-- Bangladesh BSIC 2020 for national economic activity;
-- NACE Rev. 2.1 for EU economic activity;
-- NAICS 2022 for North American industry/activity;
-- UN CPC 3.0 for international goods/services;
-- Bangladesh BCPC 2011 for national products/services;
-- CPA 2.2 for EU products/services;
-- UNSPSC and CPV 2008 for procurement contexts;
-- WCO HS 2022 for international customs/trade;
-- Bangladesh Customs Operative Tariff FY 2026-27 for current Bangladesh customs contexts;
-- NATO Codification System when defense logistics is materially applicable.
+Core governed schemes include ISO 704 / ISO 1087, ISO 25964, W3C SKOS, ISO/IEC 11179, ISO 3166, UN ISIC Rev. 5, Bangladesh BSIC 2020, NACE Rev. 2.1, NAICS 2022, UN CPC 3.0, Bangladesh BCPC 2011, CPA 2.2, UNSPSC, CPV 2008, WCO HS 2022, Bangladesh Customs Operative Tariff FY 2026-27, and NATO Codification System when materially applicable.
 
-Crosswalks are explicit (`EXACT`, `CLOSE`, `BROADER`, `NARROWER`, `RELATED`) with source/target scheme edition, code, label, basis, provenance, verification and confidence. Classification never proves compliance, procurement eligibility or legal status.
+Crosswalks are explicit (`EXACT`, `CLOSE`, `BROADER`, `NARROWER`, `RELATED`, `CANDIDATE`) with scheme/version/provenance. Classification never proves compliance, procurement eligibility or legal status. Unresolved exact codes remain unresolved rather than guessed.
 
 ## Execution spine
 
-1. preserve raw input/context;
-2. interpret intent and targets;
-3. decide collection mode;
-4. select the canonical capability plan;
-5. resolve material Domain Context Services and classification crosswalks;
-6. establish plan/providers/approvals;
-7. execute ATLAS work and any authorized ARGUS collection work unit;
-8. apply Evidence Governance and independent assurance/verification;
-9. output and persist through authorized receipts;
-10. project operational state through Observability/Dashboard.
+Pre-execution is always summarized as exactly three steps:
+
+1. `UNDERSTAND_AND_NORMALIZE`
+2. `MINIMAL_DOMAIN_FRAMING`
+3. `ROUTE`
+
+After Route, normal ATLAS or authorized ARGUS execution proceeds under the existing Control Plane, capability, approval, evidence, verification, persistence and delivery controls.
 
 ## Machine-readable authority
 

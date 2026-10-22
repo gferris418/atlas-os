@@ -22,19 +22,23 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class RepositoryContractTests(unittest.TestCase):
-    def test_execution_spine_uses_collection_need_before_domain_flow(self) -> None:
+    def test_execution_spine_frames_domain_before_route(self) -> None:
         spine = yaml.safe_load((ROOT / "spec/execution-spine.yaml").read_text(encoding="utf-8"))
         self.assertEqual(
             [
                 "INTENT_AND_TARGET_INTERPRETATION",
-                "COLLECTION_NEED_GATE",
                 "CONDITIONAL_DOMAIN_CONTEXT",
+                "COLLECTION_NEED_GATE",
                 "CAPABILITY_AND_EXECUTION_PLAN",
                 "DATA_PLANE_EXECUTION",
                 "ASSURANCE_AND_VERIFICATION",
                 "OUTPUT_AND_PERSISTENCE",
             ],
             [layer["name"] for layer in spine["contract"].get("layers", [])],
+        )
+        self.assertEqual(
+            ["UNDERSTAND_AND_NORMALIZE", "MINIMAL_DOMAIN_FRAMING", "ROUTE"],
+            spine["contract"]["pre_execution_flow"]["steps"],
         )
         self.assertEqual(
             "Human command, approval, pause/resume/abort, priority, scope and exception requests.",
@@ -256,10 +260,12 @@ class RepositoryContractTests(unittest.TestCase):
             .read_text(encoding="utf-8")
         )
         jsonschema.validate(example, schema)
-        self.assertEqual("PARTIAL", example["domain_classification"]["status"])
-        self.assertEqual("BLOCKED", example["status"])
-        self.assertIn("lifecycle-stage", example["domain_classification"]["unresolved_facets"])
-        self.assertIn("information-sensitivity", example["domain_classification"]["unresolved_facets"])
+        self.assertEqual("READY", example["semantic_context"]["status"])
+        self.assertEqual("CLASSIFIED", example["domain_classification"]["status"])
+        self.assertEqual("ACTIVE", example["status"])
+        self.assertEqual([], example["domain_classification"]["unresolved_facets"])
+        self.assertIn("lifecycle-stage", example["semantic_context"]["unresolved_context"])
+        self.assertIn("specific-standard-applicability", example["semantic_context"]["unresolved_context"])
 
 
 if __name__ == "__main__":

@@ -1,0 +1,272 @@
+schema: schemas/spec.schema.json
+id: spec.semantic-normalization
+title: Context-preserving semantic normalization and domain framing
+status: active
+normative: true
+contract:
+  purpose: >-
+    Convert the complete available user or upstream context into a precise canonical semantic
+    context without changing intent, adding unsupported facts, collapsing classification axes,
+    or turning contextual standards and best practices into assumed requirements.
+  owner: ATLAS_OS
+  preserve_raw_input: true
+  semantic_drift_prohibited: true
+  invented_facts_prohibited: true
+  record_material_corrections: true
+  preserve_ambiguity_when_unresolved: true
+  whole_context_before_decomposition: true
+  context_precedes_classification: true
+  decomposition_must_preserve_relationships: true
+  reconcile_decomposed_context_to_whole: true
+  context_minimization:
+    minimal_sufficient_context: true
+    materiality_required: true
+    skip_low_value_enrichment: true
+    do_not_enumerate_irrelevant_taxonomies: true
+    do_not_expand_standards_without_material_need: true
+    do_not_add_context_just_because_available: true
+    inclusion_threshold: meaning_or_downstream_decision_impact
+    rule: >-
+      Preserve the whole meaning, but emit only the minimal sufficient context needed to maintain
+      semantic fidelity or materially improve downstream classification, routing, or decisions.
+      Skip decorative, repetitive, speculative, or low-value enrichment.
+  pre_execution_flow:
+    canonical_summary: Understand + Normalize -> Minimal Domain Framing -> Route
+    minimal_sufficient_context: true
+    no_pre_route_research_loop: true
+    unresolved_downstream_context_is_non_blocking: true
+    normal_semantic_blocker: meaning_ambiguity
+    steps:
+      - id: UNDERSTAND_AND_NORMALIZE
+        purpose: Read the whole available context first, preserve intent and critical literals, and normalize only supported spelling, grammar, terminology, and canonical naming without adding facts.
+      - id: MINIMAL_DOMAIN_FRAMING
+        purpose: Add only material, high-confidence domain, jurisdiction, entity, sector, industry, product/service, capability, classification, standards, and best-practice context needed for correct routing or downstream work.
+      - id: ROUTE
+        purpose: Decide collection_mode and hand the minimal context either to ARGUS for structured intelligence collection or to normal ATLAS execution.
+    routing_targets:
+      ARGUS_COLLECTION: ARGUS
+      HYBRID: ARGUS
+      ATLAS_DIRECT: ATLAS_EXECUTION
+      NONE: ATLAS_EXECUTION
+  whole_context_rule: >-
+    Read the complete available context as one semantic unit before decomposing it. Establish the
+    overall meaning, intent, requested outcome, actors, relationships, constraints, qualifiers,
+    jurisdiction and critical literals first. Decompose only after those relationships are understood,
+    and reconcile every decomposed facet back to the whole before handoff.
+  normalization_rule: >-
+    Rewrite only for clarity, spelling, grammar, terminology and canonical naming when the intended
+    meaning is sufficiently supported by the whole context. Preserve the original literal and record
+    any material correction, expansion or ambiguity. If meaning itself is uncertain, preserve the
+    ambiguity instead of silently choosing an interpretation.
+  scope_boundary: >-
+    ATLAS normalizes and frames meaning. It does not infer that a real-world project, budget,
+    procurement, quantity, specification, authority, supplier, lifecycle stage or event exists
+    unless that fact is already present in accepted context.
+  fast_path_sequence:
+    - PRESERVE_WHOLE_CONTEXT
+    - UNDERSTAND_WHOLE_CONTEXT
+    - NORMALIZE_WHOLE_CONTEXT
+    - DECOMPOSE_AS_REQUIRED
+    - CLASSIFY_HIGH_CONFIDENCE_CONTEXT
+    - RECONCILE_TO_WHOLE_CONTEXT
+    - HANDOFF_WITH_UNRESOLVED_CONTEXT
+  fast_path:
+    prefer_local_governed_context: true
+    no_research_loop_for_normalization: true
+    downstream_unknowns_do_not_block_handoff: true
+    only_semantic_blocker: meaning_ambiguity
+    rule: >-
+      Resolve only what can be determined quickly and reliably from the supplied whole context and
+      local governed registries. Unknown downstream facts remain unresolved and travel with the
+      handoff. Do not search merely to complete lifecycle, procurement, specification, code or
+      standards applicability before ARGUS activation.
+  defer_to_downstream:
+    - lifecycle_stage
+    - procurement_route
+    - project_or_procurement_existence
+    - budget
+    - quantity
+    - technical_specification
+    - exact_classification_code
+    - specific_standard_applicability
+    - supplier_or_oem
+    - funding_source
+    - delivery_timeline
+  output_sections:
+    - original_input
+    - normalized_input
+    - normalization_notes
+    - whole_context_summary
+    - semantic_facets
+    - classification_context
+    - standards_and_framework_context
+    - international_best_practice_lenses
+    - unresolved_context
+    - prohibited_inferences
+  semantic_context_status:
+    READY: The whole-context meaning is sufficiently clear for downstream work; unresolved downstream facts are permitted.
+    AMBIGUOUS: Material ambiguity prevents reliable interpretation of the user's meaning and is the only normal semantic reason to block downstream handoff.
+  semantic_facets:
+    domain:
+      meaning: Broad governed knowledge or operational domain.
+    jurisdiction:
+      meaning: Country, region, authority or legal/operational scope when known.
+    buyer_or_end_user_sector:
+      meaning: Economic or public-service sector of the operator, buyer or end user.
+      relationship_to_supply_side_sector: separate
+    supply_side_sector:
+      meaning: Economic sector of the suppliers, manufacturers, contractors or service providers.
+    operator_industry:
+      meaning: Economic activity or industry of the operator, buyer or end user.
+    supplier_industry:
+      meaning: Economic activity or industry of the likely supply-side actor class.
+    product_or_service:
+      meaning: Normalized good, service, software, works or other deliverable concept.
+    platform_or_system:
+      meaning: Broader platform, system, asset or solution family when materially useful.
+    operating_environment:
+      meaning: Physical, digital, organizational or operational environment when materially useful.
+    capability:
+      meaning: What the product, service or system enables; never interchangeable with the product itself.
+  semantic_invariants:
+    domain_is_not_sector: true
+    sector_is_not_industry: true
+    industry_is_not_product: true
+    product_is_not_capability: true
+    product_is_not_procurement_category: true
+    procurement_category_is_not_customs_code: true
+    classification_is_not_compliance: true
+    contextual_best_practice_is_not_requirement: true
+    partial_term_meaning_must_not_override_whole_context: true
+    critical_relationships_survive_decomposition: true
+    downstream_unknown_is_not_semantic_blocker: true
+  classification_context:
+    international_activity: taxonomy.un-isic
+    national_activity: jurisdiction_specific_official_activity_classification_when_material
+    regional_activity: taxonomy.eu-nace
+    north_america_activity: taxonomy.naics
+    international_product_service: taxonomy.un-cpc
+    national_product_service: jurisdiction_specific_official_product_service_classification_when_material
+    regional_product_service: taxonomy.eu-cpa
+    procurement_global: taxonomy.unspsc
+    procurement_regional: taxonomy.eu-cpv
+    customs_trade: taxonomy.wco-hs
+    defense_logistics: taxonomy.nato-codification-system
+    capability_vocabulary: taxonomy.atlas-capability-skos
+  classification_rules:
+    multi_axial: true
+    materiality_driven: true
+    only_material_schemes: true
+    high_confidence_first: true
+    current_official_edition_preferred: true
+    jurisdiction_specific_scheme_preferred_when_legally_or_operationally_material: true
+    unresolved_codes_must_not_be_guessed: true
+    cross_scheme_equivalence_must_not_be_assumed: true
+    classification_completion_not_required_for_handoff: true
+    explicit_mapping_relations: [EXACT, CLOSE, BROADER, NARROWER, RELATED, CANDIDATE]
+    metadata_fields:
+      - scheme
+      - version
+      - code
+      - label
+      - relationship
+      - confidence
+      - source
+      - classification_date
+      - applicability
+      - resolution_status
+    conditional_schemes_rule: >-
+      Procurement, customs, defense-logistics and other specialized schemes are attached only
+      when their context is material. A short product phrase is not sufficient reason to guess
+      an exact code.
+  standards_and_framework_context:
+    purpose: >-
+      Identify the standards families, regulatory frameworks, recognized professional practices,
+      quality systems and domain guidance that can quickly and reliably frame downstream work.
+    minimal_material_set: true
+    precedence:
+      - applicable_law_and_regulation
+      - explicit_binding_user_or_contract_requirements
+      - international_standards
+      - recognized_professional_frameworks
+      - authoritative_domain_guidance
+      - local_or_project_practices
+    capture:
+      - identifier_or_family
+      - issuer
+      - edition_or_version_policy
+      - official_source
+      - applicability
+      - relationship_to_context
+      - confidence
+      - unresolved_conditions
+    rule: >-
+      Standards and framework families may be supplied as context before exact applicability is
+      known, but only when materially useful. Exact applicability may remain unresolved for downstream
+      work and must not block a semantically clear handoff. Candidate or conditional frameworks are not requirements.
+  international_best_practice_lenses:
+    requirements_and_use_case:
+      purpose: Start from intended outcomes, users, missions, operating scenarios and measurable needs.
+    lifecycle_and_total_cost:
+      purpose: Consider acquisition, operation, maintenance, upgrades, support, disposal and total cost of ownership.
+    safety_and_risk:
+      purpose: Identify material safety, resilience, redundancy, security and operational-risk concerns.
+    quality_and_assurance:
+      purpose: Consider quality management, assurance evidence, traceability and independent verification where material.
+    interoperability_and_open_architecture:
+      purpose: Consider interfaces, compatibility, portability, modularity, data standards and avoidance of unnecessary lock-in.
+    cybersecurity_and_information_assurance:
+      purpose: Consider identity, access, network, software, data, supply-chain and remote-support security where relevant.
+    maintainability_and_supportability:
+      purpose: Consider maintenance, diagnostics, documentation, spares, skills, training and obsolescence management.
+    human_factors_and_accessibility:
+      purpose: Consider usability, ergonomics, staffing, workload, accessibility and human-system interaction.
+    sustainability_and_environment:
+      purpose: Consider energy, emissions, materials, waste, environmental impact and sustainable lifecycle choices where material.
+    testing_acceptance_and_validation:
+      purpose: Consider staged verification, factory/site/operational testing, acceptance criteria and validation evidence appropriate to the domain.
+    configuration_and_change_management:
+      purpose: Consider controlled baselines, versioning, as-built/as-configured records, deviations and change control.
+  best_practice_rules:
+    context_lens_not_requirement: true
+    applicability_must_be_assessed: true
+    current_official_sources_preferred: true
+    exact_applicability_not_required_for_handoff: true
+    never_claim_compliance_from_context_only: true
+    domain_specific_extension_allowed: true
+    proportionality_required: true
+    only_material_lenses: true
+  handoff:
+    rule: >-
+      ATLAS transfers the whole normalized semantic context first, followed by only materially useful,
+      high-confidence classification and standards/best-practice framing plus explicit unresolved context.
+      A clear semantic context is handoff-ready even when downstream lifecycle, procurement, specification,
+      exact-code or standards-applicability questions remain unresolved. Specialists may add evidence
+      but may not silently redefine ATLAS-owned meaning or convert contextual candidates into facts.
+  prohibited_inferences:
+    - project_exists
+    - procurement_exists
+    - budget_exists
+    - quantity_is_known
+    - specification_is_known
+    - authority_is_known
+    - supplier_is_selected
+    - lifecycle_stage_is_known
+    - candidate_standard_is_mandatory
+    - candidate_classification_is_exact
+invariants:
+  - INV-001
+  - INV-002
+  - INV-006
+  - INV-016
+  - INV-018
+  - INV-019
+references:
+  - spec/context.yaml
+  - spec/request-triage.yaml
+  - spec/domain-context-services.yaml
+  - spec/classification.yaml
+  - spec/domain-practices.yaml
+  - registries/taxonomies.yaml
+  - registries/frameworks.yaml
+  - spec/domain-handoff.yaml

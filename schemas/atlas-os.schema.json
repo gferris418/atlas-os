@@ -29,11 +29,12 @@
     },
     "architecture": {
       "type": "object", "additionalProperties": false,
-      "required": ["mission_control", "control_plane", "collection_routing", "domain_context_services", "domain_intelligence", "observability", "dashboard"],
+      "required": ["mission_control", "control_plane", "collection_routing", "semantic_normalization", "domain_context_services", "domain_intelligence", "observability", "dashboard"],
       "properties": {
         "mission_control": {"const": "spec/mission-control.yaml"},
         "control_plane": {"const": "spec/control-plane.yaml"},
         "collection_routing": {"const": "spec/collection-routing.yaml"},
+        "semantic_normalization": {"const": "spec/semantic-normalization.yaml"},
         "domain_context_services": {"const": "spec/domain-context-services.yaml"},
         "domain_intelligence": {"const": "spec/domain-intelligence.yaml"},
         "observability": {"const": "spec/observability.yaml"},

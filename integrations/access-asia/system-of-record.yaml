@@ -1,0 +1,125 @@
+schema_version: 1
+integration_id: access-asia-system-of-record
+version: 1.0.0
+effective_date: 2026-10-22
+scope: Access Asia persistence routing and external system ownership
+
+principle: pointers_not_copies
+
+security:
+  github_visibility_verified: public
+  verified_date: 2026-10-22
+  native_external_ids: resolve_at_runtime
+  never_commit:
+    - credentials_or_secrets
+    - authentication_tokens
+    - sharepoint_sharing_tokens
+    - sharepoint_drive_ids
+    - sharepoint_item_ids
+    - hubspot_native_record_ids
+    - contact_personal_data
+    - confidential_crm_exports
+    - restricted_source_payloads
+
+systems:
+  atlas_github:
+    repository: gferris418/atlas-os
+    role: execution_and_persistence_governance
+    owns:
+      - mission_control
+      - control_plane
+      - routing
+      - approvals
+      - action_authorization
+      - persistence_routing
+      - verification
+      - atlas_policy_runtime_and_registry
+
+  argus_github:
+    repository: gferris418/argus-intelligence
+    role: canonical_structured_intelligence
+    owns:
+      - government_commercial_intelligence
+      - opportunity_intelligence
+      - supplier_capability_intelligence
+      - supplier_partnerability_assessment
+      - opportunity_supplier_matches
+      - intelligence_events
+      - evidence_metadata_and_provenance
+      - public_sector_institutional_intelligence
+
+  hubspot:
+    role: canonical_crm
+    owns:
+      - company_identity_and_profile
+      - contact_identity_and_contact_details
+      - access_asia_relationship_state
+      - commercial_interactions
+      - crm_deals_and_pipeline
+      - crm_tasks_notes_calls_and_emails
+    preferred_cross_system_property: argus_party_id
+    native_record_id_storage_in_public_git: prohibited
+
+  sharepoint:
+    role: canonical_document_and_working_file_store
+    hostname: accessasiaccl.sharepoint.com
+    site_path: /sites/accessasia
+    site_display_name: Access Asia Limited
+    document_library: Documents
+    business_intelligence_root: General/Business Intelligence
+    business_intelligence_structure:
+      - 10_SOURCE_MAP
+      - 20_ARCHITECTURE
+      - 30_OPERATIONS
+      - 40_VALIDATION
+      - 50_OPPORTUNITIES
+      - 90_ARCHIVE
+      - 99_INBOX
+    lifecycle_locations:
+      tracked_pre_submission: General/Business Intelligence/50_OPPORTUNITIES
+      submission_active: General/REV/OPP Opportunities
+      awarded_project: General/OPS/PRJ Projects
+    native_item_id_storage_in_public_git: prohibited
+    sharing_query_parameter_storage_in_public_git: prohibited
+
+persistence_routing:
+  CRM_COMPANY: HUBSPOT
+  CRM_CONTACT: HUBSPOT
+  CRM_RELATIONSHIP: HUBSPOT
+  CRM_DEAL: HUBSPOT
+  CRM_INTERACTION: HUBSPOT
+  SOURCE_DOCUMENT: SHAREPOINT
+  WORKING_DOCUMENT: SHAREPOINT
+  OPPORTUNITY_FOLDER: SHAREPOINT
+  PROJECT_DOCUMENT: SHAREPOINT
+  ARGUS_INTELLIGENCE: ARGUS_GITHUB
+  ARGUS_OPPORTUNITY: ARGUS_GITHUB
+  ARGUS_EVENT: ARGUS_GITHUB
+  ARGUS_MATCH: ARGUS_GITHUB
+  ARGUS_EVIDENCE_REFERENCE: ARGUS_GITHUB
+  ATLAS_POLICY: ATLAS_GITHUB
+  ATLAS_RUNTIME: ATLAS_GITHUB
+  ATLAS_REGISTRY: ATLAS_GITHUB
+
+cross_system_linking:
+  pattern: stable_integration_key_plus_runtime_resolution
+  company_key: argus_party_id
+  opportunity_keys:
+    - argus_opportunity_id
+    - commercial_px_id
+  sharepoint_reference: logical_site_and_folder_path
+  copies_of_canonical_master_records: prohibited
+
+lifecycle_contract:
+  profile: integrations/access-asia/opportunity-lifecycle.yaml
+  promote_to_px_keeps_business_intelligence_home: true
+  tender_publication_moves_to_submission: false
+  submission_active_moves_existing_lineage: true
+  award_moves_existing_lineage_to_project: true
+
+atlas_controls:
+  resolve_target_owner_before_write: true
+  authorize_external_mutation_when_gated: true
+  verify_external_state_after_write: true
+  do_not_claim_persistence_without_verification: true
+  dashboard_is_derived_not_canonical: true

@@ -4,32 +4,54 @@ title: Governed domain-context handoff
 status: active
 normative: true
 contract:
-  purpose: Transfer ATLAS-owned domain classification and framework alignment to a specialist domain method without semantic drift, loss, or silent reclassification.
-  placement: The handoff is an interoperability seam inside ROUTING/EXECUTION; it does not add a new execution-spine stage.
+  purpose: Transfer ATLAS-owned whole normalized semantic context, classification context and framework/best-practice context to a specialist domain method without semantic drift, loss, or silent reclassification.
+  pre_execution_flow: [UNDERSTAND_AND_NORMALIZE, MINIMAL_DOMAIN_FRAMING, ROUTE]
+  placement: The handoff occurs only after ROUTE selects ARGUS_COLLECTION or HYBRID. It is an interoperability seam inside routing/execution and does not add a fourth preprocessing step.
   producer: ATLAS OS
   consumer: Any authorized specialist domain method.
   input_authority:
+    semantic_context: ATLAS SEMANTIC_NORMALIZATION
     domain_classification: ATLAS DOMAIN_CLASSIFICATION
     domain_alignment: ATLAS DOMAIN_FRAMEWORK_ALIGNMENT
+  semantic_gate: >-
+    Handoff readiness is determined by whether the whole-context meaning is sufficiently clear for
+    downstream work. Meaning ambiguity may block. Downstream unknowns such as lifecycle stage,
+    procurement route, budget, quantity, technical specifications, exact codes, specific standards
+    applicability, funding, supplier/OEM or delivery timeline do not block a semantically clear handoff.
   rules:
     - A substantive specialist-domain execution must receive a schema-valid domain-context handoff before consuming ATLAS domain context.
-    - The handoff must copy the current task domain_classification and domain_alignment snapshots exactly.
-    - The producer must include source_task_id, source_plan_id, source_work_unit_id, handoff_id, contract_version, consumer, created_at, activation_expires_at, unresolved_material, risk_flags, and payload_sha256.
+    - The handoff must copy or deterministically derive the current task semantic_context and copy domain_classification and domain_alignment snapshots without semantic mutation.
+    - The handoff contains only the minimal sufficient context produced by MINIMAL_DOMAIN_FRAMING plus required integrity/control metadata.
+    - Whole normalized context must precede decomposed classification context in the handoff contract.
+    - The producer must include source_task_id, source_plan_id, source_work_unit_id, handoff_id, contract_version, consumer, created_at, activation_expires_at, semantic_context, unresolved_material, risk_flags, and payload_sha256.
     - activation_expires_at is exactly 24 hours after created_at and controls only first activation/replay eligibility; it must not be reused as an execution or result-validity deadline after activation succeeds.
     - Continued specialist execution after activation must be authorized by an ATLAS-produced execution lease bound to the exact handoff identity and payload digest.
     - An execution lease must include execution_lease_id, issued_at, lease_expires_at, and any supersedes_lease_id; only a currently trusted ATLAS signing key scoped for EXECUTION_LEASE may attest it.
     - Lease renewal or replacement must be represented by a new ATLAS-signed lease; consumers must reject expired, stale, superseded, or cross-handoff leases.
     - The payload SHA-256 covers the canonical handoff object excluding payload_sha256 and detects mutation after production.
-    - The consumer may enrich the context for specialist analysis but must not silently redefine ATLAS taxonomy, classification, standards, framework applicability, risk flags, or unresolved facets.
-    - PARTIAL context may be consumed only with unresolved facets preserved explicitly; BLOCKED context cannot authorize dependent specialist execution.
+    - The consumer may enrich the context for specialist analysis but must not silently redefine ATLAS whole-context meaning, taxonomy, classification, standards, framework context, risk flags, or unresolved context.
+    - READY context may contain unresolved downstream material and remains executable when semantic meaning is clear.
+    - BLOCKED is reserved for material meaning ambiguity or another explicit non-semantic control-plane prohibition; incomplete downstream research alone must not produce BLOCKED.
     - The consumer must return a schema-valid receipt containing the exact handoff_id, contract_version, payload_sha256, and consumer identity.
     - ATLAS must reject a returned specialist result when its receipt is missing, rejected, stale, mutated, or mismatched to the originating handoff.
-    - A new materially different domain-classification/alignment snapshot requires a new handoff_id and payload_sha256; old receipts and leases must not be reused.
+    - A materially different semantic meaning or canonical classification/alignment snapshot requires a new handoff_id and payload_sha256; old receipts and leases must not be reused.
     - Specialist activation must compare source_task_id, source_plan_id, and source_work_unit_id with the active typed ExecutionContext and reject any mismatch.
   handoff_states:
-    READY: Domain classification is CLASSIFIED and alignment is ALIGNED or NOT_APPLICABLE.
-    PARTIAL: Domain context is usable but material unresolved classification remains; the consumer must preserve those unresolved facets.
-    BLOCKED: Domain classification or framework alignment requires material research before dependent specialist execution.
+    READY: Whole-context meaning is clear enough for downstream work; unresolved downstream facts and classifications are explicitly preserved.
+    PARTIAL: Compatibility state for usable legacy context; it remains executable and must preserve unresolved material.
+    BLOCKED: Whole-context meaning is materially ambiguous or another explicit control-plane prohibition prevents dependent execution.
+  downstream_unknown_examples:
+    - lifecycle_stage
+    - procurement_route
+    - project_or_procurement_existence
+    - budget
+    - quantity
+    - technical_specification
+    - exact_classification_code
+    - specific_standard_applicability
+    - supplier_or_oem
+    - funding_source
+    - delivery_timeline
   integrity:
     algorithm: SHA-256
     canonicalization: UTF-8 JSON with sorted keys and compact separators, excluding payload_sha256.
@@ -42,12 +64,15 @@ contract:
     receipt: schemas/domain-handoff-receipt.schema.json
     execution_lease: schemas/execution-lease.schema.json
 invariants:
+  - INV-001
+  - INV-002
   - INV-006
   - INV-016
   - INV-018
   - INV-019
   - INV-021
 references:
+  - spec/semantic-normalization.yaml
   - spec/classification.yaml
   - spec/domain-practices.yaml
   - spec/execution-spine.yaml

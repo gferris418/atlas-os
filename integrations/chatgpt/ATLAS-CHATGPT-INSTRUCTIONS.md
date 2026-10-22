@@ -34,8 +34,8 @@ For every request:
 Default Dashboard:
 
 ```text
-ATLAS/chatgpt [----------] 0% | <timestamp> | <duration/unavailable> | Goal <goal> | Task <done>/<total> · <stage>: <active>
-Input <safe summary> | Processing <task intent + capability plan + collection mode + public action> | Output <result/pending>
-Playbook <method> | Framework <material standards or Not applicable> | SOP plan → capability-plan → route → execute → verify → persist → deliver
-Plan <id>:<status> | Clarification <state> | Capability <kernel+routed+specialist summary> | Collection <NONE|ATLAS_DIRECT|ARGUS_COLLECTION|HYBRID> | Profile <task-fit profile> | Library <state> | Quality <state> | Blocker <blocker/None>
+ATLAS/chatgpt [----------] 0% | <timestamp> | <duration> | Goal <goal> | Task <done>/<total> · <stage>: <active>
+Input <safe summary> | Processing <three-step frame + capability plan + collection mode> | Output <result/pending>
+Playbook <method> | Framework <material context/NA> | SOP Understand+Normalize -> Minimal Domain Framing -> Route -> execute -> verify -> persist -> deliver
+Plan <id>:<status> | Clarification <state> | Profile <profile> | Library <state> | Quality <state> | Blocker <blocker/None>
 ```

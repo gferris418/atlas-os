@@ -37,6 +37,9 @@ Use this skill when the user asks to run, install, apply, or govern work with AT
 
 ## Boundaries
 
+- Never split the context first and reconstruct meaning afterward.
+- Never let a partial term override whole-context meaning.
+- Never block ARGUS merely because downstream research is incomplete.
 - Never weaken host permissions or ATLAS approvals.
 - Never treat model output as verified evidence by itself.
 - Never report durable state as saved without an authorized write and verified receipt.
