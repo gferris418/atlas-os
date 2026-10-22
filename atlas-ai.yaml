@@ -115,6 +115,7 @@ machine_contracts:
   - schemas/evidence-governance.schema.json
   - schemas/execution-lease.schema.json
   - schemas/execution.schema.json
+  - schemas/external-proof-evidence.schema.json
   - schemas/governance.schema.json
   - schemas/migration.schema.json
   - schemas/output.schema.json
