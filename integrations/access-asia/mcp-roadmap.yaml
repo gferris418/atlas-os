@@ -1,0 +1,124 @@
+schema_version: 1
+integration_id: access-asia-mcp-roadmap
+version: 1.0.0
+effective_date: 2026-10-22
+scope: MCP and connector rollout roadmap for Access Asia ATLAS and ARGUS operations
+
+principles:
+  - stabilize_existing_connectors_before_adding_infrastructure
+  - one_canonical_owner_per_information_class
+  - pointers_not_copies
+  - read_automation_before_write_automation
+  - consequential_writes_remain_approval_gated
+  - verify_external_state_before_claiming_completion
+  - prefer_need_driven_infrastructure_over_speculative_platform_growth
+
+new_database_required_now: false
+
+phases:
+  - id: stabilize_existing_connectors
+    priority: P0
+    objective: make current GitHub, HubSpot and SharePoint access predictable and observable before adding more MCP servers
+    systems: [github, hubspot, sharepoint]
+    actions:
+      - validate_authentication_and_permissions
+      - record_supported_read_and_write_capabilities
+      - standardize_runtime_resolution_of_native_ids
+      - verify_cross_system_stable_keys_and_logical_paths
+      - surface_connector_degraded_state_without_falling_back_to_duplicate_storage
+    exit_criteria:
+      - common_read_paths_are_repeatable
+      - permission_failures_are_distinguishable_from_missing_data
+      - connector_health_is_visible_to_ATLAS
+
+  - id: read_automation_and_reconciliation
+    priority: P1
+    objective: reduce repeated manual context gathering and drift checks with safe read-only automation
+    systems: [github, hubspot, sharepoint, argus]
+    actions:
+      - reconcile_ARGUS_party_keys_against_HubSpot_company_records
+      - reconcile_PX_identifiers_against_HubSpot_deals_and_SharePoint_folders
+      - reconcile_opportunity_lifecycle_state_against_actual_SharePoint_location
+      - cache_verified_non_sensitive_context_within_session
+      - parallelize_independent_safe_reads
+    exit_criteria:
+      - normal_requests_begin_from_verified_context_without_full_rediscovery
+      - identity_or_lifecycle_drift_is_reported_before_mutation
+
+  - id: governed_write_automation
+    priority: P2
+    objective: automate deterministic low-ambiguity mutations while preserving ATLAS approval and verification controls
+    systems: [hubspot, sharepoint, github]
+    actions:
+      - create_or_update_cross_system_linkage_properties_when_connector_support_is_reliable
+      - perform_approved_lifecycle_folder_moves_as_single_canonical_mutations
+      - synchronize_pointer_metadata_after_verified_external_writes
+      - require_idempotency_for_retryable_mutations
+      - stop_and_escalate_on_business_ambiguity_permission_failure_or_policy_denial
+    exit_criteria:
+      - approved_mutations_are_duplicate_safe
+      - every_mutation_produces_a_verified_terminal_state_or_explicit_partial_state
+
+  - id: conditional_infrastructure_expansion
+    priority: P3
+    objective: add specialized MCP servers or durable infrastructure only when measured workload creates a material capability gap
+    systems: [conditional]
+    candidates:
+      - capability: transactional_structured_state
+        consider: postgres_or_managed_postgres
+        trigger: concurrent_high_frequency_ARGUS_writes_or_transactional_consistency_need
+      - capability: secret_management
+        consider: github_actions_secrets_or_enterprise_secret_manager
+        trigger: unattended_automation_requires_non_interactive_credentials
+      - capability: change_monitoring
+        consider: scheduled_reconciliation_or_change_detection_service
+        trigger: manual_drift_checks_become_material_operational_cost
+      - capability: durable_event_stream
+        consider: queue_or_event_bus
+        trigger: event_volume_or_async_fanout_exceeds_direct_connector_workflows
+      - capability: enterprise_identity_and_audit
+        consider: workos
+        trigger: multi_user_internal_application_requires_SSO_RBAC_or_central_audit_controls
+    exit_criteria:
+      - each_new_infrastructure_choice_has_a_measured_trigger_owner_and_retirement_plan
+
+mcp_server_selection_policy:
+  required_properties:
+    - explicit_read_write_scope
+    - least_privilege_authentication
+    - stable_resource_identifiers
+    - machine_readable_errors
+    - pagination_or_incremental_sync_for_large_collections
+    - idempotent_or_guarded_mutations
+    - observable_rate_limits_and_retry_signals
+  reject_when:
+    - server_requires_copying_canonical_master_data_into_a_second_store
+    - permission_model_cannot_support_least_privilege
+    - mutations_cannot_be_verified_or_made_duplicate_safe
+    - sensitive_identifiers_or_tokens_would_need_to_be_committed_to_public_git
+
+workos_position:
+  current_role: optional_future_identity_and_audit_control_plane_for_an_internal_application
+  not_current_role:
+    - canonical_crm
+    - document_store
+    - ARGUS_intelligence_store
+    - replacement_for_ATLAS_approval_policy
+  adopt_when:
+    - Access_Asia_builds_a_multi_user_internal_ATLAS_or_ARGUS_application
+    - centralized_SSO_RBAC_directory_sync_or_audit_logs_become_material_requirements
+
+hubspot_linkage_status:
+  preferred_company_key: argus_party_id
+  preferred_deal_key: access_asia_px_id
+  status: creation_pending_connector_reliability
+  rule: do_not_block_ATLAS_or_ARGUS_runtime_on_property_creation
+
+roadmap_success_metrics:
+  - lower_connector_discovery_calls_per_request
+  - lower_duplicate_read_rate
+  - lower_manual_reconciliation_time
+  - lower_approval_reprompt_rate_for_unchanged_exact_scope
+  - zero_duplicate_canonical_mutations
+  - zero_unverified_completion_claims
+  - faster_time_to_first_useful_evidence
