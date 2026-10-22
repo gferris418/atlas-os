@@ -1,5 +1,5 @@
 id: integration.chatgpt.bootstrap
-version: 1.0.0
+version: 1.0.1
 canonical_repository: gferris418/atlas-os
 canonical_ref: main
 source_resolution: github_live_when_available
@@ -17,6 +17,8 @@ surfaces:
   projects: relevance_triggered_plugin_skill
 bootstrap:
   primary_skill: skills/atlas-os/SKILL.md
+  prompt_entry: MISSION_CONTROL_FIRST
+  prompt_entry_scope: every_user_prompt_while_atlas_active
   mission_control: required
   control_plane: required
   compact_dashboard: required_for_substantive_tasks
@@ -33,5 +35,6 @@ argus:
   live_contract_resolution: github_main_when_available
 guarantees:
   universal_prompt_injection: false
+  mission_control_first_when_atlas_active: true
   reason: ChatGPT loads installed skills by relevance and active host capability; Library files alone are not system-prompt injection.
-  behavior: When the ATLAS skill is selected, resolve current canonical contracts before substantive execution when freshness materially affects routing or correctness.
+  behavior: When ATLAS is active, every user prompt enters Mission Control before the three-step pre-execution flow, routing, tool use, provider activation, or execution. Resolve current canonical contracts before substantive execution when freshness materially affects routing or correctness.
