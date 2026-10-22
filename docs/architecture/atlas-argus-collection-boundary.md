@@ -1,105 +1,214 @@
-# ATLAS–ARGUS collection architecture
+# ATLAS–ARGUS collection boundary
 
-ATLAS OS is the fixed operating architecture. ARGUS is a governed intelligence collection subsystem nested inside it.
+ATLAS-OS is the operating and governance architecture. ARGUS is a governed intelligence-collection subsystem nested inside it.
+
+## Boundary rule
+
+> **A route may establish that ARGUS is needed. Only explicit user authorization may establish that ARGUS is permitted to run.**
 
 ```text
-Human / Event
-  -> Mission Control
-  -> Control Plane
-  -> Whole-Context Interpretation
-  -> Context-Preserving Semantic Normalization
-  -> Collection-Need Gate
-       -> NONE
-       -> ATLAS_DIRECT
-       -> ARGUS_COLLECTION -> governed semantic handoff -> ARGUS Collection Mission -> Collection Package
-       -> HYBRID           -> governed semantic handoff -> ARGUS Collection Mission -> Collection Package + ATLAS analysis
-  -> High-Confidence Domain Context / Classification / Standards Framing
-  -> ATLAS Data Plane
-  -> Assurance / Verification
-  -> Output / Persistence
-  -> Observability
-  -> Dashboard
+User / Event
+  -> ATLAS bootstrap: Mission Control + Control Plane + Dashboard
+  -> Understand + Normalize
+  -> Minimal Domain Framing
+  -> Route
+       -> NONE / ATLAS_DIRECT -> ATLAS execution
+       -> ARGUS_COLLECTION ----+
+       -> HYBRID ---------------+-> ARGUS REQUIRED
+                                      |
+                                      v
+                              EXPLICIT USER APPROVAL
+                                      |
+                              approved? yes / no
+                                 |          |
+                                 v          v
+                        governed handoff   stop / revise
+                                 |
+                                 v
+                         ARGUS collection mission
+                                 |
+                                 v
+                         Collection package
+                                 |
+                                 v
+                       ATLAS analysis / verification /
+                       persistence / final delivery
 ```
 
-## Whole-context boundary
+Bootstrap is cross-cutting and the preprocessing flow remains exactly three steps.
 
-ATLAS must understand the complete available context as one semantic unit **before** decomposition or classification. It establishes overall meaning, intent, requested outcome, actors, relationships, jurisdiction, constraints and critical literals first. It then normalizes the whole meaning without semantic drift, decomposes only as required, and reconciles every derived facet back to the whole.
+## Three independent states
 
-For ARGUS-bound work ATLAS is deliberately fast. It resolves high-confidence context from the supplied input and governed local registries; it does not research merely to fill lifecycle, procurement, budget, specification, exact-code, standards-applicability, funding, supplier/OEM or timing fields.
+### 1. Collection need
 
-## Handoff contract
+Authoritative field:
 
-The governed ATLAS → ARGUS handoff carries:
+```text
+collection_mode
+```
 
-1. original whole context;
-2. normalized whole context;
-3. whole-context summary and normalization notes;
-4. high-confidence domain / sector / industry / product / capability context;
-5. classification context and conditional candidates;
-6. standards and international best-practice framing;
-7. unresolved downstream context;
-8. risk flags and integrity metadata.
+ARGUS is needed only when the mode is `ARGUS_COLLECTION` or `HYBRID`.
 
-Handoff readiness is semantic:
+### 2. User authorization
 
-- `READY` — whole-context meaning is clear enough for downstream collection; unresolved downstream facts are allowed.
-- `PARTIAL` — executable compatibility state for usable legacy context; unresolved material is preserved.
-- `BLOCKED` — whole-context meaning is materially ambiguous or another explicit Control Plane prohibition applies.
+Authoritative portable field:
 
-**Classification or framework incompleteness alone never makes a clear ARGUS handoff `BLOCKED`.**
+```text
+argus_approval_status = PENDING | APPROVED | REJECTED
+```
 
-## Integration activation contract
+Authorization is explicit, task-scoped, digest-bound and non-reusable by default.
 
-The routing preview contains a single machine-readable `activation_contract` so host adapters and external integrations do not have to independently combine collection mode, collection mission, provider order, handoff requirements and unresolved gates.
+It must not be inferred from:
 
-The contract is a projection of authoritative ATLAS state, not a new authority. It identifies:
+- collection mode;
+- specialist/provider selection;
+- an existing mission object;
+- prior task approval;
+- prior ARGUS execution;
+- silence;
+- continued conversation.
 
-- whether specialist activation is not required, ready for approval, or blocked;
-- that activation authority remains `ATLAS_OS`;
-- whether routing approval is required;
-- the authoritative `collection_mode` and whether ARGUS activation is required;
-- the bound collection-mission identifier, when present;
-- the deterministic provider sequence;
-- providers requiring governed domain handoff; and
-- the blocking gates, if any.
+### 3. Activation state
 
-The activation contract is included in the digest-bound routing preview. Any material change to it therefore invalidates stale approval automatically.
+The Control Plane may activate ARGUS only when:
+
+- ARGUS is required;
+- explicit authorization is `APPROVED`;
+- the routing approval/digest is current;
+- the provider is admitted;
+- prerequisites/permissions pass;
+- the collection mission is valid;
+- the domain-context handoff is executable;
+- no other Control Plane blocker applies.
+
+## Combined approval UX
+
+Hosts should avoid unnecessary double prompts. One explicit user interaction may approve both:
+
+- the exact digest-bound routing preview; and
+- ARGUS collection for that exact task/mission.
+
+The adapter then records the two separate machine states against the same digest. A single UI action therefore does not collapse the underlying authorization model.
+
+## Whole-context handoff
+
+The governed ATLAS → ARGUS handoff carries the minimum sufficient context:
+
+1. source task / plan / work-unit identity;
+2. original whole context or authoritative source reference;
+3. normalized semantic context;
+4. whole-context summary and normalization notes;
+5. high-confidence domain / sector / industry / product / capability framing;
+6. classification context and conditional candidates;
+7. standards / best-practice context when material;
+8. unresolved downstream facts;
+9. risk flags and integrity metadata;
+10. bounded collection mission and return expectations.
+
+Handoff readiness remains semantic:
+
+- `READY` — meaning is clear enough for downstream collection;
+- `PARTIAL` — usable context with explicit unresolved material;
+- `BLOCKED` — meaning is materially ambiguous or another Control Plane prohibition applies.
+
+Classification/framework incompleteness alone does not make a clear handoff `BLOCKED`.
+
+## Activation contract v2
+
+The portable routing result exposes one deterministic integration projection:
+
+```yaml
+activation_contract:
+  version: "2.0"
+  activation_authority: ATLAS_OS
+  route:
+    collection_mode: ARGUS_COLLECTION
+    routing_preview_digest: sha256:...
+  argus:
+    required: true
+    authorization:
+      required: true
+      status: PENDING
+      scope_task_id: TASK-...
+      bound_preview_digest: sha256:...
+      reusable: false
+      decision_source: null
+    activation:
+      status: NOT_AUTHORIZED
+    mission:
+      id: COLLECTION-...
+  blockers:
+    - ARGUS_EXPLICIT_APPROVAL_REQUIRED
+```
+
+The activation contract is a projection, not an independent authority.
+
+The proposal digest binds the proposed route, mission, provider order, permissions, data scope, prerequisites and handoff requirements. Authorization state is outside the proposal digest so the act of approving does not change the proposal being approved.
 
 ## Separation of responsibilities
 
-- Mission Control: human objectives, approvals/rejections, pause/resume/abort, priorities, scope, collection expansion/reduction and exceptions.
-- Control Plane: authoritative governance, permissions, collection-mode decision, routing, approvals, leases, lifecycle state and persistence authorization.
-- Semantic Normalization / Domain Context Services: whole-context meaning, canonical terminology, taxonomy, buyer/end-user sector, supply-side sector, industry/product/capability framing, classification context, standards/framework families and best-practice lenses.
-- ARGUS: target resolution, structured collection, acquisition, extraction, evidence normalization, entity/event/relationship resolution, deduplication, corroboration, gap/conflict detection and evidence packaging.
-- Data Plane: substantive ATLAS execution including analysis, forecasting, comparison, opportunity qualification and decision work.
-- Assurance/Verification: checks claims, evidence, specialist returns, tests and unresolved gaps independently of collection.
-- Observability: read-oriented events and measurements.
-- Dashboard: read-only projection. A state-changing dashboard action becomes a Mission Control command.
+### Mission Control
 
-## Core activation rule
+Owns human objective, scope, explicit approval/rejection, ARGUS authorization, pause/resume/abort, priorities, collection expansion/reduction/redirect/stop and permitted exceptions.
 
-Do not ask `Is this intelligence?` Ask `Does this ATLAS task require structured intelligence collection?`
+### Control Plane
 
-| Example | Collection mode |
-| --- | --- |
-| Bangladesh Bank foreign exchange policy | ATLAS_DIRECT |
-| ST Engineering | ARGUS_COLLECTION |
-| Coastal patrol vessel for Bangladesh Coast Guard | ARGUS_COLLECTION |
-| Coastal surveillance radar for Bangladesh Navy | ARGUS_COLLECTION |
-| Seed cum cleaner for BADC | ARGUS_COLLECTION |
-| Annual procurement plan of Bangladesh Navy | ARGUS_COLLECTION |
-| Explain Bangladesh Navy procurement regulations | ATLAS_DIRECT |
-| Forecast likely Bangladesh Navy procurements over 24 months | HYBRID |
-| Compare ST Engineering vs L3Harris for Bangladesh opportunities | HYBRID |
+Owns authoritative policy, permissions, task/lifecycle state, collection need, routing, routing approval, ARGUS authorization state, ARGUS activation state, execution leases, provider admission and persistence authorization.
 
-## Economic and product classification
+### ARGUS
 
-ATLAS uses multi-axial classification. Domain, buyer/end-user sector, supply-side sector, industry/activity, product/service, platform/system, procurement category, customs code, capability, lifecycle and sensitivity remain distinct. Current governed reference schemes include ISIC Rev. 5, NACE Rev. 2.1, NAICS 2022, CPC 3.0, CPA 2.2, UNSPSC, CPV 2008, HS 2022 and NATO Codification when applicable.
+After authorization, owns bounded collection work only:
 
-Crosswalks are explicit mappings, not equivalence assumptions. Exact downstream codes can remain unresolved without delaying a semantically clear handoff.
+- target resolution;
+- collection planning within authorized scope;
+- source discovery/acquisition;
+- extraction/normalization;
+- entity/event/relationship resolution;
+- deduplication;
+- corroboration/reconciliation;
+- gap/conflict/coverage assessment;
+- collection packaging.
+
+### ATLAS Data/Execution Plane
+
+Retains:
+
+- substantive and strategic analysis;
+- forecasting/scenarios;
+- comparison;
+- opportunity qualification;
+- business/pursuit decisions;
+- canonical classification acceptance;
+- evidence governance;
+- verification;
+- persistence;
+- final delivery.
+
+ARGUS never owns the ATLAS execution spine, approval model, Dashboard, or final business conclusion.
+
+## Representative routing
+
+| Example | Collection mode | Explicit ARGUS approval required? |
+| --- | --- | --- |
+| Bangladesh Bank foreign exchange policy | ATLAS_DIRECT | No |
+| ST Engineering | ARGUS_COLLECTION | Yes |
+| Coastal patrol vessel for Bangladesh Coast Guard | ARGUS_COLLECTION | Yes |
+| Coastal surveillance radar for Bangladesh Navy | ARGUS_COLLECTION | Yes |
+| Seed cum cleaner for BADC | ARGUS_COLLECTION | Yes |
+| Annual procurement plan of Bangladesh Navy | ARGUS_COLLECTION | Yes |
+| Explain Bangladesh Navy procurement regulations | ATLAS_DIRECT | No |
+| Forecast likely Bangladesh Navy procurements over 24 months | HYBRID | Yes |
+| Compare ST Engineering vs L3Harris for Bangladesh opportunities | HYBRID | Yes |
+
+## Classification boundary
+
+ATLAS uses multi-axial classification. Domain, buyer/end-user sector, supply-side sector, industry/activity, product/service, platform/system, procurement category, customs code, capability, lifecycle and sensitivity remain distinct.
+
+Exact downstream codes can remain unresolved without delaying a semantically clear route or handoff.
 
 ## Operating distinction
 
-> **ATLAS asks: What does the complete request mean, and how should it be framed?**
+> **ATLAS asks: What does the complete request mean, how should it be governed, and what is authorized?**
 
-> **ARGUS asks: What is actually true about it?**
+> **ARGUS asks: Within the authorized collection mission, what evidence can we establish?**
