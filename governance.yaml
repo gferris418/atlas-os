@@ -1,9 +1,10 @@
 id: atlas-governance
-version: 3.0.1
+version: 3.0.2
 status: active
 authority_chain: [USER, MISSION_CONTROL, CONTROL_PLANE, CAPABILITY_PROVIDER]
 principles:
   - user_authority_over_consequential_actions
+  - mission_control_first_for_atlas_governed_prompts
   - atlas_owns_orchestration_and_next_step
   - provider_neutral_core
   - explicit_state_and_fail_closed_controls
