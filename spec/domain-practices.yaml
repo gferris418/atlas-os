@@ -5,15 +5,19 @@ status: active
 normative: true
 contract:
   applicability: Every substantive task must assess relevant international standards, recognized professional frameworks, and current domain best practices.
+  semantic_normalization_contract: spec/semantic-normalization.yaml
   method:
-    - Resolve the governed domain classification, including jurisdictions, actor industries, products or services, capabilities, lifecycle stages, information sensitivity, and risk flags.
+    - Start from the context-preserving semantic normalization snapshot and governed domain classification.
+    - Resolve the governed domain classification, including jurisdictions, buyer/end-user sector, supply-side sector, actor industries, products or services, platforms or systems, capabilities, lifecycle stages, information sensitivity, and risk flags.
     - Resolve applicable binding requirements before voluntary frameworks.
     - Prefer current official editions from international standards bodies and recognized professional authorities.
-    - Record each framework identifier, issuer, edition or version policy, official source, applicability, and implementation mapping.
+    - Record each framework identifier or family, issuer, edition or version policy, official source, applicability, relationship to context, confidence, and implementation mapping.
+    - Apply generic best-practice lenses proportionately across requirements/use case, lifecycle/total cost, safety/risk, quality/assurance, interoperability/open architecture, cybersecurity, maintainability/supportability, human factors/accessibility, sustainability/environment, testing/acceptance/validation, and configuration/change management.
     - Tailor recommendations to context without silently weakening mandatory controls.
-    - Record justified deviations, conflicts, gaps, and unavailable evidence.
+    - Record justified deviations, conflicts, gaps, unresolved applicability, and unavailable evidence.
     - Recheck currency when standards, regulations, or professional guidance may have changed.
-  handoff: When a specialist domain method is routed, the resolved domain-alignment snapshot is transferred unchanged through spec/domain-handoff.yaml; specialist methods may add domain interpretation but must not silently replace ATLAS-owned applicability or framework conclusions.
+  best_practice_boundary: Best practice is context, not a binding requirement. A best-practice lens becomes a requirement only when an authoritative source, user constraint, contract, law, regulation, standard, or approved specification makes it binding.
+  handoff: When a specialist domain method is routed, the resolved semantic, classification and domain-alignment snapshots are transferred unchanged through spec/domain-handoff.yaml; specialist methods may add domain interpretation but must not silently replace ATLAS-owned applicability or framework conclusions.
   precedence:
     - applicable_law_and_regulation
     - explicit_binding_user_or_contract_requirements
@@ -33,6 +37,7 @@ invariants:
   - INV-016
   - INV-018
 references:
+  - spec/semantic-normalization.yaml
   - registries/frameworks.yaml
   - spec/classification.yaml
   - spec/domain-handoff.yaml
