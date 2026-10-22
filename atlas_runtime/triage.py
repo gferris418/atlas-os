@@ -31,6 +31,18 @@ COLLECTION_TYPES = (
     "MARKET_LANDSCAPE",
     "OPPORTUNITY_DISCOVERY",
     "MONITORING",
+    "NEED_GAP",
+    "POLICY_DRIVER",
+    "PROGRAMME_PROJECT",
+    "APPROVAL_STATUS",
+    "SUPPLIER_PROFILE",
+    "REFERENCE_PROJECT",
+    "EXPORT_FEASIBILITY",
+    "PARTNERABILITY",
+    "OPPORTUNITY_DEVELOPMENT",
+    "OPPORTUNITY_MATCHING",
+    "EXPANSION_DISCOVERY",
+    "RAPID_TENDER",
 )
 
 
@@ -87,7 +99,10 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
         r"\bproject pipeline\b", r"\bopportunit(?:y|ies)\b", r"\binstalled base\b",
         r"\bcompetitor(?:s| landscape)?\b", r"\bsupplier landscape\b",
         r"\bstakeholder(?:s| network)?\b", r"\bmarket landscape\b", r"\bdossier\b",
-        r"\bprofile (?:of|on)\b", r"\bdecision maker(?:s)?\b",
+        r"\bprofile (?:of|on)\b", r"\bdecision maker(?:s)?\b", r"\bcapability gap(?:s)?\b",
+        r"\bunmet need(?:s)?\b", r"\bpartnerability\b", r"\bpartner with\b",
+        r"\bshape (?:a |an |the )?(?:future )?opportunit(?:y|ies)\b",
+        r"\bpolicy driver(?:s)?\b", r"\bproject approval\b", r"\bapproval status\b",
     ))
 
     supplied_material = _has(normalized, (
@@ -98,7 +113,7 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
     ))
     independent_collection_leg = monitor_signal or _has(normalized, (
         r"\b(?:then|and then|also)\s+(?:monitor|watch|track|find|search|identify|profile|map)\b",
-        r"\b(?:then|and then|also)\b.*\b(?:procurement|opportunit(?:y|ies)|competitors?|suppliers?|stakeholders?)\b",
+        r"\b(?:then|and then|also)\b.*\b(?:procurement|opportunit(?:y|ies)|competitors?|suppliers?|stakeholders?|oems?)\b",
     ))
     if supplied_material and transformation and not independent_collection_leg:
         return _direct_result("GENERAL_TASK", "NONE", "SUPPLIED_MATERIAL_TRANSFORMATION", 0.99)
@@ -127,24 +142,128 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
         r"\bproject pipeline\b", r"\bprogramme pipeline\b", r"\bprogram pipeline\b",
     ))
     if project_pipeline:
-        collection_types.append("PROJECT_PIPELINE")
+        collection_types.extend(["PROJECT_PIPELINE", "PROGRAMME_PROJECT"])
 
     opportunity_signal = _has(normalized, (
         r"\bopportunit(?:y|ies)\b", r"\bprocurement opportunity\b", r"\btender pipeline\b",
         r"\bwhat .* (?:buy|procure|acquire)\b",
     ))
     if opportunity_signal:
-        collection_types.extend(["OPPORTUNITY_DISCOVERY", "PROCUREMENT_DISCOVERY"])
+        collection_types.append("OPPORTUNITY_DISCOVERY")
+        if _has(normalized, (r"\bprocurement\b", r"\btender pipeline\b", r"\bprocure\b", r"\bacquisition\b")):
+            collection_types.append("PROCUREMENT_DISCOVERY")
 
     buyer_cue = _has(normalized, (
-        r"\bbangladesh (?:navy|army|air force|coast guard)\b", r"\bbadc\b",
+        r"\bbangladesh (?:navy|army|air force|coast guard|railway)\b", r"\bbadc\b",
         r"\bministry\b", r"\bdirectorate\b", r"\bauthority\b", r"\bcorporation\b",
+        r"\bgovernment\b", r"\bpublic sector\b",
     ))
     product_for_buyer = buyer_cue and _has(
         normalized, (r".+\bfor\b.+", r"\bsupply\b.+", r"\bprocure\b.+", r"\bassess\b.+")
     )
     if product_for_buyer and not policy_or_rules:
         collection_types.extend(["BUYER_REQUIREMENT", "PRODUCT_CAPABILITY", "OPPORTUNITY_DISCOVERY"])
+
+    need_gap_signal = _has(normalized, (
+        r"\bcapability gap(?:s)?\b", r"\bunmet need(?:s)?\b", r"\boperational gap(?:s)?\b",
+        r"\bwhat (?:problem|problems|need|needs)\b", r"\bgovernment problem(?:s)?\b",
+        r"\bmoderni[sz]ation need(?:s)?\b", r"\baddress with (?:foreign|international) technolog(?:y|ies)\b",
+    ))
+    if need_gap_signal and buyer_cue:
+        collection_types.extend(["NEED_GAP", "BUYER_REQUIREMENT", "OPPORTUNITY_DISCOVERY"])
+    elif need_gap_signal and opportunity_signal:
+        collection_types.extend(["NEED_GAP", "OPPORTUNITY_DISCOVERY"])
+
+    opportunity_development = _has(normalized, (
+        r"\bshape (?:a |an |the )?(?:future )?opportunit(?:y|ies)\b",
+        r"\bcreate (?:a |an )?(?:future )?opportunit(?:y|ies)\b",
+        r"\bintroduce (?:an |a )?internationally proven solution\b",
+        r"\bintroduce .*\bsolution\b.*\bgovernment\b",
+        r"\bpropose .*\b(?:government|agency|public sector)\b",
+        r"\bmarket development\b.*\b(?:government|public sector)\b",
+    ))
+    if opportunity_development:
+        collection_types.extend(["NEED_GAP", "OPPORTUNITY_DEVELOPMENT", "OPPORTUNITY_DISCOVERY"])
+
+    supply_first_discovery = _has(normalized, (
+        r"\bwhere could\b.*\b(?:technology|solution|product|system|platform)\b.*\b(?:government|public sector|bangladesh)\b",
+        r"\bwhich (?:government )?(?:agencies|buyers|institutions) could (?:use|need|adopt)\b",
+        r"\bmap .*\b(?:technology|solution|product)\b.*\b(?:government|public sector)\b",
+    ))
+    if supply_first_discovery:
+        collection_types.extend(["PRODUCT_CAPABILITY", "OPPORTUNITY_MATCHING", "OPPORTUNITY_DISCOVERY"])
+
+    supplier_matching = _has(normalized, (
+        r"\b(?:rank|find|identify|shortlist|compare)\b.*\b(?:oems?|suppliers?|vendors?|contractors?)\b.*\b(?:for|against)\b",
+        r"\bsuitable (?:international )?(?:oems?|suppliers?|vendors?|contractors?)\b",
+        r"\bmatch .*\b(?:oems?|suppliers?|vendors?|contractors?)\b",
+    ))
+    if supplier_matching:
+        collection_types.extend(["SUPPLIER_LANDSCAPE", "OPPORTUNITY_MATCHING"])
+
+    partnerability_signal = _has(normalized, (
+        r"\bpartner with (?:us|access asia)\b", r"\brepresent(?:ation|ative| them)?\b",
+        r"\b(?:local )?(?:agent|distributor)\b", r"\bexclusive (?:agent|distributor|partner)\b",
+        r"\bpartnerability\b", r"\bwilling(?:ness)? to partner\b",
+    ))
+    if partnerability_signal and _has(normalized, (r"\boems?\b", r"\bsuppliers?\b", r"\bvendors?\b", r"\bcontractors?\b", r"\bpartner\b")):
+        collection_types.append("PARTNERABILITY")
+
+    supplier_profile_signal = _has(normalized, (
+        r"\bsupplier profile\b", r"\boem profile\b", r"\bprofile .*\b(?:supplier|oem|vendor|contractor)\b",
+    ))
+    if supplier_profile_signal:
+        collection_types.append("SUPPLIER_PROFILE")
+
+    reference_project_signal = _has(normalized, (
+        r"\breference project(?:s)?\b", r"\bsimilar project(?:s)?\b", r"\bgovernment references?\b",
+    ))
+    if reference_project_signal:
+        collection_types.append("REFERENCE_PROJECT")
+
+    export_signal = _has(normalized, (
+        r"\bexport feasibility\b", r"\bexport control(?:s)?\b", r"\bexportable\b", r"\bexport permit(?:s)?\b",
+    ))
+    if export_signal and _has(normalized, (r"\boem\b", r"\bsupplier\b", r"\btechnology\b", r"\bproduct\b", r"\bsolution\b")):
+        collection_types.append("EXPORT_FEASIBILITY")
+
+    policy_driver_signal = _has(normalized, (
+        r"\bpolicy driver(?:s)?\b", r"\bpolic(?:y|ies) .*\b(?:create|generate|drive)\b.*\bopportunit(?:y|ies)\b",
+    ))
+    if policy_driver_signal:
+        collection_types.extend(["POLICY_DRIVER", "OPPORTUNITY_DISCOVERY"])
+
+    programme_project_signal = _has(normalized, (
+        r"\b(?:programme|program|project) (?:formation|concept|planning|pipeline)\b",
+        r"\bfeasibility stud(?:y|ies)\b", r"\bdpp\b", r"\btapp\b",
+    ))
+    if programme_project_signal and (buyer_cue or opportunity_signal or monitor_signal):
+        collection_types.append("PROGRAMME_PROJECT")
+
+    approval_signal = _has(normalized, (
+        r"\bproject approval\b", r"\badministrative approval\b", r"\bapproval status\b",
+        r"\bapproved project(?:s)?\b", r"\bgovernment approval\b",
+    ))
+    if approval_signal and (buyer_cue or opportunity_signal or monitor_signal):
+        collection_types.extend(["APPROVAL_STATUS", "PROGRAMME_PROJECT"])
+
+    rapid_tender_signal = _has(normalized, (
+        r"\btender (?:is )?published\b", r"\blive tender\b", r"\btender id\b", r"\bsolicitation (?:is )?published\b",
+    )) and _has(normalized, (
+        r"\bclos(?:e|es|ing)\b", r"\bdeadline\b", r"\beligib(?:le|ility)\b",
+        r"\boems?\b", r"\bsuppliers?\b", r"\bvendors?\b", r"\bdisqualif(?:y|ier|ication)\b",
+    ))
+    if rapid_tender_signal:
+        collection_types.extend(["RAPID_TENDER", "PROCUREMENT_DISCOVERY"])
+        if _has(normalized, (r"\boems?\b", r"\bsuppliers?\b", r"\bvendors?\b", r"\bcontractors?\b")):
+            collection_types.extend(["SUPPLIER_LANDSCAPE", "OPPORTUNITY_MATCHING"])
+
+    expansion_signal = _has(normalized, (
+        r"\bfollow[- ]on\b", r"\bupgrade(?:s)?\b", r"\badditional units?\b", r"\bspares?\b",
+        r"\bmaintenance\b", r"\btraining opportunit(?:y|ies)\b", r"\breplacement\b", r"\bexpansion\b",
+    )) and _has(normalized, (r"\bexisting\b", r"\bproject\b", r"\bcontract\b", r"\binstalled\b", r"\bfleet\b", r"\bsystem\b"))
+    if expansion_signal:
+        collection_types.extend(["EXPANSION_DISCOVERY", "INSTALLED_BASE", "OPPORTUNITY_DISCOVERY"])
 
     if _has(normalized, (
         r"\bcompetitive landscape\b",
@@ -154,8 +273,7 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
     )):
         collection_types.append("COMPETITOR_LANDSCAPE")
     if _has(normalized, (
-        r"\bsupplier landscape\b",
-        r"\bvendor landscape\b",
+        r"\bsupplier landscape\b", r"\bvendor landscape\b", r"\boem landscape\b",
         r"\bsuppliers\b.*\b(?:market|landscape|identify|find|list|compare|map)\b",
         r"\b(?:identify|find|list|compare|map)\b.*\bsuppliers\b",
     )):
@@ -212,12 +330,15 @@ def triage_request(text: str, *, task_classes: Iterable[str] | None = None) -> d
             collection_depth = "C4_MONITOR"
         elif set(collection_types) & {
             "PROCUREMENT_PLAN", "PROCUREMENT_DISCOVERY", "OPPORTUNITY_DISCOVERY",
-            "BUYER_REQUIREMENT", "FUNDING_BUDGET", "PROJECT_PIPELINE",
+            "BUYER_REQUIREMENT", "FUNDING_BUDGET", "PROJECT_PIPELINE", "NEED_GAP",
+            "POLICY_DRIVER", "PROGRAMME_PROJECT", "APPROVAL_STATUS", "OPPORTUNITY_DEVELOPMENT",
+            "OPPORTUNITY_MATCHING", "EXPANSION_DISCOVERY", "RAPID_TENDER",
         }:
             collection_depth = "C3_OPPORTUNITY"
         elif set(collection_types) & {
             "ENTITY_DOSSIER", "COMPETITOR_LANDSCAPE", "SUPPLIER_LANDSCAPE",
-            "STAKEHOLDER_NETWORK", "MARKET_LANDSCAPE", "INSTALLED_BASE",
+            "STAKEHOLDER_NETWORK", "MARKET_LANDSCAPE", "INSTALLED_BASE", "SUPPLIER_PROFILE",
+            "REFERENCE_PROJECT", "EXPORT_FEASIBILITY", "PARTNERABILITY",
         }:
             collection_depth = "C2_DOSSIER"
         else:
