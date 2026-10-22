@@ -9,6 +9,8 @@ QUALITY_REQUIREMENTS: Final[dict[str, tuple[str, ...]]] = {
     "Q1": ("authoritative_source", "claim_traceability"),
     "Q2": ("relevant_evidence", "basic_reconciliation", "claim_traceability"),
     "Q3": (
+        "relevant_evidence",
+        "basic_reconciliation",
         "authoritative_source_priority",
         "corroboration",
         "source_diversity",
@@ -16,30 +18,37 @@ QUALITY_REQUIREMENTS: Final[dict[str, tuple[str, ...]]] = {
         "claim_traceability",
     ),
     "Q4": (
+        "relevant_evidence",
+        "basic_reconciliation",
         "authoritative_source_priority",
-        "broad_multi_angle_evidence",
         "corroboration",
         "source_diversity",
-        "entity_resolution",
         "contradiction_analysis",
+        "claim_traceability",
+        "broad_multi_angle_evidence",
+        "entity_resolution",
         "competing_hypotheses",
         "material_gap_disclosure",
         "confidence_calibration",
-        "claim_traceability",
         "decision_objective_coverage",
     ),
     "Q5": (
+        "relevant_evidence",
+        "basic_reconciliation",
         "authoritative_source_priority",
-        "maximum_assurance_corroboration",
-        "high_source_diversity",
-        "entity_resolution",
+        "corroboration",
+        "source_diversity",
         "contradiction_analysis",
-        "adverse_case_testing",
+        "claim_traceability",
+        "broad_multi_angle_evidence",
+        "entity_resolution",
         "competing_hypotheses",
         "material_gap_disclosure",
         "confidence_calibration",
-        "claim_traceability",
         "decision_objective_coverage",
+        "maximum_assurance_corroboration",
+        "high_source_diversity",
+        "adverse_case_testing",
         "explicit_stopping_justification",
     ),
 }
@@ -61,11 +70,53 @@ def quality_requirements(tier: str) -> tuple[str, ...]:
     return QUALITY_REQUIREMENTS[tier]
 
 
-def determine_required_quality_tier(objective: str, requested_floor: str | None = None) -> str:
-    """Return the minimum assurance tier required by the objective.
+def _contextual_quality_floor(quality_context: Mapping[str, Any] | None) -> str | None:
+    if not quality_context:
+        return None
 
-    This policy is intentionally deterministic. A requested floor may raise the
-    automatic tier but can never lower it.
+    consequence = str(quality_context.get("decision_consequence", "")).strip().lower()
+    importance = str(quality_context.get("decision_importance", "")).strip().lower()
+    reversibility = str(quality_context.get("reversibility", "")).strip().lower()
+    uncertainty = str(quality_context.get("uncertainty", "")).strip().lower()
+    evidence_condition = str(quality_context.get("evidence_condition", "")).strip().lower()
+    risk_level = str(quality_context.get("risk_level", "")).strip().lower()
+    risk_flags_raw = quality_context.get("risk_flags", ())
+    risk_flags = (
+        tuple(flag for flag in risk_flags_raw if isinstance(flag, str) and flag.strip())
+        if isinstance(risk_flags_raw, (list, tuple, set, frozenset))
+        else ()
+    )
+
+    if (
+        reversibility in {"irreversible", "effectively_irreversible"}
+        or consequence in {"critical", "catastrophic"}
+        or importance == "critical"
+        or risk_level == "critical"
+    ):
+        return "Q5"
+    if consequence == "high" or importance == "high":
+        return "Q4"
+    if (
+        uncertainty == "high"
+        or evidence_condition in {"conflicted", "disputed", "stale", "incomplete", "fragmented"}
+        or risk_level == "high"
+        or bool(risk_flags)
+    ):
+        return "Q3"
+    return None
+
+
+def determine_required_quality_tier(
+    objective: str,
+    requested_floor: str | None = None,
+    quality_context: Mapping[str, Any] | None = None,
+) -> str:
+    """Return the minimum assurance tier required by the objective and context.
+
+    The policy is deterministic. Context may raise the automatically inferred
+    tier based on decision consequence, reversibility, uncertainty, evidence
+    condition, or risk. An explicit requested floor may raise the result again,
+    but neither context nor a requested floor can lower the required tier.
     """
     text = " ".join(objective.lower().split())
 
@@ -124,6 +175,10 @@ def determine_required_quality_tier(objective: str, requested_floor: str | None 
         automatic = "Q0"
     else:
         automatic = "Q2"
+
+    contextual_floor = _contextual_quality_floor(quality_context)
+    if contextual_floor is not None:
+        automatic = max_quality_tier(automatic, contextual_floor)
 
     if requested_floor is None:
         return automatic
