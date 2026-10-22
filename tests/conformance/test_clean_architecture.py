@@ -75,9 +75,15 @@ class CleanArchitectureContractTests(unittest.TestCase):
         allowed = {
             "README.md", "SUMMARY.md", "architecture.md", "framework.md", "playbook.md", "sop.md",
             "capabilities-routing.md", "evidence-verification.md", "argus-interface.md", "host-integration.md",
-            "implementation-guide.md", "examples.md",
+            "implementation-guide.md", "examples.md", "classification-standards.md",
         }
         self.assertEqual(allowed, {path.name for path in (ROOT / "docs").iterdir() if path.is_file()})
+
+    def test_classification_standards_documentation_is_navigable(self) -> None:
+        classification_doc = ROOT / "docs" / "classification-standards.md"
+        self.assertTrue(classification_doc.is_file())
+        summary = (ROOT / "docs" / "SUMMARY.md").read_text(encoding="utf-8")
+        self.assertIn("classification-standards.md", summary)
 
 
 if __name__ == "__main__":
