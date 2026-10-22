@@ -1,5 +1,5 @@
 id: integration.chatgpt.bootstrap
-version: 1.0.1
+version: 1.0.2
 canonical_repository: gferris418/atlas-os
 canonical_ref: main
 source_resolution: github_live_when_available
@@ -22,6 +22,11 @@ bootstrap:
   mission_control: required
   control_plane: required
   compact_dashboard: required_for_substantive_tasks
+  default_renderer: FAST_TEXT
+  quality_governance: required
+  quality_tiers: [Q0, Q1, Q2, Q3, Q4, Q5]
+  quality_gate: required_before_authoritative_delivery
+  chat_event_persistence: required_when_authorized_durable_write_capability_is_available
   pre_execution_flow:
     - UNDERSTAND_AND_NORMALIZE
     - MINIMAL_DOMAIN_FRAMING
@@ -36,5 +41,8 @@ argus:
 guarantees:
   universal_prompt_injection: false
   mission_control_first_when_atlas_active: true
+  quality_tier_not_lowered_for_performance: true
+  fast_text_is_presentation_only: true
+  no_false_background_persistence_claim: true
   reason: ChatGPT loads installed skills by relevance and active host capability; Library files alone are not system-prompt injection.
-  behavior: When ATLAS is active, every user prompt enters Mission Control before the three-step pre-execution flow, routing, tool use, provider activation, or execution. Resolve current canonical contracts before substantive execution when freshness materially affects routing or correctness.
+  behavior: When ATLAS is active, every user prompt enters Mission Control before the three-step pre-execution flow, routing, tool use, provider activation, or execution. Resolve current canonical contracts before substantive execution when freshness materially affects routing or correctness. Determine the required Q0-Q5 quality tier during Minimal Domain Framing, satisfy the Quality Gate before authoritative delivery, and use FAST_TEXT for compact status rendering without reducing research depth.
