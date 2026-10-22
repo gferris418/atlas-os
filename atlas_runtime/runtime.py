@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Mapping
 
 from .models import ExecutionEnvelope, ExecutionResult
+from .quality import evaluate_quality_gate
 from .router import PRE_EXECUTION_FLOW, choose_route, minimal_domain_framing, normalize_objective
 
 
@@ -34,6 +36,11 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     active_stage = "APPROVAL" if approval_blocked else "EXECUTION"
     blocker = None
     next_action = f"Execute {route.mechanism} under ATLAS control."
+    quality_gate_status = "NOT_EVALUATED"
+    quality_gaps: list[str] = []
+    evidence_health = "UNKNOWN"
+    progress = 30 if approval_blocked else 50
+
     if approval_blocked:
         blocker = (
             "Explicit scoped approval is required before ARGUS activation."
@@ -50,7 +57,33 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
             "REROUTE, REQUEST_APPROVAL, REQUEST_CLARIFICATION, COMPLETE, or FAIL."
         )
 
-    progress = 30 if approval_blocked else 50
+        ledger = envelope.provider_result.get("quality_ledger")
+        if not approval_blocked and isinstance(ledger, Mapping):
+            gate = evaluate_quality_gate(framing["required_quality_tier"], ledger)
+            quality_gate_status = gate["status"]
+            quality_gaps = list(gate["irreducible_gaps"])
+
+            if quality_gate_status == "PASS":
+                state = "READY_FOR_FINAL_VERIFY"
+                active_stage = "FINAL_VERIFY"
+                evidence_health = "SUFFICIENT"
+                progress = 90
+                next_action = "Run ATLAS final verification before persistence and delivery."
+            elif quality_gate_status == "IRREDUCIBLE_GAP":
+                state = "QUALITY_GAP_DISCLOSED"
+                active_stage = "FINAL_VERIFY"
+                evidence_health = "GAPS_DISCLOSED"
+                progress = 90
+                blocker = "; ".join(gate["blocking_reasons"]) or None
+                next_action = "Run ATLAS final verification with explicit disclosure of irreducible gaps."
+            else:
+                state = "QUALITY_GATE_BLOCKED"
+                active_stage = "QUALITY_GATE"
+                evidence_health = "INSUFFICIENT"
+                progress = 80
+                blocker = "; ".join(gate["blocking_reasons"]) or None
+                next_action = "Continue targeted collection or analysis until the required quality tier is satisfied."
+
     dashboard = {
         "system": "ATLAS",
         "host": envelope.host,
@@ -59,8 +92,10 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         "progress": progress,
         "active_stage": active_stage,
         "blocker_or_approval": blocker,
-        "evidence_health": "UNKNOWN",
+        "evidence_health": evidence_health,
         "quality_tier": framing["required_quality_tier"],
+        "quality_gate": quality_gate_status,
+        "quality_gaps": quality_gaps,
         "persistence_state": "NOT_REQUIRED",
         "next_action": next_action,
         "route": route.mechanism,
