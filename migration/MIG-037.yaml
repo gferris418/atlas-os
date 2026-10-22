@@ -13,19 +13,19 @@ acceptance_criteria:
     surfaces: [repository]
     evidence_type: repository-publication-evidence
     status: PASS
-    evidence_ids: [EVID-010]
+    evidence_ids: [EVID-011]
   - id: AC-02
     requirement: Independently demonstrate that ChatGPT, Codex, Work, and Hermes Agent resolve the same current control revision.
     surfaces: [chatgpt, codex, work, hermes-agent]
     evidence_type: independent-host-observation
     status: BLOCKED
-    evidence_ids: [EVID-010]
+    evidence_ids: [EVID-011]
   - id: AC-03
     requirement: Retain independent evidence for each supported surface and reconcile any stale surface state before closure.
     surfaces: [chatgpt, codex, work, hermes-agent]
     evidence_type: independently-reviewed-host-evidence
     status: BLOCKED
-    evidence_ids: [EVID-010]
+    evidence_ids: [EVID-011]
 evidence:
   - {id: EVID-001, type: local-control-publication-candidate, timestamp: "2026-10-17T23:57:16+06:00", version: 2.0.0-rc.7, control_revision: chatgpt-bootstrap-2026-10-17-r1, source: integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md, independent: false, scope: [repository, chatgpt], result: READY_FOR_EXTERNAL_PROOF, limitations: Historical readiness target.}
   - {id: EVID-002, type: operator-release-risk-acceptance, timestamp: "2026-10-19T22:00:00+06:00", version: 2.0.0, source: docs/releases/v2.0.0.md, independent: false, scope: [release-governance], result: DEFERRED_POST_GA, limitations: Release-risk acceptance only.}
@@ -44,7 +44,7 @@ evidence:
     independent: false
     scope: [repository, chatgpt, codex, work, hermes-agent]
     result: PASS
-    limitations: Historical rc.5/r9 repository publication for the Collection-Need Gate and ARGUS collection boundary; not current rc.6/r10 external proof.
+    limitations: Historical rc.5/r9 repository publication for the Collection-Need Gate and ARGUS collection boundary.
   - id: EVID-010
     type: canonical-capability-layer-repository-control-publication
     timestamp: "2026-10-22T06:20:00+06:00"
@@ -54,6 +54,16 @@ evidence:
     independent: false
     scope: [repository, chatgpt, codex, work, hermes-agent]
     result: PASS
-    limitations: This proves publication/readiness of the rc.6/r10 provider-neutral capability-layer control on the repository candidate branch only. It does not prove that external hosts independently resolved or applied it; MIG-029 remains open.
+    limitations: Historical rc.6/r10 repository publication for the canonical capability layer; external-host proof remained open.
+  - id: EVID-011
+    type: argus-v3-commercial-opportunity-repository-control-publication
+    timestamp: "2026-10-22T07:37:00+06:00"
+    version: 2.0.2-rc.7
+    control_revision: atlas-bootstrap-2026-10-22-r11
+    source: atlas-os.yaml
+    independent: false
+    scope: [repository, chatgpt, codex, work, hermes-agent]
+    result: PASS
+    limitations: Repository publication proves the provider-neutral rc.7/r11 control and ARGUS v3 routing contract only. It does not prove that external hosts independently resolved or applied it; MIG-029 remains open.
 owner: atlas-maintainers
-notes: Stable v2.0.2 promotion remains blocked. rc.6/r10 is the current proof target; cross-surface propagation remains blocked on MIG-029. generic AI-host portability remains governed by the same provider-neutral core even though independent release proof is explicitly required for ChatGPT, Codex, Work, and Hermes Agent.
+notes: Stable v2.0.2 promotion remains blocked. rc.7/r11 is the current proof target; cross-surface propagation remains blocked on MIG-029. Generic AI-host portability remains governed by the same provider-neutral core even though independent release proof is explicitly required for ChatGPT, Codex, Work, and Hermes Agent.
