@@ -126,9 +126,32 @@ class CanonicalCapabilityLayerTests(unittest.TestCase):
         self.assertIn("atlas.corporate-finance", finance["routed"])
         self.assertNotIn("argus.collection", finance["specialist"])
 
+    def test_contract_review_survives_fallback_task_classification(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective="Review the attached commercial agreement and propose redlines",
+            plan_id="plan-contract-review",
+            task_id="TASK-CONTRACT-REVIEW",
+            work_units=[{"id": "review", "status": "PENDING", "dependencies": []}],
+            clarification_status="RESOLVED",
+        ))
+        self.assertIn("atlas.commercial-contract-review", result.capability_plan["routed"])
+        self.assertNotIn("argus.collection", result.capability_plan["specialist"])
+
+    def test_generic_policy_monitoring_does_not_imply_procurement(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective="Monitor Bangladesh Bank monetary policy circulars",
+            plan_id="plan-policy-monitor",
+            task_id="TASK-POLICY-MONITOR",
+            work_units=[{"id": "monitor", "status": "PENDING", "dependencies": []}],
+            clarification_status="RESOLVED",
+        ))
+        self.assertIn("atlas.economic-policy-intelligence", result.capability_plan["routed"])
+        self.assertNotIn("atlas.procurement-intelligence", result.capability_plan["routed"])
+        self.assertIn("argus.collection", result.capability_plan["specialist"])
+
     def test_explicit_deep_research_can_be_hybrid(self) -> None:
         plan = plan_canonical_capabilities(
-            "Deep research ST Engineering maritime opportunities in Bangladesh",
+            "Deep research ST Engineering maritime procurement opportunities in Bangladesh",
             task_classes=("RESEARCH", "ANALYSIS"),
             collection_mode="HYBRID",
             collection_types=("ENTITY_DOSSIER", "OPPORTUNITY_DISCOVERY"),
@@ -148,6 +171,7 @@ class CanonicalCapabilityLayerTests(unittest.TestCase):
         self.assertIn("atlas.economic-policy-intelligence", result.capability_plan["routed"])
         self.assertNotIn("argus.collection", result.capability_plan["specialist"])
         self.assertEqual(result.capability_plan, result.dashboard["capability_plan"])
+        self.assertIn("CAPABILITY_PLANNING", result.execution_trace)
 
 
 if __name__ == "__main__":
