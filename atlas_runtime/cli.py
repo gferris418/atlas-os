@@ -63,6 +63,7 @@ def _build_envelope(request: dict[str, Any]) -> ExecutionEnvelope:
         routing_approval_status=request.get("routing_approval_status", "PENDING"),
         routing_preview_digest=request.get("routing_preview_digest"),
         argus_approval_status=request.get("argus_approval_status", "PENDING"),
+        argus_approval_digest=request.get("argus_approval_digest"),
         timestamp=request.get("timestamp"),
         timezone_name=request.get("timezone_name", "UTC"),
     )
@@ -113,7 +114,7 @@ def _render_routing_preview(preview: dict[str, Any]) -> str:
     if preview["approval_prompt"]:
         lines.append(f"Review: {preview['approval_prompt']}")
         if argus.get("required"):
-            lines.append("ARGUS may not be activated until explicit user authorization is recorded for this task.")
+            lines.append("ARGUS may not be activated until explicit user authorization is recorded for this exact task and digest.")
         lines.append(f"Approve this exact preview with digest {preview['digest']}")
     return "\n".join(lines)
 
