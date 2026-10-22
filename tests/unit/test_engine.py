@@ -32,10 +32,11 @@ class ExecutionEngineTests(unittest.TestCase):
 
         result = execute(envelope)
 
-        self.assertEqual("BLOCKED", result.state)
+        self.assertEqual("READY", result.state)
         self.assertEqual("Assess coastal surveillance radar", result.normalized_intent)
+        self.assertEqual("READY", result.semantic_context["status"])
         self.assertEqual(("classify", "assess"), result.plan)
-        self.assertIsNone(result.active_unit)
+        self.assertEqual("assess", result.active_unit)
         self.assertIn("ANALYSIS", result.task_classes)
         self.assertEqual("GENERAL_TASK", result.request_route)
         self.assertEqual("ROUTED", result.taxonomy_route["status"])
@@ -45,13 +46,12 @@ class ExecutionEngineTests(unittest.TestCase):
         self.assertEqual("REQUEST_TRIAGE", result.execution_trace[0])
         self.assertIn("TAXONOMY_ROUTING", result.execution_trace)
         self.assertIn("CAPABILITY_AUDIT", result.execution_trace)
-        self.assertNotIn("EXECUTION", result.execution_trace)
+        self.assertIn("EXECUTION", result.execution_trace)
         self.assertEqual("chatgpt", result.dashboard["surface"])
-        self.assertEqual("BLOCKED", result.dashboard["plan_status"])
-        self.assertEqual("MATERIAL_CONTEXT_MATRIX", result.dashboard["active_stage"])
-        self.assertEqual("PENDING", result.dashboard["clarification_status"])
-        self.assertEqual("BLOCKED", result.dashboard["quality_gate"])
-        self.assertIn("how", result.dashboard["blocker_or_approval"])
+        self.assertEqual("READY", result.dashboard["plan_status"])
+        self.assertEqual("EXECUTION", result.dashboard["active_stage"])
+        self.assertEqual("NOT_REQUIRED", result.dashboard["clarification_status"])
+        self.assertEqual("PENDING", result.dashboard["quality_gate"])
         self.assertEqual(50, result.dashboard["progress"])
         self.assertLessEqual(len(result.compact_status.splitlines()), 4)
         for label in ("Input", "Processing", "Output", "Playbook", "Framework", "SOP"):
@@ -143,11 +143,11 @@ class ExecutionEngineTests(unittest.TestCase):
             argus["prerequisites"],
         )
         self.assertNotIn("domain_handoff_state:BLOCKED", argus["unresolved_gates"])
-        self.assertIn(
+        self.assertNotIn(
             "domain_classification:intelligence-domain-context",
             argus["unresolved_gates"],
         )
-        self.assertIn(
+        self.assertNotIn(
             "domain-method.argus-intelligence:domain_classification:intelligence-domain-context",
             result.routing_preview["unresolved_gates"],
         )
