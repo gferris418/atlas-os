@@ -1,7 +1,7 @@
 schema: schemas/ai-manifest.schema.json
 id: atlas-os-ai-entrypoint
-product_version: 2.0.2-rc.6
-control_revision: atlas-bootstrap-2026-10-22-r10
+product_version: 2.1.0-rc.1
+control_revision: atlas-portable-orchestration-2026-10-22-r1
 authority:
   product_manifest: atlas-os.yaml
   core_spec: spec/core.yaml
@@ -11,6 +11,8 @@ authority:
   architecture:
     mission_control: spec/mission-control.yaml
     control_plane: spec/control-plane.yaml
+    task_lifecycle: spec/task-lifecycle.yaml
+    host_adapters: spec/host-adapters.yaml
     collection_routing: spec/collection-routing.yaml
     semantic_normalization: spec/semantic-normalization.yaml
     domain_context_services: spec/domain-context-services.yaml
@@ -25,11 +27,13 @@ discovery_order:
   - atlas-os.yaml
   - governance.yaml
   - spec/core.yaml
+  - spec/mission-control.yaml
+  - spec/control-plane.yaml
+  - spec/task-lifecycle.yaml
+  - spec/host-adapters.yaml
   - spec/request-triage.yaml
   - spec/collection-routing.yaml
   - spec/semantic-normalization.yaml
-  - spec/mission-control.yaml
-  - spec/control-plane.yaml
   - spec/capability-layer.yaml
   - spec/evidence-governance.yaml
   - spec/execution-governance.yaml
@@ -65,6 +69,7 @@ machine_contracts:
   - spec/evidence-governance.yaml
   - spec/execution-governance.yaml
   - spec/execution-spine.yaml
+  - spec/host-adapters.yaml
   - spec/mission-control.yaml
   - spec/observability.yaml
   - spec/output.yaml
@@ -74,6 +79,7 @@ machine_contracts:
   - spec/routing.yaml
   - spec/runtime.yaml
   - spec/semantic-normalization.yaml
+  - spec/task-lifecycle.yaml
   - spec/verification.yaml
   - spec/versioning.yaml
   - registries/canonical-capabilities.yaml
@@ -106,6 +112,7 @@ machine_contracts:
   - integrations/codex/release-verification.yaml
   - integrations/work/release-verification.yaml
   - integrations/hermes-agent/release-verification.yaml
+  - schemas/activation-contract.schema.json
   - schemas/ai-manifest.schema.json
   - schemas/approval.schema.json
   - schemas/atlas-os.schema.json
