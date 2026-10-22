@@ -2,7 +2,7 @@ schema_version: 3
 product:
   id: atlas-os
   name: ATLAS OS
-  version: 3.0.2
+  version: 3.0.3
   release_channel: stable
   status: RELEASED
   license: MIT
@@ -26,6 +26,7 @@ specifications:
   - spec/persistence.yaml
   - spec/chat-event-persistence.yaml
   - spec/observability.yaml
+  - spec/performance-telemetry.yaml
 registries:
   - registries/capabilities.yaml
   - registries/providers.yaml
