@@ -18,6 +18,18 @@ contract:
   context_precedes_classification: true
   decomposition_must_preserve_relationships: true
   reconcile_decomposed_context_to_whole: true
+  context_minimization:
+    minimal_sufficient_context: true
+    materiality_required: true
+    skip_low_value_enrichment: true
+    do_not_enumerate_irrelevant_taxonomies: true
+    do_not_expand_standards_without_material_need: true
+    do_not_add_context_just_because_available: true
+    inclusion_threshold: meaning_or_downstream_decision_impact
+    rule: >-
+      Preserve the whole meaning, but emit only the minimal sufficient context needed to maintain
+      semantic fidelity or materially improve downstream classification, routing, or decisions.
+      Skip decorative, repetitive, speculative, or low-value enrichment.
   whole_context_rule: >-
     Read the complete available context as one semantic unit before decomposing it. Establish the
     overall meaning, intent, requested outcome, actors, relationships, constraints, qualifiers,
@@ -126,6 +138,7 @@ contract:
   classification_rules:
     multi_axial: true
     materiality_driven: true
+    only_material_schemes: true
     high_confidence_first: true
     current_official_edition_preferred: true
     jurisdiction_specific_scheme_preferred_when_legally_or_operationally_material: true
@@ -152,6 +165,7 @@ contract:
     purpose: >-
       Identify the standards families, regulatory frameworks, recognized professional practices,
       quality systems and domain guidance that can quickly and reliably frame downstream work.
+    minimal_material_set: true
     precedence:
       - applicable_law_and_regulation
       - explicit_binding_user_or_contract_requirements
@@ -170,8 +184,8 @@ contract:
       - unresolved_conditions
     rule: >-
       Standards and framework families may be supplied as context before exact applicability is
-      known. Exact applicability may remain unresolved for downstream work and must not block a
-      semantically clear handoff. Candidate or conditional frameworks are not requirements.
+      known, but only when materially useful. Exact applicability may remain unresolved for downstream
+      work and must not block a semantically clear handoff. Candidate or conditional frameworks are not requirements.
   international_best_practice_lenses:
     requirements_and_use_case:
       purpose: Start from intended outcomes, users, missions, operating scenarios and measurable needs.
@@ -203,11 +217,12 @@ contract:
     never_claim_compliance_from_context_only: true
     domain_specific_extension_allowed: true
     proportionality_required: true
+    only_material_lenses: true
   handoff:
     rule: >-
-      ATLAS transfers the whole normalized semantic context first, followed by high-confidence
-      classification and standards/best-practice framing plus explicit unresolved context. A clear
-      semantic context is handoff-ready even when downstream lifecycle, procurement, specification,
+      ATLAS transfers the whole normalized semantic context first, followed by only materially useful,
+      high-confidence classification and standards/best-practice framing plus explicit unresolved context.
+      A clear semantic context is handoff-ready even when downstream lifecycle, procurement, specification,
       exact-code or standards-applicability questions remain unresolved. Specialists may add evidence
       but may not silently redefine ATLAS-owned meaning or convert contextual candidates into facts.
   prohibited_inferences:
