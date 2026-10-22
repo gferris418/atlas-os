@@ -5,34 +5,77 @@ status: active
 normative: true
 contract:
   purpose: >-
-    Convert raw user or upstream input into a precise canonical semantic context without
-    changing intent, adding unsupported facts, collapsing classification axes, or turning
-    contextual standards and best practices into assumed requirements.
+    Convert the complete available user or upstream context into a precise canonical semantic
+    context without changing intent, adding unsupported facts, collapsing classification axes,
+    or turning contextual standards and best practices into assumed requirements.
   owner: ATLAS_OS
   preserve_raw_input: true
   semantic_drift_prohibited: true
   invented_facts_prohibited: true
   record_material_corrections: true
   preserve_ambiguity_when_unresolved: true
+  whole_context_before_decomposition: true
+  context_precedes_classification: true
+  decomposition_must_preserve_relationships: true
+  reconcile_decomposed_context_to_whole: true
+  whole_context_rule: >-
+    Read the complete available context as one semantic unit before decomposing it. Establish the
+    overall meaning, intent, requested outcome, actors, relationships, constraints, qualifiers,
+    jurisdiction and critical literals first. Decompose only after those relationships are understood,
+    and reconcile every decomposed facet back to the whole before handoff.
   normalization_rule: >-
-    Rewrite only for clarity, spelling, grammar, terminology and canonical naming when the
-    intended meaning is sufficiently supported. Preserve the original literal and record any
-    material correction, expansion or ambiguity. If meaning is uncertain, preserve the ambiguity
-    instead of silently choosing an interpretation.
+    Rewrite only for clarity, spelling, grammar, terminology and canonical naming when the intended
+    meaning is sufficiently supported by the whole context. Preserve the original literal and record
+    any material correction, expansion or ambiguity. If meaning itself is uncertain, preserve the
+    ambiguity instead of silently choosing an interpretation.
   scope_boundary: >-
     ATLAS normalizes and frames meaning. It does not infer that a real-world project, budget,
     procurement, quantity, specification, authority, supplier, lifecycle stage or event exists
     unless that fact is already present in accepted context.
+  fast_path_sequence:
+    - PRESERVE_WHOLE_CONTEXT
+    - UNDERSTAND_WHOLE_CONTEXT
+    - NORMALIZE_WHOLE_CONTEXT
+    - DECOMPOSE_AS_REQUIRED
+    - CLASSIFY_HIGH_CONFIDENCE_CONTEXT
+    - RECONCILE_TO_WHOLE_CONTEXT
+    - HANDOFF_WITH_UNRESOLVED_CONTEXT
+  fast_path:
+    prefer_local_governed_context: true
+    no_research_loop_for_normalization: true
+    downstream_unknowns_do_not_block_handoff: true
+    only_semantic_blocker: meaning_ambiguity
+    rule: >-
+      Resolve only what can be determined quickly and reliably from the supplied whole context and
+      local governed registries. Unknown downstream facts remain unresolved and travel with the
+      handoff. Do not search merely to complete lifecycle, procurement, specification, code or
+      standards applicability before ARGUS activation.
+  defer_to_downstream:
+    - lifecycle_stage
+    - procurement_route
+    - project_or_procurement_existence
+    - budget
+    - quantity
+    - technical_specification
+    - exact_classification_code
+    - specific_standard_applicability
+    - supplier_or_oem
+    - funding_source
+    - delivery_timeline
   output_sections:
     - original_input
     - normalized_input
     - normalization_notes
+    - whole_context_summary
     - semantic_facets
     - classification_context
     - standards_and_framework_context
     - international_best_practice_lenses
     - unresolved_context
     - prohibited_inferences
+  semantic_context_status:
+    READY: The whole-context meaning is sufficiently clear for downstream work; unresolved downstream facts are permitted.
+    AMBIGUOUS: Material ambiguity prevents reliable interpretation of the user's meaning and is the only normal semantic reason to block downstream handoff.
   semantic_facets:
     domain:
       meaning: Broad governed knowledge or operational domain.
@@ -64,6 +107,9 @@ contract:
     procurement_category_is_not_customs_code: true
     classification_is_not_compliance: true
     contextual_best_practice_is_not_requirement: true
+    partial_term_meaning_must_not_override_whole_context: true
+    critical_relationships_survive_decomposition: true
+    downstream_unknown_is_not_semantic_blocker: true
   classification_context:
     international_activity: taxonomy.un-isic
     national_activity: jurisdiction_specific_official_activity_classification_when_material
@@ -80,10 +126,12 @@ contract:
   classification_rules:
     multi_axial: true
     materiality_driven: true
+    high_confidence_first: true
     current_official_edition_preferred: true
     jurisdiction_specific_scheme_preferred_when_legally_or_operationally_material: true
     unresolved_codes_must_not_be_guessed: true
     cross_scheme_equivalence_must_not_be_assumed: true
+    classification_completion_not_required_for_handoff: true
     explicit_mapping_relations: [EXACT, CLOSE, BROADER, NARROWER, RELATED, CANDIDATE]
     metadata_fields:
       - scheme
@@ -103,7 +151,7 @@ contract:
   standards_and_framework_context:
     purpose: >-
       Identify the standards families, regulatory frameworks, recognized professional practices,
-      quality systems and domain guidance that could materially frame downstream work.
+      quality systems and domain guidance that can quickly and reliably frame downstream work.
     precedence:
       - applicable_law_and_regulation
       - explicit_binding_user_or_contract_requirements
@@ -122,8 +170,8 @@ contract:
       - unresolved_conditions
     rule: >-
       Standards and framework families may be supplied as context before exact applicability is
-      known. They must be labeled candidate or conditional when applicability depends on facts not
-      present in accepted context.
+      known. Exact applicability may remain unresolved for downstream work and must not block a
+      semantically clear handoff. Candidate or conditional frameworks are not requirements.
   international_best_practice_lenses:
     requirements_and_use_case:
       purpose: Start from intended outcomes, users, missions, operating scenarios and measurable needs.
@@ -151,15 +199,17 @@ contract:
     context_lens_not_requirement: true
     applicability_must_be_assessed: true
     current_official_sources_preferred: true
+    exact_applicability_not_required_for_handoff: true
     never_claim_compliance_from_context_only: true
     domain_specific_extension_allowed: true
     proportionality_required: true
   handoff:
     rule: >-
-      ATLAS preserves normalized meaning in the governed task and collection mission. The resolved
-      classification and standards/framework alignment snapshots transfer through the governed
-      domain-context handoff. Specialists may add evidence but may not silently redefine ATLAS-owned
-      meaning or convert contextual candidates into facts or requirements.
+      ATLAS transfers the whole normalized semantic context first, followed by high-confidence
+      classification and standards/best-practice framing plus explicit unresolved context. A clear
+      semantic context is handoff-ready even when downstream lifecycle, procurement, specification,
+      exact-code or standards-applicability questions remain unresolved. Specialists may add evidence
+      but may not silently redefine ATLAS-owned meaning or convert contextual candidates into facts.
   prohibited_inferences:
     - project_exists
     - procurement_exists
@@ -172,11 +222,14 @@ contract:
     - candidate_standard_is_mandatory
     - candidate_classification_is_exact
 invariants:
+  - INV-001
+  - INV-002
   - INV-006
   - INV-016
   - INV-018
   - INV-019
 references:
+  - spec/context.yaml
   - spec/request-triage.yaml
   - spec/domain-context-services.yaml
   - spec/classification.yaml
