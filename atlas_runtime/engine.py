@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
+import types
 from time import perf_counter_ns
 from typing import Any, Iterable, Mapping
 
@@ -55,6 +57,28 @@ _LEGACY_INTELLIGENCE_REQUIREMENTS = {
     "intelligence_analysis",
     "government_public_sector_opportunity_intelligence",
 }
+
+_REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+
+
+@lru_cache(maxsize=None)
+def _load_registry_payload(name: str) -> Mapping[str, Any]:
+    """Parse one registry document once per process.
+
+    Registry files are immutable repository artifacts during execution, so the
+    parsed result is cached and served as a read-only mapping. Callers that need
+    to mutate a derived registry must copy it first.
+    """
+    path = _REPOSITORY_ROOT / "registries" / f"{name}.yaml"
+    return yaml.safe_load(path.read_text(encoding="utf-8"))
+
+
+def _registry_view(name: str) -> Mapping[str, Any]:
+    return types.MappingProxyType(_load_registry_payload(name))
+
+
+def _registry_items(name: str) -> tuple[Any, ...]:
+    return tuple(_load_registry_payload(name)["items"])
 
 
 @dataclass(frozen=True)
@@ -220,14 +244,12 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
 
     started = perf_counter_ns()
     work_units = deepcopy(list(envelope.work_units))
-    repository_root = Path(__file__).resolve().parents[1]
 
-    def registry_payload(name: str) -> dict[str, Any]:
-        path = repository_root / "registries" / f"{name}.yaml"
-        return yaml.safe_load(path.read_text(encoding="utf-8"))
+    def registry_payload(name: str) -> Mapping[str, Any]:
+        return _registry_view(name)
 
-    def registry_items(name: str) -> list[dict[str, Any]]:
-        return list(registry_payload(name)["items"])
+    def registry_items(name: str) -> tuple[Any, ...]:
+        return _registry_items(name)
 
     normalized = normalize_intent(envelope.objective)["normalized"]
     task_classes = tuple(classify_task(normalized))
@@ -331,16 +353,18 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
             "what": normalized,
             "material_dimensions": ["what"],
         })
+        # Non-substantive paths return static control-plane views; skip the
+        # lexical classification and framework scans entirely.
         domain_classification = classify_domain_context(
-            normalized,
-            registry_items("classifications"),
-            taxonomies=taxonomies,
+            "",
+            (),
+            taxonomies=(),
             substantive=False,
             required_facets=(),
         )
         domain_alignment = align_domain_practices(
             "general",
-            registry_items("frameworks"),
+            (),
             substantive=False,
         )
 
@@ -449,7 +473,7 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
                         if item["id"] in records:
                             raise ValueError(f"provider id is registered more than once: {item['id']}")
                         records[item["id"]] = item
-                domain_registry = registry_payload("domain-methods")
+                domain_registry = deepcopy(dict(registry_payload("domain-methods")))
                 domain_registry["items"] = [
                     *domain_registry["items"],
                     *deepcopy(list(envelope.provider_inventory.get("domain-method", ()))),
