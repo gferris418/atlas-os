@@ -5,12 +5,16 @@ status: active
 normative: true
 contract:
   purpose: Determine what may happen, who or what may perform it, under which authority and permissions, in what state, and through which governed route.
+  initialization: The Control Plane initializes for every substantive task before substantive execution, creates or binds task state, and remains authoritative until completion, pause, abort or supersession. Initialization does not add a fourth preprocessing step.
   owns:
     - product_and_control_authority
+    - task_identity_and_lifecycle_state
     - policy_evaluation
     - permission_and_authorization_state
     - plan_and_work_unit_state
     - collection_need_decision
+    - argus_authorization_state
+    - argus_activation_state
     - approval_state
     - provider_and_capability_routing
     - execution_leases
@@ -20,19 +24,24 @@ contract:
     - persistence_authorization
     - control_receipts_and_audit_events
   request_interpretation: spec/request-triage.yaml separates task intent from collection mode before provider routing.
-  collection_gate: spec/collection-routing.yaml is authoritative for NONE, ATLAS_DIRECT, ARGUS_COLLECTION and HYBRID. Only ARGUS_COLLECTION or HYBRID may propose ARGUS.
+  collection_gate: spec/collection-routing.yaml is authoritative for NONE, ATLAS_DIRECT, ARGUS_COLLECTION and HYBRID. Only ARGUS_COLLECTION or HYBRID establishes an ARGUS need.
+  authorization_separation: collection_mode answers whether ARGUS is required. Mission Control authorization answers whether the user explicitly permits ARGUS for the exact task and digest. Activation may occur only when both are satisfied and all other gates are clear.
+  authorization_fail_closed: Missing, stale, rejected, inferred or mismatched ARGUS authorization blocks ARGUS handoff and activation even when collection_mode is ARGUS_COLLECTION or HYBRID.
   argus_boundary: ARGUS owns bounded intelligence collection only. It never owns the ATLAS execution spine, plan, permissions, approvals, canonical taxonomy, strategic analysis, final business decision, assurance, persistence authorization, observability, Dashboard or delivery.
   mission_control_boundary: Mission Control may request state changes; only the Control Plane may admit and apply them after governance checks.
   dashboard_boundary: Dashboard and observability surfaces are read projections of authoritative state and cannot mutate plans, collection mode, permissions, approvals, routing or execution directly.
+  adapter_boundary: Host adapters expose available host/model/tool capabilities and render state. They never own ATLAS policy, routing, approval, evidence or persistence authority.
   data_plane_boundary: The Control Plane authorizes execution but does not perform substantive host or specialist work itself.
   transition_rule: Every material state transition must be attributable to a trigger, actor/provider, authority basis, previous state, next state and result.
   fail_closed_rule: Missing authority, required approval, stale state, mismatched routing digest, invalid handoff/lease or prohibited permission blocks dependent execution.
-  performance_rule: Governance is proportional; direct tasks do not pay ARGUS collection cost without material collection need.
+  performance_rule: Governance is proportional; direct tasks do not pay ARGUS collection cost or approval cost without material collection need.
 invariants: [INV-007, INV-008, INV-009, INV-011, INV-017, INV-020, INV-021]
 references:
   - spec/request-triage.yaml
   - spec/collection-routing.yaml
   - spec/mission-control.yaml
+  - spec/task-lifecycle.yaml
+  - spec/host-adapters.yaml
   - spec/planning.yaml
   - spec/routing.yaml
   - spec/approvals.yaml
