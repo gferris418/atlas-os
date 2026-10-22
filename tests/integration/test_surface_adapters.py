@@ -111,10 +111,14 @@ class SurfaceAdapterIntegrationTests(unittest.TestCase):
 
     def test_surface_blocks_execution_while_material_clarification_is_pending(self) -> None:
         tasks = [{"id": "answer", "status": "PENDING", "dependencies": []}]
-        with self.assertRaises(ValueError):
-            get_surface_adapter("work").start_prompt(
-                "Answer safely", tasks, plan_id="plan-work", clarification_status="PENDING"
-            )
+        dashboard = get_surface_adapter("work").start_prompt(
+            "Answer safely", tasks, plan_id="plan-work", clarification_status="PENDING"
+        )
+        self.assertEqual("BLOCKED", dashboard["plan_status"])
+        self.assertEqual("PENDING", dashboard["clarification_status"])
+        self.assertEqual("MATERIAL_CONTEXT_MATRIX", dashboard["active_stage"])
+        self.assertEqual("BLOCKED", dashboard["quality_gate"])
+        self.assertIn("clarification", dashboard["blocker_or_approval"].lower())
 
     def test_surface_does_not_write_without_authorization(self) -> None:
         profile = {
