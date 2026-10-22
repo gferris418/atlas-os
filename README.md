@@ -1,11 +1,11 @@
 # ATLAS-OS
 
-ATLAS-OS is a **model-agnostic execution-governance architecture for AI agents**. It remains the single operating architecture between user intent and verified delivery. ARGUS is nested inside ATLAS as the governed intelligence collection subsystem; it is not a peer operating system or alternative execution spine.
+ATLAS-OS is a **model-agnostic execution-governance architecture for AI agents**. It remains the single operating architecture between user intent and verified delivery. ARGUS is nested inside ATLAS as the governed government commercial opportunity intelligence subsystem; it is not a peer operating system or alternative execution spine.
 
 It is **not a desktop operating system** and does not replace the host model, conversation engine, browser, tool runtime, or device OS.
 
-**Current candidate:** `v2.0.2-rc.6`  
-**Control revision:** `atlas-bootstrap-2026-10-22-r10`  
+**Current candidate:** `v2.0.2-rc.7`  
+**Control revision:** `atlas-bootstrap-2026-10-22-r11`  
 **Target stable:** `v2.0.2`  
 **Information classification:** Internal  
 **License:** [MIT](LICENSE)  
@@ -21,8 +21,8 @@ Human / Event
   -> Collection-Need Gate
        -> NONE
        -> ATLAS_DIRECT
-       -> ARGUS_COLLECTION -> ARGUS bounded collection -> evidence package
-       -> HYBRID           -> ARGUS collection + ATLAS substantive work
+       -> ARGUS_COLLECTION -> ARGUS bounded commercial-opportunity intelligence -> evidence package
+       -> HYBRID           -> ARGUS intelligence + ATLAS substantive analysis/decision
   -> Canonical Capability Planning
   -> Domain Context Services
   -> Data Plane
@@ -68,32 +68,53 @@ Research discovers evidence; Evidence Governance determines what that evidence c
 Execution Governance owns authority, approval scope, side-effect classification, idempotency, retry/compensation, failure/resume state, escalation, kill-switch behavior and audit receipts. Agent Security applies install/activate/execute/verify gates to external capabilities and treats retrieved content, provider instructions and tool outputs as untrusted until assessed.
 
 ### Domain Context Services
-ATLAS owns canonical terminology, taxonomy, economic sector context, operator/supplier industry, product/service, procurement, trade/customs and defense-logistics classification plus ontology, law, standards, professional frameworks, benchmarks and evidence precedence. `spec/domain-intelligence.yaml` remains only as a deprecated compatibility alias to this layer and is not an active machine authority.
+ATLAS owns canonical terminology, taxonomy, economic sector context, operator/supplier industry, product/service, procurement, trade/customs and defense-logistics classification plus ontology, law, international standards, professional frameworks, benchmarks and evidence precedence. `spec/domain-intelligence.yaml` remains only as a deprecated compatibility alias to this layer and is not an active machine authority.
 
 ### Data Plane
-ATLAS performs substantive work: ordinary research, writing, calculation, coding, policy analysis, comparison, strategic analysis, forecasting, scenarios, opportunity qualification and decision support.
+ATLAS performs substantive work: ordinary research, writing, calculation, coding, policy analysis, comparison, strategic analysis, forecasting, scenarios, authoritative commercial prioritization and decision support. ARGUS may supply advisory opportunity qualification and supplier-match assessments; those do not become authoritative ATLAS business state automatically.
 
-### ARGUS Intelligence Collection
+### ARGUS Government Commercial Opportunity Intelligence
 ARGUS activates only when `collection_mode` is `ARGUS_COLLECTION` or `HYBRID`. Its canonical capability is `intelligence_collection` / `argus.collection`.
 
-Within an ATLAS-authorized mission ARGUS uses the bounded method `PIR -> EEI -> Collection Plan -> Source Plan -> Collect -> Resolve -> Grade -> Competing Hypotheses -> Gaps -> Package`. It may resolve targets, discover/acquire sources, extract/normalize evidence, resolve entities/events/relationships, deduplicate, propose classifications/evidence grades, corroborate and expose conflicts/gaps/coverage. ATLAS retains canonical Evidence Governance, classification acceptance, analysis, final business decisions, assurance, persistence and delivery.
+ARGUS `3.0.0-rc.1` is commit-pinned in `registries/domain-methods.yaml`. Within an ATLAS-authorized mission it uses bounded collection tradecraft (`PIR -> EEI -> Collection Plan -> Source Plan -> Collect -> Resolve -> Grade -> Competing Hypotheses -> Gaps -> Package`) and may also:
+
+- detect government needs and capability gaps before a project or tender exists;
+- track S0–S9 government-opportunity lifecycle events;
+- create a persistent pre-PX intelligence identity `ARGUS-OPP-YYYY-NNNNNN` when tracking is justified;
+- support `SHAPE`, `POSITION`, `REACT`, and `EXPAND` commercial modes;
+- build supplier/OEM universes and assess partnerability;
+- match demand to international suppliers and technologies;
+- calculate advisory opportunity qualification and supplier-match scores;
+- track policy, programme, funding, approval, procurement, award and expansion events;
+- enter `RAPID_TENDER` collection when first material discovery occurs at live-tender stage;
+- return opportunities, supplier intelligence, supplier matches, qualification recommendations, detection metrics, evidence, gaps and conflicts to ATLAS.
+
+ATLAS retains canonical Evidence Governance and taxonomy acceptance, authoritative opportunity priority, `PROMOTE_TO_PX`, pursuit and bid/no-bid decisions, external-action authorization, assurance, persistence and final delivery.
+
+The Access Asia commercial identity is assigned only after ATLAS-authorized promotion. The permanent ARGUS intelligence identity and the PX lineage remain linked rather than replacing one another.
 
 ## Collection-Need Gate
 
-Task intent and collection mechanism are independent.
+Task intent and collection mechanism are independent. Early commercial opportunity intelligence is also distinct from procurement intelligence.
 
 | Request | ATLAS capability/task | Collection mode | ARGUS |
 | --- | --- | --- | --- |
 | Bangladesh Bank foreign exchange policy | economic-policy-intelligence | ATLAS_DIRECT | No |
 | ST Engineering | target collection | ARGUS_COLLECTION | Yes |
-| Coastal patrol vessel for Bangladesh Coast Guard | procurement-intelligence | ARGUS_COLLECTION | Yes |
-| Seed cum cleaner for BADC | procurement-intelligence | ARGUS_COLLECTION | Yes |
+| What capability gaps could Bangladesh Coast Guard address with foreign technology? | early opportunity / need discovery | ARGUS_COLLECTION | Yes |
+| Where could ST Engineering coastal surveillance technology fit in Bangladesh government? | supply-first opportunity matching | ARGUS_COLLECTION | Yes |
+| Coastal patrol vessel for Bangladesh Coast Guard | buyer/solution opportunity collection | ARGUS_COLLECTION | Yes |
+| Seed cum cleaner for BADC | buyer/solution opportunity collection | ARGUS_COLLECTION | Yes |
 | Annual procurement plan of Bangladesh Navy | procurement-intelligence | ARGUS_COLLECTION | Yes |
+| A live tender closes in 7 days; find eligible international OEMs | procurement-intelligence + Rapid Tender | ARGUS_COLLECTION | Yes |
 | Explain Bangladesh Navy procurement regulations | policy/procurement analysis | ATLAS_DIRECT | No |
 | Forecast likely Navy procurements over 24 months | procurement-intelligence / forecast | HYBRID | Yes, collection only |
-| Compare ST Engineering vs L3Harris for Bangladesh opportunities | analysis/decision | HYBRID | Yes, collection only |
+| Compare ST Engineering vs L3Harris for Bangladesh opportunities | analysis/decision | HYBRID | Yes, collection + advisory matching |
+| Rank suitable OEMs and recommend whether Access Asia should pursue | decision | HYBRID | Yes; ATLAS makes final pursuit decision |
 | Review attached commercial agreement and propose redlines | commercial-contract-review | NONE | No |
 | Calculate commission margin and FX exposure from supplied figures | corporate-finance | NONE | No |
+
+Need/gap discovery, legitimate opportunity development and supply-first technology matching do **not** automatically activate `atlas.procurement-intelligence` when procurement semantics are absent. Procurement plans, formal tenders/acquisitions, eligibility/evaluation, bid/no-bid and `RAPID_TENDER` do.
 
 `GENERAL_SEARCH`, `GENERAL_TASK` and `INTELLIGENCE` remain runtime compatibility route labels. They no longer define ARGUS semantically; `collection_mode` does.
 
@@ -155,6 +176,7 @@ AI systems begin at `atlas-ai.yaml`; `atlas-os.yaml` remains product/release aut
 - `registries/canonical-capabilities.yaml`
 - `registries/domain-methods.yaml`
 - `registries/taxonomies.yaml`
+- `integrations/access-asia/opportunity-lifecycle.yaml`
 
 The active ARGUS contract is immutable and commit-pinned in `registries/domain-methods.yaml`.
 
@@ -162,4 +184,4 @@ See `docs/architecture/capability-layer.md` for the capability boundary and `doc
 
 ## Release state
 
-Stable `v2.0.2` remains blocked by external-proof controls `MIG-029` and `MIG-037`. Repository-local conformance does not substitute for independent host evidence. Candidate `v2.0.2-rc.6` / `atlas-bootstrap-2026-10-22-r10` resets the external proof target to the canonical capability layer while preserving the rc.5/r9 Collection-Need/ARGUS evidence as historical only.
+Stable `v2.0.2` remains blocked by external-proof controls `MIG-029` and `MIG-037`. Repository-local conformance does not substitute for independent host evidence. Candidate `v2.0.2-rc.7` / `atlas-bootstrap-2026-10-22-r11` is the current external-proof target and integrates ARGUS `3.0.0-rc.1` government commercial opportunity intelligence. Earlier rc.5/r9 Collection-Need evidence and rc.6/r10 capability-layer evidence remain historical only.
