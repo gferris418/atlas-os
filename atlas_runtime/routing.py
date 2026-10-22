@@ -364,9 +364,9 @@ def build_routing_preview(
     )
 
     execution_sequence = [provider["id"] for provider in ordered]
-    handoff_provider_ids = [
+    handoff_provider_ids = list(dict.fromkeys(
         provider["id"] for provider in providers if provider["type"] == "domain-method"
-    ]
+    ))
     activation_state = (
         "NOT_REQUIRED"
         if not requirements
@@ -378,10 +378,7 @@ def build_routing_preview(
         "activation_authority": "ATLAS_OS",
         "approval_required": bool(requirements),
         "collection_mode": collection_mode or "NONE",
-        "argus_activation_required": (
-            collection_mode in _ARGUS_COLLECTION_MODES
-            and any(provider["requirement"] == "intelligence_collection" for provider in providers)
-        ),
+        "argus_activation_required": collection_mode in _ARGUS_COLLECTION_MODES,
         "collection_mission_id": mission_record["mission_id"] if mission_record else None,
         "provider_sequence": execution_sequence,
         "handoff_provider_ids": handoff_provider_ids,
