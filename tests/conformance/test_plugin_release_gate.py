@@ -10,6 +10,8 @@ ROOT = Path(__file__).resolve().parents[2]
 POLICY = ROOT / ".github" / "plugin-release-policy.yaml"
 TOOL = ROOT / "tools" / "plugin_release_gate.py"
 WORKFLOW = ROOT / ".github" / "workflows" / "plugin-release-gate.yml"
+CURRENT_ARGUS_COMMIT = "0454024624eafe704d740ca2fc6fd1cc3dba0bfd"
+CURRENT_ARGUS_CONTRACT_VERSION = "1.0.1"
 
 
 def load_gate_module():
@@ -34,6 +36,12 @@ class PluginReleaseGateContract(unittest.TestCase):
         self.assertIn("skills/atlas-os/SKILL.md", policy["bundle"]["paths"])
         self.assertIn("integrations/chatgpt-bootstrap.yaml", policy["bundle"]["paths"])
         self.assertIn("integrations/argus.yaml", policy["bundle"]["paths"])
+
+    def test_policy_tracks_current_argus_compatibility_contract(self):
+        policy = yaml.safe_load(POLICY.read_text(encoding="utf-8"))
+        argus = policy["argus_compatibility"]
+        self.assertEqual(CURRENT_ARGUS_COMMIT, argus["compatible_commit"])
+        self.assertEqual(CURRENT_ARGUS_CONTRACT_VERSION, argus["contract_version"])
 
     def test_classifier_requires_release_for_chatgpt_and_argus_boundary_changes(self):
         self.assertTrue(TOOL.is_file(), "missing plugin release classifier")
