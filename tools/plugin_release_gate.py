@@ -113,8 +113,8 @@ def write_bundle(root: Path, policy: dict, metadata: dict, output_dir: Path) -> 
 
 
 def _read_changed_paths(path: Path) -> list[str]:
-    if not path.exists():
-        return []
+    if not path.is_file():
+        raise FileNotFoundError(f"changed-path input missing: {path}")
     return [line.strip() for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
