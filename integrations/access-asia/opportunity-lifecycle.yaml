@@ -1,44 +1,80 @@
-schema_version: 1
+schema_version: 2
 integration_id: access-asia-opportunity-lifecycle
-version: 1.0.0
-effective_date: 2026-10-19
+version: 2.0.0-rc.1
+effective_date: 2026-10-22
 
 source_of_business_policy:
-  argus_profile: https://github.com/gferris418/argus-intelligence/blob/main/profiles/access-asia-opportunity-lifecycle.yaml
+  argus_profile: https://github.com/gferris418/argus-intelligence/blob/965ae0ddf885adf3dd2b9adfccae46b6b011227b/profiles/access-asia-opportunity-lifecycle.yaml
   sharepoint_bootstrap: General/Business Intelligence/AI_CONTEXT.yaml
 
-identity:
+argus_opportunity_identity:
+  pattern: ARGUS-OPP-YYYY-NNNNNN
+  created_before_px: true
+  permanent_from: persistent_opportunity_tracking
+  preserve_after_px: true
+
+commercial_identity:
   naming: "[Year]_[PXnnnnn]_[ShortName]"
+  authority: ATLAS OS
+  assign_on:
+    - PROMOTE_TO_PX
+    - explicit_atlas_pipeline_registration
+  require_existing_argus_opportunity_id: true
   preserve_across_moves: true
 
 locations:
-  pre_submission: General/Business Intelligence/50_OPPORTUNITIES
-  submission_pre_award: General/REV/OPP Opportunities
+  pre_px_working_home: General/Business Intelligence/50_OPPORTUNITIES
+  promoted_pre_award: General/REV/OPP Opportunities
   post_award: General/OPS/PRJ Projects
+  intelligence_archive: General/Business Intelligence/90_ARCHIVE
 
 transition_rules:
+  persistent_pre_px_opportunity:
+    assign_argus_opportunity_id: true
+    assign_px_id: false
+    sharepoint_folder_required: false
   promote_to_px:
-    destination: pre_submission
-    move_to_submission: false
+    assign_commercial_id: true
+    destination: promoted_pre_award
+    move_existing_folder_if_present: true
+    preserve_argus_identity: true
   tender_published:
-    move_to_submission: false
+    assign_px_id: false
+    move_folder: false
+    note: Tender publication alone does not create a commercial pipeline identity or submission state.
   submission_active:
-    move_to_submission: true
-    definition: formal response-package execution has actually started for a specific solicitation after the bid decision
+    working_home: promoted_pre_award
+    definition: formal response-package execution has actually started for a specific solicitation after the governed bid decision
   awarded_or_contract_activated:
-    move_to_project: true
+    destination: post_award
+    move_entire_folder: true
+    preserve_argus_identity: true
+    preserve_commercial_id: true
+
+non_submission_outcomes:
+  states: [MONITOR, HOLD, REJECT, CANCELLED, CLOSED_BEFORE_SUBMISSION]
+  pre_px_remains_in_business_intelligence: true
 
 mutation_controls:
   duplicate_folder_allowed: false
   separate_bid_folder: false
   verify_source_exists: true
   verify_destination_absent: true
-  preserve_identifier: true
+  preserve_argus_identifier: true
+  preserve_commercial_identifier_after_assignment: true
   verify_move_before_completion_claim: true
 
 atlas_role:
+  - authorize PROMOTE_TO_PX and assignment of the Access Asia commercial identity
+  - own authoritative opportunity priority, pursuit and bid/no-bid decisions
   - govern lifecycle mutation execution
   - preserve exact target and preconditions
   - require approval when policy classifies the move/action as gated
   - verify resulting SharePoint state
-  - keep ARGUS and SharePoint pointers synchronized
+  - keep ARGUS intelligence identity, PX identity and SharePoint pointers synchronized
+
+argus_role:
+  - create and preserve pre-PX opportunity intelligence identity when persistent tracking is justified
+  - track S0-S9 lifecycle and SHAPE/POSITION/REACT/EXPAND mode
+  - return advisory qualification, supplier matching and early-warning intelligence to ATLAS
+  - never assign the PX identity or authorize a commercial pursuit
