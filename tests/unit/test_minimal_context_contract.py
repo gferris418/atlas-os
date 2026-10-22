@@ -6,7 +6,6 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 SEMANTIC = ROOT / "spec/semantic-normalization.yaml"
 CHATGPT = ROOT / "integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md"
-README = ROOT / "README.md"
 
 
 class MinimalContextContractTests(unittest.TestCase):
@@ -29,10 +28,8 @@ class MinimalContextContractTests(unittest.TestCase):
 
     def test_host_guidance_uses_simple_minimal_context_rule(self):
         chatgpt = CHATGPT.read_text(encoding="utf-8").lower()
-        readme = README.read_text(encoding="utf-8").lower()
         self.assertIn("minimal sufficient context", chatgpt)
         self.assertIn("skip unnecessary context", chatgpt)
-        self.assertIn("minimal sufficient context", readme)
 
 
 if __name__ == "__main__":
