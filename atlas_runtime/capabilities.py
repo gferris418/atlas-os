@@ -19,18 +19,10 @@ KERNEL_CAPABILITIES = (
 )
 
 _ARGUS_MODES = {"ARGUS_COLLECTION", "HYBRID"}
-_PROCUREMENT_COLLECTION_TYPES = {
+_PROCUREMENT_PRIMARY_COLLECTION_TYPES = {
     "BUYER_REQUIREMENT",
     "PROCUREMENT_DISCOVERY",
     "PROCUREMENT_PLAN",
-    "PROJECT_PIPELINE",
-    "FUNDING_BUDGET",
-    "SUPPLIER_LANDSCAPE",
-    "COMPETITOR_LANDSCAPE",
-    "STAKEHOLDER_NETWORK",
-    "INSTALLED_BASE",
-    "OPPORTUNITY_DISCOVERY",
-    "MONITORING",
 }
 
 
@@ -76,7 +68,7 @@ def plan_canonical_capabilities(
     if explicit_deep_research:
         add_routed("atlas.deep-research", "explicit_deep_research")
 
-    procurement_signal = bool(collection_set & _PROCUREMENT_COLLECTION_TYPES) or _has(
+    procurement_text_signal = _has(
         lowered,
         r"\bprocurement\b",
         r"\btender\b",
@@ -86,6 +78,7 @@ def plan_canonical_capabilities(
         r"\bbid/no-bid\b",
         r"\bbid no bid\b",
     )
+    procurement_signal = bool(collection_set & _PROCUREMENT_PRIMARY_COLLECTION_TYPES) or procurement_text_signal
     if procurement_signal:
         add_routed("atlas.procurement-intelligence", "procurement_semantics")
 
@@ -104,16 +97,23 @@ def plan_canonical_capabilities(
     if economic_policy_signal:
         add_routed("atlas.economic-policy-intelligence", "economic_policy_semantics")
 
-    contract_signal = _has(
+    contract_subject = _has(
         lowered,
         r"\bcontract\b",
         r"\bagreement\b",
         r"\bclause\b",
+    )
+    contract_action = _has(
+        lowered,
+        r"\breview\b",
         r"\bredline(?:s|d)?\b",
-        r"\bnegotiation playbook\b",
+        r"\bnegotiat(?:e|ion|ing)\b",
+        r"\bpreferred position\b",
+        r"\bfallback position\b",
         r"\blegal risk\b",
-    ) and bool(set(classes) & {"ANALYSIS", "DECISION", "WRITING", "DOCUMENT", "MULTI_STAGE"})
-    if contract_signal:
+        r"\bcommercial risk\b",
+    )
+    if contract_subject and contract_action:
         add_routed("atlas.commercial-contract-review", "commercial_contract_semantics")
 
     finance_signal = _has(
