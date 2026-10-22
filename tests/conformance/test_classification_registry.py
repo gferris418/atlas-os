@@ -151,6 +151,25 @@ class ClassificationRegistryConformanceTests(unittest.TestCase):
             self.assertTrue(crosswalk["source_url"].startswith("https://"))
         self.assertEqual(len(ids), len(set(ids)))
 
+    def test_core_persistence_distinguishes_reference_operational_document_and_crm_workloads(self) -> None:
+        persistence = yaml.safe_load((ROOT / "spec/persistence.yaml").read_text(encoding="utf-8"))
+        workload_classes = persistence["contract"]["workload_classes"]
+        self.assertEqual(
+            {"VERSIONED_REFERENCE_DATA", "OPERATIONAL_RELATIONAL_STATE", "DOCUMENT_CONTENT", "CRM_STATE"},
+            set(workload_classes),
+        )
+        self.assertEqual("reviewed_versioned", workload_classes["VERSIONED_REFERENCE_DATA"]["mutation_model"])
+        self.assertEqual("transactional", workload_classes["OPERATIONAL_RELATIONAL_STATE"]["mutation_model"])
+        self.assertNotIn("SHAREPOINT", str(persistence).upper())
+
+    def test_argus_may_propose_but_cannot_promote_classification_state(self) -> None:
+        argus = yaml.safe_load((ROOT / "integrations/argus.yaml").read_text(encoding="utf-8"))
+        allowed = set(argus["autonomy_within_mission"]["may"])
+        prohibited = set(argus["autonomy_within_mission"]["may_not"])
+        self.assertIn("propose_classification_standards_and_crosswalks", allowed)
+        self.assertIn("promote_classification_candidate_to_canonical", prohibited)
+        self.assertIn("persist_canonical_classification_state_without_ATLAS_authorization", prohibited)
+
 
 if __name__ == "__main__":
     unittest.main()

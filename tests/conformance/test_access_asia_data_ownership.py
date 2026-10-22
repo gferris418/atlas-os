@@ -43,6 +43,22 @@ class AccessAsiaDataOwnershipConformanceTests(unittest.TestCase):
         self.assertEqual("ARGUS_GITHUB", routing["ARGUS_SCHEMA_AND_IDENTITY_RULES"])
         self.assertEqual("ATLAS_GITHUB", routing["ATLAS_POLICY_AND_RUNTIME"])
 
+    def test_classification_reference_and_operational_state_use_different_stores(self) -> None:
+        profile = yaml.safe_load(PROFILE.read_text(encoding="utf-8"))
+        routing = profile["persistence_routing"]
+        for key in (
+            "CLASSIFICATION_STANDARD",
+            "CLASSIFICATION_AUTHORITY",
+            "CLASSIFICATION_VERSION",
+            "CLASSIFICATION_CROSSWALK",
+            "CLASSIFICATION_UPDATE_SOURCE",
+            "CLASSIFICATION_DATASET_METADATA",
+        ):
+            self.assertEqual("ATLAS_GITHUB", routing[key])
+        self.assertEqual("SHAREPOINT_SQLITE", routing["OPERATIONAL_ENTITY_CLASSIFICATION"])
+        self.assertEqual("SHAREPOINT", routing["CLASSIFICATION_SOURCE_DOCUMENT"])
+        self.assertEqual("SHAREPOINT", routing["LARGE_OR_RESTRICTED_CLASSIFICATION_SOURCE_DOCUMENT"])
+
     def test_department_reporting_is_derived_not_separate_master_data(self) -> None:
         profile = yaml.safe_load(PROFILE.read_text(encoding="utf-8"))
         reporting = profile["reporting"]
