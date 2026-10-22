@@ -1,11 +1,11 @@
-"""Executable surface seams sharing the ATLAS planning and delivery contracts."""
+"""Executable host seams sharing the portable ATLAS orchestration contract."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any, Iterable, Mapping, Protocol
 
-from .engine import ExecutionEnvelope, execute
+from .orchestration import ExecutionEnvelope, execute
 from .runtime import prepare_library_record
 from .surfaces import validate_surface_id
 
@@ -16,6 +16,8 @@ class LibraryStorage(Protocol):
 
 @dataclass(frozen=True)
 class SurfaceAdapter:
+    """Host adapter that supplies capabilities without owning ATLAS governance."""
+
     surface_id: str
 
     def start_prompt(
@@ -30,6 +32,7 @@ class SurfaceAdapter:
         provider_inventory: Mapping[str, Iterable[dict[str, Any]]] | None = None,
         routing_approval_status: str = "PENDING",
         routing_preview_digest: str | None = None,
+        argus_approval_status: str = "PENDING",
         timestamp: str | None = None,
         timezone_name: str = "UTC",
     ) -> dict[str, Any]:
@@ -46,6 +49,7 @@ class SurfaceAdapter:
             provider_inventory=provider_inventory,
             routing_approval_status=routing_approval_status,
             routing_preview_digest=routing_preview_digest,
+            argus_approval_status=argus_approval_status,
         )).dashboard
 
     def deliver(
