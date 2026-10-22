@@ -25,9 +25,11 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     normalized = normalize_objective(original)
     task_id = _task_id(envelope, normalized)
     requested_quality_floor = envelope.context.get("required_quality_floor")
+    raw_quality_context = envelope.context.get("quality_context")
     framing = minimal_domain_framing(
         normalized,
         requested_quality_floor=requested_quality_floor if isinstance(requested_quality_floor, str) else None,
+        quality_context=raw_quality_context if isinstance(raw_quality_context, Mapping) else None,
     )
     route = choose_route(normalized, envelope.approvals)
 
@@ -58,7 +60,15 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         )
 
         ledger = envelope.provider_result.get("quality_ledger")
-        if not approval_blocked and isinstance(ledger, Mapping):
+        if not approval_blocked and not isinstance(ledger, Mapping):
+            state = "QUALITY_GATE_BLOCKED"
+            active_stage = "QUALITY_GATE"
+            evidence_health = "INSUFFICIENT"
+            quality_gate_status = "CONTINUE"
+            progress = 80
+            blocker = "Provider return is missing the required Quality Ledger."
+            next_action = "Request or derive a Quality Ledger, then continue targeted verification or collection."
+        elif not approval_blocked:
             gate = evaluate_quality_gate(framing["required_quality_tier"], ledger)
             quality_gate_status = gate["status"]
             quality_gaps = list(gate["irreducible_gaps"])
