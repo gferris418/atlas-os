@@ -1,5 +1,5 @@
 id: integration.chatgpt
-version: 3.0.2
+version: 3.0.3
 host: chatgpt
 status: active
 role: host_adapter
@@ -12,9 +12,15 @@ bootstrap:
   mission_control: required
   control_plane: required
   compact_dashboard: required
+  default_renderer: FAST_TEXT
+  quality_governance: required
+  quality_tiers: [Q0, Q1, Q2, Q3, Q4, Q5]
   pre_execution_flow: [UNDERSTAND_AND_NORMALIZE, MINIMAL_DOMAIN_FRAMING, ROUTE]
 capabilities:
   native: [conversation]
   optional: [direct_search, deep_research, connected_source, code_execution, external_action, persistence]
+persistence:
+  completed_turn_event: required_when_authorized_durable_write_capability_is_available
+  continuous_background_claim_without_host_hook: prohibited
 surfaces: [chat, work, projects]
-rule: Use only capabilities actually exposed in the active session; unavailable capability must be reported rather than implied. Mission Control is the first ATLAS governance gate and is not a fourth preprocessing step.
+rule: Use only capabilities actually exposed in the active session; unavailable capability must be reported rather than implied. Mission Control is the first ATLAS governance gate and is not a fourth preprocessing step. FAST_TEXT affects presentation only, never required quality or research depth.
