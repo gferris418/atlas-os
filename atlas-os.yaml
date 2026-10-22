@@ -20,6 +20,7 @@ specifications:
   - spec/routing.yaml
   - spec/execution.yaml
   - spec/evidence.yaml
+  - spec/quality-governance.yaml
   - spec/approvals.yaml
   - spec/verification.yaml
   - spec/persistence.yaml
