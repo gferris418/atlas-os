@@ -21,9 +21,10 @@ class ChatGPTPluginBootstrapContract(unittest.TestCase):
             manifest["$schema"],
         )
         self.assertEqual("atlas-os", manifest["name"])
-        self.assertEqual("3.0.2", manifest["version"])
+        self.assertEqual("3.0.3", manifest["version"])
         self.assertIn("execution governance", manifest["description"].lower())
         self.assertIn("mission control", manifest["description"].lower())
+        self.assertIn("quality", manifest["description"].lower())
         self.assertTrue(PACKAGED_SKILL.is_file())
 
     def test_packaged_skill_matches_agent_skill_exactly(self):
@@ -56,7 +57,7 @@ class ChatGPTPluginBootstrapContract(unittest.TestCase):
 
     def test_bootstrap_contract_uses_live_github_as_canonical_source(self):
         bootstrap = yaml.safe_load(BOOTSTRAP_CONTRACT.read_text(encoding="utf-8"))
-        self.assertEqual("1.0.1", bootstrap["version"])
+        self.assertEqual("1.0.2", bootstrap["version"])
         self.assertEqual("gferris418/atlas-os", bootstrap["canonical_repository"])
         self.assertEqual("main", bootstrap["canonical_ref"])
         self.assertEqual("github_live_when_available", bootstrap["source_resolution"])
@@ -68,14 +69,18 @@ class ChatGPTPluginBootstrapContract(unittest.TestCase):
         self.assertEqual("relevance_triggered_plugin_skill", bootstrap["surfaces"]["chat"])
         self.assertEqual("relevance_triggered_plugin_skill", bootstrap["surfaces"]["work"])
         self.assertEqual("relevance_triggered_plugin_skill", bootstrap["surfaces"]["projects"])
+        self.assertEqual("FAST_TEXT", bootstrap["bootstrap"]["default_renderer"])
+        self.assertTrue(bootstrap["guarantees"]["quality_tier_not_lowered_for_performance"])
+        self.assertTrue(bootstrap["guarantees"]["fast_text_is_presentation_only"])
         self.assertFalse(bootstrap["guarantees"]["universal_prompt_injection"])
 
     def test_chatgpt_host_adapter_references_bootstrap_contract(self):
         integration = yaml.safe_load(CHATGPT_INTEGRATION.read_text(encoding="utf-8"))
-        self.assertEqual("3.0.2", integration["version"])
+        self.assertEqual("3.0.3", integration["version"])
         self.assertEqual("plugin.json", integration["plugin_manifest"])
         self.assertEqual("integrations/chatgpt-bootstrap.yaml", integration["bootstrap_contract"])
         self.assertEqual("skills/atlas-os/SKILL.md", integration["primary_skill"])
+        self.assertEqual("FAST_TEXT", integration["bootstrap"]["default_renderer"])
 
 
 if __name__ == "__main__":
