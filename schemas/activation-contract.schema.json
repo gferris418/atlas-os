@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os.local/schemas/activation-contract.schema.json",
+  "title": "ATLAS activation contract v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "state",
+    "activation_authority",
+    "approval_required",
+    "collection_mode",
+    "argus_activation_required",
+    "collection_mission_id",
+    "provider_sequence",
+    "handoff_provider_ids",
+    "blockers",
+    "route",
+    "argus"
+  ],
+  "properties": {
+    "version": {"const": "2.0"},
+    "state": {"enum": ["NOT_REQUIRED", "READY_FOR_APPROVAL", "BLOCKED"]},
+    "activation_authority": {"const": "ATLAS_OS"},
+    "approval_required": {"type": "boolean"},
+    "collection_mode": {"enum": ["NONE", "ATLAS_DIRECT", "ARGUS_COLLECTION", "HYBRID"]},
+    "argus_activation_required": {"type": "boolean"},
+    "collection_mission_id": {"type": ["string", "null"]},
+    "provider_sequence": {"type": "array", "items": {"type": "string"}},
+    "handoff_provider_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "blockers": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["collection_mode", "routing_preview_digest"],
+      "properties": {
+        "collection_mode": {"enum": ["NONE", "ATLAS_DIRECT", "ARGUS_COLLECTION", "HYBRID"]},
+        "routing_preview_digest": {"type": ["string", "null"]}
+      }
+    },
+    "argus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "authorization", "activation", "mission"],
+      "properties": {
+        "required": {"type": "boolean"},
+        "authorization": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["required", "status", "scope_task_id", "bound_preview_digest", "reusable", "decision_source"],
+          "properties": {
+            "required": {"type": "boolean"},
+            "status": {"enum": ["NOT_REQUIRED", "PENDING", "APPROVED", "REJECTED"]},
+            "scope_task_id": {"type": ["string", "null"]},
+            "bound_preview_digest": {"type": ["string", "null"]},
+            "reusable": {"const": false},
+            "decision_source": {"type": ["string", "null"], "enum": ["MISSION_CONTROL", null]}
+          }
+        },
+        "activation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status"],
+          "properties": {
+            "status": {"enum": ["NOT_REQUIRED", "NOT_AUTHORIZED", "AUTHORIZED", "AUTHORIZED_BUT_BLOCKED"]}
+          }
+        },
+        "mission": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id"],
+          "properties": {
+            "id": {"type": ["string", "null"]}
+          }
+        }
+      }
+    }
+  }
+}
