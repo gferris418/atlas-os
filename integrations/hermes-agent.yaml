@@ -1,0 +1,14 @@
+id: integration.hermes-agent
+version: 3.0.0
+host: hermes-agent
+status: active
+role: host_adapter
+bootstrap:
+  mission_control: required
+  control_plane: required
+  compact_dashboard: required
+  pre_execution_flow: [UNDERSTAND_AND_NORMALIZE, MINIMAL_DOMAIN_FRAMING, ROUTE]
+capabilities:
+  native: [conversation]
+  optional: [direct_search, deep_research, connected_source, code_execution, external_action, persistence, subagents]
+rule: Hermes skills, tools, terminal, memory, and subagents remain providers; they do not become ATLAS authority.

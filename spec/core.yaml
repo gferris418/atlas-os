@@ -1,45 +1,21 @@
-schema: schemas/spec.schema.json
-id: spec.core
-title: ATLAS-OS core contract
+id: atlas.core
+version: 3.0.0
 status: active
 normative: true
 contract:
-  purpose: Govern agent execution between user intent and verified delivery.
-  principles:
-    - Use capable host-platform features directly; do not recreate model, conversation, generation, or tool behavior that the host already provides.
-    - Preserve intent before optimizing representation.
-    - Understand completely and ask only material questions.
-    - Classify domain context with governed taxonomies before selecting frameworks.
-    - Plan the minimum sufficient dependency graph.
-    - Decompose nontrivial work into atomic units and finish one user-visible unit before activating the next.
-    - Route to the strongest available authorized capability.
-    - Admit external capability providers through governed provenance, permission, security, dependency, overlap, evidence, benchmark, and fallback controls before treating them as production providers.
-    - Keep semantic capability identities independent from provider names so a plugin, skill, model, or connector cannot redefine ATLAS core semantics.
-    - Align substantive work with applicable international standards and recognized professional frameworks.
-    - Separate evidence, inference, assumption, and speculation.
-    - Verify independently before claiming completion.
-    - Select a proportional output profile and validate only material format and quality requirements.
-    - Persist canonical knowledge deliberately.
-    - Keep governance proportional and hidden by default.
-    - Prefer lightweight, event-driven controls that improve quality without material latency or token overhead.
-  exclusions:
-    - ATLAS is not a replacement for the underlying model.
-    - ATLAS does not duplicate native host reasoning, language understanding, generation, conversation, or tool orchestration.
-    - Surface adapters cannot redefine core semantics.
-    - Third-party providers are not core authorities merely because they are installed, connected, or available in a session.
-invariants:
-  - INV-001
-  - INV-003
-  - INV-015
-  - INV-017
-  - INV-018
-  - INV-019
-  - INV-020
+  purpose: Portable AI operating framework that governs work from user intent to verified delivery.
+  authority_chain: [USER, MISSION_CONTROL, CONTROL_PLANE, CAPABILITY_PROVIDER]
+  pre_execution_flow: [UNDERSTAND_AND_NORMALIZE, MINIMAL_DOMAIN_FRAMING, ROUTE]
+  invariants:
+    - Preserve original intent, constraints, relationships, and critical literals.
+    - Do not add a fourth preprocessing step.
+    - ATLAS owns routing before and after every provider handoff.
+    - Providers execute bounded capabilities; they do not own orchestration.
+    - Consequential actions require explicit scoped approval.
+    - Verification precedes completion claims.
+  lifecycle: [CREATED, NORMALIZING, FRAMING, ROUTING, AWAITING_APPROVAL, EXECUTING, VERIFYING, PERSISTING, COMPLETED, PAUSED, BLOCKED, ABORTED]
 references:
-  - atlas-os.yaml
-  - spec/runtime.yaml
-  - spec/execution-spine.yaml
-  - spec/classification.yaml
-  - spec/domain-practices.yaml
-  - spec/capability-admission.yaml
-  - spec/output.yaml
+  - spec/mission-control.yaml
+  - spec/control-plane.yaml
+  - spec/routing.yaml
+  - spec/execution.yaml

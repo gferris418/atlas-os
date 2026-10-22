@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os.local/schemas/routing-decision.schema.json",
+  "title": "ATLAS routing decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["mechanism", "capability", "provider", "approval_required", "approval_status", "reason"],
+  "properties": {
+    "mechanism": {"enum": ["NO_TOOL", "DIRECT_SEARCH", "DEEP_RESEARCH", "ARGUS", "SPECIALIST", "CONNECTED_SOURCE", "CODE_EXECUTION", "EXTERNAL_ACTION", "MULTI_CAPABILITY"]},
+    "capability": {"type": "string", "minLength": 1},
+    "provider": {"type": ["string", "null"]},
+    "approval_required": {"type": "boolean"},
+    "approval_status": {"enum": ["NOT_REQUIRED", "PENDING", "APPROVED", "REJECTED", "STALE"]},
+    "reason": {"type": "string", "minLength": 1}
+  }
+}

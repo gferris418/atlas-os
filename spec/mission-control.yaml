@@ -1,28 +1,15 @@
-schema: schemas/spec.schema.json
-id: spec.mission-control
-title: Human mission command and intervention
+id: atlas.mission-control
+version: 3.0.0
 status: active
 normative: true
 contract:
-  purpose: Provide the exclusive human supervisory command surface for governed ATLAS execution.
-  owns:
-    - mission_objective_and_scope
-    - human_approval_and_rejection
-    - pause_resume_abort_requests
-    - priority_and_scope_change_requests
-    - collection_expansion_reduction_or_stop_requests
-    - escalation_and_exception_requests
-    - human_risk_acknowledgement
-  command_semantics: Human interactions that change execution or collection are explicit commands/approval decisions. Presentation surfaces never directly mutate Control Plane state.
-  control_plane_boundary: The Control Plane validates every state-changing Mission Control request against authority, permissions, policy, approvals, current state and non-waivable restrictions.
-  dashboard_action_rule: Expand collection, redirect collection, stop ARGUS, change provider, persist, publish or execute are Mission Control commands when initiated from a Dashboard.
-  non_waivable_boundaries: [host_platform_permissions, safety_and_security_constraints, applicable_legal_restrictions, immutable_atlas_invariants, external_system_authorization, evidence_requirements_declared_non_waivable]
-  read_path: Mission Control consumes Dashboard and Control Plane projections for decisions but is not their source of truth.
-  separation_rule: Mission Control expresses human intent/authorization; it does not own policy evaluation, routing, collection execution, analysis state or telemetry computation.
-invariants: [INV-011, INV-015, INV-017]
-references:
-  - spec/control-plane.yaml
-  - spec/collection-routing.yaml
-  - spec/observability.yaml
-  - spec/approvals.yaml
-  - spec/dashboard.yaml
+  owner: USER
+  responsibilities:
+    - set_objective
+    - approve_or_reject_consequential_actions
+    - modify_scope
+    - set_priority
+    - pause_resume_abort
+    - authorize_argus_activation
+  approval_rule: Approval is explicit, scoped to the current action or routing proposal, non-transferable by default, and invalidated by material scope change.
+  dashboard_role: Human command surface; commands are evaluated by the Control Plane before state changes.

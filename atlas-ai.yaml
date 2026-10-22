@@ -1,153 +1,66 @@
-schema: schemas/ai-manifest.schema.json
 id: atlas-os-ai-entrypoint
-product_version: 2.0.2-rc.6
-control_revision: atlas-bootstrap-2026-10-22-r10
-authority:
-  product_manifest: atlas-os.yaml
-  core_spec: spec/core.yaml
-  execution_spine: spec/execution-spine.yaml
-  runtime_spec: spec/runtime.yaml
-  request_triage: spec/request-triage.yaml
-  architecture:
-    mission_control: spec/mission-control.yaml
-    control_plane: spec/control-plane.yaml
-    collection_routing: spec/collection-routing.yaml
-    semantic_normalization: spec/semantic-normalization.yaml
-    domain_context_services: spec/domain-context-services.yaml
-    domain_intelligence: spec/domain-intelligence.yaml
-    observability: spec/observability.yaml
-    dashboard: spec/dashboard.yaml
-  schema_catalog: schemas
-  registry_catalog: registries
-  migration_catalog: migration
+product_version: 3.0.0
+product_manifest: atlas-os.yaml
+core_contract: spec/core.yaml
+routing_contract: spec/routing.yaml
 discovery_order:
   - atlas-ai.yaml
   - atlas-os.yaml
   - governance.yaml
   - spec/core.yaml
-  - spec/request-triage.yaml
-  - spec/collection-routing.yaml
-  - spec/semantic-normalization.yaml
   - spec/mission-control.yaml
   - spec/control-plane.yaml
-  - spec/capability-layer.yaml
-  - spec/evidence-governance.yaml
-  - spec/execution-governance.yaml
-  - spec/agent-security.yaml
-  - spec/classification-crosswalk.yaml
-  - spec/domain-capabilities.yaml
-  - spec/domain-context-services.yaml
-  - spec/execution-spine.yaml
-  - applicable spec/*.yaml
-  - applicable registries/*.{yaml,json}
-  - integrations/**/*.yaml
-  - active migration/*.yaml
+  - spec/context.yaml
+  - spec/routing.yaml
+  - spec/execution.yaml
+  - spec/evidence.yaml
+  - spec/approvals.yaml
+  - spec/verification.yaml
+  - spec/persistence.yaml
+  - spec/observability.yaml
+  - registries/capabilities.yaml
+  - registries/providers.yaml
+  - registries/surfaces.yaml
+  - applicable integrations/*.yaml
 machine_contracts:
   - atlas-os.yaml
   - governance.yaml
-  - spec/agent-security.yaml
   - spec/approvals.yaml
-  - spec/capability-admission.yaml
-  - spec/capability-layer.yaml
-  - spec/classification.yaml
-  - spec/classification-crosswalk.yaml
-  - spec/collection-routing.yaml
-  - spec/completeness.yaml
   - spec/context.yaml
   - spec/control-plane.yaml
   - spec/core.yaml
-  - spec/dashboard.yaml
-  - spec/domain-capabilities.yaml
-  - spec/domain-context-services.yaml
-  - spec/domain-handoff.yaml
-  - spec/domain-practices.yaml
   - spec/evidence.yaml
-  - spec/evidence-governance.yaml
-  - spec/execution-governance.yaml
-  - spec/execution-spine.yaml
+  - spec/execution.yaml
   - spec/mission-control.yaml
   - spec/observability.yaml
-  - spec/output.yaml
   - spec/persistence.yaml
-  - spec/planning.yaml
-  - spec/request-triage.yaml
   - spec/routing.yaml
-  - spec/runtime.yaml
-  - spec/semantic-normalization.yaml
   - spec/verification.yaml
-  - spec/versioning.yaml
-  - registries/canonical-capabilities.yaml
-  - registries/capabilities.yaml
-  - registries/classifications.yaml
-  - registries/controls.yaml
-  - registries/domain-methods.yaml
-  - registries/frameworks.yaml
-  - registries/migrations.yaml
-  - registries/output-profiles.yaml
-  - registries/signing-keys.json
-  - registries/skills.yaml
-  - registries/surfaces.yaml
-  - registries/taxonomies.yaml
-  - registries/taxonomy-routes.yaml
-  - registries/tools.yaml
-  - migration/MIG-029.yaml
-  - migration/MIG-037.yaml
-  - migration/dtif-reconciliation.yaml
-  - integrations/access-asia/opportunity-lifecycle.yaml
-  - integrations/access-asia/system-of-record.yaml
-  - integrations/access-asia/operating-policy.yaml
-  - integrations/access-asia/mcp-roadmap.yaml
-  - integrations/chatgpt/adapter.yaml
-  - integrations/codex/adapter.yaml
-  - integrations/work/adapter.yaml
-  - integrations/hermes-agent/adapter.yaml
-  - integrations/generic-ai-host/adapter.yaml
-  - integrations/chatgpt/release-verification.yaml
-  - integrations/codex/release-verification.yaml
-  - integrations/work/release-verification.yaml
-  - integrations/hermes-agent/release-verification.yaml
-  - schemas/ai-manifest.schema.json
   - schemas/approval.schema.json
-  - schemas/atlas-os.schema.json
-  - schemas/canonical-capability-registry.schema.json
-  - schemas/capability-request.schema.json
-  - schemas/capability-result.schema.json
-  - schemas/classification-crosswalk.schema.json
-  - schemas/collection-mission.schema.json
-  - schemas/dashboard.schema.json
-  - schemas/domain-context-handoff.schema.json
-  - schemas/domain-handoff-receipt.schema.json
   - schemas/evidence.schema.json
-  - schemas/evidence-governance.schema.json
-  - schemas/execution-lease.schema.json
-  - schemas/execution.schema.json
-  - schemas/external-proof-evidence.schema.json
-  - schemas/governance.schema.json
-  - schemas/migration.schema.json
+  - schemas/execution-envelope.schema.json
+  - schemas/handoff.schema.json
   - schemas/output.schema.json
-  - schemas/persistence.schema.json
-  - schemas/registry.schema.json
-  - schemas/release-verification.schema.json
-  - schemas/signing-key-registry.schema.json
-  - schemas/spec.schema.json
-  - schemas/surface-adapter.schema.json
-  - schemas/task.schema.json
+  - schemas/routing-decision.schema.json
+  - registries/capabilities.yaml
+  - registries/providers.yaml
+  - registries/surfaces.yaml
+  - integrations/access-asia.yaml
+  - integrations/argus.yaml
+  - integrations/chatgpt.yaml
+  - integrations/generic-host.yaml
+  - integrations/hermes-agent.yaml
 human_guidance:
   - README.md
-  - GOVERNANCE.md
+  - docs/README.md
   - docs/architecture.md
-  - docs/architecture/atlas-argus-collection-boundary.md
-  - docs/architecture/capability-layer.md
-  - docs/runtime.md
-  - docs/ai-host-installation.md
-  - integrations/README.md
-  - integrations/access-asia/README.md
-  - integrations/chatgpt/ATLAS-CHATGPT-INSTRUCTIONS.md
-  - integrations/chatgpt/RELEASE-VERIFICATION.md
-  - integrations/hermes-agent/RELEASE-VERIFICATION.md
-  - .agents/skills/atlas-os/SKILL.md
-external_verification:
-  schema: schemas/release-verification.schema.json
-  control_registry: registries/migrations.yaml
-  controls: [MIG-029, MIG-037]
-  surfaces: [chatgpt, codex, work, hermes-agent]
+  - docs/framework.md
+  - docs/playbook.md
+  - docs/sop.md
+  - docs/capabilities-routing.md
+  - docs/evidence-verification.md
+  - docs/argus-interface.md
+  - docs/host-integration.md
+  - docs/implementation-guide.md
+  - docs/examples.md
+host_rule: Hosts provide capabilities and UI mechanics; ATLAS retains governance semantics and every next-step decision.

@@ -1,40 +1,19 @@
-schema: schemas/spec.schema.json
-id: spec.control-plane
-title: Authoritative governance and orchestration control plane
+id: atlas.control-plane
+version: 3.0.0
 status: active
 normative: true
 contract:
-  purpose: Determine what may happen, who or what may perform it, under which authority and permissions, in what state, and through which governed route.
-  owns:
-    - product_and_control_authority
-    - policy_evaluation
-    - permission_and_authorization_state
-    - plan_and_work_unit_state
-    - collection_need_decision
-    - approval_state
-    - provider_and_capability_routing
-    - execution_leases
-    - lifecycle_state_transitions
-    - dependency_management
-    - external_state_reconciliation
-    - persistence_authorization
-    - control_receipts_and_audit_events
-  request_interpretation: spec/request-triage.yaml separates task intent from collection mode before provider routing.
-  collection_gate: spec/collection-routing.yaml is authoritative for NONE, ATLAS_DIRECT, ARGUS_COLLECTION and HYBRID. Only ARGUS_COLLECTION or HYBRID may propose ARGUS.
-  argus_boundary: ARGUS owns bounded intelligence collection only. It never owns the ATLAS execution spine, plan, permissions, approvals, canonical taxonomy, strategic analysis, final business decision, assurance, persistence authorization, observability, Dashboard or delivery.
-  mission_control_boundary: Mission Control may request state changes; only the Control Plane may admit and apply them after governance checks.
-  dashboard_boundary: Dashboard and observability surfaces are read projections of authoritative state and cannot mutate plans, collection mode, permissions, approvals, routing or execution directly.
-  data_plane_boundary: The Control Plane authorizes execution but does not perform substantive host or specialist work itself.
-  transition_rule: Every material state transition must be attributable to a trigger, actor/provider, authority basis, previous state, next state and result.
-  fail_closed_rule: Missing authority, required approval, stale state, mismatched routing digest, invalid handoff/lease or prohibited permission blocks dependent execution.
-  performance_rule: Governance is proportional; direct tasks do not pay ARGUS collection cost without material collection need.
-invariants: [INV-007, INV-008, INV-009, INV-011, INV-017, INV-020, INV-021]
-references:
-  - spec/request-triage.yaml
-  - spec/collection-routing.yaml
-  - spec/mission-control.yaml
-  - spec/planning.yaml
-  - spec/routing.yaml
-  - spec/approvals.yaml
-  - spec/persistence.yaml
-  - spec/verification.yaml
+  owner: ATLAS
+  responsibilities:
+    - initialize_execution_context
+    - maintain_task_state
+    - enforce_policy_and_permissions
+    - select_capability
+    - select_provider
+    - evaluate_approvals
+    - issue_bounded_handoffs
+    - reconcile_provider_returns
+    - decide_every_next_step
+    - authorize_persistence
+  provider_rule: No provider may self-route, expand its authority, or make the final ATLAS decision.
+  failure_rule: Missing permission, evidence, capability, or validation fails closed and remains visible.

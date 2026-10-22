@@ -1,31 +1,10 @@
-schema: schemas/spec.schema.json
-id: spec.observability
-title: Observability, measurement and dashboard projection
+id: atlas.observability
+version: 3.0.0
 status: active
 normative: true
 contract:
-  purpose: Provide read-oriented state and measurement showing what is happening, what happened, execution/collection performance and what needs attention.
-  owns:
-    - telemetry_projection
-    - progress_measurement
-    - collection_mode_and_argus_state_projection
-    - collection_coverage_gap_and_conflict_projection
-    - evidence_health_projection
-    - performance_and_latency_measurement
-    - quality_and_verification_projection
-    - reliability_and_degradation_projection
-    - persistence_status_projection
-  dashboard_role: spec/dashboard.yaml defines the human projection. Dashboard is not a source of execution authority.
-  source_of_truth_rule: Projections derive from Control Plane, data-plane, ARGUS collection receipts/packages, verification and persistence events. Displayed values cannot silently become authoritative state.
-  mutation_rule: A user action from Dashboard becomes a Mission Control command and is evaluated by the Control Plane before state change.
-  event_rule: Refresh only at material changes such as work-unit start/completion, collection activation/return, blocker, approval, routing, verification, persistence, degradation or delivery.
-  measurement_rule: Use actual available telemetry. Unavailable cost, confidence, duration or performance remains unavailable rather than fabricated.
-  privacy_rule: Never expose private chain-of-thought, hidden reasoning tokens, secrets or unnecessary sensitive payloads.
-invariants: [INV-003, INV-004, INV-017, INV-020, INV-021]
-references:
-  - spec/dashboard.yaml
-  - spec/mission-control.yaml
-  - spec/control-plane.yaml
-  - spec/collection-routing.yaml
-  - spec/verification.yaml
-  - spec/persistence.yaml
+  dashboard_fields: [objective, progress, active_stage, blocker_or_approval, evidence_health, persistence_state, next_action]
+  source_of_truth: CONTROL_PLANE_STATE
+  read_only_projection: true
+  startup_rule: Mission Control, Control Plane, execution identity, and compact dashboard initialize before substantive execution.
+  update_rule: Emit state changes at meaningful checkpoints; avoid ceremonial noise.

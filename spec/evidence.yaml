@@ -1,31 +1,13 @@
-schema: schemas/spec.schema.json
-id: spec.evidence
-title: Evidence architecture
+id: atlas.evidence
+version: 3.0.0
 status: active
 normative: true
 contract:
-  classes:
-    VERIFIED: Directly checked against adequate provenance.
-    SUPPORTED: Evidence supports the claim but is incomplete.
-    INFERRED: Derived logically from evidence.
-    ASSUMED: Temporarily accepted to permit execution.
-    SPECULATIVE: Possible but inadequately evidenced.
-    UNKNOWN: Evidence state is not known.
-  health:
-    GREEN: Required evidence is verified and no material conflict remains.
-    AMBER: Evidence is usable but incomplete or contains managed uncertainty.
-    RED: Required evidence conflicts, fails, or is materially insufficient.
-    UNKNOWN: Evidence health cannot yet be evaluated.
-  separation: Source quality, completeness, confidence, and inference are independent attributes.
-  absence_rule: Absence of evidence is not evidence of absence.
-  framework_rule: Framework applicability and compliance are separate claims; compliance requires scope-specific verification evidence.
-  classification_rule: A taxonomy match is not evidence that a conditional code, legal status, or crosswalk applies.
-invariants:
-  - INV-005
-  - INV-006
-  - INV-016
-  - INV-018
-  - INV-019
-references:
-  - schemas/evidence.schema.json
-
+  statuses: [CONFIRMED, PROBABLE, POSSIBLE, DISPUTED, UNVERIFIED, STALE]
+  principles:
+    - A source is distinct from a claim.
+    - Observation is distinct from inference.
+    - A citation or URL is provenance, not proof by itself.
+    - Multiple sources are not automatically independent corroboration.
+    - Uncertainty must remain visible.
+  provider_role: Providers may collect and propose evidence state; ATLAS owns final evidence acceptance.

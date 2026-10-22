@@ -1,17 +1,12 @@
-## Change
+## Purpose
 
-- Classification:
-- Runtime/schema/compatibility impact:
-- Canonical files changed:
+Describe the ATLAS behavior or contract changed by this PR.
 
-## Evidence
+## Verification
 
-- Tests:
-- Repository validation:
-- Packaging (when applicable):
-
-## Governance
-
-- Migrations or controls affected:
-- Approval boundary:
-- Remaining uncertainty:
+- [ ] Unit tests pass
+- [ ] Conformance tests pass
+- [ ] Integration tests pass
+- [ ] `python tools/validate.py .` passes
+- [ ] No new provider or external action bypasses Mission Control / Control Plane approval
+- [ ] Documentation reflects any user- or integrator-visible change

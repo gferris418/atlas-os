@@ -1,101 +1,21 @@
-"""Reference implementation of ATLAS-OS v2 governance invariants."""
+"""ATLAS-OS v3 reference runtime."""
 
-from .runtime import (
-    ApprovalRequired,
-    CanonicalRevisionInUse,
-    PersistenceReceipt,
-    StateStore,
-    align_domain_practices,
-    audit_capability_providers,
-    assess_completeness,
-    build_plan,
-    can_transition_release,
-    classify_action,
-    classify_domain_context,
-    classify_task,
-    classify_task_intent,
-    confirm_library_save,
-    create_dashboard,
-    determine_execution_depth,
-    normalize_intent,
-    prepare_library_record,
-    render_dashboard,
-    require_approval,
-    route_taxonomy_layer,
-    select_output_profile,
-    select_next_work_unit,
-    validate_output_record,
-    verify_evidence,
-)
-from .authentication import (
-    attest_control_record,
-    canonical_record_sha256,
-    resolve_trusted_public_key,
-    verify_control_record_attestation,
-    verify_control_record_attestation_with_registry,
-)
-from .handoff import (
-    ExecutionContext,
-    prepare_domain_context_handoff,
-    verify_domain_context_handoff,
-    verify_domain_handoff_receipt,
-)
-from .lease import prepare_execution_lease, verify_execution_lease
-from .routing import build_routing_preview, route_capability, route_domain_method
-from .triage import triage_request
-from .capabilities import KERNEL_CAPABILITIES, plan_canonical_capabilities
-from .engine import ExecutionEnvelope, ExecutionResult, execute
-from .adapters import LibraryStorage, SurfaceAdapter, get_surface_adapter
-from .persistence import FileSystemLibraryAdapter
+from .adapters import SurfaceAdapter, get_surface_adapter
+from .models import ExecutionEnvelope, ExecutionResult, RouteDecision
+from .router import ARGUS_APPROVAL, EXTERNAL_ACTION_APPROVAL, PRE_EXECUTION_FLOW, choose_route, minimal_domain_framing, normalize_objective
+from .runtime import execute
 
 __all__ = [
-    "ApprovalRequired",
-    "attest_control_record",
-    "CanonicalRevisionInUse",
-    "FileSystemLibraryAdapter",
-    "ExecutionContext",
+    "ARGUS_APPROVAL",
+    "EXTERNAL_ACTION_APPROVAL",
+    "PRE_EXECUTION_FLOW",
     "ExecutionEnvelope",
     "ExecutionResult",
-    "KERNEL_CAPABILITIES",
-    "LibraryStorage",
-    "PersistenceReceipt",
+    "RouteDecision",
     "SurfaceAdapter",
-    "StateStore",
-    "align_domain_practices",
-    "audit_capability_providers",
-    "assess_completeness",
-    "build_plan",
-    "build_routing_preview",
-    "can_transition_release",
-    "canonical_record_sha256",
-    "classify_action",
-    "classify_domain_context",
-    "classify_task",
-    "classify_task_intent",
-    "confirm_library_save",
-    "create_dashboard",
-    "determine_execution_depth",
+    "choose_route",
     "execute",
     "get_surface_adapter",
-    "normalize_intent",
-    "plan_canonical_capabilities",
-    "prepare_domain_context_handoff",
-    "prepare_execution_lease",
-    "prepare_library_record",
-    "render_dashboard",
-    "require_approval",
-    "route_taxonomy_layer",
-    "resolve_trusted_public_key",
-    "route_domain_method",
-    "route_capability",
-    "select_output_profile",
-    "select_next_work_unit",
-    "triage_request",
-    "validate_output_record",
-    "verify_domain_context_handoff",
-    "verify_domain_handoff_receipt",
-    "verify_control_record_attestation",
-    "verify_control_record_attestation_with_registry",
-    "verify_evidence",
-    "verify_execution_lease",
+    "minimal_domain_framing",
+    "normalize_objective",
 ]

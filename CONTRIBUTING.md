@@ -1,12 +1,20 @@
 # Contributing
 
-1. Branch from `main` and classify the proposed change using `GOVERNANCE.md`.
-2. Preserve `atlas-os.yaml` as the sole product version authority.
-3. Update specifications, schemas, registries, tests, and migration records together when their contracts change.
-4. Run every validation command documented in `README.md`.
-5. Explain evidence, compatibility impact, open blockers, and required approvals in the pull request.
+ATLAS-OS keeps a deliberately small architecture surface. Changes should strengthen an existing contract before introducing a new one.
 
-When `requirements.txt` changes, regenerate the universal hash lock with `uv pip compile requirements.txt --generate-hashes --universal --output-file requirements.lock`, review the resolution, and run the locked install plus vulnerability audit before committing it.
+## Rules
 
-Do not close migration controls, weaken assertions, or change release state merely to obtain a green build.
+1. Preserve the exact three-step preprocessing flow.
+2. Keep ATLAS as the sole next-step and orchestration authority.
+3. Treat tools, plugins, skills, connectors, models, and ARGUS as providers rather than architectural authorities.
+4. Add or change observable behavior through tests first.
+5. Keep organization-specific workflow/storage rules in deployment integrations.
+6. Do not reintroduce migration diaries, release-candidate logs, compatibility aliases, generated libraries, or duplicate registries into the active tree.
+7. Run all validation commands before requesting merge.
 
+```bash
+python -m unittest discover -s tests/unit -v
+python -m unittest discover -s tests/conformance -v
+python -m unittest discover -s tests/integration -v
+python tools/validate.py .
+```
