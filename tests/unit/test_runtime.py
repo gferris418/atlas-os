@@ -60,7 +60,7 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual("READY", result.state)
         self.assertEqual("APPROVED", result.route.approval_status)
 
-    def test_provider_return_always_returns_to_atlas(self) -> None:
+    def test_provider_return_always_returns_to_atlas_and_requires_quality_ledger(self) -> None:
         result = execute(ExecutionEnvelope(
             objective="Assess ST Engineering opportunity evidence.",
             task_id="TASK-2",
@@ -70,7 +70,9 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual("ATLAS", result.provider_return_target)
         self.assertEqual("ATLAS", result.next_step_authority)
         self.assertIn("PROVIDER_RETURN_RECONCILIATION", result.execution_trace)
-        self.assertIn("REROUTE", result.dashboard["next_action"])
+        self.assertEqual("QUALITY_GATE_BLOCKED", result.state)
+        self.assertEqual("CONTINUE", result.dashboard["quality_gate"])
+        self.assertIn("quality ledger", result.dashboard["blocker_or_approval"].lower())
 
     def test_provider_return_with_insufficient_ledger_continues_collection(self) -> None:
         result = execute(ExecutionEnvelope(
