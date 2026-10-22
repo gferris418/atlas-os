@@ -118,7 +118,7 @@
     "routing_preview": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "objective", "task_id", "plan_id", "surface", "plan", "work_unit", "requirements", "intent_profile", "collection_mission", "providers", "unmatched_requirements", "cyclic_provider_ids", "conflicting_provider_pairs", "missing_prerequisite_providers", "unresolved_gates", "execution_sequence", "steps", "approval_prompt", "digest"],
+      "required": ["status", "objective", "task_id", "plan_id", "surface", "plan", "work_unit", "requirements", "intent_profile", "collection_mission", "activation_contract", "providers", "unmatched_requirements", "cyclic_provider_ids", "conflicting_provider_pairs", "missing_prerequisite_providers", "unresolved_gates", "execution_sequence", "steps", "approval_prompt", "digest"],
       "properties": {
         "status": {"enum": ["NOT_REQUIRED", "PROPOSED"]},
         "objective": {"type": "string", "minLength": 1},
@@ -146,6 +146,23 @@
           }
         },
         "collection_mission": {"type": ["object", "null"]},
+        "activation_contract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["version", "state", "activation_authority", "approval_required", "collection_mode", "argus_activation_required", "collection_mission_id", "provider_sequence", "handoff_provider_ids", "blockers"],
+          "properties": {
+            "version": {"const": "1.0"},
+            "state": {"enum": ["NOT_REQUIRED", "READY_FOR_APPROVAL", "BLOCKED"]},
+            "activation_authority": {"const": "ATLAS_OS"},
+            "approval_required": {"type": "boolean"},
+            "collection_mode": {"enum": ["NONE", "ATLAS_DIRECT", "ARGUS_COLLECTION", "HYBRID"]},
+            "argus_activation_required": {"type": "boolean"},
+            "collection_mission_id": {"type": ["string", "null"]},
+            "provider_sequence": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+            "handoff_provider_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+            "blockers": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+          }
+        },
         "unresolved_gates": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
         "execution_sequence": {"type": "array", "items": {"type": "string"}},
         "providers": {
