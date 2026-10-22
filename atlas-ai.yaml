@@ -1,5 +1,5 @@
 id: atlas-os-ai-entrypoint
-product_version: 3.0.2
+product_version: 3.0.3
 product_manifest: atlas-os.yaml
 mission_control_contract: spec/mission-control.yaml
 core_contract: spec/core.yaml
@@ -17,10 +17,13 @@ discovery_order:
   - spec/routing.yaml
   - spec/execution.yaml
   - spec/evidence.yaml
+  - spec/quality-governance.yaml
   - spec/approvals.yaml
   - spec/verification.yaml
   - spec/persistence.yaml
+  - spec/chat-event-persistence.yaml
   - spec/observability.yaml
+  - spec/performance-telemetry.yaml
   - registries/capabilities.yaml
   - registries/providers.yaml
   - registries/surfaces.yaml
@@ -31,6 +34,7 @@ machine_contracts:
   - governance.yaml
   - plugin.json
   - spec/approvals.yaml
+  - spec/chat-event-persistence.yaml
   - spec/context.yaml
   - spec/control-plane.yaml
   - spec/core.yaml
@@ -38,7 +42,9 @@ machine_contracts:
   - spec/execution.yaml
   - spec/mission-control.yaml
   - spec/observability.yaml
+  - spec/performance-telemetry.yaml
   - spec/persistence.yaml
+  - spec/quality-governance.yaml
   - spec/routing.yaml
   - spec/verification.yaml
   - schemas/approval.schema.json
