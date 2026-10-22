@@ -2,7 +2,7 @@ schema: schemas/atlas-os.schema.json
 product:
   id: atlas-os
   name: ATLAS OS
-  version: 2.0.2-rc.6
+  version: 2.1.0-rc.1
   release_channel: candidate
   schema_version: 2
   status: CANDIDATE
@@ -17,6 +17,8 @@ authority:
 architecture:
   mission_control: spec/mission-control.yaml
   control_plane: spec/control-plane.yaml
+  task_lifecycle: spec/task-lifecycle.yaml
+  host_adapters: spec/host-adapters.yaml
   collection_routing: spec/collection-routing.yaml
   semantic_normalization: spec/semantic-normalization.yaml
   domain_context_services: spec/domain-context-services.yaml
@@ -31,6 +33,7 @@ execution:
   domain_practices: spec/domain-practices.yaml
   domain_handoff: spec/domain-handoff.yaml
   collection_mission: schemas/collection-mission.schema.json
+  activation_contract: schemas/activation-contract.schema.json
   capability_layer: spec/capability-layer.yaml
   evidence_governance: spec/evidence-governance.yaml
   execution_governance: spec/execution-governance.yaml
@@ -40,9 +43,9 @@ execution:
   canonical_capability_registry: registries/canonical-capabilities.yaml
   output: spec/output.yaml
   default_depth: L1
-  control_revision: atlas-bootstrap-2026-10-22-r10
+  control_revision: atlas-portable-orchestration-2026-10-22-r1
 release:
-  target_version: 2.0.2
+  target_version: 2.1.0
   blocking_controls: [MIG-029, MIG-037]
   package_command: python tools/package/build_release.py . dist
   validation_command: python tools/validate/validate_repository.py . && python tools/validate/validate_machine_contracts.py . && python tools/validate/validate_output_contracts.py .
