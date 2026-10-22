@@ -12,6 +12,7 @@ authority:
     mission_control: spec/mission-control.yaml
     control_plane: spec/control-plane.yaml
     collection_routing: spec/collection-routing.yaml
+    semantic_normalization: spec/semantic-normalization.yaml
     domain_context_services: spec/domain-context-services.yaml
     domain_intelligence: spec/domain-intelligence.yaml
     observability: spec/observability.yaml
@@ -26,6 +27,7 @@ discovery_order:
   - spec/core.yaml
   - spec/request-triage.yaml
   - spec/collection-routing.yaml
+  - spec/semantic-normalization.yaml
   - spec/mission-control.yaml
   - spec/control-plane.yaml
   - spec/capability-layer.yaml
@@ -71,6 +73,7 @@ machine_contracts:
   - spec/request-triage.yaml
   - spec/routing.yaml
   - spec/runtime.yaml
+  - spec/semantic-normalization.yaml
   - spec/verification.yaml
   - spec/versioning.yaml
   - registries/canonical-capabilities.yaml
