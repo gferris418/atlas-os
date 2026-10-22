@@ -1,8 +1,8 @@
 schema: schemas/release-verification.schema.json
 id: verification.hermes-agent
 surface: hermes-agent
-product_version: 2.0.2-rc.6
-control_revision: atlas-bootstrap-2026-10-22-r10
+product_version: 2.0.2-rc.7
+control_revision: atlas-bootstrap-2026-10-22-r11
 status: READY_FOR_EXTERNAL_PROOF
 fresh_session_required: true
 independent_evidence_required: true
@@ -16,8 +16,8 @@ checks:
     input: Discover the project-local atlas-os skill, trust the checkout, and resolve its ATLAS identity.
     assertions:
       - {id: AST-01, property: skill_discovered, operator: equals, expected: true}
-      - {id: AST-02, property: product_version, operator: equals, expected: 2.0.2-rc.6}
-      - {id: AST-03, property: control_revision, operator: equals, expected: atlas-bootstrap-2026-10-22-r10}
+      - {id: AST-02, property: product_version, operator: equals, expected: 2.0.2-rc.7}
+      - {id: AST-03, property: control_revision, operator: equals, expected: atlas-bootstrap-2026-10-22-r11}
     required_evidence: [session_id, timestamp, source_commit, skill_index]
     controls: [MIG-037]
   - id: CHK-02
@@ -65,6 +65,33 @@ checks:
     required_evidence: [session_id, timestamp, prompt, response]
     controls: [MIG-037]
   - id: CHK-07
+    kind: prompt
+    input: /atlas-os What capability gaps could Bangladesh Coast Guard address with foreign technology?
+    assertions:
+      - {id: AST-01, property: collection_mode, operator: equals, expected: ARGUS_COLLECTION}
+      - {id: AST-02, property: collection_type, operator: contains, expected: NEED_GAP}
+      - {id: AST-03, property: capability_plan, operator: contains, expected: argus.collection}
+    required_evidence: [session_id, timestamp, prompt, response]
+    controls: [MIG-037]
+  - id: CHK-08
+    kind: prompt
+    input: /atlas-os Where could ST Engineering coastal surveillance technology fit in Bangladesh government?
+    assertions:
+      - {id: AST-01, property: collection_mode, operator: equals, expected: ARGUS_COLLECTION}
+      - {id: AST-02, property: collection_type, operator: contains, expected: OPPORTUNITY_MATCHING}
+      - {id: AST-03, property: capability_plan, operator: contains, expected: argus.collection}
+    required_evidence: [session_id, timestamp, prompt, response]
+    controls: [MIG-037]
+  - id: CHK-09
+    kind: prompt
+    input: /atlas-os A Bangladesh Coast Guard patrol vessel tender is published and closes in 7 days; find eligible international OEMs.
+    assertions:
+      - {id: AST-01, property: collection_mode, operator: equals, expected: ARGUS_COLLECTION}
+      - {id: AST-02, property: collection_type, operator: contains, expected: RAPID_TENDER}
+      - {id: AST-03, property: capability_plan, operator: contains, expected: atlas.procurement-intelligence}
+    required_evidence: [session_id, timestamp, prompt, response]
+    controls: [MIG-037]
+  - id: CHK-10
     kind: action
     input: Save this answer in the ATLAS library.
     assertions:
