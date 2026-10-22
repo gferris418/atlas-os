@@ -6,6 +6,8 @@ from pathlib import Path
 
 import yaml
 
+from atlas_runtime.collection import build_collection_mission
+
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -34,15 +36,49 @@ class CollectionArchitectureTests(unittest.TestCase):
         argus = registry["items"][0]
         self.assertEqual("2.2.0-rc.2", argus["version"])
         self.assertIn("intelligence_collection", argus["capabilities"])
-        self.assertEqual("be5fcaf48d84e14e147288e05f3fe90bc96744ac", argus["source_commit"])
-        self.assertEqual("3.0.0", argus["contract_version"])
-        self.assertEqual("sha256:5b082a12c6f0b469cba274a0e43e29032e349e3d377cf6d12ffa58762e8cb307", argus["contract_sha256"])
+        self.assertEqual("7ed812822b613a0eeff7fbd90fe5c242fc15a8ae", argus["source_commit"])
+        self.assertEqual("3.1.0", argus["contract_version"])
+        self.assertEqual("sha256:5cc8f16667fc1d2af49778d1da1effab36ed8f09f3fc15d9a3a0ee60e7552a90", argus["contract_sha256"])
 
     def test_collection_mission_schema_is_machine_readable(self) -> None:
         schema = json.loads((ROOT / "schemas/collection-mission.schema.json").read_text(encoding="utf-8"))
         self.assertEqual(["ARGUS_COLLECTION", "HYBRID"], schema["properties"]["collection_mode"]["enum"])
         self.assertIn("collection_depth", schema["properties"])
         self.assertIn("stopping_rule", schema["required"])
+        self.assertIn("execution_policy", schema["required"])
+
+    def test_argus_mission_uses_one_bounded_autonomous_startup_sequence(self) -> None:
+        mission = build_collection_mission(
+            "Coastal patrol vessel for Bangladesh Coast Guard",
+            task_id="TASK-BCG-CPV-001",
+            plan_id="PLAN-BCG-CPV-001",
+            request_triage={
+                "collection_mode": "ARGUS_COLLECTION",
+                "collection_types": ["BUYER_REQUIREMENT", "PROCUREMENT_DISCOVERY", "SUPPLIER_LANDSCAPE"],
+                "collection_depth": "C3_OPPORTUNITY",
+            },
+        )
+        policy = mission["execution_policy"]
+        self.assertEqual("BOUNDED_AUTONOMOUS", policy["autonomy_mode"])
+        self.assertEqual(
+            [
+                "RESOLVE_INSTITUTIONAL_HIERARCHY",
+                "CHECK_INTERNAL_CANONICAL_REGISTRY",
+                "RECONCILE_OPPORTUNITY_IDENTITY",
+                "CHECK_OFFICIAL_PROCUREMENT_SOURCES",
+                "CHECK_INTERNAL_CUSTOMER_INTELLIGENCE",
+                "BUILD_RESEARCH_FRONTIER",
+                "EXECUTE_ADAPTIVE_360_COLLECTION",
+            ],
+            policy["startup_sequence"],
+        )
+        self.assertEqual(
+            ["MATERIAL_SCOPE_CHANGE", "AUTHORIZATION_REQUIRED", "POLICY_OR_SECURITY_CONFLICT", "MATERIAL_AMBIGUITY"],
+            policy["escalation_conditions"],
+        )
+        self.assertEqual("AMBIGUOUS_ONLY", policy["identity_confirmation"])
+        self.assertEqual("PROPOSE_BATCH_THEN_ATLAS_COMMIT", policy["persistence_mode"])
+        self.assertEqual("TRANSIENT_ONLY", policy["mission_context"])
 
     def test_economic_taxonomy_stack_uses_current_named_editions(self) -> None:
         registry = yaml.safe_load((ROOT / "registries/taxonomies.yaml").read_text(encoding="utf-8"))
