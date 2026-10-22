@@ -6,6 +6,8 @@ from pathlib import Path
 
 import yaml
 
+from atlas_runtime.collection import build_collection_mission
+
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -43,6 +45,40 @@ class CollectionArchitectureTests(unittest.TestCase):
         self.assertEqual(["ARGUS_COLLECTION", "HYBRID"], schema["properties"]["collection_mode"]["enum"])
         self.assertIn("collection_depth", schema["properties"])
         self.assertIn("stopping_rule", schema["required"])
+        self.assertIn("execution_policy", schema["required"])
+
+    def test_argus_mission_uses_one_bounded_autonomous_startup_sequence(self) -> None:
+        mission = build_collection_mission(
+            "Coastal patrol vessel for Bangladesh Coast Guard",
+            task_id="TASK-BCG-CPV-001",
+            plan_id="PLAN-BCG-CPV-001",
+            request_triage={
+                "collection_mode": "ARGUS_COLLECTION",
+                "collection_types": ["BUYER_REQUIREMENT", "PROCUREMENT_DISCOVERY", "SUPPLIER_LANDSCAPE"],
+                "collection_depth": "C3_OPPORTUNITY",
+            },
+        )
+        policy = mission["execution_policy"]
+        self.assertEqual("BOUNDED_AUTONOMOUS", policy["autonomy_mode"])
+        self.assertEqual(
+            [
+                "RESOLVE_INSTITUTIONAL_HIERARCHY",
+                "CHECK_INTERNAL_CANONICAL_REGISTRY",
+                "RECONCILE_OPPORTUNITY_IDENTITY",
+                "CHECK_OFFICIAL_PROCUREMENT_SOURCES",
+                "CHECK_INTERNAL_CUSTOMER_INTELLIGENCE",
+                "BUILD_RESEARCH_FRONTIER",
+                "EXECUTE_ADAPTIVE_360_COLLECTION",
+            ],
+            policy["startup_sequence"],
+        )
+        self.assertEqual(
+            ["MATERIAL_SCOPE_CHANGE", "AUTHORIZATION_REQUIRED", "POLICY_OR_SECURITY_CONFLICT", "MATERIAL_AMBIGUITY"],
+            policy["escalation_conditions"],
+        )
+        self.assertEqual("AMBIGUOUS_ONLY", policy["identity_confirmation"])
+        self.assertEqual("PROPOSE_BATCH_THEN_ATLAS_COMMIT", policy["persistence_mode"])
+        self.assertEqual("TRANSIENT_ONLY", policy["mission_context"])
 
     def test_economic_taxonomy_stack_uses_current_named_editions(self) -> None:
         registry = yaml.safe_load((ROOT / "registries/taxonomies.yaml").read_text(encoding="utf-8"))
