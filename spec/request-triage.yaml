@@ -10,8 +10,8 @@ contract:
   collection_modes:
     NONE: No external collection is required.
     ATLAS_DIRECT: Ordinary lookup or research remains inside ATLAS.
-    ARGUS_COLLECTION: Structured intelligence collection is delegated to ARGUS and returned to ATLAS as evidence.
-    HYBRID: ARGUS performs collection while ATLAS retains substantive analysis, forecasting, comparison, qualification or decision work.
+    ARGUS_COLLECTION: Structured government commercial opportunity or target intelligence collection is delegated to ARGUS and returned to ATLAS as evidence/advisory domain intelligence.
+    HYBRID: ARGUS performs collection and may compute advisory opportunity/supplier assessments while ATLAS retains substantive analysis, forecasting, authoritative prioritization and final decision work.
   authoritative_activation_field: collection_mode
   argus_activation_modes: [ARGUS_COLLECTION, HYBRID]
   argus_capability: intelligence_collection
@@ -25,15 +25,24 @@ contract:
       collection_mode: ATLAS_DIRECT
     - request: ST Engineering
       collection_mode: ARGUS_COLLECTION
+    - request: What capability gaps could Bangladesh Coast Guard address with foreign technology?
+      collection_mode: ARGUS_COLLECTION
+    - request: Where could ST Engineering coastal surveillance technology fit in Bangladesh government?
+      collection_mode: ARGUS_COLLECTION
     - request: coastal patrol vessel for Bangladesh Coast Guard
       collection_mode: ARGUS_COLLECTION
     - request: seed cum cleaner for BADC
       collection_mode: ARGUS_COLLECTION
     - request: share the annual procurement plan of Bangladesh Navy
       collection_mode: ARGUS_COLLECTION
+    - request: A Bangladesh Coast Guard patrol-vessel tender is published and closes in 7 days; find eligible international OEMs.
+      collection_mode: ARGUS_COLLECTION
     - request: compare ST Engineering and L3Harris for Bangladesh opportunities
       collection_mode: HYBRID
-  government_mention_rule: A government/public-sector mention alone does not activate ARGUS. A buyer-product, procurement-plan, opportunity, installed-base, landscape, target-profile or monitoring collection requirement may do so.
+    - request: Rank suitable international OEMs for a Coast Guard opportunity and recommend whether Access Asia should pursue.
+      collection_mode: HYBRID
+  government_mention_rule: A government/public-sector mention alone does not activate ARGUS. A named strategic target, need/capability-gap, programme/project/funding/approval, buyer-product, legitimate opportunity-development, supply-first matching, supplier/partnerability, procurement-plan, Rapid Tender, installed-base/expansion, landscape or monitoring collection requirement may do so.
+  procurement_separation_rule: Early need/gap discovery, opportunity development and supply-first matching do not automatically activate ATLAS Procurement Intelligence when procurement semantics are absent.
   performance_rule: The gate is local and proportional; do not perform web research merely to decide collection mode.
   fallback_rule: When structured collection need is not materially established, prefer direct ATLAS execution.
 invariants: [INV-001, INV-002, INV-017, INV-018]
