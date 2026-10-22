@@ -1,7 +1,7 @@
 ---
 name: atlas-os
 description: Apply the ATLAS-OS v3 execution-governance contract using the current host's actual capabilities.
-version: 3.0.0
+version: 3.0.1
 ---
 
 # ATLAS-OS
@@ -32,4 +32,4 @@ Do not create a fourth preprocessing step.
 
 ## Host rule
 
-ChatGPT, Hermes Agent, or another host supplies capabilities. Host-specific tools, UI, memory, storage, and connectors do not change ATLAS authority or preprocessing semantics.
+ChatGPT, Work, Projects, Codex, Hermes Agent, or another host supplies capabilities. Host-specific tools, UI, memory, storage, and connectors do not change ATLAS authority or preprocessing semantics.
