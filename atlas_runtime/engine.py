@@ -400,11 +400,9 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     candidate_active_unit: str | None = None
 
     # Classification completeness and framework applicability are informational at
-    # this seam. Only an explicit unresolved material clarification blocks routing.
-    if (
-        routing_preview["status"] == "PROPOSED"
-        and envelope.clarification_status == "PENDING"
-    ):
+    # this seam. Explicit unresolved material clarification blocks every dependent
+    # execution path, whether or not provider routing is required.
+    if envelope.clarification_status == "PENDING":
         blocking_stage = "MATERIAL_CONTEXT_MATRIX"
         blocker = "Resolve material clarification before provider routing or execution."
     if blocking_stage is None and routing_preview["status"] == "PROPOSED":
