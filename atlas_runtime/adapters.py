@@ -33,6 +33,7 @@ class SurfaceAdapter:
         routing_approval_status: str = "PENDING",
         routing_preview_digest: str | None = None,
         argus_approval_status: str = "PENDING",
+        argus_approval_digest: str | None = None,
         timestamp: str | None = None,
         timezone_name: str = "UTC",
     ) -> dict[str, Any]:
@@ -50,6 +51,7 @@ class SurfaceAdapter:
             routing_approval_status=routing_approval_status,
             routing_preview_digest=routing_preview_digest,
             argus_approval_status=argus_approval_status,
+            argus_approval_digest=argus_approval_digest,
         )).dashboard
 
     def deliver(
