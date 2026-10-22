@@ -23,7 +23,10 @@ EXPECTED_REGISTRIES = {"capabilities.yaml", "providers.yaml", "surfaces.yaml"}
 EXPECTED_CLASSIFICATION_REGISTRIES = {
     "families.yaml", "authorities.yaml", "standards.yaml", "update-sources.yaml", "crosswalks.yaml",
 }
-EXPECTED_INTEGRATIONS = {"access-asia.yaml", "argus.yaml", "chatgpt.yaml", "generic-host.yaml", "hermes-agent.yaml"}
+EXPECTED_INTEGRATIONS = {
+    "access-asia.yaml", "argus.yaml", "chatgpt-bootstrap.yaml", "chatgpt.yaml",
+    "generic-host.yaml", "hermes-agent.yaml",
+}
 EXPECTED_DOCS = {
     "README.md", "SUMMARY.md", "architecture.md", "framework.md", "playbook.md", "sop.md",
     "capabilities-routing.md", "evidence-verification.md", "classification-standards.md",
@@ -183,10 +186,15 @@ def validate(root: Path) -> list[str]:
             f"{sorted(classification_actual)} != {sorted(EXPECTED_CLASSIFICATION_REGISTRIES)}"
         )
 
-    required_root = ["atlas-ai.yaml", "atlas-os.yaml", "governance.yaml", "README.md", "LICENSE"]
+    required_root = ["atlas-ai.yaml", "atlas-os.yaml", "governance.yaml", "plugin.json", "README.md", "LICENSE"]
     for relative in required_root:
         if not (root / relative).is_file():
             errors.append(f"missing required root file: {relative}")
+
+    required_skills = [".agents/skills/atlas-os/SKILL.md", "skills/atlas-os/SKILL.md"]
+    for relative in required_skills:
+        if not (root / relative).is_file():
+            errors.append(f"missing required skill file: {relative}")
 
     if errors:
         return errors
@@ -207,20 +215,23 @@ def validate(root: Path) -> list[str]:
         manifest = _load(root / "atlas-os.yaml")
         ai = _load(root / "atlas-ai.yaml")
         governance = _load(root / "governance.yaml")
+        plugin = _load(root / "plugin.json")
     except Exception as exc:
         return [f"cannot parse root machine contract: {exc}"]
 
     version = manifest.get("product", {}).get("version")
-    if version != "3.0.0":
+    if version != "3.0.1":
         errors.append(f"unexpected product version: {version}")
     if ai.get("product_version") != version:
         errors.append("atlas-ai product_version does not match atlas-os")
     if governance.get("version") != version:
         errors.append("governance version does not match atlas-os")
+    if plugin.get("version") != version:
+        errors.append("plugin version does not match atlas-os")
 
     machine_contracts = ai.get("machine_contracts", [])
     expected_contracts = {
-        "atlas-os.yaml", "governance.yaml",
+        "atlas-os.yaml", "governance.yaml", "plugin.json",
         *(f"spec/{name}" for name in EXPECTED_SPECS),
         *(f"schemas/{name}" for name in EXPECTED_SCHEMAS),
         *(f"registries/{name}" for name in EXPECTED_REGISTRIES),
@@ -234,6 +245,11 @@ def validate(root: Path) -> list[str]:
             errors.append(f"machine contract missing: {relative}")
         if relative.startswith(("migration/", "legacy/")) or "release-verification" in relative:
             errors.append(f"historical contract leaked into machine authority: {relative}")
+
+    canonical_skill = (root / ".agents/skills/atlas-os/SKILL.md").read_text(encoding="utf-8")
+    packaged_skill = (root / "skills/atlas-os/SKILL.md").read_text(encoding="utf-8")
+    if canonical_skill != packaged_skill:
+        errors.append("packaged ATLAS plugin skill must exactly match the canonical agent skill")
 
     if "registries/classification" not in manifest.get("registries", []):
         errors.append("atlas-os registries must include registries/classification")

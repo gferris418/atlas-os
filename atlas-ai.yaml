@@ -1,5 +1,5 @@
 id: atlas-os-ai-entrypoint
-product_version: 3.0.0
+product_version: 3.0.1
 product_manifest: atlas-os.yaml
 core_contract: spec/core.yaml
 routing_contract: spec/routing.yaml
@@ -7,6 +7,8 @@ discovery_order:
   - atlas-ai.yaml
   - atlas-os.yaml
   - governance.yaml
+  - plugin.json
+  - skills/atlas-os/SKILL.md
   - spec/core.yaml
   - spec/mission-control.yaml
   - spec/control-plane.yaml
@@ -26,6 +28,7 @@ discovery_order:
 machine_contracts:
   - atlas-os.yaml
   - governance.yaml
+  - plugin.json
   - spec/approvals.yaml
   - spec/context.yaml
   - spec/control-plane.yaml
@@ -57,6 +60,7 @@ machine_contracts:
   - integrations/access-asia.yaml
   - integrations/argus.yaml
   - integrations/chatgpt.yaml
+  - integrations/chatgpt-bootstrap.yaml
   - integrations/generic-host.yaml
   - integrations/hermes-agent.yaml
 human_guidance:

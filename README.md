@@ -2,7 +2,7 @@
 
 ATLAS-OS is a portable operating framework for governed AI work. It sits between user intent and the capabilities supplied by ChatGPT, Hermes Agent, or another host. ATLAS owns orchestration, routing, approvals, provider reconciliation, verification, classification governance, and persistence authority.
 
-**Current release:** `3.0.0`
+**Current release:** `3.0.1`
 
 ## Core invariant
 
@@ -47,6 +47,8 @@ atlas-os/
 ├── atlas-ai.yaml            # AI discovery entrypoint
 ├── atlas-os.yaml            # product/release authority
 ├── governance.yaml          # authority and change rules
+├── plugin.json              # portable plugin manifest
+├── skills/                  # packaged host skills
 ├── spec/                    # 11 durable normative contracts
 ├── schemas/                 # 9 public interchange/reference schemas
 ├── registries/              # capabilities, providers, surfaces, classifications

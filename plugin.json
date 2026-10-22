@@ -1,0 +1,19 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "atlas-os",
+  "version": "3.0.1",
+  "description": "ATLAS-OS execution governance for routing, approvals, verification, provider return, and ARGUS intelligence collection handoff.",
+  "author": {
+    "name": "Access Asia"
+  },
+  "repository": "https://github.com/gferris418/atlas-os",
+  "license": "MIT",
+  "keywords": [
+    "atlas-os",
+    "execution-governance",
+    "routing",
+    "verification",
+    "argus",
+    "access-asia"
+  ]
+}

@@ -1,8 +1,11 @@
 id: integration.chatgpt
-version: 3.0.0
+version: 3.0.1
 host: chatgpt
 status: active
 role: host_adapter
+plugin_manifest: plugin.json
+bootstrap_contract: integrations/chatgpt-bootstrap.yaml
+primary_skill: skills/atlas-os/SKILL.md
 bootstrap:
   mission_control: required
   control_plane: required
@@ -11,4 +14,5 @@ bootstrap:
 capabilities:
   native: [conversation]
   optional: [direct_search, deep_research, connected_source, code_execution, external_action, persistence]
+surfaces: [chat, work, projects]
 rule: Use only capabilities actually exposed in the active session; unavailable capability must be reported rather than implied.

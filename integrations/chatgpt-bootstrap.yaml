@@ -1,0 +1,37 @@
+id: integration.chatgpt.bootstrap
+version: 1.0.0
+canonical_repository: gferris418/atlas-os
+canonical_ref: main
+source_resolution: github_live_when_available
+resolution_order:
+  - active_installed_plugin_release
+  - live_github_main_for_current_contracts
+  - library_bootstrap_cache
+library_bootstrap:
+  root: /AI Frameworks/ATLAS-ARGUS
+  entrypoint: /AI Frameworks/ATLAS-ARGUS/00_START_HERE.md
+  role: cache_bootstrap_not_canonical
+surfaces:
+  chat: relevance_triggered_plugin_skill
+  work: relevance_triggered_plugin_skill
+  projects: relevance_triggered_plugin_skill
+bootstrap:
+  primary_skill: skills/atlas-os/SKILL.md
+  mission_control: required
+  control_plane: required
+  compact_dashboard: required_for_substantive_tasks
+  pre_execution_flow:
+    - UNDERSTAND_AND_NORMALIZE
+    - MINIMAL_DOMAIN_FRAMING
+    - ROUTE
+argus:
+  repository: gferris418/argus-intelligence
+  capability: intelligence_collection
+  activation_authority: ATLAS
+  next_step_authority: ATLAS
+  explicit_user_approval_required: true
+  live_contract_resolution: github_main_when_available
+guarantees:
+  universal_prompt_injection: false
+  reason: ChatGPT loads installed skills by relevance and active host capability; Library files alone are not system-prompt injection.
+  behavior: When the ATLAS skill is selected, resolve current canonical contracts before substantive execution when freshness materially affects routing or correctness.

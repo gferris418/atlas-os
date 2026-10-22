@@ -6,7 +6,7 @@ description: ATLAS-OS v3 documentation: architecture, framework, playbook, SOP, 
 
 ATLAS-OS is a portable operating framework for AI work. It sits between user intent and host capabilities, keeps the user in control of consequential actions, chooses the next execution mechanism, reconciles every provider return, governs classification reference data, and verifies outcomes before delivery.
 
-**Version:** `3.0.0`
+**Version:** `3.0.1`
 
 ## Operating invariant
 
