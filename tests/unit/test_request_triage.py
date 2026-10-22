@@ -137,6 +137,43 @@ class RequestTriageTests(unittest.TestCase):
         self.assertEqual("ARGUS_COLLECTION", mission["collection_mode"])
         self.assertEqual([], [gate for gate in result.routing_preview["unresolved_gates"] if "collection_mission" in gate])
 
+    def test_collection_preview_exposes_activation_contract_for_integrators(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective="ST Engineering",
+            plan_id="plan-activation-contract",
+            task_id="TASK-ACTIVATION-CONTRACT",
+            work_units=[{"id": "collect", "status": "PENDING", "dependencies": []}],
+            clarification_status="RESOLVED",
+            timestamp="2026-10-22T05:20:00+06:00",
+            timezone_name="Asia/Dhaka",
+        ))
+        contract = result.routing_preview["activation_contract"]
+        self.assertEqual("1.0", contract["version"])
+        self.assertEqual("READY_FOR_APPROVAL", contract["state"])
+        self.assertEqual("ARGUS_COLLECTION", contract["collection_mode"])
+        self.assertTrue(contract["argus_activation_required"])
+        self.assertEqual("COLLECTION-ACTIVATION-CONTRACT", contract["collection_mission_id"])
+        self.assertIn("domain-method.argus-intelligence", contract["provider_sequence"])
+        self.assertIn("domain-method.argus-intelligence", contract["handoff_provider_ids"])
+        self.assertEqual([], contract["blockers"])
+
+    def test_direct_preview_exposes_not_required_activation_contract(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective="Rewrite this supplier letter in a formal tone.",
+            plan_id="plan-no-activation-contract",
+            task_id="TASK-NO-ACTIVATION-CONTRACT",
+            work_units=[{"id": "rewrite", "status": "PENDING", "dependencies": []}],
+            clarification_status="RESOLVED",
+        ))
+        contract = result.routing_preview["activation_contract"]
+        self.assertEqual("NOT_REQUIRED", contract["state"])
+        self.assertEqual("NONE", contract["collection_mode"])
+        self.assertFalse(contract["argus_activation_required"])
+        self.assertIsNone(contract["collection_mission_id"])
+        self.assertEqual([], contract["provider_sequence"])
+        self.assertEqual([], contract["handoff_provider_ids"])
+        self.assertEqual([], contract["blockers"])
+
     def test_historical_procurement_mission_preserves_requested_period(self) -> None:
         result = execute(ExecutionEnvelope(
             objective="Find the annual procurement plan of Bangladesh Navy for 2020",
