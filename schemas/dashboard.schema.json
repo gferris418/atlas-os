@@ -158,7 +158,7 @@
             "collection_mode": {"enum": ["NONE", "ATLAS_DIRECT", "ARGUS_COLLECTION", "HYBRID"]},
             "argus_activation_required": {"type": "boolean"},
             "collection_mission_id": {"type": ["string", "null"]},
-            "provider_sequence": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+            "provider_sequence": {"type": "array", "items": {"type": "string"}},
             "handoff_provider_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
             "blockers": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
           }
