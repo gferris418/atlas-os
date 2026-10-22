@@ -29,6 +29,15 @@ class DomainContextHandoffTests(unittest.TestCase):
     def _task(self) -> dict:
         task = json.loads((ROOT / "tests/fixtures/sample-task.json").read_text())
         task["execution_depth"] = "L2"
+        task["semantic_context"] = {
+            "status": "READY",
+            "original_input": task["objective"],
+            "normalized_input": task["objective"],
+            "whole_context_summary": task["objective"],
+            "normalization_notes": [],
+            "meaning_ambiguities": [],
+            "unresolved_context": ["downstream-detail"],
+        }
         task["domain_alignment"] = {
             "domains": ["planning"],
             "status": "ALIGNED",
@@ -49,18 +58,21 @@ class DomainContextHandoffTests(unittest.TestCase):
             handoff_id="HANDOFF-ARGUS-001",
             created_at="2026-10-18T03:00:00+06:00",
         )
-        self.assertEqual("1.2.0", handoff["contract_version"])
+        self.assertEqual("1.3.0", handoff["contract_version"])
         self.assertEqual("ATLAS_OS", handoff["producer"])
         self.assertEqual("ARGUS", handoff["consumer"])
         self.assertEqual(task["id"], handoff["source_task_id"])
         self.assertEqual("plan-domain-handoff", handoff["source_plan_id"])
         self.assertEqual("unit-domain-analysis", handoff["source_work_unit_id"])
         self.assertEqual("2026-10-19T03:00:00+06:00", handoff["activation_expires_at"])
+        self.assertEqual(task["semantic_context"], handoff["semantic_context"])
         self.assertEqual(task["domain_classification"], handoff["domain_classification"])
         self.assertEqual(task["domain_alignment"], handoff["domain_alignment"])
-        self.assertEqual(task["domain_classification"]["unresolved_facets"], handoff["unresolved_material"])
+        self.assertIn("downstream-detail", handoff["unresolved_material"])
+        for facet in task["domain_classification"]["unresolved_facets"]:
+            self.assertIn(facet, handoff["unresolved_material"])
         self.assertEqual(task["domain_classification"]["risk_flags"], handoff["risk_flags"])
-        self.assertEqual("PARTIAL", handoff["state"])
+        self.assertEqual("READY", handoff["state"])
         self.assertRegex(handoff["payload_sha256"], r"^sha256:[0-9a-f]{64}$")
         self.assertTrue(verify_domain_context_handoff(handoff))
 
@@ -96,7 +108,7 @@ class DomainContextHandoffTests(unittest.TestCase):
             created_at="2026-10-18T03:00:00+06:00",
         )
         tampered = deepcopy(handoff)
-        tampered["domain_classification"]["status"] = "CLASSIFIED"
+        tampered["semantic_context"]["normalized_input"] = "changed"
         with self.assertRaisesRegex(ValueError, "integrity"):
             verify_domain_context_handoff(tampered)
 
@@ -109,7 +121,7 @@ class DomainContextHandoffTests(unittest.TestCase):
             created_at="2026-10-18T03:00:00+06:00",
         )
         receipt = {
-            "contract_version": "1.2.0",
+            "contract_version": "1.3.0",
             "handoff_id": "HANDOFF-OTHER-004",
             "payload_sha256": handoff["payload_sha256"],
             "consumer": "ARGUS",

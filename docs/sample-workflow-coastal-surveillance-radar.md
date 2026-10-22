@@ -1,93 +1,119 @@
 # Sample workflow: coastal surveillance radar for Bangladesh Navy
 
-This example shows how ATLAS processes the prompt `coastal surveillance radar for Bangladesh navy`. It is a governance example, not a radar design or procurement recommendation. The corresponding machine-readable task state is in [`examples/workflows/coastal-surveillance-radar-bangladesh-navy.json`](../examples/workflows/coastal-surveillance-radar-bangladesh-navy.json).
+This example shows how ATLAS processes the prompt `coastal surveillance radar for Bangladesh navy`. It demonstrates the fast semantic path before ARGUS collection. It is not a radar design, procurement recommendation, or claim that a Bangladesh Navy project exists. The corresponding machine-readable task state is in [`examples/workflows/coastal-surveillance-radar-bangladesh-navy.json`](../examples/workflows/coastal-surveillance-radar-bangladesh-navy.json).
 
-## 1. Taxonomy layer and input boundary
+## 1. Preserve and understand the whole context
 
-ATLAS preserves the untouched prompt, then uses its internal hierarchy to route the task before interpreting an outcome:
+ATLAS first reads the complete available context as one semantic unit. It does **not** classify `coastal`, `surveillance`, `radar`, `Bangladesh`, and `navy` independently and then attempt to reconstruct the meaning.
 
-- Domain: government and public sector
-- Sub-domain: defense and national security
-- Vertical: maritime defense
-- Artifact class: surveillance-sensor capability
+Whole-context interpretation:
 
-These are internal routing concepts, not external industry, product, customs, procurement, or legal codes. The layer identifies candidate schemes such as ISO 3166-1, UN ISIC, UN CPC, HS, UNSPSC, or the NATO Codification System; it does not assign a code until later context establishes applicability.
+> A coastal-surveillance radar product/capability context associated with the Bangladesh Navy in Bangladesh.
 
-## 2. Intent normalization and material context
+ATLAS preserves the untouched source prompt and the relationships between end user, jurisdiction, product and capability.
 
-ATLAS preserves the literal entities and capability terms:
+## 2. Normalize without changing meaning
 
-- `Bangladesh`
-- `navy`
-- `coastal surveillance radar`
+Normalized form:
 
-The request does not state the intended outcome. ATLAS does not silently reinterpret it as acquisition, technical design, market research, or operational planning.
+> **Coastal Surveillance Radar for the Bangladesh Navy**
 
-The Who/What/Where/When/Why/Which/How/How Much matrix is applied proportionally. Only missing answers that could change scope, authorization, safety, classification, or the deliverable become clarification questions.
+Only grammar, capitalization and canonical terminology are normalized. ATLAS does not infer a project, tender, procurement, budget, quantity, technical specification, lifecycle stage, supplier, OEM, delivery date, or authority chain.
 
-## 3. Task classification and depth
+## 3. Decompose only after the whole meaning is stable
 
-Initial task classes are `RESEARCH`, `ANALYSIS`, `PLANNING`, and `MULTI_STAGE`. Because the subject is defense-related and materially ambiguous, the initial execution depth is `L3`.
+ATLAS then derives the minimum useful semantic facets:
 
-## 4. Industry, product, capability, and other domain classification
-
-ATLAS resolves independent facets:
-
-| Facet | Result | State |
-|---|---|---|
-| Jurisdiction | Bangladesh (`ISO 3166-1: BD`) | Resolved |
-| Operator industry | Defence activities (`UN ISIC: 8422`) | Resolved |
-| Capability | Coastal surveillance radar | Resolved internal SKOS concept |
-| Supplier industry | Navigation/control equipment manufacturing (`UN ISIC: 2651`) | Conditional on supplier analysis |
-| Customs product | Radar and related radio apparatus (`HS 8526`) | Conditional on import/export or customs scope |
-| Lifecycle stage | Research, requirements, acquisition, design, integration, operation, or sustainment | Unresolved |
-| Information sensitivity | Public, controlled, restricted, classified, or unknown | Unresolved |
-
-Risk flags are `defense`, `dual-use`, `national-security`, and `operational-security`. Classification status is `PARTIAL`; no conditional code is treated as applicable yet.
-
-## 5. Material clarification gate
-
-ATLAS pauses detailed work and asks:
-
-> What outcome and lifecycle stage are intended—public market research, requirements definition, procurement planning, system design, integration, operation, or sustainment—and what information is authorized for use?
-
-This single question controls the downstream workflow. Until it is answered, task status is `BLOCKED` and domain-framework alignment is `RESEARCH_REQUIRED`.
-
-## 6. Conditional branch activation
-
-The answer determines which branches activate:
-
-| User intent | Activated classification and research |
+| Facet | High-confidence context |
 |---|---|
-| Public market research | Public-source supplier/product taxonomy, evidence quality, current-market verification |
-| Requirements definition | Capability taxonomy, systems engineering, safety, cybersecurity, human factors, spectrum and maritime requirements |
-| Procurement planning | Supplier industry, UNSPSC or applicable procurement scheme, Bangladesh procurement requirements, assurance and acceptance criteria |
-| Import/export analysis | WCO HS, competent export-control regimes for all relevant jurisdictions, licensing and end-use evidence |
-| Defense logistics | NATO Codification System only if applicable and authoritative code access is available |
-| Design or integration | Authorized technical scope, interface/security boundaries, verification strategy, and current engineering standards |
-| Operations or sustainment | Authorized operational scope, maintenance, availability, training, configuration, incident, and information-security controls |
+| Jurisdiction | Bangladesh (`ISO 3166-1: BD`) |
+| End user | Bangladesh Navy |
+| Domain | Defence / maritime surveillance / radar systems |
+| Buyer/end-user sector | Public administration / defence / naval-maritime defence |
+| Supply-side sector | Manufacturing / electronics / radar and sensor systems |
+| Operator industry | Defence activities (`UN ISIC: 8422`) |
+| Product family | Radar systems |
+| Product | Coastal surveillance radar |
+| Capability | Coastal / maritime surveillance |
+| Operating environment | Coastal / littoral / maritime |
 
-## 7. Binding-requirement and framework alignment
+Every derived facet must remain consistent with the original whole context.
 
-ATLAS next identifies applicable Bangladesh law, policy, procurement authority, spectrum authority, security classification, contractual requirements, and supplier/export jurisdictions. Only then does it select current international standards and professional frameworks. A candidate standard is recorded as applicable, not applicable, conditional, or research-required; alignment never becomes a compliance claim without evidence.
+## 4. Attach classification context proportionally
 
-Classification systems and governing requirements remain separate. ISO 3166-1, UN ISIC, UN CPC, HS, UNSPSC, and the NATO Codification System classify particular facets when applicable. Engineering standards, military standards, and Bangladesh procurement law or rules govern requirements and execution; their current official status and applicability must be verified rather than inferred from the prompt.
+ATLAS identifies relevant classification schemes without delaying handoff merely to force exact codes:
 
-## 8. Capability audit, plan, evidence, and approvals
+- ISO 3166 for jurisdiction;
+- UN ISIC and jurisdiction-specific activity classifications for economic activity;
+- UN CPC and relevant national/regional product classifications for product/service context;
+- UNSPSC or CPV when procurement classification becomes material;
+- WCO HS when customs/import/export becomes material;
+- NATO Codification System when defence logistics becomes material;
+- ATLAS capability vocabulary for internal capability concepts.
 
-The execution plan is built from the selected branch. It names required sources, unresolved dependencies, approval boundaries, verification methods, and deliverables. The required semantic capabilities are then mapped to the smallest admitted set of native host features, skills, plugins, tools, or specialist methods after provenance, permissions, security, dependencies, evidence, overlap, and fallback behavior are checked. Public-source analysis may proceed within the agreed scope. Access to restricted sources, external communications, procurement actions, publication, or other high-impact actions requires the relevant authorization.
+Known, supported mappings may be included. Conditional or unresolved mappings remain explicitly unresolved; ATLAS does not guess them.
 
-## 9. Data plane, assurance, and delivery
+## 5. Attach standards and best-practice context
 
-The data plane executes one authorized atomic unit at a time. Generated work is not considered verified: ATLAS checks requirements and evidence independently before it persists or delivers the result.
+ATLAS may quickly attach relevant framework families and best-practice lenses such as:
 
-The deliverable reports:
+- radar and radio-frequency / spectrum context;
+- electromagnetic compatibility;
+- systems engineering;
+- cybersecurity and information assurance;
+- interoperability and open interfaces;
+- quality and reliability;
+- maintainability and supportability;
+- lifecycle and total cost of ownership;
+- testing, acceptance and validation;
+- configuration and change management.
 
-- the interpreted objective and authorized scope;
-- resolved and unresolved classification facets;
-- applicable requirements and frameworks with editions and sources;
-- evidence, assumptions, conflicts, and gaps;
-- recommendations appropriate to the selected lifecycle stage;
-- verification performed and any decisions or approvals still required.
+These are **context lenses, not Bangladesh Navy requirements**. Exact applicability can be determined later from evidence.
 
-If the user answers, for example, “public market research for an early capability assessment; public information only,” ATLAS can safely continue into public-source capability criteria, market structure, standards research, and an evidence-backed options framework. It still does not infer permission for procurement, supplier contact, sensitive performance analysis, or operational planning.
+## 6. Preserve downstream unknowns without blocking
+
+The prompt does not establish, and ATLAS does not try to resolve before handoff:
+
+- whether any project or procurement exists;
+- lifecycle stage;
+- procurement route;
+- budget or funding;
+- quantity or number of sites;
+- technical specifications, frequency band, range or performance;
+- exact product, customs or procurement codes;
+- exact standards applicability;
+- selected or preferred supplier/OEM;
+- delivery timeline.
+
+These values travel downstream as unresolved context.
+
+**Unknown downstream facts are not a semantic blocker.**
+
+ATLAS blocks the normal semantic handoff only when the *meaning itself* is materially ambiguous—for example, an input such as `radar for bank` where the intended subject or entity cannot be reliably understood from the available context.
+
+## 7. Fast handoff to ARGUS
+
+For this example the semantic state is `READY` even though many real-world facts remain unknown.
+
+The handoff contains, in order:
+
+1. original whole context;
+2. normalized whole context;
+3. whole-context summary;
+4. high-confidence semantic facets;
+5. classification context and conditional candidates;
+6. standards / international best-practice framing;
+7. unresolved downstream context;
+8. risk flags and integrity metadata.
+
+ARGUS can then investigate what is actually true in the real world. ARGUS may return evidence and suggested refinements, but it cannot silently redefine ATLAS-owned meaning.
+
+## 8. Boundary of responsibility
+
+The operating distinction is:
+
+> **ATLAS asks: “What does the complete request mean, and how should it be framed?”**
+
+> **ARGUS asks: “What is actually true about it?”**
+
+This keeps ATLAS fast, deterministic and reliable while preserving enough structured context for deeper downstream intelligence work.

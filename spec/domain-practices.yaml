@@ -4,20 +4,21 @@ title: Domain standards and best-practice alignment
 status: active
 normative: true
 contract:
-  applicability: Every substantive task must assess relevant international standards, recognized professional frameworks, and current domain best practices.
+  applicability: Every substantive task assesses relevant standards, recognized professional frameworks, and current domain best-practice families proportionately to the immediate semantic need.
   semantic_normalization_contract: spec/semantic-normalization.yaml
+  whole_context_precondition: Standards and best-practice framing begins from the complete normalized whole context and must not reinterpret isolated terms outside their relationships.
   method:
-    - Start from the context-preserving semantic normalization snapshot and governed domain classification.
-    - Resolve the governed domain classification, including jurisdictions, buyer/end-user sector, supply-side sector, actor industries, products or services, platforms or systems, capabilities, lifecycle stages, information sensitivity, and risk flags.
-    - Resolve applicable binding requirements before voluntary frameworks.
-    - Prefer current official editions from international standards bodies and recognized professional authorities.
-    - Record each framework identifier or family, issuer, edition or version policy, official source, applicability, relationship to context, confidence, and implementation mapping.
+    - Start from the whole context-preserving semantic normalization snapshot and high-confidence governed domain classification.
+    - Identify only the standards, regulatory, professional-framework and best-practice families that can reliably frame downstream work from current context.
+    - Keep binding requirements distinct from contextual or candidate frameworks.
+    - Prefer current official editions from international standards bodies and recognized professional authorities when an exact edition is immediately material and available without a normalization research loop.
+    - Record framework identifier or family, issuer, edition/version policy when known, official source when known, applicability, relationship to context, confidence, and unresolved conditions.
     - Apply generic best-practice lenses proportionately across requirements/use case, lifecycle/total cost, safety/risk, quality/assurance, interoperability/open architecture, cybersecurity, maintainability/supportability, human factors/accessibility, sustainability/environment, testing/acceptance/validation, and configuration/change management.
-    - Tailor recommendations to context without silently weakening mandatory controls.
-    - Record justified deviations, conflicts, gaps, unresolved applicability, and unavailable evidence.
-    - Recheck currency when standards, regulations, or professional guidance may have changed.
+    - Preserve exact applicability, jurisdiction-specific requirements, lifecycle-specific requirements and unavailable evidence as unresolved downstream context rather than blocking a semantically clear handoff.
+    - Tailor context without silently weakening any binding control already established by accepted evidence.
   best_practice_boundary: Best practice is context, not a binding requirement. A best-practice lens becomes a requirement only when an authoritative source, user constraint, contract, law, regulation, standard, or approved specification makes it binding.
-  handoff: When a specialist domain method is routed, the resolved semantic, classification and domain-alignment snapshots are transferred unchanged through spec/domain-handoff.yaml; specialist methods may add domain interpretation but must not silently replace ATLAS-owned applicability or framework conclusions.
+  handoff: When a specialist domain method is routed, the whole semantic context is transferred first, followed by high-confidence classification and standards/best-practice framing plus unresolved applicability. Specialist methods may add evidence and interpretation but must not silently replace ATLAS-owned meaning or convert candidates into requirements.
+  handoff_non_blocking_rule: RESEARCH_REQUIRED framework applicability does not by itself block ARGUS when whole-context meaning is clear; exact applicability may be resolved downstream.
   precedence:
     - applicable_law_and_regulation
     - explicit_binding_user_or_contract_requirements
@@ -26,13 +27,15 @@ contract:
     - authoritative_domain_guidance
     - local_or_project_practices
   result_states:
-    ALIGNED: Applicable frameworks are identified and mapped, without implying certified compliance.
-    RESEARCH_REQUIRED: No adequate current authoritative framework has yet been established.
-    NOT_APPLICABLE: A documented assessment found no material domain framework for the task.
-  compliance_rule: Never claim compliance, certification, accreditation, or conformity without scope-specific verification evidence from a competent process.
-  proportionality: L0 and L1 tasks may omit explicit alignment when no domain standard could materially change the result; L2-L4 tasks record the assessment.
+    ALIGNED: Sufficient framework families or applicable frameworks are identified for the immediate semantic frame, without implying certified compliance.
+    RESEARCH_REQUIRED: Exact or authoritative framework applicability requires downstream research; this state is handoff-safe when semantic meaning is clear.
+    NOT_APPLICABLE: A documented assessment found no material domain framework for the immediate context.
+  compliance_rule: Never claim compliance, certification, accreditation, conformity, or mandatory applicability from contextual framing alone.
+  proportionality: Resolve only what materially improves immediate semantic framing. Do not delay handoff to complete lifecycle, procurement, specification, exact-code, or standards-applicability research.
   extensibility: The framework registry is a governed baseline, not an exhaustive global catalog.
 invariants:
+  - INV-001
+  - INV-002
   - INV-006
   - INV-016
   - INV-018

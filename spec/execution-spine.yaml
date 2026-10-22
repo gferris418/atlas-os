@@ -4,17 +4,17 @@ title: Canonical ATLAS execution spine
 status: active
 normative: true
 contract:
-  input_boundary: Preserve the untouched prompt/event, critical literals, named entities, attachments and relevant upstream context before semantic processing.
+  input_boundary: Preserve the untouched prompt/event, critical literals, named entities, attachments, conversation context and relevant upstream context before semantic processing.
   layers:
     - id: 0
       name: INTENT_AND_TARGET_INTERPRETATION
-      purpose: Resolve objective, task intent, target objects, requested outcome, constraints, jurisdiction, time/freshness, sensitivity and required output without losing original literals.
+      purpose: Read the entire available context as one semantic unit first. Establish overall meaning, objective, task intent, requested outcome, actors, target objects, relationships, constraints, jurisdiction, time/freshness, sensitivity and critical literals before any decomposition or classification.
     - id: 1
       name: COLLECTION_NEED_GATE
       purpose: Select NONE, ATLAS_DIRECT, ARGUS_COLLECTION or HYBRID independently of task intent. ARGUS activation is based on structured collection need, not an analytical keyword.
     - id: 2
       name: CONDITIONAL_DOMAIN_CONTEXT
-      purpose: Perform context-preserving semantic normalization and resolve material ATLAS-owned domain, sector, industry, product/service, platform/system, capability, economic/procurement/trade classification, law, standards, frameworks, international best-practice lenses, benchmarks and evidence precedence. Normalization must preserve intent and must not create unsupported real-world facts.
+      purpose: Normalize the whole context first, then decompose only as required and resolve high-confidence ATLAS-owned domain, sector, industry, product/service, platform/system, capability, economic/procurement/trade classification, standards, frameworks and international best-practice lenses. Reconcile decomposed facets back to the whole. Downstream unknowns remain unresolved and do not block handoff when meaning is clear.
     - id: 3
       name: CAPABILITY_AND_EXECUTION_PLAN
       purpose: Build the dependency-aware plan, approvals, semantic capability needs, provider admission and digest-bound routing preview.
@@ -49,15 +49,16 @@ contract:
     - PERSISTENCE
     - DELIVERY
   compatibility: Runtime traces may retain REQUEST_TRIAGE and INTELLIGENCE request-route labels for host compatibility; collection_mode is authoritative for ARGUS activation.
-  optimization: Prefer the minimum sufficient path. Ordinary tasks and policy/rule analysis do not incur ARGUS cost unless structured collection is materially required.
-  semantic_normalization: spec/semantic-normalization.yaml governs context-preserving rewrite, multi-axial semantic framing, classification context, standards and international best-practice lenses before specialist execution.
+  optimization: Prefer the minimum sufficient path. Whole-context interpretation, normalization and high-confidence local classification should be fast; do not enter a research loop merely to resolve downstream lifecycle, procurement, specification, exact-code or standards-applicability questions before ARGUS handoff.
+  semantic_normalization: spec/semantic-normalization.yaml governs whole-context-first understanding, context-preserving rewrite, decomposition, multi-axial semantic framing, classification context, standards and international best-practice lenses before specialist execution.
   collection_gate: The canonical ARGUS capability is intelligence_collection. ARGUS_COLLECTION and HYBRID are the only collection modes that may propose ARGUS routing.
-  taxonomy_gate: Classification is multi-axial and conditional. Domain, buyer/end-user sector, supply-side sector, industry, product/service, platform/system, procurement category, customs code and capability are distinct concepts.
+  taxonomy_gate: Classification is multi-axial and conditional. Domain, buyer/end-user sector, supply-side sector, industry, product/service, platform/system, procurement category, customs code and capability are distinct concepts. Classification completeness is not a prerequisite for handoff when semantic meaning is clear.
+  semantic_handoff_gate: Material ambiguity in the meaning of the whole context may block specialist activation; unresolved downstream facts do not.
   capability_gate: Availability is not admission. Providers must satisfy capability-admission, permission, provenance, dependency, conflict and fallback controls before routing.
   routing_preview_gate: Provider invocation requires the digest-bound preview and applicable approval state; changed proposals require a new preview.
   visibility: One ATLAS plan and execution spine governs all visible state. ARGUS does not create a competing spine.
   resume: Reconcile persisted state against actual external state before continuing.
-invariants: [INV-003, INV-007, INV-008, INV-009, INV-021]
+invariants: [INV-001, INV-002, INV-003, INV-007, INV-008, INV-009, INV-021]
 references:
   - spec/request-triage.yaml
   - spec/collection-routing.yaml

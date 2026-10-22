@@ -17,20 +17,45 @@ It is **not a desktop operating system** and does not replace the host model, co
 Human / Event
   -> Mission Control
   -> Control Plane
-  -> Intent + Target Interpretation
+  -> Whole-Context Interpretation
+  -> Context-Preserving Semantic Normalization
   -> Collection-Need Gate
        -> NONE
        -> ATLAS_DIRECT
        -> ARGUS_COLLECTION -> ARGUS bounded collection -> evidence package
        -> HYBRID           -> ARGUS collection + ATLAS substantive work
+  -> Decompose Only As Required
+  -> High-Confidence Domain / Sector / Industry / Product / Capability Framing
+  -> Classification + Standards / Best-Practice Context
   -> Canonical Capability Planning
-  -> Domain Context Services
   -> Data Plane
   -> Evidence Governance / Assurance / Verification
   -> Output / Persistence
   -> Observability
   -> Dashboard
 ```
+
+### Core semantic rule
+
+ATLAS always reads the **entire available context as a whole before breaking it apart**. It establishes the overall meaning, intent, requested outcome, actors, relationships, jurisdiction, constraints, qualifiers and critical literals first. Only then may it decompose the request into domain, sector, industry, product/service, platform/system, operating environment, capability, classifications, standards and best-practice lenses.
+
+The fast path is:
+
+```text
+whole context
+  -> preserve
+  -> understand
+  -> normalize
+  -> decompose only as required
+  -> classify high-confidence context
+  -> attach standards / best-practice framing
+  -> mark downstream unknowns
+  -> handoff
+```
+
+ATLAS resolves only what can be determined quickly and reliably from the supplied context and local governed registries. It does not enter a research loop merely to complete lifecycle stage, procurement route, budget, quantity, technical specification, exact classification codes, exact standards applicability, funding, supplier/OEM or delivery timing before an ARGUS handoff.
+
+**Unknown downstream facts are not semantic blockers.** Material ambiguity in the meaning itself is the normal semantic reason to block a specialist handoff.
 
 ### Mission Control
 Human supervisory command: objectives, approvals, rejection, pause/resume/abort, priorities, scope, collection expansion/reduction and permitted exceptions.
@@ -68,13 +93,25 @@ Research discovers evidence; Evidence Governance determines what that evidence c
 Execution Governance owns authority, approval scope, side-effect classification, idempotency, retry/compensation, failure/resume state, escalation, kill-switch behavior and audit receipts. Agent Security applies install/activate/execute/verify gates to external capabilities and treats retrieved content, provider instructions and tool outputs as untrusted until assessed.
 
 ### Domain Context Services
-ATLAS owns canonical terminology, taxonomy, economic sector context, operator/supplier industry, product/service, procurement, trade/customs and defense-logistics classification plus ontology, law, standards, professional frameworks, benchmarks and evidence precedence. `spec/domain-intelligence.yaml` remains only as a deprecated compatibility alias to this layer and is not an active machine authority.
+ATLAS owns canonical whole-context semantics, terminology, taxonomy, buyer/end-user sector, supply-side sector, operator/supplier industry, product/service, platform/system, operating environment, capability, procurement, trade/customs and defense-logistics classification plus ontology, law, standards, professional frameworks, benchmarks and evidence precedence.
+
+Classification is proportional and high-confidence-first. Exact codes and exact framework applicability can remain unresolved without blocking a semantically clear handoff. `spec/domain-intelligence.yaml` remains only as a deprecated compatibility alias to this layer and is not an active machine authority.
 
 ### Data Plane
 ATLAS performs substantive work: ordinary research, writing, calculation, coding, policy analysis, comparison, strategic analysis, forecasting, scenarios, opportunity qualification and decision support.
 
 ### ARGUS Intelligence Collection
 ARGUS activates only when `collection_mode` is `ARGUS_COLLECTION` or `HYBRID`. Its canonical capability is `intelligence_collection` / `argus.collection`.
+
+Before ARGUS activation, ATLAS passes a governed handoff containing, in order:
+
+1. whole normalized semantic context;
+2. high-confidence classification context;
+3. standards / international best-practice framing;
+4. explicit downstream unknowns;
+5. risk flags and integrity metadata.
+
+A handoff may be `READY` even when lifecycle, procurement, budget, quantity, specification, exact codes, standards applicability or supplier/OEM remain unresolved. `BLOCKED` is reserved for material meaning ambiguity or another explicit Control Plane prohibition.
 
 Within an ATLAS-authorized mission ARGUS uses the bounded method `PIR -> EEI -> Collection Plan -> Source Plan -> Collect -> Resolve -> Grade -> Competing Hypotheses -> Gaps -> Package`. It may resolve targets, discover/acquire sources, extract/normalize evidence, resolve entities/events/relationships, deduplicate, propose classifications/evidence grades, corroborate and expose conflicts/gaps/coverage. ATLAS retains canonical Evidence Governance, classification acceptance, analysis, final business decisions, assurance, persistence and delivery.
 
@@ -87,6 +124,7 @@ Task intent and collection mechanism are independent.
 | Bangladesh Bank foreign exchange policy | economic-policy-intelligence | ATLAS_DIRECT | No |
 | ST Engineering | target collection | ARGUS_COLLECTION | Yes |
 | Coastal patrol vessel for Bangladesh Coast Guard | procurement-intelligence | ARGUS_COLLECTION | Yes |
+| Coastal surveillance radar for Bangladesh Navy | procurement-intelligence | ARGUS_COLLECTION | Yes |
 | Seed cum cleaner for BADC | procurement-intelligence | ARGUS_COLLECTION | Yes |
 | Annual procurement plan of Bangladesh Navy | procurement-intelligence | ARGUS_COLLECTION | Yes |
 | Explain Bangladesh Navy procurement regulations | policy/procurement analysis | ATLAS_DIRECT | No |
@@ -120,24 +158,28 @@ Core governed schemes include:
 - Bangladesh Customs Operative Tariff FY 2026-27 for current Bangladesh customs contexts;
 - NATO Codification System when defense logistics is materially applicable.
 
-Crosswalks are explicit (`EXACT`, `CLOSE`, `BROADER`, `NARROWER`, `RELATED`) with source/target scheme edition, code, label, basis, provenance, verification and confidence. Classification never proves compliance, procurement eligibility or legal status.
+Crosswalks are explicit (`EXACT`, `CLOSE`, `BROADER`, `NARROWER`, `RELATED`, `CANDIDATE`) with source/target scheme edition, code, label, basis, provenance, verification and confidence. Classification never proves compliance, procurement eligibility or legal status. Unresolved exact codes remain unresolved rather than guessed.
 
 ## Execution spine
 
-1. preserve raw input/context;
-2. interpret intent and targets;
-3. decide collection mode;
-4. select the canonical capability plan;
-5. resolve material Domain Context Services and classification crosswalks;
-6. establish plan/providers/approvals;
-7. execute ATLAS work and any authorized ARGUS collection work unit;
-8. apply Evidence Governance and independent assurance/verification;
-9. output and persist through authorized receipts;
-10. project operational state through Observability/Dashboard.
+1. preserve the whole raw input/context;
+2. understand the complete context and relationships;
+3. normalize the whole context without semantic drift;
+4. interpret intent and targets;
+5. decide collection mode;
+6. decompose only as required;
+7. resolve high-confidence Domain Context Services, classification and standards/best-practice framing;
+8. mark downstream unknowns without blocking a clear handoff;
+9. select the canonical capability plan and establish providers/approvals;
+10. execute ATLAS work and any authorized ARGUS collection work unit;
+11. apply Evidence Governance and independent assurance/verification;
+12. output and persist through authorized receipts;
+13. project operational state through Observability/Dashboard.
 
 ## Machine-readable authority
 
 AI systems begin at `atlas-ai.yaml`; `atlas-os.yaml` remains product/release authority. Key active contracts include:
+- `spec/semantic-normalization.yaml`
 - `spec/mission-control.yaml`
 - `spec/control-plane.yaml`
 - `spec/request-triage.yaml`
@@ -149,6 +191,7 @@ AI systems begin at `atlas-ai.yaml`; `atlas-os.yaml` remains product/release aut
 - `spec/classification-crosswalk.yaml`
 - `spec/domain-capabilities.yaml`
 - `spec/domain-context-services.yaml`
+- `spec/domain-handoff.yaml`
 - `spec/execution-spine.yaml`
 - `spec/observability.yaml`
 - `spec/dashboard.yaml`

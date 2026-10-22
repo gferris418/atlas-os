@@ -107,6 +107,7 @@ class ExecutionResult:
     request_route: str
     request_triage: dict[str, Any]
     normalized_intent: str
+    semantic_context: dict[str, Any]
     task_classes: tuple[str, ...]
     plan: tuple[str, ...]
     active_unit: str | None
@@ -182,14 +183,39 @@ def _partial_intelligence_alignment() -> dict[str, Any]:
     }
 
 
+def _semantic_context(
+    original: str,
+    normalized: str,
+    domain_classification: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Build the fast whole-context snapshot used for specialist handoff.
+
+    The runtime does not convert downstream research gaps into semantic ambiguity.
+    Explicit material clarification remains a separate control-plane concern.
+    """
+    notes = [] if original.strip() == normalized else [
+        "Whitespace and surface form normalized without changing intended meaning."
+    ]
+    return {
+        "status": "READY",
+        "original_input": original,
+        "normalized_input": normalized,
+        "whole_context_summary": normalized,
+        "normalization_notes": notes,
+        "meaning_ambiguities": [],
+        "unresolved_context": list(dict.fromkeys(domain_classification.get("unresolved_facets", []))),
+    }
+
+
 def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     """Compile current ATLAS state through one stable public interface.
 
-    Request triage is the first semantic gate. Ordinary searches and tasks stay
-    on the direct ATLAS path. Structured collection activates ARGUS only through
-    an ATLAS-owned Collection-Need Gate, bounded collection mission, governed
-    domain handoff, and approved provider preview. Sensitive collection retains
-    ATLAS classification and clarification controls before delegation.
+    ATLAS reads and normalizes the whole context first, then performs only the
+    high-confidence classification and framing needed for reliable downstream
+    work. Structured collection activates ARGUS through the Collection-Need Gate,
+    bounded collection mission, governed whole-context handoff, and approved
+    provider preview. Downstream unknowns remain visible but do not become normal
+    semantic blockers.
     """
 
     started = perf_counter_ns()
@@ -276,21 +302,20 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
             registry_items("frameworks"),
             substantive=substantive,
         )
-        # A bounded collection mission may carry unresolved sensitive facets as a
-        # PARTIAL handoff when no clarification was requested. Explicit PENDING
-        # clarification still blocks. Risks and unresolved facets remain visible.
+        # Collection-bound work carries unresolved classification/framework context
+        # forward rather than forcing a research loop inside ATLAS.
         if collection_route and envelope.clarification_status in {"RESOLVED", "NOT_REQUIRED"}:
             if domain_classification.get("status") == "RESEARCH_REQUIRED":
                 domain_classification = {
                     **domain_classification,
                     "status": "PARTIAL",
-                    "next_action": "Carry unresolved sensitive facets and risk flags into the bounded collection mission.",
+                    "next_action": "Carry unresolved context into the bounded collection mission.",
                 }
             if domain_alignment.get("status") == "RESEARCH_REQUIRED":
                 domain_alignment = {
                     **domain_alignment,
                     "status": "PARTIAL",
-                    "next_action": "Carry unresolved framework questions forward without transferring ATLAS authority.",
+                    "next_action": "Carry unresolved framework applicability downstream without transferring ATLAS authority.",
                 }
     elif intelligence_route:
         substantive = False
@@ -318,6 +343,12 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
             registry_items("frameworks"),
             substantive=False,
         )
+
+    semantic_context = _semantic_context(
+        envelope.objective,
+        normalized,
+        domain_classification,
+    )
 
     collection_mission: dict[str, Any] | None = None
     if collection_route and envelope.task_id is not None:
@@ -368,26 +399,10 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     routing_decisions: list[dict[str, Any]] = []
     candidate_active_unit: str | None = None
 
-    if (
-        material_domain_context
-        and substantive
-        and envelope.clarification_status != "RESOLVED"
-        and not (collection_route and envelope.clarification_status == "NOT_REQUIRED")
-    ):
-        if not completeness["complete"]:
-            blocking_stage = "MATERIAL_CONTEXT_MATRIX"
-            blocker = "Clarify material context: " + ", ".join(completeness["questions"])
-        elif domain_classification["status"] != "CLASSIFIED":
-            blocking_stage = "DOMAIN_CLASSIFICATION"
-            blocker = domain_classification["next_action"]
-        elif domain_alignment["status"] == "RESEARCH_REQUIRED":
-            blocking_stage = "DOMAIN_FRAMEWORK_ALIGNMENT"
-            blocker = domain_alignment["next_action"]
-    if (
-        blocking_stage is None
-        and routing_preview["status"] == "PROPOSED"
-        and envelope.clarification_status == "PENDING"
-    ):
+    # Classification completeness and framework applicability are informational at
+    # this seam. Explicit unresolved material clarification blocks every dependent
+    # execution path, whether or not provider routing is required.
+    if envelope.clarification_status == "PENDING":
         blocking_stage = "MATERIAL_CONTEXT_MATRIX"
         blocker = "Resolve material clarification before provider routing or execution."
     if blocking_stage is None and routing_preview["status"] == "PROPOSED":
@@ -471,6 +486,8 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
                             handoff = prepare_domain_context_handoff(
                                 {
                                     "id": envelope.task_id,
+                                    "inputs": [{"type": "user_prompt", "value": envelope.objective}],
+                                    "semantic_context": semantic_context,
                                     "domain_classification": domain_classification,
                                     "domain_alignment": domain_alignment,
                                 },
@@ -522,9 +539,7 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
 
     plan_status = "BLOCKED" if blocking_stage else "READY"
     clarification_status = (
-        "PENDING"
-        if blocking_stage in {"MATERIAL_CONTEXT_MATRIX", "DOMAIN_CLASSIFICATION", "DOMAIN_FRAMEWORK_ALIGNMENT"}
-        else envelope.clarification_status
+        "PENDING" if blocking_stage == "MATERIAL_CONTEXT_MATRIX" else envelope.clarification_status
     )
     active_unit = None
     if not blocking_stage:
@@ -604,6 +619,7 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         request_route=request_triage["route"],
         request_triage=request_triage,
         normalized_intent=normalized,
+        semantic_context=semantic_context,
         task_classes=task_classes,
         plan=plan,
         active_unit=active_unit,

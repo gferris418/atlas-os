@@ -256,10 +256,12 @@ class RepositoryContractTests(unittest.TestCase):
             .read_text(encoding="utf-8")
         )
         jsonschema.validate(example, schema)
-        self.assertEqual("PARTIAL", example["domain_classification"]["status"])
-        self.assertEqual("BLOCKED", example["status"])
-        self.assertIn("lifecycle-stage", example["domain_classification"]["unresolved_facets"])
-        self.assertIn("information-sensitivity", example["domain_classification"]["unresolved_facets"])
+        self.assertEqual("READY", example["semantic_context"]["status"])
+        self.assertEqual("CLASSIFIED", example["domain_classification"]["status"])
+        self.assertEqual("ACTIVE", example["status"])
+        self.assertEqual([], example["domain_classification"]["unresolved_facets"])
+        self.assertIn("lifecycle-stage", example["semantic_context"]["unresolved_context"])
+        self.assertIn("specific-standard-applicability", example["semantic_context"]["unresolved_context"])
 
 
 if __name__ == "__main__":

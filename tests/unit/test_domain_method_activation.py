@@ -31,25 +31,32 @@ class DomainMethodActivationTests(unittest.TestCase):
         return self._registry()["items"][0]
 
     def _handoff(self, *, state: str = "READY", consumer: str = "ARGUS") -> dict:
-        classification_status = "CLASSIFIED" if state == "READY" else "PARTIAL"
-        alignment_status = "ALIGNED"
-        if state == "BLOCKED":
-            alignment_status = "RESEARCH_REQUIRED"
+        ambiguous = state == "BLOCKED"
+        unresolved = ["procurement-route"] if state == "DOWNSTREAM_UNRESOLVED" else []
         task = {
             "id": "TASK-ARGUS-ACTIVATION",
+            "semantic_context": {
+                "status": "AMBIGUOUS" if ambiguous else "READY",
+                "original_input": "coastal surveillance radar for Bangladesh navy" if not ambiguous else "radar for bank",
+                "normalized_input": "Coastal Surveillance Radar for the Bangladesh Navy" if not ambiguous else "radar for bank",
+                "whole_context_summary": None,
+                "normalization_notes": [],
+                "meaning_ambiguities": ["meaning is ambiguous"] if ambiguous else [],
+                "unresolved_context": unresolved,
+            },
             "domain_classification": {
-                "status": classification_status,
+                "status": "PARTIAL" if unresolved else "CLASSIFIED",
                 "facets": {},
                 "taxonomy_references": [],
                 "risk_flags": [],
-                "unresolved_facets": [] if state == "READY" else ["procurement-route"],
+                "unresolved_facets": unresolved,
                 "conditional_candidates": [],
                 "evidence": [],
                 "next_action": None,
             },
             "domain_alignment": {
                 "domains": ["government-opportunity-intelligence"],
-                "status": alignment_status,
+                "status": "RESEARCH_REQUIRED" if unresolved else "ALIGNED",
                 "frameworks": [],
                 "applicability": {},
                 "deviations": [],
@@ -84,7 +91,7 @@ class DomainMethodActivationTests(unittest.TestCase):
                 handoff=self._handoff(),
             )
 
-    def test_missing_or_blocked_handoff_blocks_dependent_activation(self) -> None:
+    def test_missing_or_semantically_ambiguous_handoff_blocks_dependent_activation(self) -> None:
         missing = route_domain_method(
             "government_public_sector_opportunity_intelligence",
             self._registry(),
@@ -101,12 +108,12 @@ class DomainMethodActivationTests(unittest.TestCase):
         self.assertEqual("BLOCKED", blocked["status"])
         self.assertEqual("HANDOFF_STATE_NOT_ACCEPTED", blocked["reason"])
 
-    def test_partial_handoff_may_activate_with_unresolved_context_preserved(self) -> None:
+    def test_unresolved_downstream_context_does_not_block_argus(self) -> None:
         decision = route_domain_method(
             "government_public_sector_opportunity_intelligence",
             self._registry(),
             execution_context=self._context(),
-            handoff=self._handoff(state="PARTIAL"),
+            handoff=self._handoff(state="DOWNSTREAM_UNRESOLVED"),
         )
         self.assertEqual("ACTIVATE", decision["status"])
         self.assertEqual(["procurement-route"], decision["unresolved_material"])

@@ -1,7 +1,7 @@
 {
   "id": "TASK-BD-NAVY-RADAR-001",
-  "objective": "Determine the authorized scope and applicable governance for a Bangladesh Navy coastal-surveillance-radar task",
-  "status": "BLOCKED",
+  "objective": "Coastal Surveillance Radar for the Bangladesh Navy",
+  "status": "ACTIVE",
   "classification": ["RESEARCH", "ANALYSIS", "PLANNING", "MULTI_STAGE"],
   "execution_depth": "L3",
   "dependencies": [],
@@ -13,14 +13,14 @@
   ],
   "outputs": [
     {
-      "type": "material_question",
-      "value": "What outcome and lifecycle stage are intended, and what information is authorized for use?"
+      "type": "semantic_context",
+      "value": "Whole-context meaning normalized and ready for downstream ARGUS collection."
     }
   ],
   "evidence": [
     {
       "class": "SUPPORTED",
-      "claim": "The prompt identifies Bangladesh, a navy operator, and a coastal-surveillance-radar capability.",
+      "claim": "The whole prompt identifies Bangladesh, the Bangladesh Navy as end user, and coastal surveillance radar as the product/capability context.",
       "provenance": ["user_prompt", "registry.classifications"]
     }
   ],
@@ -28,12 +28,33 @@
   "verification": [],
   "assumptions": [
     {
-      "value": "No operational, classified, procurement, design, or export scope is assumed until clarified.",
+      "value": "No project, procurement, budget, quantity, exact specification, supplier, lifecycle stage, or exact standards applicability is inferred.",
       "class": "ASSUMED"
     }
   ],
+  "semantic_context": {
+    "status": "READY",
+    "original_input": "coastal surveillance radar for Bangladesh navy",
+    "normalized_input": "Coastal Surveillance Radar for the Bangladesh Navy",
+    "whole_context_summary": "A coastal-surveillance radar product/capability context associated with the Bangladesh Navy in Bangladesh.",
+    "normalization_notes": [
+      "Capitalization and grammar normalized without changing meaning."
+    ],
+    "meaning_ambiguities": [],
+    "unresolved_context": [
+      "project-or-procurement-existence",
+      "lifecycle-stage",
+      "procurement-route",
+      "budget",
+      "quantity",
+      "technical-specification",
+      "exact-product-classification-codes",
+      "specific-standard-applicability",
+      "supplier-or-oem"
+    ]
+  },
   "domain_classification": {
-    "status": "PARTIAL",
+    "status": "CLASSIFIED",
     "classification_sequence": [
       "TAXONOMY_SELECTION",
       "JURISDICTION_CLASSIFICATION",
@@ -83,7 +104,7 @@
       "taxonomy.un-isic"
     ],
     "risk_flags": ["defense", "dual-use", "national-security", "operational-security"],
-    "unresolved_facets": ["lifecycle-stage", "information-sensitivity"],
+    "unresolved_facets": [],
     "conditional_candidates": [
       {
         "id": "classification.industry.navigation-equipment-manufacturing",
@@ -99,17 +120,17 @@
       }
     ],
     "evidence": ["user_prompt", "registries/classifications.yaml"],
-    "next_action": "Clarify intended outcome, lifecycle stage, authorization, and information sensitivity before framework selection."
+    "next_action": null
   },
   "domain_alignment": {
     "domains": ["defense", "maritime-surveillance", "radar-systems"],
-    "status": "RESEARCH_REQUIRED",
+    "status": "ALIGNED",
     "frameworks": [],
     "applicability": {
-      "reason": "Framework selection is deferred until the lifecycle, jurisdictional, and information-sensitivity scope is resolved."
+      "context": "Relevant radar, RF/spectrum, EMC, systems-engineering, cybersecurity, interoperability, quality and testing families are contextual lenses; exact applicability is deferred downstream."
     },
     "deviations": [],
-    "compliance": "UNVERIFIED",
+    "compliance": "NOT_CLAIMED",
     "evidence": []
   }
 }
