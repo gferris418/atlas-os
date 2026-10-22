@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import patch
 
 import atlas_runtime.runtime as runtime_module
-from atlas_runtime import ARGUS_APPROVAL, ExecutionEnvelope, PRE_EXECUTION_FLOW, execute
+from atlas_runtime import ARGUS_APPROVAL, ExecutionEnvelope, PRE_EXECUTION_FLOW, execute, quality_requirements
 
 
 class RuntimeTests(unittest.TestCase):
@@ -71,6 +71,60 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual("ATLAS", result.next_step_authority)
         self.assertIn("PROVIDER_RETURN_RECONCILIATION", result.execution_trace)
         self.assertIn("REROUTE", result.dashboard["next_action"])
+
+    def test_provider_return_with_insufficient_ledger_continues_collection(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective="Explain procurement policy.",
+            provider_result={
+                "provider": "research",
+                "status": "complete",
+                "quality_ledger": {
+                    "achieved_tier": "Q1",
+                    "passed_requirements": [],
+                    "evidence_confidence": 0.99,
+                    "irreducible_gaps": [],
+                },
+            },
+        ))
+        self.assertEqual("QUALITY_GATE_BLOCKED", result.state)
+        self.assertEqual("CONTINUE", result.dashboard["quality_gate"])
+        self.assertIn("targeted collection", result.dashboard["next_action"].lower())
+
+    def test_provider_return_with_sufficient_ledger_advances_to_final_verify(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective="Explain procurement policy.",
+            provider_result={
+                "provider": "research",
+                "status": "complete",
+                "quality_ledger": {
+                    "achieved_tier": "Q2",
+                    "passed_requirements": list(quality_requirements("Q2")),
+                    "evidence_confidence": 0.92,
+                    "irreducible_gaps": [],
+                },
+            },
+        ))
+        self.assertEqual("READY_FOR_FINAL_VERIFY", result.state)
+        self.assertEqual("PASS", result.dashboard["quality_gate"])
+        self.assertEqual("FINAL_VERIFY", result.dashboard["active_stage"])
+
+    def test_provider_return_with_irreducible_gap_is_not_silently_passed(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective="Explain procurement policy.",
+            provider_result={
+                "provider": "research",
+                "status": "complete",
+                "quality_ledger": {
+                    "achieved_tier": "Q1",
+                    "passed_requirements": [],
+                    "evidence_confidence": 0.99,
+                    "irreducible_gaps": ["official source unavailable"],
+                },
+            },
+        ))
+        self.assertEqual("QUALITY_GAP_DISCLOSED", result.state)
+        self.assertEqual("IRREDUCIBLE_GAP", result.dashboard["quality_gate"])
+        self.assertIn("official source unavailable", result.dashboard["quality_gaps"])
 
     def test_generated_task_id_is_deterministic(self) -> None:
         first = execute(ExecutionEnvelope(objective="Explain procurement policy."))
