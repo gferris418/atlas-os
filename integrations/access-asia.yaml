@@ -1,12 +1,12 @@
 id: integration.access-asia
-version: 3.1.0
+version: 3.2.0
 status: active
 role: deployment_profile
 scope: Access Asia storage and system-of-record routing. This profile is not ATLAS core architecture.
 authority:
   atlas_github: execution_and_governance
   argus_github: ARGUS schemas, identity rules, commercial-data rules, migrations, methods, tests, and versioned release baselines
-  sharepoint: documents, working files, and the SharePoint-hosted operational database
+  sharepoint: documents, working files, chat-event audit files, and the SharePoint-hosted operational database
   sharepoint_sqlite: canonical_commercial_graph_and_argus_current_state
   hubspot: crm_relationship_engagement_and_contactability
 argus_operational_store:
@@ -28,6 +28,16 @@ argus_operational_store:
     - recheck_sharepoint_target_before_replace
     - replace_same_sharepoint_file
     - verify_uploaded_target_and_version
+chat_event_archive:
+  target: SHAREPOINT
+  root: General/Business Intelligence/30_OPERATIONS/CHAT_LOGS
+  path_template: General/Business Intelligence/30_OPERATIONS/CHAT_LOGS/YYYY-MM/CHAT_<conversation-id>_T<turn-number>.md
+  writer_authority: ATLAS
+  mutation_model: immutable_per_completed_turn
+  event_boundary: completed_user_assistant_turn
+  no_per_token_writes: true
+  verification_required: true
+  host_boundary: if the active host does not expose an authorized durable write or post-turn event hook, report persistence as UNAVAILABLE or PENDING rather than claiming continuous background persistence
 persistence_routing:
   CANONICAL_ORGANIZATION: SHAREPOINT_SQLITE
   CANONICAL_PERSON: SHAREPOINT_SQLITE
@@ -58,6 +68,7 @@ persistence_routing:
   FINANCIAL_EVIDENCE_DOCUMENT: SHAREPOINT
   CLASSIFICATION_SOURCE_DOCUMENT: SHAREPOINT
   LARGE_OR_RESTRICTED_CLASSIFICATION_SOURCE_DOCUMENT: SHAREPOINT
+  CONVERSATION_EVENT: SHAREPOINT
   ARGUS_CURRENT_STRUCTURED_STATE: SHAREPOINT_SQLITE
   ARGUS_SCHEMA_AND_IDENTITY_RULES: ARGUS_GITHUB
   ARGUS_COMMERCIAL_DATA_RULES: ARGUS_GITHUB
