@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Final
+from typing import Any, Final, Mapping
 
 QUALITY_TIERS: Final[tuple[str, ...]] = ("Q0", "Q1", "Q2", "Q3", "Q4", "Q5")
 
@@ -129,3 +129,46 @@ def determine_required_quality_tier(objective: str, requested_floor: str | None 
         return automatic
     quality_rank(requested_floor)
     return max_quality_tier(automatic, requested_floor)
+
+
+def evaluate_quality_gate(required_tier: str, ledger: Mapping[str, Any]) -> dict[str, Any]:
+    """Evaluate whether provider evidence satisfies the required assurance tier."""
+    quality_rank(required_tier)
+    achieved_tier = ledger.get("achieved_tier")
+    if not isinstance(achieved_tier, str):
+        achieved_tier = "Q0"
+    quality_rank(achieved_tier)
+
+    passed_raw = ledger.get("passed_requirements", ())
+    passed_requirements = {
+        item for item in passed_raw if isinstance(item, str)
+    } if isinstance(passed_raw, (list, tuple, set, frozenset)) else set()
+
+    blocking_reasons: list[str] = []
+    if quality_rank(achieved_tier) < quality_rank(required_tier):
+        blocking_reasons.append("achieved_quality_below_required")
+
+    for requirement in quality_requirements(required_tier):
+        if requirement not in passed_requirements:
+            blocking_reasons.append(f"missing_requirement:{requirement}")
+
+    gaps_raw = ledger.get("irreducible_gaps", ())
+    irreducible_gaps = [
+        item for item in gaps_raw if isinstance(item, str) and item.strip()
+    ] if isinstance(gaps_raw, (list, tuple)) else []
+
+    if not blocking_reasons:
+        status = "PASS"
+    elif irreducible_gaps:
+        status = "IRREDUCIBLE_GAP"
+    else:
+        status = "CONTINUE"
+
+    return {
+        "status": status,
+        "required_tier": required_tier,
+        "achieved_tier": achieved_tier,
+        "blocking_reasons": blocking_reasons,
+        "irreducible_gaps": irreducible_gaps,
+        "evidence_confidence": ledger.get("evidence_confidence"),
+    }
