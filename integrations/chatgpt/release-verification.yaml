@@ -1,8 +1,8 @@
 schema: schemas/release-verification.schema.json
 id: verification.chatgpt
 surface: chatgpt
-product_version: 2.0.2-rc.6
-control_revision: atlas-bootstrap-2026-10-22-r10
+product_version: 2.1.0-rc.1
+control_revision: atlas-portable-orchestration-2026-10-22-r1
 status: READY_FOR_EXTERNAL_PROOF
 fresh_session_required: true
 independent_evidence_required: true
@@ -15,8 +15,8 @@ checks:
     kind: prompt
     input: What ATLAS version and control revision govern this chat?
     assertions:
-      - {id: AST-01, property: product_version, operator: equals, expected: 2.0.2-rc.6}
-      - {id: AST-02, property: control_revision, operator: equals, expected: atlas-bootstrap-2026-10-22-r10}
+      - {id: AST-01, property: product_version, operator: equals, expected: 2.1.0-rc.1}
+      - {id: AST-02, property: control_revision, operator: equals, expected: atlas-portable-orchestration-2026-10-22-r1}
     required_evidence: [session_id, timestamp, response]
     controls: [MIG-029, MIG-037]
   - id: CHK-02
@@ -33,9 +33,10 @@ checks:
     input: ST Engineering
     assertions:
       - {id: AST-01, property: collection_mode, operator: equals, expected: ARGUS_COLLECTION}
-      - {id: AST-02, property: specialist, operator: equals, expected: ARGUS}
-      - {id: AST-03, property: capability_plan, operator: contains, expected: argus.collection}
-    required_evidence: [session_id, timestamp, prompt, response]
+      - {id: AST-02, property: argus_authorization, operator: equals, expected: PENDING}
+      - {id: AST-03, property: lifecycle_state, operator: equals, expected: AWAITING_APPROVAL}
+      - {id: AST-04, property: argus_activation, operator: equals, expected: NOT_AUTHORIZED}
+    required_evidence: [session_id, timestamp, prompt, response, routing_preview_digest]
     controls: [MIG-029, MIG-037]
   - id: CHK-04
     kind: prompt
@@ -43,17 +44,16 @@ checks:
     assertions:
       - {id: AST-01, property: collection_mode, operator: equals, expected: ARGUS_COLLECTION}
       - {id: AST-02, property: collection_depth, operator: equals, expected: C3_OPPORTUNITY}
-      - {id: AST-03, property: capability_plan, operator: contains, expected: atlas.procurement-intelligence}
-    required_evidence: [session_id, timestamp, prompt, response]
+      - {id: AST-03, property: argus_authorization, operator: equals, expected: PENDING}
+    required_evidence: [session_id, timestamp, prompt, response, routing_preview_digest]
     controls: [MIG-029, MIG-037]
   - id: CHK-05
     kind: prompt
     input: seed cum cleaner for BADC
     assertions:
       - {id: AST-01, property: collection_mode, operator: equals, expected: ARGUS_COLLECTION}
-      - {id: AST-02, property: specialist, operator: equals, expected: ARGUS}
-      - {id: AST-03, property: capability_plan, operator: contains, expected: atlas.procurement-intelligence}
-    required_evidence: [session_id, timestamp, prompt, response]
+      - {id: AST-02, property: argus_authorization, operator: equals, expected: PENDING}
+    required_evidence: [session_id, timestamp, prompt, response, routing_preview_digest]
     controls: [MIG-029, MIG-037]
   - id: CHK-06
     kind: prompt
@@ -61,17 +61,17 @@ checks:
     assertions:
       - {id: AST-01, property: collection_mode, operator: equals, expected: ARGUS_COLLECTION}
       - {id: AST-02, property: collection_type, operator: contains, expected: PROCUREMENT_PLAN}
-      - {id: AST-03, property: capability_plan, operator: contains, expected: atlas.procurement-intelligence}
-    required_evidence: [session_id, timestamp, prompt, response]
+      - {id: AST-03, property: argus_authorization, operator: equals, expected: PENDING}
+    required_evidence: [session_id, timestamp, prompt, response, routing_preview_digest]
     controls: [MIG-029, MIG-037]
   - id: CHK-07
     kind: prompt
     input: Compare ST Engineering and L3Harris for Bangladesh opportunities
     assertions:
       - {id: AST-01, property: collection_mode, operator: equals, expected: HYBRID}
-      - {id: AST-02, property: specialist, operator: equals, expected: ARGUS}
-      - {id: AST-03, property: final_analysis_owner, operator: equals, expected: ATLAS}
-    required_evidence: [session_id, timestamp, prompt, response]
+      - {id: AST-02, property: final_analysis_owner, operator: equals, expected: ATLAS}
+      - {id: AST-03, property: argus_authorization, operator: equals, expected: PENDING}
+    required_evidence: [session_id, timestamp, prompt, response, routing_preview_digest]
     controls: [MIG-029, MIG-037]
   - id: CHK-08
     kind: prompt
@@ -79,7 +79,6 @@ checks:
     assertions:
       - {id: AST-01, property: collection_mode, operator: equals, expected: ATLAS_DIRECT}
       - {id: AST-02, property: specialist, operator: absent, expected: true}
-      - {id: AST-03, property: capability_plan, operator: contains, expected: atlas.procurement-intelligence}
     required_evidence: [session_id, timestamp, prompt, response]
     controls: [MIG-029, MIG-037]
   - id: CHK-09
@@ -105,5 +104,14 @@ checks:
       - {id: AST-01, property: external_send, operator: requires-approval, expected: true}
     required_evidence: [session_id, timestamp, prompt, response, available_tools]
     controls: [MIG-029]
-evidence_requirements: [session_id, timestamp, timezone, product_version, control_revision, prompt, response, available_tools, persistence_state, result, reviewer]
+  - id: CHK-12
+    kind: action
+    input: Explicitly approve ARGUS for the exact current ST Engineering routing preview, then continue.
+    assertions:
+      - {id: AST-01, property: argus_authorization, operator: equals, expected: APPROVED}
+      - {id: AST-02, property: argus_approval_digest, operator: present, expected: true}
+      - {id: AST-03, property: argus_activation, operator: one-of, expected: [AUTHORIZED, AUTHORIZED_BUT_BLOCKED]}
+    required_evidence: [session_id, timestamp, prompt, response, routing_preview_digest, approval_record]
+    controls: [MIG-029, MIG-037]
+evidence_requirements: [session_id, timestamp, timezone, product_version, control_revision, prompt, response, routing_preview_digest, approval_record, available_tools, persistence_state, result, reviewer]
 controls: [MIG-029, MIG-037]
