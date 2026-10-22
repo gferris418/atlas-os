@@ -246,15 +246,45 @@ class RequestTriageTests(unittest.TestCase):
         self.assertEqual("BLOCKED", contract["state"])
         self.assertIn("task_id:REQUIRED", contract["blockers"])
 
-    def test_direct_preview_exposes_not_required_activation_contract(self) -> None:
+    def test_direct_non_argus_preview_can_still_require_provider_approval(self) -> None:
         result = execute(ExecutionEnvelope(
             objective="Rewrite this supplier letter in a formal tone.",
-            plan_id="plan-no-activation-contract",
-            task_id="TASK-NO-ACTIVATION-CONTRACT",
+            plan_id="plan-non-argus-activation-contract",
+            task_id="TASK-NON-ARGUS-ACTIVATION-CONTRACT",
             work_units=[{"id": "rewrite", "status": "PENDING", "dependencies": []}],
             clarification_status="RESOLVED",
         ))
         contract = result.routing_preview["activation_contract"]
+        self.assertEqual("READY_FOR_APPROVAL", contract["state"])
+        self.assertEqual("NONE", contract["collection_mode"])
+        self.assertFalse(contract["argus_activation_required"])
+        self.assertIsNone(contract["collection_mission_id"])
+        self.assertTrue(contract["provider_sequence"])
+        self.assertEqual([], contract["handoff_provider_ids"])
+        self.assertEqual([], contract["blockers"])
+
+    def test_preview_without_provider_requirements_needs_no_activation(self) -> None:
+        preview = atlas_runtime.build_routing_preview(
+            "Return the supplied text unchanged.",
+            task_classes=("WRITING",),
+            taxonomy_route={},
+            surface="chatgpt",
+            task_id="TASK-NO-PROVIDER-ACTIVATION",
+            plan_id="plan-no-provider-activation",
+            plan=("return",),
+            work_unit="return",
+            timestamp="2026-10-22T05:20:00+06:00",
+            domain_methods={"items": []},
+            skills=(),
+            tools=(),
+            capabilities=(),
+            requested_requirements=(),
+            intent_profile={
+                "request_route": "GENERAL_TASK",
+                "collection_mode": "NONE",
+            },
+        )
+        contract = preview["activation_contract"]
         self.assertEqual("NOT_REQUIRED", contract["state"])
         self.assertEqual("NONE", contract["collection_mode"])
         self.assertFalse(contract["argus_activation_required"])
