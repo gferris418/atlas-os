@@ -10,6 +10,7 @@ from typing import Any, Iterable, Mapping
 
 import yaml
 
+from .capabilities import plan_canonical_capabilities
 from .collection import build_collection_mission
 from .handoff import ExecutionContext, prepare_domain_context_handoff
 from .routing import build_routing_preview, route_capability, route_domain_method
@@ -115,6 +116,7 @@ class ExecutionResult:
     domain_classification: dict[str, Any]
     domain_alignment: dict[str, Any]
     capability_audit: dict[str, Any]
+    capability_plan: dict[str, Any]
     intent_profile: dict[str, Any]
     behavioral_learning_state: dict[str, Any]
     routing_preview: dict[str, Any]
@@ -204,6 +206,12 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     normalized = normalize_intent(envelope.objective)["normalized"]
     task_classes = tuple(classify_task(normalized))
     request_triage = triage_request(normalized, task_classes=task_classes)
+    capability_plan = plan_canonical_capabilities(
+        envelope.objective,
+        task_classes=task_classes,
+        collection_mode=request_triage["collection_mode"],
+        collection_types=request_triage["collection_types"],
+    )
     collection_route = request_triage["collection_mode"] in _ARGUS_COLLECTION_MODES
     intelligence_route = request_triage["route"] == "INTELLIGENCE"
     material_domain_context = _needs_direct_domain_context(normalized)
@@ -531,7 +539,11 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
     completed = sum(item.get("status") == "COMPLETED" for item in work_units)
     state = "BLOCKED" if blocking_stage else ("COMPLETED" if active_unit is None else "READY")
 
-    preflight_trace: tuple[str, ...] = ("REQUEST_TRIAGE", "INTENT_NORMALIZATION")
+    preflight_trace: tuple[str, ...] = (
+        "REQUEST_TRIAGE",
+        "INTENT_NORMALIZATION",
+        "CAPABILITY_PLANNING",
+    )
     if material_domain_context:
         preflight_trace += (
             "TAXONOMY_ROUTING",
@@ -581,6 +593,7 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         blocker=blocker,
     )
     dashboard["request_triage"] = deepcopy(request_triage)
+    dashboard["capability_plan"] = deepcopy(capability_plan)
     dashboard["routing_preview"] = deepcopy(routing_preview)
     dashboard["routing_decisions"] = deepcopy(routing_decisions)
     dashboard["intent_profile"] = deepcopy(intent_profile)
@@ -600,6 +613,7 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         domain_classification=domain_classification,
         domain_alignment=domain_alignment,
         capability_audit=capability_audit,
+        capability_plan=capability_plan,
         intent_profile=intent_profile,
         behavioral_learning_state=behavioral_learning_state,
         routing_preview=routing_preview,
