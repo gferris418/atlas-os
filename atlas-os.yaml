@@ -24,6 +24,7 @@ specifications:
   - spec/approvals.yaml
   - spec/verification.yaml
   - spec/persistence.yaml
+  - spec/chat-event-persistence.yaml
   - spec/observability.yaml
 registries:
   - registries/capabilities.yaml
