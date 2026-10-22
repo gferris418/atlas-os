@@ -364,13 +364,18 @@ def build_routing_preview(
     )
 
     execution_sequence = [provider["id"] for provider in ordered]
+    activation_provider_sequence = list(dict.fromkeys(execution_sequence))
     handoff_provider_ids = list(dict.fromkeys(
         provider["id"] for provider in providers if provider["type"] == "domain-method"
     ))
+    activation_blockers = list(unresolved_gates)
+    if requirements and task_id is None:
+        activation_blockers.append("task_id:REQUIRED")
+    activation_blockers = list(dict.fromkeys(activation_blockers))
     activation_state = (
         "NOT_REQUIRED"
         if not requirements
-        else "BLOCKED" if unresolved_gates else "READY_FOR_APPROVAL"
+        else "BLOCKED" if activation_blockers else "READY_FOR_APPROVAL"
     )
     activation_contract = {
         "version": "1.0",
@@ -380,9 +385,9 @@ def build_routing_preview(
         "collection_mode": collection_mode or "NONE",
         "argus_activation_required": collection_mode in _ARGUS_COLLECTION_MODES,
         "collection_mission_id": mission_record["mission_id"] if mission_record else None,
-        "provider_sequence": execution_sequence,
+        "provider_sequence": activation_provider_sequence,
         "handoff_provider_ids": handoff_provider_ids,
-        "blockers": deepcopy(unresolved_gates),
+        "blockers": activation_blockers,
     }
 
     preview = {
