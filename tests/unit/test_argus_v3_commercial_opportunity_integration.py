@@ -7,7 +7,7 @@ from pathlib import Path
 import yaml
 
 import atlas_runtime
-from atlas_runtime import plan_canonical_capabilities
+from atlas_runtime import ExecutionEnvelope, execute, plan_canonical_capabilities
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -98,6 +98,21 @@ class ArgusV3CommercialOpportunityIntegrationTests(unittest.TestCase):
         )
         self.assertIn("atlas.procurement-intelligence", plan["routed"])
         self.assertIn("argus.collection", plan["specialist"])
+
+    def test_matching_mission_requests_v3_commercial_outputs(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective="Rank suitable international OEMs for a Bangladesh Coast Guard coastal patrol vessel opportunity and assess who can partner with us.",
+            plan_id="plan-argus-v3-match",
+            task_id="TASK-ARGUS-V3-MATCH",
+            work_units=[{"id": "match", "status": "PENDING", "dependencies": []}],
+            clarification_status="RESOLVED",
+        ))
+        mission = result.routing_preview["collection_mission"]
+        outputs = set(mission["required_output_components"])
+        self.assertTrue({
+            "opportunities", "supplier_intelligence", "supplier_matches",
+            "qualification_recommendations", "detection_metrics",
+        } <= outputs)
 
     def test_argus_registry_pins_v3_candidate_and_unchanged_activation_contract(self) -> None:
         registry = yaml.safe_load((ROOT / "registries/domain-methods.yaml").read_text(encoding="utf-8"))
