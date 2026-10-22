@@ -97,7 +97,7 @@ class RequestTriageTests(unittest.TestCase):
         registry = yaml.safe_load((ROOT / "registries/domain-methods.yaml").read_text(encoding="utf-8"))
         method = next(item for item in registry["items"] if item["id"] == "domain-method.argus-intelligence")
         self.assertIn("intelligence_collection", method["capabilities"])
-        self.assertEqual("2.2.0-rc.1", method["version"])
+        self.assertEqual("2.2.0-rc.2", method["version"])
         self.assertEqual("INTELLIGENCE", method["request_route"])
         self.assertIn("PLANNING", method["task_classes"])
         self.assertIn("WORKFLOW", method["task_classes"])
