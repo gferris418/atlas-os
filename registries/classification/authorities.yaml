@@ -14,6 +14,9 @@ authorities:
   - id: EUROSTAT
     official_name: Eurostat
     source_url: https://ec.europa.eu/eurostat/web/main/data/classifications
+  - id: EUROPEAN_COMMISSION
+    official_name: European Commission
+    source_url: https://single-market-economy.ec.europa.eu/single-market/public-procurement/digital-procurement/e-procurement/cpv_en
   - id: US_CENSUS
     official_name: United States Census Bureau
     source_url: https://www.census.gov/naics/

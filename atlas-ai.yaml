@@ -51,6 +51,9 @@ machine_contracts:
   - registries/surfaces.yaml
   - registries/classification/families.yaml
   - registries/classification/authorities.yaml
+  - registries/classification/standards.yaml
+  - registries/classification/update-sources.yaml
+  - registries/classification/crosswalks.yaml
   - integrations/access-asia.yaml
   - integrations/argus.yaml
   - integrations/chatgpt.yaml
