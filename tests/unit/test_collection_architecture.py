@@ -32,9 +32,10 @@ class CollectionArchitectureTests(unittest.TestCase):
     def test_argus_is_commit_pinned_collection_provider(self) -> None:
         registry = yaml.safe_load((ROOT / "registries/domain-methods.yaml").read_text(encoding="utf-8"))
         argus = registry["items"][0]
-        self.assertEqual("2.2.0-rc.2", argus["version"])
+        self.assertEqual("3.0.0-rc.1", argus["version"])
         self.assertIn("intelligence_collection", argus["capabilities"])
-        self.assertEqual("be5fcaf48d84e14e147288e05f3fe90bc96744ac", argus["source_commit"])
+        self.assertIn("government_commercial_opportunity_intelligence", argus["capabilities"])
+        self.assertEqual("965ae0ddf885adf3dd2b9adfccae46b6b011227b", argus["source_commit"])
         self.assertEqual("3.0.0", argus["contract_version"])
         self.assertEqual("sha256:5b082a12c6f0b469cba274a0e43e29032e349e3d377cf6d12ffa58762e8cb307", argus["contract_sha256"])
 
