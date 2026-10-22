@@ -1,0 +1,102 @@
+id: atlas.quality-governance
+version: 3.0.3
+status: active
+normative: true
+contract:
+  objective: Maximize decision-grade intelligence quality and decision utility, then minimize latency and computational cost subject to preserving that quality.
+  optimization_hierarchy:
+    - QUALITY_DECISION_UTILITY
+    - EVIDENCE_VERIFIABILITY
+    - COMPLETENESS
+    - ACCURACY_CONSISTENCY
+    - PERFORMANCE
+    - COST_TOKEN_EFFICIENCY
+  tier_assignment_stage: MINIMAL_DOMAIN_FRAMING
+  performance_invariant:
+    may_not_lower_required_quality_tier: true
+    may_not_bypass_evidence_or_verification: true
+    may_not_bypass_governance_or_approval: true
+    allowed_optimizations:
+      - verified_state_reuse
+      - incremental_change_detection
+      - caching
+      - indexing
+      - duplicate_elimination
+      - parallel_independent_retrieval
+      - deterministic_computation
+      - canonical_entity_reuse
+      - precomputed_relationship_graphs
+      - selective_freshness_checks
+      - delta_collection
+  tiers:
+    Q0:
+      mode: direct_deterministic
+      purpose: Deterministic computation, transformation, or canonical-state handling.
+    Q1:
+      mode: verified_lookup
+      purpose: Focused factual retrieval with authoritative verification and traceability.
+    Q2:
+      mode: normal_analytical
+      purpose: Multi-source analysis with reconciliation and provenance.
+    Q3:
+      mode: high_assurance_research
+      purpose: Strong corroboration, source diversity, contradiction investigation, and authoritative-source priority.
+    Q4:
+      mode: strategic_decision_grade_intelligence
+      purpose: Broad multi-angle research with entity resolution, competing hypotheses, explicit gaps, confidence calibration, and decision coverage.
+    Q5:
+      mode: maximum_assurance_with_explicit_stopping_justification
+      purpose: Critical work requiring maximum reasonable corroboration, adverse-case testing, high source diversity, explicit residual gaps, and a justified stopping point.
+  quality_ledger:
+    required_fields:
+      - required_tier
+      - achieved_tier
+      - evidence_confidence
+      - source_authority
+      - corroboration_count
+      - source_diversity
+      - freshness
+      - contradiction_status
+      - entity_resolution_confidence
+      - completeness
+      - last_verified_at
+      - unresolved_gaps
+      - reusable
+      - invalidation_triggers
+    rule: Aggregate confidence is descriptive and cannot replace mandatory tier-specific gates.
+  quality_gate:
+    required_before_authoritative_delivery: true
+    outcomes: [PASS, CONTINUE, IRREDUCIBLE_GAP]
+    aggregate_confidence_cannot_override_mandatory_gates: true
+    checks:
+      - required_vs_achieved_quality
+      - mandatory_evidence_requirements
+      - authoritative_sources
+      - source_diversity
+      - freshness
+      - entity_resolution
+      - contradiction_handling
+      - material_alternative_hypotheses
+      - material_gap_disclosure
+      - confidence_calibration
+      - claim_traceability
+      - user_objective_coverage
+    continue_rule: When the gate returns CONTINUE, collect or reason further rather than stopping because of a time or token budget.
+    irreducible_gap_rule: Irreducible material gaps remain explicit and are never silently converted to PASS.
+  incremental_intelligence:
+    default_model: previous_verified_intelligence_plus_changed_evidence_then_reconcile
+    recommendations: [REUSE, REFRESH_DELTA, RECOLLECT]
+    decision_authority: ATLAS
+    provider_role: Providers may propose a reuse recommendation; ATLAS decides the next step.
+    reuse_checks:
+      - freshness
+      - completeness
+      - contradiction_status
+      - entity_resolution
+      - required_vs_achieved_quality
+      - invalidation_triggers
+      - material_change_events
+    reuse_rule: Reuse verified intelligence wherever possible; recollect only when freshness, completeness, contradiction, confidence, identity, or invalidation state requires it.
+  presentation:
+    FAST_TEXT_affects_research_depth: false
+    rule: Rendering mode may reduce presentation overhead but may not change evidence, analysis, verification, or quality-tier requirements.
