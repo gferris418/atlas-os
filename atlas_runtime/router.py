@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from typing import Any, Iterable
 
 from .models import RouteDecision
@@ -21,7 +22,11 @@ def normalize_objective(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def minimal_domain_framing(text: str, requested_quality_floor: str | None = None) -> dict[str, Any]:
+def minimal_domain_framing(
+    text: str,
+    requested_quality_floor: str | None = None,
+    quality_context: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     lower = text.lower()
     risk_flags: list[str] = []
     if any(token in lower for token in ("navy", "military", "defence", "defense", "radar", "weapon")):
@@ -29,10 +34,25 @@ def minimal_domain_framing(text: str, requested_quality_floor: str | None = None
     if any(token in lower for token in ("contract", "agreement", "legal")):
         risk_flags.append("legal_or_commercial")
     jurisdiction = "Bangladesh" if "bangladesh" in lower else None
-    required_quality_tier = determine_required_quality_tier(text, requested_floor=requested_quality_floor)
+
+    merged_quality_context = dict(quality_context or {})
+    supplied_risk_flags = merged_quality_context.get("risk_flags", ())
+    combined_risk_flags = list(risk_flags)
+    if isinstance(supplied_risk_flags, (list, tuple, set, frozenset)):
+        combined_risk_flags.extend(
+            flag for flag in supplied_risk_flags if isinstance(flag, str) and flag.strip()
+        )
+    combined_risk_flags = list(dict.fromkeys(combined_risk_flags))
+    merged_quality_context["risk_flags"] = combined_risk_flags
+
+    required_quality_tier = determine_required_quality_tier(
+        text,
+        requested_floor=requested_quality_floor,
+        quality_context=merged_quality_context,
+    )
     return {
         "jurisdiction": jurisdiction,
-        "risk_flags": risk_flags,
+        "risk_flags": combined_risk_flags,
         "unresolved": [],
         "principle": "minimal_sufficient_context",
         "required_quality_tier": required_quality_tier,
