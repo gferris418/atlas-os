@@ -7,7 +7,7 @@ contract:
   purpose: Determine whether evidence acquisition is unnecessary, ordinary ATLAS research, structured ARGUS collection, or hybrid collection plus ATLAS analysis.
   owner: ATLAS_CONTROL_PLANE
   modes: [NONE, ATLAS_DIRECT, ARGUS_COLLECTION, HYBRID]
-  argus_role: Governed intelligence collection subsystem nested inside ATLAS.
+  argus_role: Governed government commercial opportunity intelligence subsystem nested inside ATLAS.
   argus_capability: intelligence_collection
   argus_does:
     - target_resolution
@@ -16,35 +16,51 @@ contract:
     - acquisition
     - extraction
     - normalization
-    - entity_resolution
+    - entity_event_relationship_resolution
     - deduplication
     - collection_side_taxonomy_suggestions
     - corroboration
     - source_reconciliation
     - gap_and_conflict_detection
     - coverage_assessment
+    - pre_px_opportunity_identity
+    - opportunity_lifecycle_tracking
+    - demand_intelligence
+    - supply_intelligence
+    - supplier_universe_construction
+    - supplier_partnerability_assessment
+    - supplier_match_assessment
+    - advisory_opportunity_qualification
+    - early_warning_event_tracking
+    - rapid_tender_collection
     - collection_packaging
   atlas_retains:
     - mission_control
     - control_plane
     - canonical_taxonomy_authority
+    - canonical_evidence_acceptance
     - plan_and_work_units
     - permissions_and_approvals
     - substantive_analysis
     - strategic_analysis
     - forecasting_and_scenarios
-    - opportunity_qualification
+    - authoritative_opportunity_priority
+    - promote_to_px
     - access_asia_pursuit_decisions
+    - bid_no_bid_decisions
+    - external_action_authorization
     - assurance_and_verification
     - persistence_authorization
     - observability_and_dashboard
     - final_delivery
   collection_mission: schemas/collection-mission.schema.json
   handoff_rule: ARGUS activation receives the governed ATLAS domain-context handoff plus a collection mission. READY or PARTIAL context may proceed under the pinned specialist contract; BLOCKED context cannot authorize dependent collection.
-  return_rule: ARGUS returns a collection package/evidence result to ATLAS. The package is not a final user-facing answer, forecast, bid/no-bid decision, or PX promotion decision.
+  return_rule: ARGUS returns a collection package/evidence result that may include pre-PX opportunities, supplier intelligence, supplier matches, qualification recommendations and detection metrics. The package is not a final user-facing answer, authoritative priority, bid/no-bid decision, external-action authorization or PX promotion decision.
+  opportunity_rule: Need/gap discovery, legitimate opportunity development, supply-first technology matching and early lifecycle tracking may activate ARGUS without activating ATLAS Procurement Intelligence when no procurement semantics are present.
+  procurement_rule: Procurement plans, tenders, acquisitions, eligibility/evaluation work and RAPID_TENDER retain ATLAS Procurement Intelligence in addition to ARGUS collection when structured collection is required.
   dashboard_rule: Collection mode, collection status, ARGUS provider state, evidence health, gaps and blockers are observable projections only; Dashboard cannot activate ARGUS directly.
   mission_control_rule: A dashboard request to expand, stop or redirect collection becomes a Mission Control command evaluated by the Control Plane.
-  stopping_rule: Stop collection when additional evidence is unlikely to change sufficiency, material uncertainty, identified gaps, risk or the next ATLAS action.
+  stopping_rule: Stop collection when additional evidence is unlikely to change sufficiency, material uncertainty, supplier matching, advisory qualification, identified gaps, risk or the next ATLAS action.
 invariants: [INV-007, INV-008, INV-017, INV-018, INV-021]
 references:
   - spec/request-triage.yaml
