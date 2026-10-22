@@ -157,6 +157,95 @@ class RequestTriageTests(unittest.TestCase):
         self.assertIn("domain-method.argus-intelligence", contract["handoff_provider_ids"])
         self.assertEqual([], contract["blockers"])
 
+    def test_activation_contract_keeps_argus_required_when_provider_is_missing(self) -> None:
+        preview = atlas_runtime.build_routing_preview(
+            "ST Engineering",
+            task_classes=("RESEARCH",),
+            taxonomy_route={},
+            surface="chatgpt",
+            task_id="TASK-MISSING-ARGUS",
+            plan_id="plan-missing-argus",
+            plan=("collect",),
+            work_unit="collect",
+            timestamp="2026-10-22T05:20:00+06:00",
+            domain_methods={"items": []},
+            skills=(),
+            tools=(),
+            capabilities=(),
+            requested_requirements=("intelligence_collection",),
+            intent_profile={
+                "request_route": "INTELLIGENCE",
+                "collection_mode": "ARGUS_COLLECTION",
+            },
+        )
+        contract = preview["activation_contract"]
+        self.assertTrue(contract["argus_activation_required"])
+        self.assertEqual("BLOCKED", contract["state"])
+        self.assertIn(
+            "requirement:intelligence_collection:NO_ADMITTED_PROVIDER",
+            contract["blockers"],
+        )
+
+    def test_activation_contract_deduplicates_provider_ids_without_changing_execution_sequence(self) -> None:
+        provider = {
+            "id": "capability.shared",
+            "name": "Shared execution capability",
+            "description": "Satisfies both test and execute requirements.",
+            "status": "available",
+            "authority": "canonical",
+            "permission": "read",
+            "risk_class": "low",
+            "version": "1.0.0",
+            "source": "test-fixture",
+            "capabilities": ["test", "execute"],
+            "requires": [],
+            "conflicts_with": [],
+            "task_classes": ["CODING"],
+            "fallback": None,
+        }
+        preview = atlas_runtime.build_routing_preview(
+            "Implement a Python function",
+            task_classes=("CODING",),
+            taxonomy_route={},
+            surface="chatgpt",
+            task_id="TASK-DUPLICATE-PROVIDER",
+            plan_id="plan-duplicate-provider",
+            plan=("implement",),
+            work_unit="implement",
+            timestamp="2026-10-22T05:20:00+06:00",
+            domain_methods={"items": []},
+            skills=(),
+            tools=(),
+            capabilities=(provider,),
+            requested_requirements=("test",),
+            intent_profile={
+                "request_route": "GENERAL_TASK",
+                "collection_mode": "NONE",
+            },
+        )
+        self.assertEqual(
+            ["capability.shared", "capability.shared"],
+            preview["execution_sequence"],
+        )
+        self.assertEqual(
+            ["capability.shared"],
+            preview["activation_contract"]["provider_sequence"],
+        )
+
+    def test_activation_contract_blocks_provider_routing_without_task_id(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective="Implement a Python function",
+            plan_id="plan-missing-task-id",
+            work_units=[{"id": "implement", "status": "PENDING", "dependencies": []}],
+            clarification_status="RESOLVED",
+            capability_requirements=("test",),
+            timestamp="2026-10-22T05:20:00+06:00",
+            timezone_name="Asia/Dhaka",
+        ))
+        contract = result.routing_preview["activation_contract"]
+        self.assertEqual("BLOCKED", contract["state"])
+        self.assertIn("task_id:REQUIRED", contract["blockers"])
+
     def test_direct_preview_exposes_not_required_activation_contract(self) -> None:
         result = execute(ExecutionEnvelope(
             objective="Rewrite this supplier letter in a formal tone.",
