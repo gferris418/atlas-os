@@ -1,0 +1,70 @@
+version: 1.0.0
+plugin:
+  name: atlas-os
+  canonical_repository: gferris418/atlas-os
+  manifest: plugin.json
+  primary_skill: skills/atlas-os/SKILL.md
+publication:
+  automatic: false
+  mechanism: plugin_creator_guarded_update
+  preserve_plugin_identity: true
+  require_current_release_id: true
+  expected_release_guard: current_release_id_required
+  rule: >-
+    GitHub prepares and validates a release bundle. Publication to ChatGPT is a guarded
+    Plugin Creator update against the existing plugin identity, using the current release
+    ID as the update guard; GitHub Actions never publishes the plugin automatically.
+argus_compatibility:
+  repository: gferris418/argus-intelligence
+  contract_path: contracts/atlas/current-integration.yaml
+  release_impact_path: contracts/atlas/plugin-release-impact.yaml
+  compatible_commit: c262b774d03543b7209d9512d802c4fa4e197c36
+  contract_version: 1.0.0
+impact:
+  release_required:
+    exact:
+      - plugin.json
+      - skills/atlas-os/SKILL.md
+      - .agents/skills/atlas-os/SKILL.md
+      - integrations/chatgpt.yaml
+      - integrations/chatgpt-bootstrap.yaml
+      - integrations/argus.yaml
+      - spec/core.yaml
+      - spec/routing.yaml
+      - spec/approvals.yaml
+      - spec/verification.yaml
+      - governance.yaml
+  review_required:
+    prefixes:
+      - atlas_runtime/
+      - spec/
+      - schemas/
+      - registries/
+      - integrations/
+      - tools/
+    exact:
+      - atlas-os.yaml
+      - atlas-ai.yaml
+  normally_no_release:
+    prefixes:
+      - docs/
+      - tests/
+    exact:
+      - README.md
+      - CONTRIBUTING.md
+      - LICENSE
+      - SECURITY.md
+bundle:
+  paths:
+    - plugin.json
+    - skills/atlas-os/SKILL.md
+    - integrations/chatgpt.yaml
+    - integrations/chatgpt-bootstrap.yaml
+    - integrations/argus.yaml
+  metadata_file: plugin-release-metadata.json
+  artifact_name: atlas-os-chatgpt-plugin-release
+validation:
+  required_checks:
+    - validate
+  require_argus_contract_tests_for_boundary_change: true
+  require_cross_repo_e2e_for_argus_boundary_change: true
