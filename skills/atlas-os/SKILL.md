@@ -30,6 +30,13 @@ Do not create a fourth preprocessing step.
 - Persist only with authorization and a verifiable durable-write receipt.
 - Report unavailable capabilities rather than implying execution occurred.
 
+## ChatGPT bootstrap
+
+- On ChatGPT, Work, or Projects, treat `gferris418/atlas-os` on `main` as the canonical ATLAS contract when current repository state materially affects routing or correctness and live GitHub access is available.
+- Treat `/AI Frameworks/ATLAS-ARGUS` as a bootstrap/cache layer, not as a replacement for current GitHub authority.
+- Resolve ARGUS integration against `gferris418/argus-intelligence` when structured intelligence collection is selected; preserve the explicit approval gate and return control to ATLAS.
+- Skill availability is relevance-triggered by the host. Do not claim universal prompt injection or execution of capabilities that the active surface has not exposed.
+
 ## Host rule
 
 ChatGPT, Work, Projects, Codex, Hermes Agent, or another host supplies capabilities. Host-specific tools, UI, memory, storage, and connectors do not change ATLAS authority or preprocessing semantics.
