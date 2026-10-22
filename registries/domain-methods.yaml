@@ -13,7 +13,7 @@ items:
     permission: read
     risk_class: medium
     priority: 90
-    version: 3.0.0-rc.1
+    version: 2.2.0-rc.2
     source: https://github.com/gferris418/argus-intelligence/blob/7ed812822b613a0eeff7fbd90fe5c242fc15a8ae/contracts/atlas/argus-activation-v1.json
     source_commit: 7ed812822b613a0eeff7fbd90fe5c242fc15a8ae
     contract_version: 3.1.0
