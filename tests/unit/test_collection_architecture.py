@@ -34,11 +34,11 @@ class CollectionArchitectureTests(unittest.TestCase):
     def test_argus_is_commit_pinned_collection_provider(self) -> None:
         registry = yaml.safe_load((ROOT / "registries/domain-methods.yaml").read_text(encoding="utf-8"))
         argus = registry["items"][0]
-        self.assertEqual("2.2.0-rc.2", argus["version"])
+        self.assertEqual("3.0.0-rc.1", argus["version"])
         self.assertIn("intelligence_collection", argus["capabilities"])
-        self.assertEqual("be5fcaf48d84e14e147288e05f3fe90bc96744ac", argus["source_commit"])
-        self.assertEqual("3.0.0", argus["contract_version"])
-        self.assertEqual("sha256:5b082a12c6f0b469cba274a0e43e29032e349e3d377cf6d12ffa58762e8cb307", argus["contract_sha256"])
+        self.assertEqual("7ed812822b613a0eeff7fbd90fe5c242fc15a8ae", argus["source_commit"])
+        self.assertEqual("3.1.0", argus["contract_version"])
+        self.assertEqual("sha256:5cc8f16667fc1d2af49778d1da1effab36ed8f09f3fc15d9a3a0ee60e7552a90", argus["contract_sha256"])
 
     def test_collection_mission_schema_is_machine_readable(self) -> None:
         schema = json.loads((ROOT / "schemas/collection-mission.schema.json").read_text(encoding="utf-8"))
