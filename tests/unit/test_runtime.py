@@ -6,6 +6,14 @@ from atlas_runtime import ARGUS_APPROVAL, ExecutionEnvelope, PRE_EXECUTION_FLOW,
 
 
 class RuntimeTests(unittest.TestCase):
+    def test_mission_control_is_first_prompt_entry_stage(self) -> None:
+        result = execute(ExecutionEnvelope(objective="Rewrite this text."))
+        self.assertEqual("MISSION_CONTROL", result.execution_trace[0])
+        self.assertEqual(
+            ("MISSION_CONTROL", *PRE_EXECUTION_FLOW),
+            result.execution_trace[: 1 + len(PRE_EXECUTION_FLOW)],
+        )
+
     def test_exact_three_step_pre_execution_flow(self) -> None:
         result = execute(ExecutionEnvelope(objective="Rewrite this text."))
         self.assertEqual(PRE_EXECUTION_FLOW, result.pre_execution_flow)
