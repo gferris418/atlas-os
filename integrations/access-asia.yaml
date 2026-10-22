@@ -1,38 +1,89 @@
 id: integration.access-asia
-version: 3.0.0
+version: 3.1.0
 status: active
 role: deployment_profile
 scope: Access Asia storage and system-of-record routing. This profile is not ATLAS core architecture.
 authority:
   atlas_github: execution_and_governance
-  argus_github: ARGUS schemas, methods, migrations, and versioned release baselines
-  sharepoint: documents, working files, and current mutable ARGUS operational database
-  hubspot: CRM identity, relationships, interactions, deals, and pipeline
+  argus_github: ARGUS schemas, identity rules, commercial-data rules, migrations, methods, tests, and versioned release baselines
+  sharepoint: documents, working files, and the SharePoint-hosted operational database
+  sharepoint_sqlite: canonical_commercial_graph_and_argus_current_state
+  hubspot: crm_relationship_engagement_and_contactability
 argus_operational_store:
   format: SQLite
   logical_path: General/Business Intelligence/30_OPERATIONS/ARGUS_Master_Registry.sqlite
   writer_authority: ATLAS
   concurrent_writers: prohibited
   open_in_place_over_sharepoint_sync: prohibited
+  canonical_graph_rule: enter_once_identify_once_relate_once_derive_views
   protocol:
     - fetch_latest_sharepoint_file
     - verify_target_version_and_integrity
     - resolve_identity_before_creation
     - mutate_locally_in_single_transaction
     - preserve_source_provenance
+    - preserve_append_only_history
     - record_mutation_log
     - run_integrity_and_foreign_key_checks
     - recheck_sharepoint_target_before_replace
     - replace_same_sharepoint_file
     - verify_uploaded_target_and_version
 persistence_routing:
-  CRM: HUBSPOT
+  CANONICAL_ORGANIZATION: SHAREPOINT_SQLITE
+  CANONICAL_PERSON: SHAREPOINT_SQLITE
+  CANONICAL_PRODUCT: SHAREPOINT_SQLITE
+  CANONICAL_PRODUCT_CATEGORY: SHAREPOINT_SQLITE
+  CANONICAL_SECTOR: SHAREPOINT_SQLITE
+  CANONICAL_GEOGRAPHY: SHAREPOINT_SQLITE
+  GOVERNMENT_PROJECT: SHAREPOINT_SQLITE
+  REQUIREMENT: SHAREPOINT_SQLITE
+  PROCUREMENT: SHAREPOINT_SQLITE
+  TENDER: SHAREPOINT_SQLITE
+  PX_OPPORTUNITY: SHAREPOINT_SQLITE
+  BID: SHAREPOINT_SQLITE
+  AWARD: SHAREPOINT_SQLITE
+  ACCESS_ASIA_PROJECT: SHAREPOINT_SQLITE
+  CONTRACT_FACT: SHAREPOINT_SQLITE
+  FINANCIAL_FACT: SHAREPOINT_SQLITE
+  CRM_COMPANY_MIRROR: HUBSPOT
+  CRM_CONTACTABILITY: HUBSPOT
+  CRM_RELATIONSHIP: HUBSPOT
+  CRM_DEAL: HUBSPOT
+  CRM_INTERACTION: HUBSPOT
   SOURCE_DOCUMENT: SHAREPOINT
   WORKING_DOCUMENT: SHAREPOINT
   OPPORTUNITY_FOLDER: SHAREPOINT
   PROJECT_DOCUMENT: SHAREPOINT
+  FINANCIAL_EVIDENCE_DOCUMENT: SHAREPOINT
   ARGUS_CURRENT_STRUCTURED_STATE: SHAREPOINT_SQLITE
   ARGUS_SCHEMA_AND_IDENTITY_RULES: ARGUS_GITHUB
+  ARGUS_COMMERCIAL_DATA_RULES: ARGUS_GITHUB
   ATLAS_POLICY_AND_RUNTIME: ATLAS_GITHUB
+reporting:
+  model: DERIVED_VIEWS
+  department_master_databases: false
+  departments:
+    - MARKETING
+    - SALES
+    - BUSINESS_DEVELOPMENT
+    - OPERATIONS
+    - FINANCE
+    - MANAGEMENT
+  rule: reports and dashboards derive from the canonical graph and must not create competing master records
+commercial_lineage:
+  permanent_key: PX_ID
+  authority: ATLAS
+  preserve_through:
+    - OPPORTUNITY
+    - BID
+    - AWARD
+    - ACCESS_ASIA_PROJECT
+  external_government_project_is_distinct_from_access_asia_project: true
 security:
-  never_commit: [credentials, tokens, sharepoint_native_ids, hubspot_native_ids, personal_contact_data, restricted_source_payloads]
+  never_commit:
+    - credentials
+    - tokens
+    - sharepoint_native_ids
+    - hubspot_native_ids
+    - personal_contact_data
+    - restricted_source_payloads
