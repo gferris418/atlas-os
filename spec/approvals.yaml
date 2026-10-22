@@ -5,6 +5,7 @@ status: active
 normative: true
 contract:
   gated_actions:
+    - argus_activation
     - destructive_action
     - irreversible_action
     - publication
@@ -17,13 +18,19 @@ contract:
     - reversible_analysis
     - reversible_preparation
   classification: Every executable operation must declare one or more governed semantic action classes before approval policy evaluation; missing or unknown classes fail closed.
-  scope: Approval is specific to the described action, target, input digest, precondition revision, execution context, policy revision, and validity interval.
+  argus_rule: ARGUS activation is always explicitly user-gated when collection_mode is ARGUS_COLLECTION or HYBRID. The user must authorize the current task and routing preview before any ARGUS handoff or activation.
+  need_is_not_consent: collection_mode, specialist selection, an existing collection mission, previous approval, previous ARGUS use, silence or continued conversation never substitutes for explicit ARGUS authorization.
+  scope: Approval is specific to the described action, target, input digest, precondition revision, execution context, policy revision, task/plan/work-unit identity and validity interval.
+  argus_scope: ARGUS authorization is bound to source task identity and routing preview digest, is non-reusable by default, and is invalidated by a materially changed proposal or task scope.
+  combined_user_event: One explicit user approval event may populate both routing_approval_status=APPROVED and argus_approval_status=APPROVED for the same current digest; the two states remain machine-distinct.
   binding: High-impact execution requires an exact action_type, target_id, input_sha256, precondition_revision, authenticated approver_identity, source task/plan/work-unit identity, optional handoff identity, issued_at, expires_at, and policy_revision match.
   clock: Approval validity is evaluated against the ATLAS system clock; callers cannot supply the evaluation time.
-  reuse: Do not request approval repeatedly for the same clearly approved scope.
+  reuse: Do not request approval repeatedly for the same clearly approved scope. ARGUS approval may not be reused outside its exact bound task/digest.
   default: Reversible analysis and preparation proceed autonomously within authority.
 invariants:
   - INV-011
 references:
   - schemas/approval.schema.json
-
+  - schemas/activation-contract.schema.json
+  - spec/mission-control.yaml
+  - spec/control-plane.yaml
