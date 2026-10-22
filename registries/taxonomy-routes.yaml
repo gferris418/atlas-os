@@ -2,12 +2,12 @@ schema: schemas/registry.schema.json
 registry:
   id: registry.taxonomy-routes
   type: taxonomy-route
-  version: 1
+  version: 2
   status: active
 items:
   - id: taxonomy-route.coastal-patrol-vessel
     name: Coastal patrol vessel
-    description: Internal routing hierarchy for coast-guard or maritime-security patrol-vessel work.
+    description: Internal routing hierarchy for coast-guard or maritime-security patrol-vessel semantic context.
     status: active
     domain: government-public-sector
     sub_domain: maritime-safety-security
@@ -15,11 +15,11 @@ items:
     artifact_class: patrol-vessel
     match_all: [coastal, patrol, vessel]
     candidate_taxonomies: [taxonomy.iso-3166-1, taxonomy.un-isic, taxonomy.un-cpc, taxonomy.unspsc]
-    required_facets: [jurisdiction, operator-industry, product-or-service, capability, lifecycle-stage, information-sensitivity]
+    required_facets: [jurisdiction, operator-industry, product-or-service, capability]
     material_dimensions: [what, why, which, how]
   - id: taxonomy-route.coastal-surveillance-radar
     name: Coastal surveillance radar
-    description: Internal routing hierarchy for maritime-defense coastal-surveillance-radar work.
+    description: Internal routing hierarchy for maritime-defense coastal-surveillance-radar semantic context.
     status: active
     domain: government-public-sector
     sub_domain: defense-national-security
@@ -27,11 +27,11 @@ items:
     artifact_class: surveillance-sensor-capability
     match_all: [coastal, surveillance, radar]
     candidate_taxonomies: [taxonomy.iso-3166-1, taxonomy.un-isic, taxonomy.un-cpc, taxonomy.wco-hs, taxonomy.unspsc, taxonomy.nato-codification-system, taxonomy.atlas-capability-skos]
-    required_facets: [jurisdiction, operator-industry, capability, lifecycle-stage, information-sensitivity]
+    required_facets: [jurisdiction, operator-industry, product-or-service, capability]
     material_dimensions: [what, why, which, how]
   - id: taxonomy-route.social-media-monitoring
     name: Social media monitoring
-    description: Internal routing hierarchy for public-safety social-media-monitoring work.
+    description: Internal routing hierarchy for public-safety social-media-monitoring semantic context.
     status: active
     domain: government-public-sector
     sub_domain: public-safety-law-enforcement
@@ -39,5 +39,5 @@ items:
     artifact_class: social-media-monitoring-system
     match_all: [social, media, monitoring]
     candidate_taxonomies: [taxonomy.iso-3166-1, taxonomy.un-isic, taxonomy.un-cpc, taxonomy.unspsc, taxonomy.atlas-capability-skos]
-    required_facets: [jurisdiction, operator-industry, product-or-service, capability, lifecycle-stage, stakeholder, information-sensitivity]
+    required_facets: [jurisdiction, operator-industry, product-or-service, capability, stakeholder]
     material_dimensions: [who, what, where, why, which, how, how_much]
