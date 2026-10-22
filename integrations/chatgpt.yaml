@@ -1,5 +1,5 @@
 id: integration.chatgpt
-version: 3.0.1
+version: 3.0.2
 host: chatgpt
 status: active
 role: host_adapter
@@ -7,6 +7,8 @@ plugin_manifest: plugin.json
 bootstrap_contract: integrations/chatgpt-bootstrap.yaml
 primary_skill: skills/atlas-os/SKILL.md
 bootstrap:
+  prompt_entry: MISSION_CONTROL_FIRST
+  prompt_entry_scope: every_user_prompt_while_atlas_active
   mission_control: required
   control_plane: required
   compact_dashboard: required
@@ -15,4 +17,4 @@ capabilities:
   native: [conversation]
   optional: [direct_search, deep_research, connected_source, code_execution, external_action, persistence]
 surfaces: [chat, work, projects]
-rule: Use only capabilities actually exposed in the active session; unavailable capability must be reported rather than implied.
+rule: Use only capabilities actually exposed in the active session; unavailable capability must be reported rather than implied. Mission Control is the first ATLAS governance gate and is not a fourth preprocessing step.
