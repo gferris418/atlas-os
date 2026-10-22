@@ -108,7 +108,8 @@ class SemanticNormalizationContractTests(unittest.TestCase):
         self.assertIn("supply-side sector", domain_context)
         self.assertIn("semantic normalization", classification.lower())
         self.assertIn("best practice is context, not a binding requirement", domain_practices.lower())
-        self.assertIn("semantic normalization", spine.lower())
+        self.assertIn("semantic_normalization", spine.lower())
+        self.assertIn("whole-context", spine.lower())
 
 
 if __name__ == "__main__":
