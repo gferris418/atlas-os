@@ -1,10 +1,25 @@
 id: atlas.observability
-version: 3.0.0
+version: 3.0.3
 status: active
 normative: true
 contract:
-  dashboard_fields: [objective, progress, active_stage, blocker_or_approval, evidence_health, persistence_state, next_action]
+  dashboard_fields:
+    - objective
+    - progress
+    - active_stage
+    - blocker_or_approval
+    - evidence_health
+    - quality_tier
+    - quality_gate
+    - quality_gaps
+    - persistence_state
+    - next_action
   source_of_truth: CONTROL_PLANE_STATE
   read_only_projection: true
+  default_user_renderer: FAST_TEXT
+  renderer_rule: FAST_TEXT is presentation-only and may not change routing, quality tier, evidence requirements, or execution semantics.
   startup_rule: Mission Control, Control Plane, execution identity, and compact dashboard initialize before substantive execution.
   update_rule: Emit state changes at meaningful checkpoints; avoid ceremonial noise.
+  progress_rule: Progress is deterministic and stage-based rather than elapsed-time estimation.
+  performance_telemetry_contract: spec/performance-telemetry.yaml
+  telemetry_authority_rule: Performance telemetry is observational and cannot select or lower the required quality tier.
