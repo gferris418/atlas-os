@@ -7,6 +7,10 @@ from atlas_runtime.persistence import build_chat_event_markdown, chat_event_path
 
 
 class ChatEventPersistenceTests(unittest.TestCase):
+    @staticmethod
+    def _event_id(markdown: str) -> str:
+        return next(line.split(": ", 1)[1] for line in markdown.splitlines() if line.startswith("event_id: "))
+
     def test_event_path_is_month_partitioned_and_immutable_per_turn(self) -> None:
         path = chat_event_path(
             conversation_id="conv-123",
@@ -77,6 +81,18 @@ class ChatEventPersistenceTests(unittest.TestCase):
             metadata={"task_id": "ATLAS-3", "route": "DIRECT_SEARCH"},
         )
         self.assertEqual(build_chat_event_markdown(**kwargs), build_chat_event_markdown(**kwargs))
+
+    def test_event_identity_changes_when_prompt_changes_even_if_response_and_turn_match(self) -> None:
+        common = dict(
+            visible_response="Same response",
+            conversation_id="conv-123",
+            turn_id="10",
+            timestamp_utc="2026-10-23T00:18:00Z",
+            metadata={"task_id": "ATLAS-4"},
+        )
+        first = build_chat_event_markdown(visible_prompt="Prompt A", **common)
+        second = build_chat_event_markdown(visible_prompt="Prompt B", **common)
+        self.assertNotEqual(self._event_id(first), self._event_id(second))
 
 
 if __name__ == "__main__":
