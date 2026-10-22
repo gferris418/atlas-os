@@ -1,0 +1,76 @@
+id: atlas.classification.update-sources
+version: 1
+status: active
+update_sources:
+  - id: SRC-UNSD-CLASSIFICATIONS
+    authority_id: UNSD
+    url: https://unstats.un.org/unsd/classifications/
+    source_class: AUTHORITATIVE
+    scope: ISIC, CPC, SITC and UN classification metadata
+    check_mode: PERIODIC_AND_USER_TRIGGERED
+  - id: SRC-WCO-HS
+    authority_id: WCO
+    url: https://www.wcoomd.org/en/topics/nomenclature/overview.aspx
+    source_class: AUTHORITATIVE
+    scope: Harmonized System editions and nomenclature notices
+    check_mode: PERIODIC_AND_USER_TRIGGERED
+  - id: SRC-UNSPSC
+    authority_id: UNSPSC
+    url: https://www.unspsc.org/
+    source_class: AUTHORITATIVE
+    scope: UNSPSC release and licensing metadata
+    check_mode: PERIODIC_AND_USER_TRIGGERED
+  - id: SRC-EUROSTAT-NACE
+    authority_id: EUROSTAT
+    url: https://ec.europa.eu/eurostat/web/nace
+    source_class: AUTHORITATIVE
+    scope: NACE editions and implementation metadata
+    check_mode: PERIODIC_AND_USER_TRIGGERED
+  - id: SRC-EUROSTAT-CPA
+    authority_id: EUROSTAT
+    url: https://ec.europa.eu/eurostat/web/cpa
+    source_class: AUTHORITATIVE
+    scope: CPA editions and implementation metadata
+    check_mode: PERIODIC_AND_USER_TRIGGERED
+  - id: SRC-EC-CPV
+    authority_id: EUROPEAN_COMMISSION
+    url: https://single-market-economy.ec.europa.eu/single-market/public-procurement/digital-procurement/e-procurement/cpv_en
+    source_class: AUTHORITATIVE
+    scope: Common Procurement Vocabulary
+    check_mode: PERIODIC_AND_USER_TRIGGERED
+  - id: SRC-US-CENSUS-NAICS
+    authority_id: US_CENSUS
+    url: https://www.census.gov/naics/
+    source_class: AUTHORITATIVE
+    scope: NAICS editions and revision notices
+    check_mode: PERIODIC_AND_USER_TRIGGERED
+  - id: SRC-WORLD-BANK
+    authority_id: WORLD_BANK
+    url: https://www.worldbank.org/en/projects-operations
+    source_class: AUTHORITATIVE
+    scope: World Bank sector and procurement frameworks
+    check_mode: PERIODIC_AND_USER_TRIGGERED
+  - id: SRC-ADB
+    authority_id: ADB
+    url: https://www.adb.org/business/main
+    source_class: AUTHORITATIVE
+    scope: ADB sector and procurement frameworks
+    check_mode: PERIODIC_AND_USER_TRIGGERED
+  - id: SRC-BBS
+    authority_id: BBS
+    url: https://bbs.gov.bd/
+    source_class: AUTHORITATIVE
+    scope: Bangladesh statistical, product, industry and geography classifications
+    check_mode: PERIODIC_AND_USER_TRIGGERED
+  - id: SRC-NBR-BANGLADESH
+    authority_id: NBR_BANGLADESH
+    url: https://nbr.gov.bd/
+    source_class: AUTHORITATIVE
+    scope: Bangladesh customs tariff classification
+    check_mode: PERIODIC_AND_USER_TRIGGERED
+  - id: SRC-BPPA
+    authority_id: BPPA
+    url: https://www.bppa.gov.bd/
+    source_class: AUTHORITATIVE
+    scope: Bangladesh public procurement classifications and rules
+    check_mode: PERIODIC_AND_USER_TRIGGERED

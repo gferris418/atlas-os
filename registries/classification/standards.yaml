@@ -1,0 +1,339 @@
+id: atlas.classification.standards
+version: 1
+status: active
+rules:
+  historical_versions_preserved: true
+  candidate_discovery_is_not_canonical: true
+  classification_does_not_prove_eligibility: true
+standards:
+  - standard_id: STD-UN-ISIC
+    official_name: International Standard Industrial Classification of All Economic Activities
+    abbreviation: ISIC
+    family_id: ECONOMIC_ACTIVITY
+    authority_id: UNSD
+    jurisdiction: Global
+    versions:
+      - version_id: VER-UN-ISIC-REV4
+        official_version: Rev. 4
+        hierarchy_available: true
+        source_url: https://unstats.un.org/unsd/classifications/Econ/ISIC.cshtml
+        lifecycle: SUPERSEDED
+        evidence_status: CONFIRMED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+      - version_id: VER-UN-ISIC-REV5
+        official_version: Rev. 5
+        publication_date: '2024'
+        supersedes_version_id: VER-UN-ISIC-REV4
+        hierarchy_available: true
+        source_url: https://unstats.un.org/unsd/classifications/Econ/ISIC.cshtml
+        lifecycle: ACTIVE
+        evidence_status: CONFIRMED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+  - standard_id: STD-UN-CPC
+    official_name: Central Product Classification
+    abbreviation: CPC
+    family_id: PRODUCT
+    authority_id: UNSD
+    jurisdiction: Global
+    versions:
+      - version_id: VER-UN-CPC-2.1
+        official_version: Version 2.1
+        hierarchy_available: true
+        source_url: https://unstats.un.org/unsd/classifications/Econ/CPC.cshtml
+        lifecycle: SUPERSEDED
+        evidence_status: CONFIRMED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+      - version_id: VER-UN-CPC-3.0
+        official_version: Version 3.0
+        publication_date: '2025'
+        supersedes_version_id: VER-UN-CPC-2.1
+        hierarchy_available: true
+        source_url: https://unstats.un.org/unsd/classifications/Econ/CPC.cshtml
+        lifecycle: ACTIVE
+        evidence_status: CONFIRMED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+  - standard_id: STD-WCO-HS
+    official_name: Harmonized Commodity Description and Coding System
+    abbreviation: HS
+    family_id: TRADE_CLASSIFICATION
+    authority_id: WCO
+    jurisdiction: Global
+    versions:
+      - version_id: VER-WCO-HS-2017
+        official_version: HS 2017
+        hierarchy_available: true
+        source_url: https://www.wcoomd.org/en/topics/nomenclature/overview.aspx
+        lifecycle: SUPERSEDED
+        evidence_status: CONFIRMED
+        redistribution_status: RESTRICTED
+        dataset_storage: METADATA_ONLY
+      - version_id: VER-WCO-HS-2022
+        official_version: HS 2022
+        effective_date: '2022-01-01'
+        supersedes_version_id: VER-WCO-HS-2017
+        hierarchy_available: true
+        source_url: https://www.wcoomd.org/en/topics/nomenclature/instrument-and-tools/hs-nomenclature-2022-edition.aspx
+        lifecycle: ACTIVE
+        evidence_status: CONFIRMED
+        redistribution_status: RESTRICTED
+        dataset_storage: METADATA_ONLY
+  - standard_id: STD-UN-SITC
+    official_name: Standard International Trade Classification
+    abbreviation: SITC
+    family_id: TRADE_CLASSIFICATION
+    authority_id: UNSD
+    jurisdiction: Global
+    versions:
+      - version_id: VER-UN-SITC-REV4
+        official_version: Rev. 4
+        publication_date: '2006'
+        hierarchy_available: true
+        source_url: https://unstats.un.org/unsd/classifications/Econ/Detail/EN/14/SITC
+        lifecycle: ACTIVE
+        evidence_status: CONFIRMED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+  - standard_id: STD-UNSPSC
+    official_name: United Nations Standard Products and Services Code
+    abbreviation: UNSPSC
+    family_id: PROCUREMENT_CATEGORY
+    authority_id: UNSPSC
+    jurisdiction: Global
+    versions:
+      - version_id: VER-UNSPSC-CURRENT-PENDING
+        official_version: Current edition pending authoritative version verification
+        hierarchy_available: true
+        source_url: https://www.unspsc.org/
+        lifecycle: CANDIDATE
+        evidence_status: UNVERIFIED
+        redistribution_status: RESTRICTED
+        dataset_storage: METADATA_ONLY
+  - standard_id: STD-EU-NACE
+    official_name: Statistical Classification of Economic Activities in the European Community
+    abbreviation: NACE
+    family_id: ECONOMIC_ACTIVITY
+    authority_id: EUROSTAT
+    jurisdiction: European Union
+    versions:
+      - version_id: VER-EU-NACE-REV2
+        official_version: Rev. 2
+        hierarchy_available: true
+        source_url: https://ec.europa.eu/eurostat/web/nace
+        lifecycle: SUPERSEDED
+        evidence_status: CONFIRMED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+      - version_id: VER-EU-NACE-REV2.1
+        official_version: Rev. 2.1
+        effective_date: '2025'
+        supersedes_version_id: VER-EU-NACE-REV2
+        hierarchy_available: true
+        source_url: https://ec.europa.eu/eurostat/web/nace
+        lifecycle: ACTIVE
+        evidence_status: CONFIRMED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+  - standard_id: STD-EU-CPA
+    official_name: Statistical Classification of Products by Activity
+    abbreviation: CPA
+    family_id: PRODUCT
+    authority_id: EUROSTAT
+    jurisdiction: European Union
+    versions:
+      - version_id: VER-EU-CPA-2.1
+        official_version: Version 2.1
+        hierarchy_available: true
+        source_url: https://ec.europa.eu/eurostat/web/cpa
+        lifecycle: SUPERSEDED
+        evidence_status: CONFIRMED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+      - version_id: VER-EU-CPA-2.2
+        official_version: Version 2.2
+        effective_date: '2025'
+        supersedes_version_id: VER-EU-CPA-2.1
+        hierarchy_available: true
+        source_url: https://ec.europa.eu/eurostat/web/cpa
+        lifecycle: ACTIVE
+        evidence_status: CONFIRMED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+  - standard_id: STD-EU-CPV
+    official_name: Common Procurement Vocabulary
+    abbreviation: CPV
+    family_id: PROCUREMENT_CATEGORY
+    authority_id: EUROPEAN_COMMISSION
+    jurisdiction: European Union
+    versions:
+      - version_id: VER-EU-CPV-2008
+        official_version: Regulation (EC) No 213/2008 vocabulary
+        publication_date: '2008'
+        hierarchy_available: true
+        source_url: https://single-market-economy.ec.europa.eu/single-market/public-procurement/digital-procurement/e-procurement/cpv_en
+        lifecycle: ACTIVE
+        evidence_status: CONFIRMED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+  - standard_id: STD-US-NAICS
+    official_name: North American Industry Classification System
+    abbreviation: NAICS
+    family_id: INDUSTRY
+    authority_id: US_CENSUS
+    jurisdiction: United States, Canada, and Mexico
+    versions:
+      - version_id: VER-US-NAICS-2017
+        official_version: '2017'
+        hierarchy_available: true
+        source_url: https://www.census.gov/naics/
+        lifecycle: SUPERSEDED
+        evidence_status: CONFIRMED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+      - version_id: VER-US-NAICS-2022
+        official_version: '2022'
+        supersedes_version_id: VER-US-NAICS-2017
+        hierarchy_available: true
+        source_url: https://www.census.gov/naics/
+        lifecycle: ACTIVE
+        evidence_status: CONFIRMED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+  - standard_id: STD-WB-SECTOR
+    official_name: World Bank sector classification framework
+    abbreviation: WB-SECTOR
+    family_id: SECTOR
+    authority_id: WORLD_BANK
+    jurisdiction: World Bank operations
+    versions:
+      - version_id: VER-WB-SECTOR-CURRENT-PENDING
+        official_version: Current edition pending authoritative metadata verification
+        hierarchy_available: true
+        source_url: https://www.worldbank.org/en/projects-operations
+        lifecycle: CANDIDATE
+        evidence_status: UNVERIFIED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+  - standard_id: STD-WB-PROCUREMENT
+    official_name: World Bank procurement classification framework
+    abbreviation: WB-PROCUREMENT
+    family_id: PROCUREMENT_CATEGORY
+    authority_id: WORLD_BANK
+    jurisdiction: World Bank-financed procurement
+    versions:
+      - version_id: VER-WB-PROCUREMENT-CURRENT-PENDING
+        official_version: Current edition pending authoritative metadata verification
+        hierarchy_available: true
+        source_url: https://projects.worldbank.org/en/projects-operations/products-and-services/procurement-projects-programs
+        lifecycle: CANDIDATE
+        evidence_status: UNVERIFIED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+  - standard_id: STD-ADB-SECTOR
+    official_name: Asian Development Bank sector classification framework
+    abbreviation: ADB-SECTOR
+    family_id: SECTOR
+    authority_id: ADB
+    jurisdiction: ADB operations
+    versions:
+      - version_id: VER-ADB-SECTOR-CURRENT-PENDING
+        official_version: Current edition pending authoritative metadata verification
+        hierarchy_available: true
+        source_url: https://www.adb.org/what-we-do/topics
+        lifecycle: CANDIDATE
+        evidence_status: UNVERIFIED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+  - standard_id: STD-ADB-PROCUREMENT
+    official_name: Asian Development Bank procurement classification framework
+    abbreviation: ADB-PROCUREMENT
+    family_id: PROCUREMENT_CATEGORY
+    authority_id: ADB
+    jurisdiction: ADB-financed procurement
+    versions:
+      - version_id: VER-ADB-PROCUREMENT-CURRENT-PENDING
+        official_version: Current edition pending authoritative metadata verification
+        hierarchy_available: true
+        source_url: https://www.adb.org/business/main
+        lifecycle: CANDIDATE
+        evidence_status: UNVERIFIED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+  - standard_id: STD-BD-BCPC
+    official_name: Bangladesh Central Product Classification
+    abbreviation: BCPC
+    family_id: PRODUCT
+    authority_id: BBS
+    jurisdiction: Bangladesh
+    versions:
+      - version_id: VER-BD-BCPC-CURRENT-PENDING
+        official_version: Current edition pending authoritative metadata verification
+        hierarchy_available: true
+        source_url: https://bbs.gov.bd/
+        lifecycle: CANDIDATE
+        evidence_status: UNVERIFIED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+  - standard_id: STD-BD-INDUSTRY
+    official_name: Bangladesh industrial and economic activity classification
+    abbreviation: BD-INDUSTRY
+    family_id: ECONOMIC_ACTIVITY
+    authority_id: BBS
+    jurisdiction: Bangladesh
+    versions:
+      - version_id: VER-BD-INDUSTRY-CURRENT-PENDING
+        official_version: Current edition pending authoritative metadata verification
+        hierarchy_available: true
+        source_url: https://bbs.gov.bd/
+        lifecycle: CANDIDATE
+        evidence_status: UNVERIFIED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+  - standard_id: STD-BD-GEOGRAPHY
+    official_name: Bangladesh geographic and administrative classification
+    abbreviation: BD-GEOGRAPHY
+    family_id: GEOGRAPHY
+    authority_id: BBS
+    jurisdiction: Bangladesh
+    versions:
+      - version_id: VER-BD-GEOGRAPHY-CURRENT-PENDING
+        official_version: Current edition pending authoritative metadata verification
+        hierarchy_available: true
+        source_url: https://bbs.gov.bd/
+        lifecycle: CANDIDATE
+        evidence_status: UNVERIFIED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+  - standard_id: STD-BD-CUSTOMS
+    official_name: Bangladesh customs tariff classification
+    abbreviation: BD-CUSTOMS
+    family_id: TRADE_CLASSIFICATION
+    authority_id: NBR_BANGLADESH
+    jurisdiction: Bangladesh
+    versions:
+      - version_id: VER-BD-CUSTOMS-CURRENT-PENDING
+        official_version: Current tariff edition pending authoritative metadata verification
+        hierarchy_available: true
+        source_url: https://nbr.gov.bd/
+        lifecycle: CANDIDATE
+        evidence_status: UNVERIFIED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY
+  - standard_id: STD-BD-PROCUREMENT
+    official_name: Bangladesh public procurement category framework
+    abbreviation: BD-PROCUREMENT
+    family_id: PROCUREMENT_CATEGORY
+    authority_id: BPPA
+    jurisdiction: Bangladesh
+    versions:
+      - version_id: VER-BD-PROCUREMENT-CURRENT-PENDING
+        official_version: Current category framework pending authoritative metadata verification
+        hierarchy_available: true
+        source_url: https://www.bppa.gov.bd/
+        lifecycle: CANDIDATE
+        evidence_status: UNVERIFIED
+        redistribution_status: UNKNOWN
+        dataset_storage: METADATA_ONLY

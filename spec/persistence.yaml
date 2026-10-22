@@ -8,3 +8,21 @@ contract:
   save_rule: SAVED requires an authorized durable write and a verifiable receipt.
   provider_rule: Providers may propose mutations or return artifacts; ATLAS decides whether and where canonical persistence occurs.
   deployment_profiles: Host or organization integrations may define storage targets without becoming core architectural authority.
+  workload_classes:
+    VERSIONED_REFERENCE_DATA:
+      purpose: Reviewed standards, policies, schemas, mappings, and other reference knowledge that benefits from immutable history and review.
+      mutation_model: reviewed_versioned
+      target_rule: Deployment profiles select an authorized version-controlled durable store.
+    OPERATIONAL_RELATIONAL_STATE:
+      purpose: Current operational entities, relationships, classifications, facts, and workflow state requiring transactional integrity.
+      mutation_model: transactional
+      target_rule: Deployment profiles select an authorized relational operational store.
+    DOCUMENT_CONTENT:
+      purpose: Source documents, working documents, evidence files, and large or restricted content.
+      mutation_model: document_versioned_or_replaced
+      target_rule: Deployment profiles select an authorized document store appropriate to sensitivity and size.
+    CRM_STATE:
+      purpose: Relationship, engagement, contactability, and CRM-native commercial interaction state.
+      mutation_model: crm_managed
+      target_rule: Deployment profiles select an authorized CRM system of record.
+  reference_data_rule: Version-controlled reference stores are appropriate for reviewed reference knowledge, not high-frequency transactional operational state.

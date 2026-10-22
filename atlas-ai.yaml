@@ -23,6 +23,7 @@ discovery_order:
   - registries/capabilities.yaml
   - registries/providers.yaml
   - registries/surfaces.yaml
+  - registries/classification/*.yaml
   - applicable integrations/*.yaml
 machine_contracts:
   - atlas-os.yaml
@@ -45,9 +46,17 @@ machine_contracts:
   - schemas/handoff.schema.json
   - schemas/output.schema.json
   - schemas/routing-decision.schema.json
+  - schemas/classification-standard.schema.json
+  - schemas/classification-entry.schema.json
+  - schemas/classification-crosswalk.schema.json
   - registries/capabilities.yaml
   - registries/providers.yaml
   - registries/surfaces.yaml
+  - registries/classification/families.yaml
+  - registries/classification/authorities.yaml
+  - registries/classification/standards.yaml
+  - registries/classification/update-sources.yaml
+  - registries/classification/crosswalks.yaml
   - integrations/access-asia.yaml
   - integrations/argus.yaml
   - integrations/chatgpt.yaml
@@ -63,6 +72,7 @@ human_guidance:
   - docs/sop.md
   - docs/capabilities-routing.md
   - docs/evidence-verification.md
+  - docs/classification-standards.md
   - docs/argus-interface.md
   - docs/host-integration.md
   - docs/implementation-guide.md

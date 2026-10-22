@@ -1,0 +1,37 @@
+id: atlas.classification.authorities
+version: 1
+status: active
+authorities:
+  - id: UNSD
+    official_name: United Nations Statistics Division
+    source_url: https://unstats.un.org/unsd/classifications/
+  - id: WCO
+    official_name: World Customs Organization
+    source_url: https://www.wcoomd.org/en/topics/nomenclature/overview.aspx
+  - id: UNSPSC
+    official_name: United Nations Standard Products and Services Code
+    source_url: https://www.unspsc.org/
+  - id: EUROSTAT
+    official_name: Eurostat
+    source_url: https://ec.europa.eu/eurostat/web/main/data/classifications
+  - id: EUROPEAN_COMMISSION
+    official_name: European Commission
+    source_url: https://single-market-economy.ec.europa.eu/single-market/public-procurement/digital-procurement/e-procurement/cpv_en
+  - id: US_CENSUS
+    official_name: United States Census Bureau
+    source_url: https://www.census.gov/naics/
+  - id: WORLD_BANK
+    official_name: World Bank
+    source_url: https://www.worldbank.org/en/projects-operations
+  - id: ADB
+    official_name: Asian Development Bank
+    source_url: https://www.adb.org/
+  - id: BBS
+    official_name: Bangladesh Bureau of Statistics
+    source_url: https://bbs.gov.bd/
+  - id: NBR_BANGLADESH
+    official_name: National Board of Revenue, Bangladesh
+    source_url: https://nbr.gov.bd/
+  - id: BPPA
+    official_name: Bangladesh Public Procurement Authority
+    source_url: https://www.bppa.gov.bd/

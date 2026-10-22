@@ -16,18 +16,33 @@ EXPECTED_SPECS = {
 EXPECTED_SCHEMAS = {
     "approval.schema.json", "evidence.schema.json", "execution-envelope.schema.json",
     "handoff.schema.json", "output.schema.json", "routing-decision.schema.json",
+    "classification-standard.schema.json", "classification-entry.schema.json",
+    "classification-crosswalk.schema.json",
 }
 EXPECTED_REGISTRIES = {"capabilities.yaml", "providers.yaml", "surfaces.yaml"}
+EXPECTED_CLASSIFICATION_REGISTRIES = {
+    "families.yaml", "authorities.yaml", "standards.yaml", "update-sources.yaml", "crosswalks.yaml",
+}
 EXPECTED_INTEGRATIONS = {
     "access-asia.yaml", "argus.yaml", "chatgpt-bootstrap.yaml", "chatgpt.yaml",
     "generic-host.yaml", "hermes-agent.yaml",
 }
 EXPECTED_DOCS = {
     "README.md", "SUMMARY.md", "architecture.md", "framework.md", "playbook.md", "sop.md",
-    "capabilities-routing.md", "evidence-verification.md", "argus-interface.md", "host-integration.md",
-    "implementation-guide.md", "examples.md",
+    "capabilities-routing.md", "evidence-verification.md", "classification-standards.md",
+    "argus-interface.md", "host-integration.md", "implementation-guide.md", "examples.md",
 }
 BANNED = {"legacy", "migration", "library", "docs/releases", "docs/plans"}
+APPROVED_FAMILIES = {
+    "DOMAIN", "SECTOR", "INDUSTRY", "ECONOMIC_ACTIVITY", "PRODUCT", "CAPABILITY",
+    "PROCUREMENT_CATEGORY", "TRADE_CLASSIFICATION", "OCCUPATION", "GEOGRAPHY",
+    "COMPLIANCE_REGULATORY",
+}
+LIFECYCLES = {"DISCOVERED", "CANDIDATE", "VERIFIED", "ACTIVE", "SUPERSEDED", "ARCHIVED"}
+EVIDENCE_STATUSES = {"CONFIRMED", "PROBABLE", "POSSIBLE", "DISPUTED", "UNVERIFIED", "STALE"}
+RELATIONSHIPS = {"EXACT", "CLOSE", "BROADER", "NARROWER", "RELATED", "CANDIDATE"}
+REDISTRIBUTION_STATUSES = {"PERMITTED", "RESTRICTED", "UNKNOWN", "NOT_APPLICABLE"}
+DATASET_STORAGE_MODES = {"NONE", "METADATA_ONLY", "PERMITTED_EXTRACT", "FULL_DATASET"}
 
 
 def _load(path: Path):
@@ -38,7 +53,125 @@ def _load(path: Path):
 
 def _names(root: Path, directory: str, suffixes: tuple[str, ...]) -> set[str]:
     base = root / directory
+    if not base.is_dir():
+        return set()
     return {path.name for path in base.iterdir() if path.is_file() and path.suffix in suffixes}
+
+
+def _validate_classification(root: Path, errors: list[str]) -> None:
+    base = root / "registries" / "classification"
+    families = _load(base / "families.yaml").get("families", [])
+    family_ids = [entry.get("id") for entry in families]
+    if set(family_ids) != APPROVED_FAMILIES or len(family_ids) != len(set(family_ids)):
+        errors.append("classification families must exactly match the approved unique family set")
+
+    authorities = _load(base / "authorities.yaml").get("authorities", [])
+    authority_ids = [entry.get("id") for entry in authorities]
+    authority_set = set(authority_ids)
+    if len(authority_ids) != len(authority_set):
+        errors.append("classification authority IDs must be unique")
+    for authority in authorities:
+        if not authority.get("official_name") or not str(authority.get("source_url", "")).startswith("https://"):
+            errors.append(f"invalid classification authority: {authority.get('id')}")
+
+    standards_payload = _load(base / "standards.yaml")
+    if standards_payload.get("rules", {}).get("historical_versions_preserved") is not True:
+        errors.append("classification standards must preserve historical versions")
+    standards = standards_payload.get("standards", [])
+    standard_ids = [record.get("standard_id") for record in standards]
+    standard_id_set = set(standard_ids)
+    if len(standard_ids) != len(standard_id_set):
+        errors.append("classification standard IDs must be unique")
+
+    versions: dict[str, dict] = {}
+    version_owner: dict[str, str] = {}
+    for standard in standards:
+        standard_id = standard.get("standard_id")
+        if standard.get("family_id") not in APPROVED_FAMILIES:
+            errors.append(f"unknown classification family on {standard_id}")
+        if standard.get("authority_id") not in authority_set:
+            errors.append(f"unknown classification authority on {standard_id}")
+        if not standard.get("official_name") or not standard.get("abbreviation") or not standard.get("jurisdiction"):
+            errors.append(f"incomplete classification standard metadata: {standard_id}")
+        for version in standard.get("versions", []):
+            version_id = version.get("version_id")
+            if not version_id or version_id in versions:
+                errors.append(f"duplicate or missing classification version ID: {version_id}")
+                continue
+            versions[version_id] = version
+            version_owner[version_id] = standard_id
+            official_version = version.get("official_version")
+            if not isinstance(official_version, str) or not official_version.strip():
+                errors.append(f"classification official version must be a non-empty string: {version_id}")
+            if version.get("lifecycle") not in LIFECYCLES:
+                errors.append(f"invalid classification lifecycle: {version_id}")
+            if version.get("evidence_status") not in EVIDENCE_STATUSES:
+                errors.append(f"invalid classification evidence status: {version_id}")
+            if not str(version.get("source_url", "")).startswith("https://"):
+                errors.append(f"classification version lacks authoritative provenance URL: {version_id}")
+            if version.get("redistribution_status") not in REDISTRIBUTION_STATUSES:
+                errors.append(f"invalid redistribution status: {version_id}")
+            if version.get("dataset_storage") not in DATASET_STORAGE_MODES:
+                errors.append(f"invalid dataset storage mode: {version_id}")
+            if version.get("lifecycle") == "ACTIVE" and version.get("evidence_status") != "CONFIRMED":
+                errors.append(f"ACTIVE classification version must be CONFIRMED: {version_id}")
+            if version.get("dataset_storage") == "FULL_DATASET" and version.get("redistribution_status") != "PERMITTED":
+                errors.append(f"FULL_DATASET requires PERMITTED redistribution: {version_id}")
+
+    for version_id, version in versions.items():
+        supersedes = version.get("supersedes_version_id")
+        if supersedes:
+            if supersedes not in versions:
+                errors.append(f"classification supersedes unknown version: {version_id} -> {supersedes}")
+            elif supersedes == version_id:
+                errors.append(f"classification version cannot supersede itself: {version_id}")
+            elif version_owner[supersedes] != version_owner[version_id]:
+                errors.append(f"classification version supersedes a different standard: {version_id} -> {supersedes}")
+
+    sources = _load(base / "update-sources.yaml").get("update_sources", [])
+    source_ids = [source.get("id") for source in sources]
+    if len(source_ids) != len(set(source_ids)):
+        errors.append("classification update-source IDs must be unique")
+    for source in sources:
+        if source.get("authority_id") not in authority_set:
+            errors.append(f"classification update source has unknown authority: {source.get('id')}")
+        if source.get("source_class") != "AUTHORITATIVE" or not str(source.get("url", "")).startswith("https://"):
+            errors.append(f"classification update source must be authoritative: {source.get('id')}")
+
+    crosswalk_payload = _load(base / "crosswalks.yaml")
+    if crosswalk_payload.get("directional") is not True:
+        errors.append("classification crosswalks must be directional")
+    if crosswalk_payload.get("candidate_is_not_canonical_equivalence") is not True:
+        errors.append("CANDIDATE crosswalks must not be canonical equivalence")
+    crosswalk_ids: set[str] = set()
+    for crosswalk in crosswalk_payload.get("crosswalks", []):
+        crosswalk_id = crosswalk.get("crosswalk_id")
+        if not crosswalk_id or crosswalk_id in crosswalk_ids:
+            errors.append(f"duplicate or missing crosswalk ID: {crosswalk_id}")
+        crosswalk_ids.add(crosswalk_id)
+        if crosswalk.get("relationship") not in RELATIONSHIPS:
+            errors.append(f"invalid crosswalk relationship: {crosswalk_id}")
+        if crosswalk.get("evidence_status") not in EVIDENCE_STATUSES:
+            errors.append(f"invalid crosswalk evidence status: {crosswalk_id}")
+        if not str(crosswalk.get("source_url", "")).startswith("https://"):
+            errors.append(f"crosswalk lacks provenance URL: {crosswalk_id}")
+        source_standard = crosswalk.get("source_standard_id")
+        target_standard = crosswalk.get("target_standard_id")
+        source_version = crosswalk.get("source_version_id")
+        target_version = crosswalk.get("target_version_id")
+        if source_standard not in standard_id_set:
+            errors.append(f"crosswalk references unknown source standard: {crosswalk_id}")
+        if target_standard not in standard_id_set:
+            errors.append(f"crosswalk references unknown target standard: {crosswalk_id}")
+        if source_version not in versions or target_version not in versions:
+            errors.append(f"crosswalk references unknown version: {crosswalk_id}")
+        else:
+            if version_owner[source_version] != source_standard:
+                errors.append(f"crosswalk source version does not belong to source standard: {crosswalk_id}")
+            if version_owner[target_version] != target_standard:
+                errors.append(f"crosswalk target version does not belong to target standard: {crosswalk_id}")
+        if crosswalk.get("relationship") == "CANDIDATE" and crosswalk.get("evidence_status") == "CONFIRMED":
+            errors.append(f"CANDIDATE crosswalk cannot be treated as confirmed equivalence: {crosswalk_id}")
 
 
 def validate(root: Path) -> list[str]:
@@ -61,6 +194,13 @@ def validate(root: Path) -> list[str]:
         if actual != expected:
             errors.append(f"{directory} surface drift: {sorted(actual)} != {sorted(expected)}")
 
+    classification_actual = _names(root, "registries/classification", (".yaml",))
+    if classification_actual != EXPECTED_CLASSIFICATION_REGISTRIES:
+        errors.append(
+            "classification registry surface drift: "
+            f"{sorted(classification_actual)} != {sorted(EXPECTED_CLASSIFICATION_REGISTRIES)}"
+        )
+
     required_root = ["atlas-ai.yaml", "atlas-os.yaml", "governance.yaml", "plugin.json", "README.md", "LICENSE"]
     for relative in required_root:
         if not (root / relative).is_file():
@@ -78,8 +218,13 @@ def validate(root: Path) -> list[str]:
         for name in sorted(expected):
             try:
                 _load(root / directory / name)
-            except Exception as exc:  # validation boundary intentionally reports parse failures
+            except Exception as exc:
                 errors.append(f"cannot parse {directory}/{name}: {exc}")
+    for name in sorted(EXPECTED_CLASSIFICATION_REGISTRIES):
+        try:
+            _load(root / "registries" / "classification" / name)
+        except Exception as exc:
+            errors.append(f"cannot parse registries/classification/{name}: {exc}")
 
     try:
         manifest = _load(root / "atlas-os.yaml")
@@ -105,6 +250,7 @@ def validate(root: Path) -> list[str]:
         *(f"spec/{name}" for name in EXPECTED_SPECS),
         *(f"schemas/{name}" for name in EXPECTED_SCHEMAS),
         *(f"registries/{name}" for name in EXPECTED_REGISTRIES),
+        *(f"registries/classification/{name}" for name in EXPECTED_CLASSIFICATION_REGISTRIES),
         *(f"integrations/{name}" for name in EXPECTED_INTEGRATIONS),
     }
     if set(machine_contracts) != expected_contracts:
@@ -119,6 +265,11 @@ def validate(root: Path) -> list[str]:
     packaged_skill = (root / "skills/atlas-os/SKILL.md").read_text(encoding="utf-8")
     if canonical_skill != packaged_skill:
         errors.append("packaged ATLAS plugin skill must exactly match the canonical agent skill")
+
+    if "registries/classification" not in manifest.get("registries", []):
+        errors.append("atlas-os registries must include registries/classification")
+
+    _validate_classification(root, errors)
 
     core = _load(root / "spec/core.yaml")["contract"]
     if core.get("pre_execution_flow") != ["UNDERSTAND_AND_NORMALIZE", "MINIMAL_DOMAIN_FRAMING", "ROUTE"]:

@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os/schemas/classification-crosswalk.schema.json",
+  "title": "ATLAS Classification Crosswalk",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "crosswalk_id",
+    "source_standard_id",
+    "source_version_id",
+    "source_code",
+    "target_standard_id",
+    "target_version_id",
+    "target_code",
+    "relationship",
+    "evidence_status",
+    "source_url"
+  ],
+  "properties": {
+    "crosswalk_id": {"type": "string", "minLength": 1},
+    "source_standard_id": {"type": "string", "minLength": 1},
+    "source_version_id": {"type": "string", "minLength": 1},
+    "source_code": {"type": "string", "minLength": 1},
+    "target_standard_id": {"type": "string", "minLength": 1},
+    "target_version_id": {"type": "string", "minLength": 1},
+    "target_code": {"type": "string", "minLength": 1},
+    "relationship": {"enum": ["EXACT", "CLOSE", "BROADER", "NARROWER", "RELATED", "CANDIDATE"]},
+    "evidence_status": {
+      "enum": ["CONFIRMED", "PROBABLE", "POSSIBLE", "DISPUTED", "UNVERIFIED", "STALE"]
+    },
+    "source_url": {"type": "string", "pattern": "^https://"},
+    "valid_from": {"type": ["string", "null"]},
+    "valid_to": {"type": ["string", "null"]},
+    "reviewed_by": {"type": ["string", "null"]},
+    "notes": {"type": "string"}
+  }
+}

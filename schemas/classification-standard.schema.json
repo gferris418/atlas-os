@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os/schemas/classification-standard.schema.json",
+  "title": "ATLAS Classification Standard",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["standard_id", "official_name", "abbreviation", "family_id", "authority_id", "jurisdiction", "versions"],
+  "properties": {
+    "standard_id": {"type": "string", "minLength": 1},
+    "official_name": {"type": "string", "minLength": 1},
+    "abbreviation": {"type": "string", "minLength": 1},
+    "family_id": {"type": "string", "minLength": 1},
+    "authority_id": {"type": "string", "minLength": 1},
+    "jurisdiction": {"type": "string", "minLength": 1},
+    "versions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["version_id", "official_version", "hierarchy_available", "source_url", "lifecycle", "evidence_status", "redistribution_status", "dataset_storage"],
+        "properties": {
+          "version_id": {"type": "string", "minLength": 1},
+          "official_version": {"type": "string", "minLength": 1},
+          "publication_date": {"type": ["string", "null"]},
+          "effective_date": {"type": ["string", "null"]},
+          "superseded_date": {"type": ["string", "null"]},
+          "supersedes_version_id": {"type": ["string", "null"]},
+          "hierarchy_available": {"type": "boolean"},
+          "source_url": {"type": "string", "pattern": "^https://"},
+          "lifecycle": {"enum": ["DISCOVERED", "CANDIDATE", "VERIFIED", "ACTIVE", "SUPERSEDED", "ARCHIVED"]},
+          "evidence_status": {"enum": ["CONFIRMED", "PROBABLE", "POSSIBLE", "DISPUTED", "UNVERIFIED", "STALE"]},
+          "redistribution_status": {"enum": ["PERMITTED", "RESTRICTED", "UNKNOWN", "NOT_APPLICABLE"]},
+          "dataset_storage": {"enum": ["NONE", "METADATA_ONLY", "PERMITTED_EXTRACT", "FULL_DATASET"]},
+          "notes": {"type": "string"}
+        }
+      }
+    }
+  }
+}

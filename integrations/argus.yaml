@@ -21,6 +21,7 @@ autonomy_within_mission:
     - acquire_and_normalize_evidence
     - corroborate_and_reconcile_sources
     - detect_gaps_conflicts_and_coverage
+    - propose_classification_standards_and_crosswalks
     - stop_when_additional_collection_is_unlikely_to_change_the_result
   may_not:
     - expand_scope_without_ATLAS
@@ -28,5 +29,7 @@ autonomy_within_mission:
     - self_activate
     - self_route_after_return
     - make_final_business_decisions
+    - promote_classification_candidate_to_canonical
+    - persist_canonical_classification_state_without_ATLAS_authorization
     - persist_canonical_state_without_ATLAS_authorization
 mission_method: PIR -> EEI -> Collection Plan -> Source Plan -> Collect -> Resolve -> Grade -> Competing Hypotheses -> Gaps -> Package

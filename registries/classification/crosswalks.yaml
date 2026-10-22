@@ -1,0 +1,10 @@
+id: atlas.classification.crosswalks
+version: 1
+status: active
+directional: true
+candidate_is_not_canonical_equivalence: true
+rules:
+  allowed_relationships: [EXACT, CLOSE, BROADER, NARROWER, RELATED, CANDIDATE]
+  canonical_adoption_requires_atlas_validation: true
+  no_automatic_equivalence: true
+crosswalks: []

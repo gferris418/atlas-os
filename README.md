@@ -1,8 +1,8 @@
 # ATLAS-OS
 
-ATLAS-OS is a portable operating framework for governed AI work. It sits between user intent and the capabilities supplied by ChatGPT, Hermes Agent, or another host. ATLAS owns orchestration, routing, approvals, provider reconciliation, verification, and persistence authority.
+ATLAS-OS is a portable operating framework for governed AI work. It sits between user intent and the capabilities supplied by ChatGPT, Hermes Agent, or another host. ATLAS owns orchestration, routing, approvals, provider reconciliation, verification, classification governance, and persistence authority.
 
-**Current release:** `3.0.0`
+**Current release:** `3.0.1`
 
 ## Core invariant
 
@@ -34,6 +34,12 @@ User / Event
 
 Preprocessing is **exactly three steps**. Planning, approvals, execution, evidence review, verification, persistence, and delivery are governed controls after routing; they are not additional preprocessing stages.
 
+## Classification standards registry
+
+ATLAS maintains a versioned reference registry for external classification systems used in routing, research, procurement, supplier matching, analytics, and operational tagging. Domain, sector, industry, economic activity, product, capability, procurement category, trade classification, occupation, geography, and compliance/regulatory classification remain distinct concepts.
+
+The registry preserves historical editions, authoritative provenance, lifecycle state, licensing/storage constraints, and directional crosswalks. `CANDIDATE` discoveries are proposals only and never become canonical automatically. Classification is context and indexing evidence; by itself it does not prove customs treatment, legal compliance, procurement eligibility, sanctions status, licensing, or regulatory approval.
+
 ## Repository
 
 ```text
@@ -41,9 +47,11 @@ atlas-os/
 ├── atlas-ai.yaml            # AI discovery entrypoint
 ├── atlas-os.yaml            # product/release authority
 ├── governance.yaml          # authority and change rules
+├── plugin.json              # portable plugin manifest
+├── skills/                  # packaged host skills
 ├── spec/                    # 11 durable normative contracts
-├── schemas/                 # 6 public interchange schemas
-├── registries/              # capabilities, providers, surfaces
+├── schemas/                 # 9 public interchange/reference schemas
+├── registries/              # capabilities, providers, surfaces, classifications
 ├── integrations/            # ARGUS, hosts, deployment profiles
 ├── atlas_runtime/           # compact reference runtime
 ├── tests/                   # unit, conformance, integration
@@ -78,4 +86,4 @@ ATLAS will route this to `ARGUS` but stop at `AWAITING_APPROVAL` until explicit 
 
 ## Documentation
 
-Human documentation is under [`docs/`](docs/README.md). GitHub is the source of truth for machine contracts and implementation; GitBook is the published human-readable projection.
+Human documentation is under [`docs/`](docs/README.md), including the [Classification Standards Registry](docs/classification-standards.md). GitHub is the source of truth for machine contracts and implementation; GitBook is the published human-readable projection.
