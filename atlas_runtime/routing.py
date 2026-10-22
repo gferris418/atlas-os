@@ -353,6 +353,7 @@ def build_routing_preview(
         "provider_conflict:" + ",".join(pair)
         for pair in conflicting_provider_pairs
     )
+    unresolved_gates = list(dict.fromkeys(unresolved_gates))
     missing_prerequisite_providers = sorted(
         provider["id"]
         for provider in providers
@@ -361,6 +362,33 @@ def build_routing_preview(
             for gate in provider["unresolved_gates"]
         )
     )
+
+    execution_sequence = [provider["id"] for provider in ordered]
+    activation_provider_sequence = list(dict.fromkeys(execution_sequence))
+    handoff_provider_ids = list(dict.fromkeys(
+        provider["id"] for provider in providers if provider["type"] == "domain-method"
+    ))
+    activation_blockers = list(unresolved_gates)
+    if requirements and task_id is None:
+        activation_blockers.append("task_id:REQUIRED")
+    activation_blockers = list(dict.fromkeys(activation_blockers))
+    activation_state = (
+        "NOT_REQUIRED"
+        if not requirements
+        else "BLOCKED" if activation_blockers else "READY_FOR_APPROVAL"
+    )
+    activation_contract = {
+        "version": "1.0",
+        "state": activation_state,
+        "activation_authority": "ATLAS_OS",
+        "approval_required": bool(requirements),
+        "collection_mode": collection_mode or "NONE",
+        "argus_activation_required": collection_mode in _ARGUS_COLLECTION_MODES,
+        "collection_mission_id": mission_record["mission_id"] if mission_record else None,
+        "provider_sequence": activation_provider_sequence,
+        "handoff_provider_ids": handoff_provider_ids,
+        "blockers": activation_blockers,
+    }
 
     preview = {
         "status": "PROPOSED" if requirements else "NOT_REQUIRED",
@@ -373,13 +401,14 @@ def build_routing_preview(
         "requirements": requirements,
         "intent_profile": deepcopy(profile),
         "collection_mission": deepcopy(mission_record),
+        "activation_contract": activation_contract,
         "providers": providers,
         "unmatched_requirements": unmatched_requirements,
         "cyclic_provider_ids": cyclic_provider_ids,
         "conflicting_provider_pairs": [list(pair) for pair in conflicting_provider_pairs],
         "missing_prerequisite_providers": missing_prerequisite_providers,
         "unresolved_gates": unresolved_gates,
-        "execution_sequence": [provider["id"] for provider in ordered],
+        "execution_sequence": execution_sequence,
         "steps": [
             {
                 "stage": "ROUTING",
