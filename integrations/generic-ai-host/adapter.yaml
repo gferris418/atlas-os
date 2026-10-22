@@ -18,18 +18,24 @@ persistence:
   saved_requires_verified_receipt: true
 approvals:
   preserve_host_boundaries: true
-  required_for: [external-write, publication, destructive-action, purchase, permission-change, credential-operation]
+  explicit_argus_authorization: true
+  digest_bound_argus_authorization: true
+  required_for: [argus-activation, external-write, publication, destructive-action, purchase, permission-change, credential-operation]
 startup:
   discovery: [atlas-ai.yaml, atlas-os.yaml, spec/core.yaml, registries/surfaces.yaml, integrations/generic-ai-host/adapter.yaml]
+  mission_control: true
+  control_plane: true
+  observability: true
   plan_id_required: true
   compact_dashboard: true
   single_active_atomic_unit: true
+  preprocessing_steps: [UNDERSTAND_AND_NORMALIZE, MINIMAL_DOMAIN_FRAMING, ROUTE]
 output:
   honor_explicit_format: true
   profile_fallback: smallest-task-fit
   verify_before_delivery: true
 unsupported_claims:
-  - Do not infer unavailable tools, approvals, storage, external actions, or durable state from registration alone.
+  - Do not infer unavailable tools, approvals, storage, external actions, ARGUS activation, or durable state from registration alone.
 executable_seam:
   function: atlas_runtime.get_surface_adapter
   surface_argument: generic-ai-host
