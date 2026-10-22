@@ -11,6 +11,7 @@ from .quality import (
     quality_rank,
     quality_requirements,
 )
+from .render import progress_for_stage, render_fast_text
 from .router import ARGUS_APPROVAL, EXTERNAL_ACTION_APPROVAL, PRE_EXECUTION_FLOW, choose_route, minimal_domain_framing, normalize_objective
 from .runtime import execute
 
@@ -32,6 +33,8 @@ __all__ = [
     "max_quality_tier",
     "minimal_domain_framing",
     "normalize_objective",
+    "progress_for_stage",
     "quality_rank",
     "quality_requirements",
+    "render_fast_text",
 ]
