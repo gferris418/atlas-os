@@ -4,11 +4,14 @@ title: ATLAS collection-need gate and ARGUS mission routing
 status: active
 normative: true
 contract:
-  purpose: Determine whether evidence acquisition is unnecessary, ordinary ATLAS research, structured ARGUS collection, or hybrid collection plus ATLAS analysis.
+  purpose: Determine whether evidence acquisition is unnecessary, ordinary ATLAS research, structured ARGUS collection, or hybrid collection plus ATLAS analysis, then enforce the explicit authorization boundary before ARGUS handoff.
   owner: ATLAS_CONTROL_PLANE
   modes: [NONE, ATLAS_DIRECT, ARGUS_COLLECTION, HYBRID]
   argus_role: Governed intelligence collection subsystem nested inside ATLAS.
   argus_capability: intelligence_collection
+  need_rule: ARGUS_COLLECTION and HYBRID establish collection need only. They never authorize collection.
+  authorization_rule: Before any ARGUS domain-method routing, handoff or collection execution, Mission Control must supply explicit user authorization for the current task and routing preview digest. PENDING, REJECTED, stale or mismatched authorization fails closed.
+  combined_approval_rule: One explicit user action may approve the exact routing preview and authorize ARGUS together, but the Control Plane records routing approval and ARGUS authorization as separate machine states.
   argus_does:
     - target_resolution
     - collection_planning_within_authorized_scope
@@ -40,15 +43,17 @@ contract:
     - observability_and_dashboard
     - final_delivery
   collection_mission: schemas/collection-mission.schema.json
-  handoff_rule: ARGUS activation receives the governed ATLAS domain-context handoff plus a collection mission. READY or PARTIAL context may proceed under the pinned specialist contract; BLOCKED context cannot authorize dependent collection.
+  handoff_rule: After explicit authorization, ARGUS activation receives the governed ATLAS domain-context handoff plus a collection mission. READY or PARTIAL context may proceed under the pinned specialist contract; BLOCKED context cannot authorize dependent collection.
   return_rule: ARGUS returns a collection package/evidence result to ATLAS. The package is not a final user-facing answer, forecast, bid/no-bid decision, or PX promotion decision.
-  dashboard_rule: Collection mode, collection status, ARGUS provider state, evidence health, gaps and blockers are observable projections only; Dashboard cannot activate ARGUS directly.
-  mission_control_rule: A dashboard request to expand, stop or redirect collection becomes a Mission Control command evaluated by the Control Plane.
+  dashboard_rule: Collection mode, authorization status, collection status, ARGUS provider state, evidence health, gaps and blockers are observable projections only; Dashboard cannot activate ARGUS directly.
+  mission_control_rule: A dashboard request to approve, reject, expand, stop or redirect ARGUS becomes a Mission Control command evaluated by the Control Plane.
   stopping_rule: Stop collection when additional evidence is unlikely to change sufficiency, material uncertainty, identified gaps, risk or the next ATLAS action.
 invariants: [INV-007, INV-008, INV-017, INV-018, INV-021]
 references:
   - spec/request-triage.yaml
   - spec/control-plane.yaml
   - spec/domain-handoff.yaml
+  - spec/approvals.yaml
   - spec/observability.yaml
+  - spec/task-lifecycle.yaml
   - registries/domain-methods.yaml
