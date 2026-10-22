@@ -1,6 +1,7 @@
 id: atlas-os-ai-entrypoint
-product_version: 3.0.1
+product_version: 3.0.2
 product_manifest: atlas-os.yaml
+mission_control_contract: spec/mission-control.yaml
 core_contract: spec/core.yaml
 routing_contract: spec/routing.yaml
 discovery_order:
@@ -9,8 +10,8 @@ discovery_order:
   - governance.yaml
   - plugin.json
   - skills/atlas-os/SKILL.md
-  - spec/core.yaml
   - spec/mission-control.yaml
+  - spec/core.yaml
   - spec/control-plane.yaml
   - spec/context.yaml
   - spec/routing.yaml
@@ -77,4 +78,4 @@ human_guidance:
   - docs/host-integration.md
   - docs/implementation-guide.md
   - docs/examples.md
-host_rule: Hosts provide capabilities and UI mechanics; ATLAS retains governance semantics and every next-step decision.
+host_rule: Hosts provide capabilities and UI mechanics; when ATLAS is active, Mission Control is the first governance gate and ATLAS retains every next-step decision.

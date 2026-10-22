@@ -2,11 +2,11 @@
 
 ATLAS-OS is a portable operating framework for governed AI work. It sits between user intent and the capabilities supplied by ChatGPT, Hermes Agent, or another host. ATLAS owns orchestration, routing, approvals, provider reconciliation, verification, classification governance, and persistence authority.
 
-**Current release:** `3.0.1`
+**Current release:** `3.0.2`
 
 ## Core invariant
 
-> **ATLAS governs. Providers execute bounded capabilities. Every provider returns to ATLAS. The user retains authority over consequential actions.**
+> **When ATLAS is active, every user prompt enters Mission Control first. ATLAS governs. Providers execute bounded capabilities. Every provider returns to ATLAS. The user retains authority over consequential actions.**
 
 ARGUS is the provider for structured `intelligence_collection`; it is not a peer operating system and cannot self-activate or choose the next ATLAS step.
 
@@ -14,7 +14,8 @@ ARGUS is the provider for structured `intelligence_collection`; it is not a peer
 
 ```text
 User / Event
-    -> Mission Control + Control Plane
+    -> Mission Control [FIRST GOVERNANCE GATE]
+    -> Control Plane
     -> Understand + Normalize
     -> Minimal Domain Framing
     -> Route
@@ -32,7 +33,9 @@ User / Event
     -> Deliver / persist
 ```
 
-Preprocessing is **exactly three steps**. Planning, approvals, execution, evidence review, verification, persistence, and delivery are governed controls after routing; they are not additional preprocessing stages.
+Mission Control runs before preprocessing whenever ATLAS is active. It is a governance entry gate, **not a fourth preprocessing step**. Preprocessing remains **exactly three steps**: Understand + Normalize, Minimal Domain Framing, Route. Planning, approvals, execution, evidence review, verification, persistence, and delivery are governed controls after routing; they are not additional preprocessing stages.
+
+ChatGPT and other hosts may load ATLAS by relevance or explicit selection. The repository therefore guarantees Mission Control-first behavior **once ATLAS is active**, but does not claim universal host-level prompt injection when ATLAS has not been loaded.
 
 ## Classification standards registry
 
@@ -82,7 +85,7 @@ Example request:
 }
 ```
 
-ATLAS will route this to `ARGUS` but stop at `AWAITING_APPROVAL` until explicit `ARGUS_ACTIVATION` approval is supplied.
+ATLAS enters Mission Control first, then routes this request to `ARGUS` and stops at `AWAITING_APPROVAL` until explicit `ARGUS_ACTIVATION` approval is supplied.
 
 ## Documentation
 
