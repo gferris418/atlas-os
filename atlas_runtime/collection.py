@@ -19,6 +19,34 @@ _COLLECTION_MISSION_VALIDATOR = jsonschema.Draft202012Validator(
     format_checker=jsonschema.FormatChecker(),
 )
 
+_OPPORTUNITY_OUTPUT_TYPES = {
+    "BUYER_REQUIREMENT",
+    "PROCUREMENT_DISCOVERY",
+    "PROCUREMENT_PLAN",
+    "PROJECT_PIPELINE",
+    "FUNDING_BUDGET",
+    "OPPORTUNITY_DISCOVERY",
+    "NEED_GAP",
+    "POLICY_DRIVER",
+    "PROGRAMME_PROJECT",
+    "APPROVAL_STATUS",
+    "OPPORTUNITY_DEVELOPMENT",
+    "OPPORTUNITY_MATCHING",
+    "EXPANSION_DISCOVERY",
+    "RAPID_TENDER",
+}
+_SUPPLIER_OUTPUT_TYPES = {
+    "PRODUCT_CAPABILITY",
+    "SUPPLIER_LANDSCAPE",
+    "COMPETITOR_LANDSCAPE",
+    "SUPPLIER_PROFILE",
+    "REFERENCE_PROJECT",
+    "EXPORT_FEASIBILITY",
+    "PARTNERABILITY",
+    "OPPORTUNITY_MATCHING",
+    "RAPID_TENDER",
+}
+
 
 def validate_collection_mission(
     mission: Mapping[str, Any],
@@ -64,6 +92,18 @@ def _temporal_scope(objective: str) -> tuple[str | None, str]:
     if re.search(r"\b(?:latest|current|today|present)\b", normalized, re.IGNORECASE):
         return None, "CURRENT"
     return None, "CURRENT"
+
+
+def _required_outputs(collection_types: list[str]) -> list[str]:
+    collection_set = set(collection_types)
+    outputs = ["findings", "evidence", "collection_gaps", "unknowns_conflicts"]
+    if collection_set & _OPPORTUNITY_OUTPUT_TYPES:
+        outputs.extend(["opportunities", "qualification_recommendations", "detection_metrics"])
+    if collection_set & _SUPPLIER_OUTPUT_TYPES:
+        outputs.append("supplier_intelligence")
+    if "OPPORTUNITY_MATCHING" in collection_set or "RAPID_TENDER" in collection_set:
+        outputs.append("supplier_matches")
+    return list(dict.fromkeys(outputs))
 
 
 def build_collection_mission(
@@ -113,10 +153,11 @@ def build_collection_mission(
         "source_priorities": ["official", "primary", "authoritative-secondary"],
         "source_exclusions": [],
         "risk_flags": list(dict.fromkeys(risk_flags)),
-        "required_output_components": ["findings", "evidence", "collection_gaps", "unknowns_conflicts"],
+        "required_output_components": _required_outputs(collection_types),
         "stopping_rule": (
             "Stop when the requested collection questions are materially answered with corroborated evidence, "
-            "or when remaining gaps are explicitly identified and further collection would not materially change ATLAS analysis."
+            "or when remaining gaps are explicitly identified and further collection would not materially change "
+            "ATLAS analysis, authoritative opportunity priority or authorized next action."
         ),
     }
     return validate_collection_mission(
