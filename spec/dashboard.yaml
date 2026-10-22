@@ -14,7 +14,8 @@ contract:
   realtime_rule: Update at meaningful events only; never poll or emit token-by-token status.
   performance: Dashboard generation remains deterministic, local and constant-cost relative to task size.
   privacy: Summarize safely and never expose secrets, raw sensitive prompts, private chain-of-thought or hidden reasoning tokens.
-  routing_visibility: Before provider invocation show the digest-bound routing preview; after review expose routed/blocked decisions.
+  routing_visibility: Before provider invocation show the digest-bound routing preview, including its deterministic activation_contract projection for host integrations; after review expose routed/blocked decisions.
+  activation_contract_semantics: The activation_contract summarizes provider readiness, ATLAS activation authority, approval requirement, collection mode, ARGUS activation need, bound collection mission, provider sequence, handoff providers and blocking gates without becoming a separate routing authority.
   duration_semantics: Show measured elapsed duration only.
   library_semantics: SAVED requires durable-write evidence; otherwise show PENDING, READY, BLOCKED or CAPABILITY_UNAVAILABLE.
 invariants: [INV-003, INV-004, INV-017, INV-020, INV-021]
