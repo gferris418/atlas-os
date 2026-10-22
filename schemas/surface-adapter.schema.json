@@ -70,14 +70,18 @@
     "approvals": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["preserve_host_boundaries", "required_for"],
+      "required": ["preserve_host_boundaries", "explicit_argus_authorization", "digest_bound_argus_authorization", "required_for"],
       "properties": {
         "preserve_host_boundaries": {"const": true},
+        "explicit_argus_authorization": {"const": true},
+        "digest_bound_argus_authorization": {"const": true},
         "required_for": {
           "type": "array",
           "uniqueItems": true,
+          "contains": {"const": "argus-activation"},
           "items": {
             "enum": [
+              "argus-activation",
               "external-write",
               "publication",
               "destructive-action",
@@ -92,16 +96,31 @@
     "startup": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["discovery", "plan_id_required", "compact_dashboard", "single_active_atomic_unit"],
+      "required": [
+        "discovery",
+        "mission_control",
+        "control_plane",
+        "observability",
+        "plan_id_required",
+        "compact_dashboard",
+        "single_active_atomic_unit",
+        "preprocessing_steps"
+      ],
       "properties": {
         "discovery": {
           "type": "array",
           "minItems": 1,
           "items": {"type": "string", "minLength": 1}
         },
+        "mission_control": {"const": true},
+        "control_plane": {"const": true},
+        "observability": {"const": true},
         "plan_id_required": {"const": true},
         "compact_dashboard": {"const": true},
-        "single_active_atomic_unit": {"const": true}
+        "single_active_atomic_unit": {"const": true},
+        "preprocessing_steps": {
+          "const": ["UNDERSTAND_AND_NORMALIZE", "MINIMAL_DOMAIN_FRAMING", "ROUTE"]
+        }
       }
     },
     "output": {
