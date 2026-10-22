@@ -1,56 +1,260 @@
 # ATLAS-OS
 
-ATLAS-OS is a **model-agnostic execution-governance architecture for AI agents**. It remains the single operating architecture between user intent and verified delivery. ARGUS is nested inside ATLAS as the governed intelligence collection subsystem; it is not a peer operating system or alternative execution spine.
+ATLAS-OS is a **portable, model-agnostic operating and governance layer for AI systems**. It sits between user intent and verified delivery and is designed to run inside ChatGPT, Hermes Agent, Claude, Codex, or another compatible AI host without transferring ATLAS authority to that host.
 
-It is **not a desktop operating system** and does not replace the host model, conversation engine, browser, tool runtime, or device OS.
+ATLAS does not replace the host model, conversation engine, browser, tool runtime, MCP layer, or device operating system. The host supplies capabilities; ATLAS supplies the operating model, governance, routing, approvals, evidence controls, lifecycle, verification, persistence policy, and delivery semantics.
 
-**Current candidate:** `v2.0.2-rc.6`  
-**Control revision:** `atlas-bootstrap-2026-10-22-r10`  
-**Target stable:** `v2.0.2`  
+ARGUS is nested inside ATLAS as the governed intelligence-collection subsystem. It is not a peer operating system and cannot self-activate.
+
+**Current candidate:** `v2.1.0-rc.1`  
+**Control revision:** `atlas-portable-orchestration-2026-10-22-r1`  
+**Target stable:** `v2.1.0`  
 **Information classification:** Internal  
 **License:** [MIT](LICENSE)  
 **Release status:** **CANDIDATE / EXTERNAL VERIFICATION PENDING**
 
-## Fixed architecture
+## Core invariant
+
+> **ATLAS governs. ARGUS collects. Tools execute. The host supplies capabilities. The user retains authority over consequential actions.**
+
+## Portable runtime architecture
 
 ```text
-Human / Event
-  -> Mission Control
-  -> Control Plane
-  -> Understand + Normalize
-  -> Minimal Domain Framing
-  -> Route
-       -> NONE / ATLAS_DIRECT -> normal ATLAS execution
-       -> ARGUS_COLLECTION    -> ARGUS bounded collection
-       -> HYBRID              -> ARGUS collection + ATLAS substantive work
-  -> Evidence Governance / Assurance / Verification
-  -> Output / Persistence
-  -> Observability
-  -> Dashboard
+USER / EVENT / FILE
+        |
+        v
++---------------- EXPERIENCE PLANE ----------------+
+| Mission Control                                  |
+| Compact Dashboard / progress / approvals        |
++--------------------------------------------------+
+        |
+        v
++----------------- CONTROL PLANE ------------------+
+| Task identity / lifecycle                        |
+| Policy / permissions / approvals                 |
+| Routing / provider admission / leases            |
+| ARGUS need / authorization / activation state    |
+| Evidence / persistence authority                 |
++--------------------------------------------------+
+        |
+        v
+      Understand + Normalize
+        |
+      Minimal Domain Framing
+        |
+      Route
+        |
+        +--> NONE / ATLAS_DIRECT --> ATLAS execution
+        |
+        +--> ARGUS_COLLECTION -----> explicit approval gate
+        |                               |
+        |                               +--> ARGUS bounded collection
+        |
+        +--> HYBRID ----------------> explicit approval gate
+                                        |
+                                        +--> ARGUS collection + ATLAS analysis
+        |
+        v
++---------------- EXECUTION PLANE -----------------+
+| ATLAS capabilities / ARGUS / admitted providers |
+| Evidence acquisition / analysis / actions       |
++--------------------------------------------------+
+        |
+        v
+ Assurance / Verification -> Output / Persistence
+        |
+        v
++----------------- ADAPTER PLANE ------------------+
+| ChatGPT / Hermes / Claude / Codex / MCP / APIs  |
++--------------------------------------------------+
 ```
 
-### Canonical pre-execution flow
+Mission Control, the Control Plane, Observability, and the Dashboard are cross-cutting. They initialize before substantive execution but **do not add preprocessing steps**.
 
-**Understand + Normalize -> Minimal Domain Framing -> Route**
+## Canonical pre-execution flow
 
-1. **Understand + Normalize** — read the whole context first, preserve intent and critical literals, and normalize only supported spelling, grammar, terminology and canonical naming without adding facts.
-2. **Minimal Domain Framing** — add only material high-confidence jurisdiction/entity, domain, sector, industry, product/service, capability, classification, standards and best-practice context needed for correct routing or downstream work.
-3. **Route** — `ARGUS_COLLECTION` and `HYBRID` go to ARGUS; `NONE` and `ATLAS_DIRECT` continue to normal ATLAS execution.
+ATLAS preprocessing is exactly:
 
-Internal control-plane, approval, provider-admission and execution mechanics remain governed implementation details; they do not create additional preprocessing steps.
+1. **Understand + Normalize** — read the available context as one semantic unit, preserve the original input and critical literals, and normalize only without semantic drift.
+2. **Minimal Domain Framing** — add only material high-confidence jurisdiction/entity, domain, sector, industry, product/service, capability, classification, standards, and best-practice context needed for correct routing or downstream work.
+3. **Route** — select `NONE`, `ATLAS_DIRECT`, `ARGUS_COLLECTION`, or `HYBRID`.
 
-ATLAS resolves only what can be determined quickly and reliably from the supplied context and local governed registries. It does not enter a research loop merely to complete lifecycle stage, procurement route, budget, quantity, technical specification, exact classification codes, exact standards applicability, funding, supplier/OEM or delivery timing before routing.
+ATLAS does not create a pre-routing research loop merely to resolve lifecycle stage, procurement route, budget, quantity, technical specification, exact classification codes, exact standards applicability, funding, supplier/OEM, or delivery timing.
 
-**Unknown downstream facts are not semantic blockers.** Material ambiguity in the meaning itself is the normal semantic reason to block routing.
+**Unknown downstream facts are not semantic blockers.** Material ambiguity in meaning, or another explicit Control Plane prohibition, is the normal reason to block routing.
 
-### Mission Control
-Human supervisory command: objectives, approvals, rejection, pause/resume/abort, priorities, scope, collection expansion/reduction and permitted exceptions.
+## Bootstrap and startup dashboard
 
-### Control Plane
-Authoritative machine governance: policy, permissions, collection-mode decision, plans/work units, routing, approvals, execution leases, lifecycle state, external-state reconciliation and persistence authorization.
+For every substantive task, the host enters the portable ATLAS orchestration seam and initializes:
 
-### Canonical capability layer
-ATLAS exposes ten canonical capabilities. They are **capabilities, not ten independent agents**, and provider implementations cannot redefine their semantics.
+- task and plan identity;
+- Mission Control;
+- Control Plane state;
+- Observability;
+- a compact Dashboard.
+
+The Dashboard should expose, at minimum:
+
+```text
+ATLAS Mission Control
+Task: <task-id>
+Objective: <normalized objective>
+Stage: <current stage>
+Progress: <measured progress>
+Blocker / Approval: <state>
+Evidence: <health>
+Library: <persistence state>
+Next: <next action>
+```
+
+Each host may render this differently. The state semantics must remain the same.
+
+## Mission Control
+
+Mission Control is the human supervisory surface for:
+
+- objective and scope;
+- approve / reject;
+- explicit ARGUS authorization;
+- pause / resume / abort;
+- priority and scope changes;
+- collection expansion, reduction, redirect, or stop;
+- permitted exceptions and risk acknowledgement.
+
+Presentation surfaces never mutate execution directly. A Dashboard action becomes a Mission Control command, which the Control Plane validates.
+
+## Control Plane
+
+The Control Plane is the machine authority for:
+
+- task identity and lifecycle state;
+- policy and permissions;
+- collection-need decisions;
+- routing and provider admission;
+- routing approval;
+- ARGUS authorization and activation state;
+- plans and work units;
+- execution leases and dependencies;
+- external-state reconciliation;
+- persistence authorization;
+- audit/control receipts.
+
+The Control Plane remains active for the task until completion, pause, abort, or supersession.
+
+## ARGUS need is not ARGUS consent
+
+`collection_mode` answers:
+
+> **Does this task require ARGUS?**
+
+It does **not** answer:
+
+> **Has the user authorized ARGUS to run?**
+
+The states are separate.
+
+```yaml
+collection_mode: ARGUS_COLLECTION
+argus:
+  required: true
+  authorization:
+    required: true
+    status: PENDING
+  activation:
+    status: NOT_AUTHORIZED
+```
+
+Before ARGUS handoff or activation, ATLAS must obtain explicit user permission for the current task and routing preview.
+
+After approval:
+
+```yaml
+argus:
+  required: true
+  authorization:
+    required: true
+    status: APPROVED
+    reusable: false
+  activation:
+    status: AUTHORIZED
+```
+
+No implicit approval is permitted. Approval cannot be inferred from:
+
+- `collection_mode`;
+- specialist selection;
+- an existing collection mission;
+- prior ARGUS use;
+- prior task approval;
+- silence;
+- continued conversation.
+
+A host may use **one explicit user interaction** to approve both the exact routing preview and the ARGUS mission, but ATLAS records `routing_approval_status` and `argus_approval_status` as separate machine states bound to the same task/digest.
+
+## Activation contract v2
+
+Host integrations consume a deterministic activation projection that separates route, authorization, and activation readiness.
+
+```yaml
+activation_contract:
+  version: "2.0"
+  activation_authority: ATLAS_OS
+  collection_mode: ARGUS_COLLECTION
+  route:
+    collection_mode: ARGUS_COLLECTION
+    routing_preview_digest: sha256:...
+  argus:
+    required: true
+    authorization:
+      required: true
+      status: PENDING
+      scope_task_id: TASK-...
+      bound_preview_digest: sha256:...
+      reusable: false
+    activation:
+      status: NOT_AUTHORIZED
+    mission:
+      id: COLLECTION-...
+  blockers:
+    - ARGUS_EXPLICIT_APPROVAL_REQUIRED
+```
+
+The proposal digest binds the proposed route, mission, providers, permissions, and handoff requirements. Approval state remains separate so authorizing a proposal does not mutate the proposal being authorized.
+
+## Canonical task lifecycle
+
+Portable host-facing states are:
+
+`CREATED -> NORMALIZING -> FRAMING -> ROUTING -> AWAITING_APPROVAL -> COLLECTING / ANALYZING -> VERIFYING -> PERSISTING -> COMPLETED`
+
+Control states may also be `PAUSED`, `BLOCKED`, or `ABORTED`.
+
+`AWAITING_APPROVAL` is used when dependent work is otherwise ready but explicit human authorization is required, including ARGUS authorization.
+
+## Host adapter plane
+
+ATLAS should request **semantic capabilities**, not unnecessarily hard-code products.
+
+Examples:
+
+```text
+WEB_SEARCH
+FILE_READ
+FILE_WRITE
+CODE_EXECUTION
+DATABASE_QUERY
+EXTERNAL_ACTION
+PERSISTENCE
+SPECIALIST_METHOD
+```
+
+A host adapter resolves these to available implementations such as native tools, plugins, MCP servers, connectors, subagents, or external APIs. Those implementations remain subject to ATLAS Agent Security, permissions, provenance, scope, routing, and verification controls.
+
+ChatGPT, Hermes Agent, Claude, Codex, and other hosts may differ in UI and tool inventory. They must not redefine ATLAS approval, routing, evidence, lifecycle, or persistence semantics.
+
+## Canonical capability layer
+
+ATLAS exposes ten canonical capabilities. They are capabilities, not ten independent agents.
 
 | Capability | Class | Owner |
 | --- | --- | --- |
@@ -65,55 +269,77 @@ ATLAS exposes ten canonical capabilities. They are **capabilities, not ten indep
 | `atlas.economic-policy-intelligence` | ROUTED | ATLAS |
 | `atlas.classification-crosswalk` | KERNEL | ATLAS |
 
-The four kernel services are always active. Routed capabilities are selected proportionately after task intent and collection mode are known. A capability can declare collection dependency but **cannot self-activate ARGUS**; only the Route step may do so through `collection_mode`.
+The four kernel services are always active. Routed capabilities are selected proportionately after task intent and collection mode are known. A capability may declare a collection dependency but cannot self-activate ARGUS.
 
-Third-party skills, plugins, MCP servers, connectors and models are implementations or source material. Agent Security admits them as `ADOPT`, `ADAPT`, `MERGE`, `REWRITE` or `REJECT`; they never become ATLAS architectural authority.
+Third-party skills, plugins, MCP servers, connectors, models, and subagents are implementations or source material. Agent Security admits them as `ADOPT`, `ADAPT`, `MERGE`, `REWRITE`, or `REJECT`; they never become ATLAS architectural authority.
 
-### Dashboard and Observability
-Observability derives read-only events/measurements from authoritative state. Dashboard is the human projection. Dashboard actions never mutate execution directly: they become Mission Control commands evaluated by the Control Plane. Live execution exposes the selected `capability_plan` and collection mode.
+## Evidence Governance
 
-### Evidence Governance
-Research discovers evidence; Evidence Governance determines what that evidence can legitimately support. Canonical statuses are `CONFIRMED`, `PROBABLE`, `POSSIBLE`, `DISPUTED`, `UNVERIFIED`, and `STALE`. Source is distinct from claim; observation is distinct from analyst inference; multiple sources are not automatically independent corroboration; a source link is provenance rather than proof.
+Research discovers evidence; Evidence Governance determines what that evidence can legitimately support.
 
-### Execution Governance and Agent Security
-Execution Governance owns authority, approval scope, side-effect classification, idempotency, retry/compensation, failure/resume state, escalation, kill-switch behavior and audit receipts. Agent Security applies install/activate/execute/verify gates to external capabilities and treats retrieved content, provider instructions and tool outputs as untrusted until assessed.
+Canonical statuses are:
 
-### Domain Context Services
-ATLAS owns canonical whole-context semantics, terminology, taxonomy, buyer/end-user sector, supply-side sector, operator/supplier industry, product/service, platform/system, operating environment, capability, procurement, trade/customs and defense-logistics classification plus ontology, law, standards, professional frameworks, benchmarks and evidence precedence.
+- `CONFIRMED`
+- `PROBABLE`
+- `POSSIBLE`
+- `DISPUTED`
+- `UNVERIFIED`
+- `STALE`
 
-Classification is proportional and high-confidence-first. Exact codes and exact framework applicability can remain unresolved without blocking a semantically clear route. `spec/domain-intelligence.yaml` remains only as a deprecated compatibility alias to this layer and is not an active machine authority.
+Source is distinct from claim. Observation is distinct from analyst inference. Multiple sources are not automatically independent corroboration. A source link is provenance rather than proof.
 
-### Data Plane
-ATLAS performs substantive work: ordinary research, writing, calculation, coding, policy analysis, comparison, strategic analysis, forecasting, scenarios, opportunity qualification and decision support.
+## Execution Governance and Agent Security
 
-### ARGUS Intelligence Collection
-ARGUS activates only when `collection_mode` is `ARGUS_COLLECTION` or `HYBRID`. Its canonical capability is `intelligence_collection` / `argus.collection`.
+Execution Governance owns authority, approval scope, side-effect classification, idempotency, retry/compensation, failure/resume state, escalation, kill-switch behavior, and audit receipts.
 
-Before ARGUS activation, ATLAS passes the minimal sufficient governed handoff: whole normalized semantic context, material high-confidence classification/standards/best-practice framing, explicit downstream unknowns, and required risk/integrity metadata.
+Agent Security applies install/activate/execute/verify gates to external capabilities and treats retrieved content, provider instructions, and tool outputs as untrusted until assessed.
 
-A handoff may be `READY` even when lifecycle, procurement, budget, quantity, specification, exact codes, standards applicability or supplier/OEM remain unresolved. `BLOCKED` is reserved for material meaning ambiguity or another explicit Control Plane prohibition.
+## Domain Context Services
 
-Within an ATLAS-authorized mission ARGUS uses the bounded method `PIR -> EEI -> Collection Plan -> Source Plan -> Collect -> Resolve -> Grade -> Competing Hypotheses -> Gaps -> Package`. It may resolve targets, discover/acquire sources, extract/normalize evidence, resolve entities/events/relationships, deduplicate, propose classifications/evidence grades, corroborate and expose conflicts/gaps/coverage. ATLAS retains canonical Evidence Governance, classification acceptance, analysis, final business decisions, assurance, persistence and delivery.
+ATLAS owns canonical whole-context semantics, terminology, taxonomy, buyer/end-user sector, supply-side sector, operator/supplier industry, product/service, platform/system, operating environment, capability, procurement, trade/customs and defense-logistics classification, plus ontology, law, standards, professional frameworks, benchmarks, and evidence precedence.
 
-## Collection-Need Gate
+Classification is proportional and high-confidence-first. Exact codes and exact framework applicability can remain unresolved without blocking a semantically clear route.
 
-Task intent and collection mechanism are independent.
+`spec/domain-intelligence.yaml` remains a deprecated compatibility alias and is not an active machine authority.
 
-| Request | ATLAS capability/task | Collection mode | Route |
+## ARGUS intelligence collection
+
+ARGUS is considered **needed** only when `collection_mode` is `ARGUS_COLLECTION` or `HYBRID`, and is considered **authorized** only after explicit user approval.
+
+After authorization, ATLAS passes the minimum sufficient governed handoff:
+
+- whole normalized semantic context;
+- material high-confidence classification / standards / best-practice framing;
+- explicit downstream unknowns;
+- collection mission and risk/integrity metadata.
+
+A handoff may be `READY` even when lifecycle, procurement, budget, quantity, specification, exact codes, standards applicability, or supplier/OEM remain unresolved. `BLOCKED` is reserved for material meaning ambiguity or another explicit Control Plane prohibition.
+
+Within an authorized mission ARGUS uses the bounded method:
+
+`PIR -> EEI -> Collection Plan -> Source Plan -> Collect -> Resolve -> Grade -> Competing Hypotheses -> Gaps -> Package`
+
+ARGUS may resolve targets, discover/acquire sources, extract/normalize evidence, resolve entities/events/relationships, deduplicate, propose classifications/evidence grades, corroborate, and expose conflicts/gaps/coverage.
+
+ATLAS retains canonical Evidence Governance, classification acceptance, substantive analysis, strategic analysis, forecasting, opportunity qualification, final business decisions, assurance, persistence, and delivery.
+
+## Collection-Need Gate examples
+
+| Request | Collection mode | ARGUS approval? | Execution |
 | --- | --- | --- | --- |
-| Bangladesh Bank foreign exchange policy | economic-policy-intelligence | ATLAS_DIRECT | ATLAS |
-| ST Engineering | target collection | ARGUS_COLLECTION | ARGUS |
-| Coastal patrol vessel for Bangladesh Coast Guard | procurement-intelligence | ARGUS_COLLECTION | ARGUS |
-| Coastal surveillance radar for Bangladesh Navy | procurement-intelligence | ARGUS_COLLECTION | ARGUS |
-| Seed cum cleaner for BADC | procurement-intelligence | ARGUS_COLLECTION | ARGUS |
-| Annual procurement plan of Bangladesh Navy | procurement-intelligence | ARGUS_COLLECTION | ARGUS |
-| Explain Bangladesh Navy procurement regulations | policy/procurement analysis | ATLAS_DIRECT | ATLAS |
-| Forecast likely Navy procurements over 24 months | procurement-intelligence / forecast | HYBRID | ARGUS + ATLAS |
-| Compare ST Engineering vs L3Harris for Bangladesh opportunities | analysis/decision | HYBRID | ARGUS + ATLAS |
-| Review attached commercial agreement and propose redlines | commercial-contract-review | NONE | ATLAS |
-| Calculate commission margin and FX exposure from supplied figures | corporate-finance | NONE | ATLAS |
+| Bangladesh Bank foreign exchange policy | ATLAS_DIRECT | No | ATLAS |
+| ST Engineering | ARGUS_COLLECTION | Yes | ARGUS after approval |
+| Coastal patrol vessel for Bangladesh Coast Guard | ARGUS_COLLECTION | Yes | ARGUS after approval |
+| Coastal surveillance radar for Bangladesh Navy | ARGUS_COLLECTION | Yes | ARGUS after approval |
+| Seed cum cleaner for BADC | ARGUS_COLLECTION | Yes | ARGUS after approval |
+| Annual procurement plan of Bangladesh Navy | ARGUS_COLLECTION | Yes | ARGUS after approval |
+| Explain Bangladesh Navy procurement regulations | ATLAS_DIRECT | No | ATLAS |
+| Forecast likely Navy procurements over 24 months | HYBRID | Yes | ARGUS + ATLAS after approval |
+| Compare ST Engineering vs L3Harris for Bangladesh opportunities | HYBRID | Yes | ARGUS + ATLAS after approval |
+| Review attached commercial agreement and propose redlines | NONE | No | ATLAS |
+| Calculate commission margin and FX exposure from supplied figures | NONE | No | ATLAS |
 
-`GENERAL_SEARCH`, `GENERAL_TASK` and `INTELLIGENCE` remain runtime compatibility route labels. They no longer define ARGUS semantically; `collection_mode` does.
+`GENERAL_SEARCH`, `GENERAL_TASK`, and `INTELLIGENCE` remain compatibility route labels. `collection_mode` defines ARGUS need; explicit authorization defines ARGUS permission.
 
 ## Economic taxonomy and classification crosswalk
 
@@ -123,26 +349,31 @@ ATLAS uses a multi-axial model and never collapses unlike concepts:
 
 Core governed schemes include ISO 704 / ISO 1087, ISO 25964, W3C SKOS, ISO/IEC 11179, ISO 3166, UN ISIC Rev. 5, Bangladesh BSIC 2020, NACE Rev. 2.1, NAICS 2022, UN CPC 3.0, Bangladesh BCPC 2011, CPA 2.2, UNSPSC, CPV 2008, WCO HS 2022, Bangladesh Customs Operative Tariff FY 2026-27, and NATO Codification System when materially applicable.
 
-Crosswalks are explicit (`EXACT`, `CLOSE`, `BROADER`, `NARROWER`, `RELATED`, `CANDIDATE`) with scheme/version/provenance. Classification never proves compliance, procurement eligibility or legal status. Unresolved exact codes remain unresolved rather than guessed.
-
-## Execution spine
-
-Pre-execution is always summarized as exactly three steps:
-
-1. `UNDERSTAND_AND_NORMALIZE`
-2. `MINIMAL_DOMAIN_FRAMING`
-3. `ROUTE`
-
-After Route, normal ATLAS or authorized ARGUS execution proceeds under the existing Control Plane, capability, approval, evidence, verification, persistence and delivery controls.
+Crosswalks are explicit (`EXACT`, `CLOSE`, `BROADER`, `NARROWER`, `RELATED`, `CANDIDATE`) with scheme/version/provenance. Classification never proves compliance, procurement eligibility, or legal status. Unresolved exact codes remain unresolved rather than guessed.
 
 ## Machine-readable authority
 
-AI systems begin at `atlas-ai.yaml`; `atlas-os.yaml` remains product/release authority. Key active contracts include `spec/semantic-normalization.yaml`, `spec/request-triage.yaml`, `spec/domain-context-services.yaml`, `spec/domain-handoff.yaml`, `spec/execution-spine.yaml`, and the remaining active control/evidence/output registries referenced by `atlas-ai.yaml`.
+AI systems begin at `atlas-ai.yaml`; `atlas-os.yaml` remains product/release authority.
 
-The active ARGUS contract is immutable and commit-pinned in `registries/domain-methods.yaml`.
+Key active contracts include:
 
-See `docs/architecture/capability-layer.md` for the capability boundary and `docs/architecture/atlas-argus-collection-boundary.md` for the ATLAS/ARGUS seam.
+- `spec/mission-control.yaml`
+- `spec/control-plane.yaml`
+- `spec/task-lifecycle.yaml`
+- `spec/host-adapters.yaml`
+- `spec/semantic-normalization.yaml`
+- `spec/request-triage.yaml`
+- `spec/collection-routing.yaml`
+- `spec/domain-context-services.yaml`
+- `spec/domain-handoff.yaml`
+- `spec/execution-spine.yaml`
+- `spec/dashboard.yaml`
+- `schemas/activation-contract.schema.json`
+
+The active ARGUS provider contract remains commit-pinned in `registries/domain-methods.yaml`.
 
 ## Release state
 
-Stable `v2.0.2` remains blocked by external-proof controls `MIG-029` and `MIG-037`. Repository-local conformance does not substitute for independent host evidence. Candidate `v2.0.2-rc.6` / `atlas-bootstrap-2026-10-22-r10` resets the external proof target to the canonical capability layer while preserving the rc.5/r9 Collection-Need/ARGUS evidence as historical only.
+`v2.1.0-rc.1` is a candidate architecture revision. Existing external-proof controls `MIG-029` and `MIG-037` remain blocking controls for stable release. Repository-local conformance does not substitute for independent host evidence.
+
+See `docs/architecture.md`, `docs/architecture/atlas-argus-collection-boundary.md`, `docs/architecture/capability-layer.md`, and `docs/ai-host-installation.md` for implementation guidance.
