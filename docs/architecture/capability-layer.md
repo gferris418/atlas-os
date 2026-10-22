@@ -40,17 +40,7 @@ Kernel services are always active. Routed capabilities are selected only when ta
 
 ## Common capability contract
 
-Every canonical capability records:
-- owner and architectural class;
-- purpose and accepted task classes;
-- activation conditions and exclusions;
-- collection dependency mode and allowed collection types;
-- read/write/external-action permissions;
-- side-effect class;
-- evidence requirement;
-- security profile;
-- input and output schema;
-- fallback.
+Every canonical capability records owner/class, purpose, accepted task classes, activation conditions/exclusions, collection dependency, permissions, side-effect class, evidence requirement, security profile, input/output schema and fallback.
 
 The canonical interfaces are:
 - `schemas/capability-request.schema.json`
@@ -68,8 +58,6 @@ Mission Control decides what should happen. The Control Plane decides whether it
 ### Agent Security
 Agent Security applies at install, activate, execute and verify gates. It evaluates prompt injection, indirect injection, tool misuse, excessive agency, memory poisoning, private-data leakage, MCP/connector surfaces, dependency and supply-chain risk, credentials, egress and provider integrity.
 
-External scanners are evidence providers to Agent Security, not ATLAS security authority.
-
 ### Classification Crosswalk
 Classification is multi-axial. ATLAS keeps domain, sector, industry, economic activity, product/service, capability, procurement category, trade classification and compliance separate. Crosswalk relations are explicit: `EXACT`, `CLOSE`, `BROADER`, `NARROWER`, `RELATED`.
 
@@ -81,7 +69,11 @@ Question -> scope -> research facets -> source strategy -> direct retrieval or c
 Deep research does not imply ARGUS. A policy study may remain `ATLAS_DIRECT`; a target dossier or multi-source landscape may require `ARGUS_COLLECTION` or `HYBRID`.
 
 ### Procurement Intelligence
-ARGUS may collect procurement plans, tenders, projects, buyers, requirements, eligibility evidence, evaluation criteria, funding, incumbents, competitors and chronology. ATLAS retains opportunity qualification, probability, bid/no-bid, partner strategy, pricing/response strategy and submission governance.
+Procurement Intelligence is narrower than government commercial opportunity intelligence. It activates for procurement plans/APPs, tender or acquisition pipelines, live solicitations, eligibility/evaluation analysis, procurement forecasts, bid/no-bid, and `RAPID_TENDER` recovery.
+
+ARGUS may collect procurement plans, tenders, buyers, requirements, eligibility evidence, evaluation criteria, funding, incumbents, competitors and supplier ecosystem evidence. ATLAS retains procurement eligibility analysis, authoritative opportunity priority, bid/no-bid, partner/positioning strategy, pricing/response strategy and submission governance.
+
+Early government need/gap discovery, legitimate opportunity development and supply-first technology matching do not automatically activate Procurement Intelligence when procurement semantics are absent.
 
 ### Commercial Contract Review
 Supplied contract text stays in ATLAS by default. Output should separate clause, current position, preferred position, deviation, commercial/legal/operational impact, severity, fallback, proposed redline and escalation. Counterparty/project/market collection is a separate Collection-Need decision.
@@ -90,15 +82,19 @@ Supplied contract text stays in ATLAS by default. Output should separate clause,
 Covers P&L, cash flow, working capital, project economics, commission economics, FX exposure, receivables/payables, budget vs actual, pricing, landed cost and scenarios. Supplied/internal data does not imply ARGUS; external market/funding/supplier evidence may create `HYBRID`.
 
 ### Economic Policy Intelligence
-Covers monetary, fiscal, foreign-exchange, trade and economic regulation. Policy analysis defaults to ATLAS authoritative research. Entity, programme, buyer, project or opportunity mapping may create `HYBRID`.
+Covers monetary, fiscal, foreign-exchange, trade and economic regulation. Policy analysis defaults to ATLAS authoritative research. Entity, programme, project, government-need, supplier, procurement or opportunity mapping may create `HYBRID` through the Collection-Need Gate.
 
 ## ARGUS collection
 
-ATLAS authorizes the mission. ARGUS derives PIR and EEI internally without expanding the authorized scope, then executes:
+ATLAS authorizes the mission. ARGUS `3.0.0-rc.1` derives PIR/EEI internally without expanding authorized scope, then executes bounded collection plus government commercial opportunity intelligence.
 
-`PIR -> EEI -> Collection Plan -> Source Plan -> Collect -> Resolve -> Grade -> Competing Hypotheses -> Gaps -> Package`
+ARGUS may maintain pre-PX opportunity identity and S0–S9 lifecycle, build supplier/OEM universes, assess partnerability, calculate supplier matches and advisory opportunity qualification, track early-warning events, and return detection metrics together with evidence/gaps/conflicts.
 
-ARGUS establishes what evidence exists and what remains unknown. ATLAS determines what it can support, what it means, and what should be done.
+The authority split is:
+
+> **ARGUS may calculate and recommend; ATLAS authorizes and decides.**
+
+ATLAS retains canonical evidence acceptance, authoritative opportunity priority, `PROMOTE_TO_PX`, pursuit/bid decisions, external-action authorization, persistence, assurance and final delivery.
 
 ## Third-party capability admission
 
