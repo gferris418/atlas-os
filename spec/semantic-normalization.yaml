@@ -33,154 +33,149 @@ contract:
     - international_best_practice_lenses
     - unresolved_context
     - prohibited_inferences
-
-semantic_facets:
-  domain:
-    meaning: Broad governed knowledge or operational domain.
-  jurisdiction:
-    meaning: Country, region, authority or legal/operational scope when known.
-  buyer_or_end_user_sector:
-    meaning: Economic or public-service sector of the operator, buyer or end user.
-    relationship_to_supply_side_sector: separate
-  supply_side_sector:
-    meaning: Economic sector of the suppliers, manufacturers, contractors or service providers.
-  operator_industry:
-    meaning: Economic activity or industry of the operator, buyer or end user.
-  supplier_industry:
-    meaning: Economic activity or industry of the likely supply-side actor class.
-  product_or_service:
-    meaning: Normalized good, service, software, works or other deliverable concept.
-  platform_or_system:
-    meaning: Broader platform, system, asset or solution family when materially useful.
-  operating_environment:
-    meaning: Physical, digital, organizational or operational environment when materially useful.
-  capability:
-    meaning: What the product, service or system enables; never interchangeable with the product itself.
-
-semantic_invariants:
-  domain_is_not_sector: true
-  sector_is_not_industry: true
-  industry_is_not_product: true
-  product_is_not_capability: true
-  product_is_not_procurement_category: true
-  procurement_category_is_not_customs_code: true
-  classification_is_not_compliance: true
-  contextual_best_practice_is_not_requirement: true
-
-classification_context:
-  international_activity: taxonomy.un-isic
-  national_activity: jurisdiction_specific_official_activity_classification_when_material
-  regional_activity: taxonomy.eu-nace
-  north_america_activity: taxonomy.naics
-  international_product_service: taxonomy.un-cpc
-  national_product_service: jurisdiction_specific_official_product_service_classification_when_material
-  regional_product_service: taxonomy.eu-cpa
-  procurement_global: taxonomy.unspsc
-  procurement_regional: taxonomy.eu-cpv
-  customs_trade: taxonomy.wco-hs
-  defense_logistics: taxonomy.nato-codification-system
-  capability_vocabulary: taxonomy.atlas-capability-skos
-
-classification_rules:
-  multi_axial: true
-  materiality_driven: true
-  current_official_edition_preferred: true
-  jurisdiction_specific_scheme_preferred_when_legally_or_operationally_material: true
-  unresolved_codes_must_not_be_guessed: true
-  cross_scheme_equivalence_must_not_be_assumed: true
-  explicit_mapping_relations: [EXACT, CLOSE, BROADER, NARROWER, RELATED, CANDIDATE]
-  metadata_fields:
-    - scheme
-    - version
-    - code
-    - label
-    - relationship
-    - confidence
-    - source
-    - classification_date
-    - applicability
-    - resolution_status
-  conditional_schemes_rule: >-
-    Procurement, customs, defense-logistics and other specialized schemes are attached only
-    when their context is material. A short product phrase is not sufficient reason to guess
-    an exact code.
-
-standards_and_framework_context:
-  purpose: >-
-    Identify the standards families, regulatory frameworks, recognized professional practices,
-    quality systems and domain guidance that could materially frame downstream work.
-  precedence:
-    - applicable_law_and_regulation
-    - explicit_binding_user_or_contract_requirements
-    - international_standards
-    - recognized_professional_frameworks
-    - authoritative_domain_guidance
-    - local_or_project_practices
-  capture:
-    - identifier_or_family
-    - issuer
-    - edition_or_version_policy
-    - official_source
-    - applicability
-    - relationship_to_context
-    - confidence
-    - unresolved_conditions
-  rule: >-
-    Standards and framework families may be supplied as context before exact applicability is
-    known. They must be labeled candidate or conditional when applicability depends on facts not
-    present in accepted context.
-
-international_best_practice_lenses:
-  requirements_and_use_case:
-    purpose: Start from intended outcomes, users, missions, operating scenarios and measurable needs.
-  lifecycle_and_total_cost:
-    purpose: Consider acquisition, operation, maintenance, upgrades, support, disposal and total cost of ownership.
-  safety_and_risk:
-    purpose: Identify material safety, resilience, redundancy, security and operational-risk concerns.
-  quality_and_assurance:
-    purpose: Consider quality management, assurance evidence, traceability and independent verification where material.
-  interoperability_and_open_architecture:
-    purpose: Consider interfaces, compatibility, portability, modularity, data standards and avoidance of unnecessary lock-in.
-  cybersecurity_and_information_assurance:
-    purpose: Consider identity, access, network, software, data, supply-chain and remote-support security where relevant.
-  maintainability_and_supportability:
-    purpose: Consider maintenance, diagnostics, documentation, spares, skills, training and obsolescence management.
-  human_factors_and_accessibility:
-    purpose: Consider usability, ergonomics, staffing, workload, accessibility and human-system interaction.
-  sustainability_and_environment:
-    purpose: Consider energy, emissions, materials, waste, environmental impact and sustainable lifecycle choices where material.
-  testing_acceptance_and_validation:
-    purpose: Consider staged verification, factory/site/operational testing, acceptance criteria and validation evidence appropriate to the domain.
-  configuration_and_change_management:
-    purpose: Consider controlled baselines, versioning, as-built/as-configured records, deviations and change control.
-
-best_practice_rules:
-  context_lens_not_requirement: true
-  applicability_must_be_assessed: true
-  current_official_sources_preferred: true
-  never_claim_compliance_from_context_only: true
-  domain_specific_extension_allowed: true
-  proportionality_required: true
-
-handoff:
-  rule: >-
-    When downstream specialist execution is authorized, ATLAS transfers the normalized semantic
-    context, classification snapshot and standards/best-practice framing unchanged through the
-    governed domain-context handoff. Specialists may add evidence but may not silently redefine
-    ATLAS-owned meaning or convert contextual candidates into facts or requirements.
-
-prohibited_inferences:
-  - project_exists
-  - procurement_exists
-  - budget_exists
-  - quantity_is_known
-  - specification_is_known
-  - authority_is_known
-  - supplier_is_selected
-  - lifecycle_stage_is_known
-  - candidate_standard_is_mandatory
-  - candidate_classification_is_exact
-
+  semantic_facets:
+    domain:
+      meaning: Broad governed knowledge or operational domain.
+    jurisdiction:
+      meaning: Country, region, authority or legal/operational scope when known.
+    buyer_or_end_user_sector:
+      meaning: Economic or public-service sector of the operator, buyer or end user.
+      relationship_to_supply_side_sector: separate
+    supply_side_sector:
+      meaning: Economic sector of the suppliers, manufacturers, contractors or service providers.
+    operator_industry:
+      meaning: Economic activity or industry of the operator, buyer or end user.
+    supplier_industry:
+      meaning: Economic activity or industry of the likely supply-side actor class.
+    product_or_service:
+      meaning: Normalized good, service, software, works or other deliverable concept.
+    platform_or_system:
+      meaning: Broader platform, system, asset or solution family when materially useful.
+    operating_environment:
+      meaning: Physical, digital, organizational or operational environment when materially useful.
+    capability:
+      meaning: What the product, service or system enables; never interchangeable with the product itself.
+  semantic_invariants:
+    domain_is_not_sector: true
+    sector_is_not_industry: true
+    industry_is_not_product: true
+    product_is_not_capability: true
+    product_is_not_procurement_category: true
+    procurement_category_is_not_customs_code: true
+    classification_is_not_compliance: true
+    contextual_best_practice_is_not_requirement: true
+  classification_context:
+    international_activity: taxonomy.un-isic
+    national_activity: jurisdiction_specific_official_activity_classification_when_material
+    regional_activity: taxonomy.eu-nace
+    north_america_activity: taxonomy.naics
+    international_product_service: taxonomy.un-cpc
+    national_product_service: jurisdiction_specific_official_product_service_classification_when_material
+    regional_product_service: taxonomy.eu-cpa
+    procurement_global: taxonomy.unspsc
+    procurement_regional: taxonomy.eu-cpv
+    customs_trade: taxonomy.wco-hs
+    defense_logistics: taxonomy.nato-codification-system
+    capability_vocabulary: taxonomy.atlas-capability-skos
+  classification_rules:
+    multi_axial: true
+    materiality_driven: true
+    current_official_edition_preferred: true
+    jurisdiction_specific_scheme_preferred_when_legally_or_operationally_material: true
+    unresolved_codes_must_not_be_guessed: true
+    cross_scheme_equivalence_must_not_be_assumed: true
+    explicit_mapping_relations: [EXACT, CLOSE, BROADER, NARROWER, RELATED, CANDIDATE]
+    metadata_fields:
+      - scheme
+      - version
+      - code
+      - label
+      - relationship
+      - confidence
+      - source
+      - classification_date
+      - applicability
+      - resolution_status
+    conditional_schemes_rule: >-
+      Procurement, customs, defense-logistics and other specialized schemes are attached only
+      when their context is material. A short product phrase is not sufficient reason to guess
+      an exact code.
+  standards_and_framework_context:
+    purpose: >-
+      Identify the standards families, regulatory frameworks, recognized professional practices,
+      quality systems and domain guidance that could materially frame downstream work.
+    precedence:
+      - applicable_law_and_regulation
+      - explicit_binding_user_or_contract_requirements
+      - international_standards
+      - recognized_professional_frameworks
+      - authoritative_domain_guidance
+      - local_or_project_practices
+    capture:
+      - identifier_or_family
+      - issuer
+      - edition_or_version_policy
+      - official_source
+      - applicability
+      - relationship_to_context
+      - confidence
+      - unresolved_conditions
+    rule: >-
+      Standards and framework families may be supplied as context before exact applicability is
+      known. They must be labeled candidate or conditional when applicability depends on facts not
+      present in accepted context.
+  international_best_practice_lenses:
+    requirements_and_use_case:
+      purpose: Start from intended outcomes, users, missions, operating scenarios and measurable needs.
+    lifecycle_and_total_cost:
+      purpose: Consider acquisition, operation, maintenance, upgrades, support, disposal and total cost of ownership.
+    safety_and_risk:
+      purpose: Identify material safety, resilience, redundancy, security and operational-risk concerns.
+    quality_and_assurance:
+      purpose: Consider quality management, assurance evidence, traceability and independent verification where material.
+    interoperability_and_open_architecture:
+      purpose: Consider interfaces, compatibility, portability, modularity, data standards and avoidance of unnecessary lock-in.
+    cybersecurity_and_information_assurance:
+      purpose: Consider identity, access, network, software, data, supply-chain and remote-support security where relevant.
+    maintainability_and_supportability:
+      purpose: Consider maintenance, diagnostics, documentation, spares, skills, training and obsolescence management.
+    human_factors_and_accessibility:
+      purpose: Consider usability, ergonomics, staffing, workload, accessibility and human-system interaction.
+    sustainability_and_environment:
+      purpose: Consider energy, emissions, materials, waste, environmental impact and sustainable lifecycle choices where material.
+    testing_acceptance_and_validation:
+      purpose: Consider staged verification, factory/site/operational testing, acceptance criteria and validation evidence appropriate to the domain.
+    configuration_and_change_management:
+      purpose: Consider controlled baselines, versioning, as-built/as-configured records, deviations and change control.
+  best_practice_rules:
+    context_lens_not_requirement: true
+    applicability_must_be_assessed: true
+    current_official_sources_preferred: true
+    never_claim_compliance_from_context_only: true
+    domain_specific_extension_allowed: true
+    proportionality_required: true
+  handoff:
+    rule: >-
+      ATLAS preserves normalized meaning in the governed task and collection mission. The resolved
+      classification and standards/framework alignment snapshots transfer through the governed
+      domain-context handoff. Specialists may add evidence but may not silently redefine ATLAS-owned
+      meaning or convert contextual candidates into facts or requirements.
+  prohibited_inferences:
+    - project_exists
+    - procurement_exists
+    - budget_exists
+    - quantity_is_known
+    - specification_is_known
+    - authority_is_known
+    - supplier_is_selected
+    - lifecycle_stage_is_known
+    - candidate_standard_is_mandatory
+    - candidate_classification_is_exact
+invariants:
+  - INV-006
+  - INV-016
+  - INV-018
+  - INV-019
 references:
   - spec/request-triage.yaml
   - spec/domain-context-services.yaml
