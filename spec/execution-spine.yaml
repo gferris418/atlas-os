@@ -14,7 +14,7 @@ contract:
       purpose: Select NONE, ATLAS_DIRECT, ARGUS_COLLECTION or HYBRID independently of task intent. ARGUS activation is based on structured collection need, not an analytical keyword.
     - id: 2
       name: CONDITIONAL_DOMAIN_CONTEXT
-      purpose: Resolve material ATLAS-owned terminology, taxonomy, economic/industry/product/procurement/trade classification, law, standards, frameworks, benchmarks and evidence precedence. ARGUS may enrich unresolved collection context but cannot replace canonical ATLAS authority.
+      purpose: Perform context-preserving semantic normalization and resolve material ATLAS-owned domain, sector, industry, product/service, platform/system, capability, economic/procurement/trade classification, law, standards, frameworks, international best-practice lenses, benchmarks and evidence precedence. Normalization must preserve intent and must not create unsupported real-world facts.
     - id: 3
       name: CAPABILITY_AND_EXECUTION_PLAN
       purpose: Build the dependency-aware plan, approvals, semantic capability needs, provider admission and digest-bound routing preview.
@@ -50,8 +50,9 @@ contract:
     - DELIVERY
   compatibility: Runtime traces may retain REQUEST_TRIAGE and INTELLIGENCE request-route labels for host compatibility; collection_mode is authoritative for ARGUS activation.
   optimization: Prefer the minimum sufficient path. Ordinary tasks and policy/rule analysis do not incur ARGUS cost unless structured collection is materially required.
+  semantic_normalization: spec/semantic-normalization.yaml governs context-preserving rewrite, multi-axial semantic framing, classification context, standards and international best-practice lenses before specialist execution.
   collection_gate: The canonical ARGUS capability is intelligence_collection. ARGUS_COLLECTION and HYBRID are the only collection modes that may propose ARGUS routing.
-  taxonomy_gate: Classification is multi-axial and conditional. Domain, sector, industry, product/service, procurement category, customs code and capability are distinct concepts.
+  taxonomy_gate: Classification is multi-axial and conditional. Domain, buyer/end-user sector, supply-side sector, industry, product/service, platform/system, procurement category, customs code and capability are distinct concepts.
   capability_gate: Availability is not admission. Providers must satisfy capability-admission, permission, provenance, dependency, conflict and fallback controls before routing.
   routing_preview_gate: Provider invocation requires the digest-bound preview and applicable approval state; changed proposals require a new preview.
   visibility: One ATLAS plan and execution spine governs all visible state. ARGUS does not create a competing spine.
@@ -60,6 +61,7 @@ invariants: [INV-003, INV-007, INV-008, INV-009, INV-021]
 references:
   - spec/request-triage.yaml
   - spec/collection-routing.yaml
+  - spec/semantic-normalization.yaml
   - spec/mission-control.yaml
   - spec/control-plane.yaml
   - spec/domain-context-services.yaml
