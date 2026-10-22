@@ -33,7 +33,7 @@ def execute(envelope: ExecutionEnvelope) -> ExecutionResult:
         )
         next_action = "Obtain explicit user approval or revise the route."
 
-    trace = ("BOOTSTRAP", *PRE_EXECUTION_FLOW)
+    trace = ("MISSION_CONTROL", *PRE_EXECUTION_FLOW)
     if envelope.provider_result is not None:
         trace = (*trace, "PROVIDER_RETURN_RECONCILIATION")
         next_action = (
