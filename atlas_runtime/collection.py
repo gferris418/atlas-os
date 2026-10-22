@@ -19,6 +19,23 @@ _COLLECTION_MISSION_VALIDATOR = jsonschema.Draft202012Validator(
     format_checker=jsonschema.FormatChecker(),
 )
 
+_STARTUP_SEQUENCE = [
+    "RESOLVE_INSTITUTIONAL_HIERARCHY",
+    "CHECK_INTERNAL_CANONICAL_REGISTRY",
+    "RECONCILE_OPPORTUNITY_IDENTITY",
+    "CHECK_OFFICIAL_PROCUREMENT_SOURCES",
+    "CHECK_INTERNAL_CUSTOMER_INTELLIGENCE",
+    "BUILD_RESEARCH_FRONTIER",
+    "EXECUTE_ADAPTIVE_360_COLLECTION",
+]
+
+_ESCALATION_CONDITIONS = [
+    "MATERIAL_SCOPE_CHANGE",
+    "AUTHORIZATION_REQUIRED",
+    "POLICY_OR_SECURITY_CONFLICT",
+    "MATERIAL_AMBIGUITY",
+]
+
 
 def validate_collection_mission(
     mission: Mapping[str, Any],
@@ -64,6 +81,27 @@ def _temporal_scope(objective: str) -> tuple[str | None, str]:
     if re.search(r"\b(?:latest|current|today|present)\b", normalized, re.IGNORECASE):
         return None, "CURRENT"
     return None, "CURRENT"
+
+
+def _execution_policy() -> dict[str, Any]:
+    """Return the fixed bounded-autonomy policy for one ATLAS-delegated ARGUS mission."""
+
+    return {
+        "handoff_pattern": "ONE_HANDOFF_ONE_RETURN",
+        "autonomy_mode": "BOUNDED_AUTONOMOUS",
+        "startup_sequence": list(_STARTUP_SEQUENCE),
+        "identity_resolution": {
+            "auto_reuse": ["EXACT", "HIGH_CONFIDENCE_MATCH"],
+            "auto_new_candidate": ["DISTINCT"],
+            "escalate": ["PROBABLE_MATCH", "UNRESOLVED"],
+        },
+        "identity_confirmation": "AMBIGUOUS_ONLY",
+        "escalation_conditions": list(_ESCALATION_CONDITIONS),
+        "follow_evidence_leads_without_callback": True,
+        "parallel_safe_reads": True,
+        "persistence_mode": "PROPOSE_BATCH_THEN_ATLAS_COMMIT",
+        "mission_context": "TRANSIENT_ONLY",
+    }
 
 
 def build_collection_mission(
@@ -114,9 +152,11 @@ def build_collection_mission(
         "source_exclusions": [],
         "risk_flags": list(dict.fromkeys(risk_flags)),
         "required_output_components": ["findings", "evidence", "collection_gaps", "unknowns_conflicts"],
+        "execution_policy": _execution_policy(),
         "stopping_rule": (
             "Stop when the requested collection questions are materially answered with corroborated evidence, "
-            "or when remaining gaps are explicitly identified and further collection would not materially change ATLAS analysis."
+            "or when remaining gaps are explicit and further collection is unlikely to change the commercial decision, "
+            "identity outcome, lifecycle interpretation, supplier strategy, or next authorized ATLAS action."
         ),
     }
     return validate_collection_mission(
