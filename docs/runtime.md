@@ -49,6 +49,8 @@ Mission Control, Control Plane, Observability and Dashboard are cross-cutting AT
 
 Before routing an external or specialist provider, ATLAS presents the digest-bound routing preview. Approval binds to that exact proposal. Changed providers, permissions, task classes, prerequisites, data scope or execution sequence invalidate stale approval.
 
+The routing preview also exposes one deterministic `activation_contract` for host integrations. Integrators should consume this projection instead of reconstructing specialist readiness from multiple routing fields. The contract reports activation state (`NOT_REQUIRED`, `READY_FOR_APPROVAL`, or `BLOCKED`), ATLAS activation authority, approval requirement, authoritative collection mode, whether ARGUS activation is required, the bound collection-mission ID, provider sequence, domain-handoff providers and blocking gates. The activation contract is included in the routing-preview digest, so approval remains bound to the complete integration state.
+
 ARGUS canonical specialist requirement is `intelligence_collection`. A governed `READY` or `PARTIAL` domain-context handoff plus collection mission may proceed under the pinned contract. `BLOCKED` never authorizes dependent collection.
 
 ARGUS returns evidence/collection state to ATLAS. ATLAS performs strategic analysis, forecasting, scenario work, opportunity qualification, business decisions, assurance, persistence and final delivery.
