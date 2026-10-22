@@ -9,10 +9,11 @@ publication:
   mechanism: plugin_creator_guarded_update
   preserve_plugin_identity: true
   require_current_release_id: true
+  expected_release_guard: current_release_id_required
   rule: >-
     GitHub prepares and validates a release bundle. Publication to ChatGPT is a guarded
-    Plugin Creator update against the existing plugin identity, never an automatic push
-    from GitHub Actions.
+    Plugin Creator update against the existing plugin identity, using the current release
+    ID as the update guard; GitHub Actions never publishes the plugin automatically.
 argus_compatibility:
   repository: gferris418/argus-intelligence
   contract_path: contracts/atlas/current-integration.yaml
