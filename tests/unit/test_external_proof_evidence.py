@@ -13,21 +13,21 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class ExternalProofEvidenceTests(unittest.TestCase):
     def _valid_codex_evidence(self) -> dict:
-        session_id = "codex-session-rc6-001"
-        timestamp = "2026-10-22T07:45:00+06:00"
-        source_commit = "aafa1194383d4739f6ed2e34000579551a2cd44b"
+        session_id = "codex-session-rc7-001"
+        timestamp = "2026-10-22T08:30:00+06:00"
+        source_commit = "1111111111111111111111111111111111111111"
         common = {"session_id": session_id, "timestamp": timestamp}
         return {
             "schema": "schemas/external-proof-evidence.schema.json",
-            "id": "external-proof.codex.rc6.001",
+            "id": "external-proof.codex.rc7.001",
             "verification_id": "verification.codex",
             "surface": "codex",
             "session_id": session_id,
             "timestamp": timestamp,
             "timezone": "Asia/Dhaka",
             "source_commit": source_commit,
-            "product_version": "2.0.2-rc.6",
-            "control_revision": "atlas-bootstrap-2026-10-22-r10",
+            "product_version": "2.0.2-rc.7",
+            "control_revision": "atlas-bootstrap-2026-10-22-r11",
             "resolved_authority": "atlas-os.yaml",
             "fresh_session": True,
             "independent": True,
@@ -42,8 +42,8 @@ class ExternalProofEvidenceTests(unittest.TestCase):
                         "resolved_authority": "atlas-os.yaml",
                     },
                     "observed": {
-                        "product_version": "2.0.2-rc.6",
-                        "control_revision": "atlas-bootstrap-2026-10-22-r10",
+                        "product_version": "2.0.2-rc.7",
+                        "control_revision": "atlas-bootstrap-2026-10-22-r11",
                         "product_authority": "atlas-os.yaml",
                     },
                 },
@@ -104,6 +104,36 @@ class ExternalProofEvidenceTests(unittest.TestCase):
                     "observed": {
                         "collection_mode": "HYBRID",
                         "final_analysis_owner": "ATLAS",
+                    },
+                },
+                {
+                    "check_id": "CHK-08",
+                    "result": "PASS",
+                    "evidence": {**common, "response": "Early need discovery result"},
+                    "observed": {
+                        "collection_mode": "ARGUS_COLLECTION",
+                        "collection_type": ["NEED_GAP", "OPPORTUNITY_DISCOVERY"],
+                        "capability_plan": ["argus.collection"],
+                    },
+                },
+                {
+                    "check_id": "CHK-09",
+                    "result": "PASS",
+                    "evidence": {**common, "response": "Supply-first matching result"},
+                    "observed": {
+                        "collection_mode": "ARGUS_COLLECTION",
+                        "collection_type": ["PRODUCT_CAPABILITY", "OPPORTUNITY_MATCHING", "OPPORTUNITY_DISCOVERY"],
+                        "capability_plan": ["argus.collection"],
+                    },
+                },
+                {
+                    "check_id": "CHK-10",
+                    "result": "PASS",
+                    "evidence": {**common, "response": "Rapid Tender result"},
+                    "observed": {
+                        "collection_mode": "ARGUS_COLLECTION",
+                        "collection_type": ["RAPID_TENDER", "PROCUREMENT_DISCOVERY", "SUPPLIER_LANDSCAPE"],
+                        "capability_plan": ["atlas.procurement-intelligence", "argus.collection"],
                     },
                 },
             ],
