@@ -19,18 +19,24 @@ persistence:
   saved_requires_verified_receipt: true
 approvals:
   preserve_host_boundaries: true
-  required_for: [external-write, publication, destructive-action, purchase, permission-change, credential-operation]
+  explicit_argus_authorization: true
+  digest_bound_argus_authorization: true
+  required_for: [argus-activation, external-write, publication, destructive-action, purchase, permission-change, credential-operation]
 startup:
   discovery: [atlas-ai.yaml, atlas-os.yaml, .agents/skills/atlas-os/SKILL.md, registries/surfaces.yaml, integrations/hermes-agent/adapter.yaml]
+  mission_control: true
+  control_plane: true
+  observability: true
   plan_id_required: true
   compact_dashboard: true
   single_active_atomic_unit: true
+  preprocessing_steps: [UNDERSTAND_AND_NORMALIZE, MINIMAL_DOMAIN_FRAMING, ROUTE]
 output:
   honor_explicit_format: true
   profile_fallback: smallest-task-fit
   verify_before_delivery: true
 unsupported_claims:
-  - Do not claim tools, memory, Python, filesystem access, external actions, or durable saves until the active Hermes session exposes and executes them.
+  - Do not claim tools, memory, Python, filesystem access, external actions, ARGUS activation, or durable saves until the active Hermes session exposes and executes them under ATLAS authority.
 executable_seam:
   function: atlas_runtime.get_surface_adapter
   surface_argument: hermes-agent
