@@ -2,20 +2,20 @@ schema: schemas/registry.schema.json
 registry:
   id: registry.domain-methods
   type: domain-method
-  version: 3
+  version: 4
   status: active
 items:
   - id: domain-method.argus-intelligence
     name: ARGUS Intelligence Collection
-    description: Governed ATLAS subsystem for structured target, procurement, supplier, competitor, stakeholder, installed-base, market and monitoring collection. Returns evidence packages; ATLAS retains analysis and decisions.
+    description: Governed ATLAS subsystem for structured target, procurement, supplier, competitor, stakeholder, installed-base, market and monitoring collection. Returns evidence packages; ATLAS retains Evidence Governance, analysis and decisions.
     status: available
     authority: specialist-contract
     permission: read
     risk_class: medium
     priority: 90
-    version: 2.2.0-rc.1
-    source: https://github.com/gferris418/argus-intelligence/blob/ba97ace36832cd464351a2078ef3c4d7ff89c8bf/contracts/atlas/argus-activation-v1.json
-    source_commit: ba97ace36832cd464351a2078ef3c4d7ff89c8bf
+    version: 2.2.0-rc.2
+    source: https://github.com/gferris418/argus-intelligence/blob/be5fcaf48d84e14e147288e05f3fe90bc96744ac/contracts/atlas/argus-activation-v1.json
+    source_commit: be5fcaf48d84e14e147288e05f3fe90bc96744ac
     contract_version: 3.0.0
     contract_sha256: sha256:5b082a12c6f0b469cba274a0e43e29032e349e3d377cf6d12ffa58762e8cb307
     triggers:
