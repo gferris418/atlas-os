@@ -1,7 +1,7 @@
 schema: schemas/canonical-capability-registry.schema.json
 registry:
   id: registry.canonical-capabilities
-  version: 1
+  version: 2
   status: active
 items:
   - id: atlas.deep-research
@@ -18,7 +18,7 @@ items:
       exclusions: [ordinary factual lookup, supplied-document transformation only]
     collection_dependency:
       mode: CONDITIONAL
-      allowed_collection_types: [TARGET_PROFILE, ENTITY_DOSSIER, PRODUCT_CAPABILITY, PROCUREMENT_DISCOVERY, PROCUREMENT_PLAN, PROJECT_PIPELINE, FUNDING_BUDGET, SUPPLIER_LANDSCAPE, COMPETITOR_LANDSCAPE, STAKEHOLDER_NETWORK, INSTALLED_BASE, MARKET_LANDSCAPE, OPPORTUNITY_DISCOVERY]
+      allowed_collection_types: [TARGET_PROFILE, ENTITY_DOSSIER, PRODUCT_CAPABILITY, BUYER_REQUIREMENT, PROCUREMENT_DISCOVERY, PROCUREMENT_PLAN, PROJECT_PIPELINE, FUNDING_BUDGET, SUPPLIER_LANDSCAPE, COMPETITOR_LANDSCAPE, STAKEHOLDER_NETWORK, INSTALLED_BASE, MARKET_LANDSCAPE, OPPORTUNITY_DISCOVERY, MONITORING, NEED_GAP, POLICY_DRIVER, PROGRAMME_PROJECT, APPROVAL_STATUS, SUPPLIER_PROFILE, REFERENCE_PROJECT, EXPORT_FEASIBILITY, PARTNERABILITY, OPPORTUNITY_DEVELOPMENT, OPPORTUNITY_MATCHING, EXPANSION_DISCOVERY, RAPID_TENDER]
     permissions:
       read: [authorized sources, supplied material, connected read-only context]
       write: []
@@ -65,20 +65,20 @@ items:
     fallback: null
 
   - id: argus.collection
-    name: ARGUS Collection
+    name: ARGUS Government Commercial Opportunity Intelligence
     owner: ARGUS
     class: SPECIALIST
-    purpose: Execute a bounded ATLAS-authorized structured intelligence collection mission and return an evidence package without taking ownership of final analysis or decisions.
+    purpose: Execute a bounded ATLAS-authorized government commercial opportunity intelligence mission across demand, supply, project/procurement lifecycle, supplier/OEM partnerability, matching, early warning and monitoring; return evidence and advisory commercial intelligence without taking ownership of authoritative priority, pursuit decisions or final delivery.
     status: candidate
     accepted_task_classes: [ANSWER, RESEARCH, ANALYSIS, DECISION, PLANNING, WORKFLOW, MONITORING, MULTI_STAGE]
-    supported_domains: [general, public-sector, commercial, procurement]
+    supported_domains: [general, public-sector, commercial, procurement, supplier-intelligence, government-commercial-opportunity]
     activation:
       automatic: true
       conditions: [ATLAS collection_mode is ARGUS_COLLECTION or HYBRID]
       exclusions: [NONE collection mode, ATLAS_DIRECT collection mode, keyword-only activation]
     collection_dependency:
       mode: REQUIRED
-      allowed_collection_types: [TARGET_PROFILE, ENTITY_DOSSIER, PRODUCT_CAPABILITY, BUYER_REQUIREMENT, PROCUREMENT_DISCOVERY, PROCUREMENT_PLAN, PROJECT_PIPELINE, FUNDING_BUDGET, SUPPLIER_LANDSCAPE, COMPETITOR_LANDSCAPE, STAKEHOLDER_NETWORK, INSTALLED_BASE, MARKET_LANDSCAPE, OPPORTUNITY_DISCOVERY, MONITORING]
+      allowed_collection_types: [TARGET_PROFILE, ENTITY_DOSSIER, PRODUCT_CAPABILITY, BUYER_REQUIREMENT, PROCUREMENT_DISCOVERY, PROCUREMENT_PLAN, PROJECT_PIPELINE, FUNDING_BUDGET, SUPPLIER_LANDSCAPE, COMPETITOR_LANDSCAPE, STAKEHOLDER_NETWORK, INSTALLED_BASE, MARKET_LANDSCAPE, OPPORTUNITY_DISCOVERY, MONITORING, NEED_GAP, POLICY_DRIVER, PROGRAMME_PROJECT, APPROVAL_STATUS, SUPPLIER_PROFILE, REFERENCE_PROJECT, EXPORT_FEASIBILITY, PARTNERABILITY, OPPORTUNITY_DEVELOPMENT, OPPORTUNITY_MATCHING, EXPANSION_DISCOVERY, RAPID_TENDER]
     permissions:
       read: [ATLAS collection mission, governed domain context, authorized sources]
       write: []
@@ -98,20 +98,20 @@ items:
     name: Procurement Intelligence
     owner: ATLAS
     class: HYBRID
-    purpose: Govern procurement, APP, tender, buyer, project, eligibility and opportunity analysis while delegating structured external collection to ARGUS only when required.
+    purpose: Govern procurement-specific APP, tender, acquisition, eligibility, evaluation and bid/no-bid analysis while delegating structured collection to ARGUS when required. Early pre-procurement commercial opportunity discovery does not activate this capability merely because a government buyer has a need.
     status: candidate
     accepted_task_classes: [RESEARCH, ANALYSIS, DECISION, PLANNING, WORKFLOW, MONITORING, MULTI_STAGE]
     supported_domains: [public-sector, procurement, commercial]
     activation:
       automatic: true
-      conditions: [procurement plan or pipeline, tender or acquisition, buyer-product requirement, opportunity or project procurement analysis]
-      exclusions: [supplied procurement document transformation only, policy explanation without collection need]
+      conditions: [procurement plan or pipeline, tender or acquisition, live solicitation, bid or procurement analysis]
+      exclusions: [supplied procurement document transformation only, policy explanation without collection need, pre-procurement need or opportunity discovery without procurement semantics]
     collection_dependency:
       mode: CONDITIONAL
-      allowed_collection_types: [BUYER_REQUIREMENT, PROCUREMENT_DISCOVERY, PROCUREMENT_PLAN, PROJECT_PIPELINE, FUNDING_BUDGET, SUPPLIER_LANDSCAPE, COMPETITOR_LANDSCAPE, STAKEHOLDER_NETWORK, INSTALLED_BASE, OPPORTUNITY_DISCOVERY, MONITORING]
+      allowed_collection_types: [PROCUREMENT_DISCOVERY, PROCUREMENT_PLAN, PROJECT_PIPELINE, FUNDING_BUDGET, SUPPLIER_LANDSCAPE, COMPETITOR_LANDSCAPE, STAKEHOLDER_NETWORK, INSTALLED_BASE, OPPORTUNITY_DISCOVERY, MONITORING, APPROVAL_STATUS, REFERENCE_PROJECT, EXPORT_FEASIBILITY, PARTNERABILITY, OPPORTUNITY_MATCHING, RAPID_TENDER]
     permissions:
       read: [procurement records, supplied tender material, collection packages]
-      write: [ATLAS opportunity assessment]
+      write: [ATLAS procurement and bid/no-bid assessment]
       external_action: false
     side_effect_class: NONE
     evidence_requirement: DECISION_GRADE
@@ -198,7 +198,7 @@ items:
       exclusions: [general legal research without a contract-review objective]
     collection_dependency:
       mode: CONDITIONAL
-      allowed_collection_types: [TARGET_PROFILE, ENTITY_DOSSIER, PROJECT_PIPELINE, MARKET_LANDSCAPE, OPPORTUNITY_DISCOVERY]
+      allowed_collection_types: [TARGET_PROFILE, ENTITY_DOSSIER, PROJECT_PIPELINE, MARKET_LANDSCAPE, OPPORTUNITY_DISCOVERY, SUPPLIER_PROFILE, REFERENCE_PROJECT]
     permissions:
       read: [supplied contracts, negotiation playbooks, authorized external context]
       write: [draft redlines, review artifacts]
@@ -228,7 +228,7 @@ items:
       exclusions: [public-equity investment research]
     collection_dependency:
       mode: CONDITIONAL
-      allowed_collection_types: [FUNDING_BUDGET, MARKET_LANDSCAPE, SUPPLIER_LANDSCAPE, OPPORTUNITY_DISCOVERY]
+      allowed_collection_types: [FUNDING_BUDGET, MARKET_LANDSCAPE, SUPPLIER_LANDSCAPE, OPPORTUNITY_DISCOVERY, PROGRAMME_PROJECT]
     permissions:
       read: [supplied financial data, authorized internal financial context, authorized market evidence]
       write: [analysis artifacts]
@@ -255,10 +255,10 @@ items:
     activation:
       automatic: true
       conditions: [central bank, monetary, fiscal, foreign-exchange, trade or economic policy objective]
-      exclusions: [entity or procurement collection is delegated only through the Collection-Need Gate]
+      exclusions: [entity or opportunity collection is delegated only through the Collection-Need Gate]
     collection_dependency:
       mode: CONDITIONAL
-      allowed_collection_types: [TARGET_PROFILE, ENTITY_DOSSIER, PROJECT_PIPELINE, FUNDING_BUDGET, MARKET_LANDSCAPE, STAKEHOLDER_NETWORK, OPPORTUNITY_DISCOVERY, MONITORING]
+      allowed_collection_types: [TARGET_PROFILE, ENTITY_DOSSIER, PROJECT_PIPELINE, FUNDING_BUDGET, MARKET_LANDSCAPE, STAKEHOLDER_NETWORK, OPPORTUNITY_DISCOVERY, MONITORING, POLICY_DRIVER, PROGRAMME_PROJECT]
     permissions:
       read: [official policy sources, economic data, supplied material]
       write: [analysis artifacts]
