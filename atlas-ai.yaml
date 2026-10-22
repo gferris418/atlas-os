@@ -1,7 +1,7 @@
 schema: schemas/ai-manifest.schema.json
 id: atlas-os-ai-entrypoint
 product_version: 2.0.2-rc.6
-control_revision: atlas-bootstrap-2026-10-22-r11
+control_revision: atlas-bootstrap-2026-10-22-r10
 authority:
   product_manifest: atlas-os.yaml
   core_spec: spec/core.yaml
