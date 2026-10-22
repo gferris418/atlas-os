@@ -50,7 +50,7 @@
           "required": ["required", "status", "scope_task_id", "bound_preview_digest", "reusable", "decision_source"],
           "properties": {
             "required": {"type": "boolean"},
-            "status": {"enum": ["NOT_REQUIRED", "PENDING", "APPROVED", "REJECTED"]},
+            "status": {"enum": ["NOT_REQUIRED", "PENDING", "APPROVED", "REJECTED", "STALE"]},
             "scope_task_id": {"type": ["string", "null"]},
             "bound_preview_digest": {"type": ["string", "null"]},
             "reusable": {"const": false},
