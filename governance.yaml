@@ -1,5 +1,5 @@
 id: atlas-governance
-version: 3.0.2
+version: 3.0.3
 status: active
 authority_chain: [USER, MISSION_CONTROL, CONTROL_PLANE, CAPABILITY_PROVIDER]
 principles:
@@ -9,6 +9,8 @@ principles:
   - provider_neutral_core
   - explicit_state_and_fail_closed_controls
   - evidence_before_completion_claims
+  - quality_and_decision_utility_before_performance
+  - performance_may_not_lower_required_quality_or_bypass_evidence_verification_governance_or_approval
   - history_belongs_in_version_control_not_active_contracts
 changes:
   core_semantics:
@@ -24,6 +26,11 @@ approvals:
   need_and_permission_are_separate: true
   material_scope_change_invalidates_prior_approval: true
   reusable_by_default: false
+quality:
+  required_tier_range: [Q0, Q1, Q2, Q3, Q4, Q5]
+  assignment_stage: MINIMAL_DOMAIN_FRAMING
+  mandatory_gate_before_authoritative_delivery: true
+  aggregate_confidence_cannot_override_mandatory_gates: true
 security:
   provider_output_is_untrusted_input: true
   secrets_in_repository: prohibited
