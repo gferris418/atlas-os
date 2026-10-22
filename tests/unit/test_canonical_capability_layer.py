@@ -137,6 +137,26 @@ class CanonicalCapabilityLayerTests(unittest.TestCase):
         self.assertIn("atlas.commercial-contract-review", result.capability_plan["routed"])
         self.assertNotIn("argus.collection", result.capability_plan["specialist"])
 
+    def test_clause_analysis_routes_to_contract_review(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective="Analyze the indemnity clause in the attached agreement",
+            plan_id="plan-clause-analysis",
+            task_id="TASK-CLAUSE-ANALYSIS",
+            work_units=[{"id": "analyze", "status": "PENDING", "dependencies": []}],
+            clarification_status="RESOLVED",
+        ))
+        self.assertIn("atlas.commercial-contract-review", result.capability_plan["routed"])
+        self.assertNotIn("argus.collection", result.capability_plan["specialist"])
+
+    def test_public_equity_research_excludes_corporate_finance(self) -> None:
+        plan = plan_canonical_capabilities(
+            "Research public-equity investments by comparing the cash flow of Apple and Microsoft",
+            task_classes=("RESEARCH", "ANALYSIS"),
+            collection_mode="ATLAS_DIRECT",
+            collection_types=(),
+        )
+        self.assertNotIn("atlas.corporate-finance", plan["routed"])
+
     def test_generic_policy_monitoring_does_not_imply_procurement(self) -> None:
         result = execute(ExecutionEnvelope(
             objective="Monitor Bangladesh Bank monetary policy circulars",
