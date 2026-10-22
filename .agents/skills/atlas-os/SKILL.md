@@ -1,12 +1,18 @@
 ---
 name: atlas-os
-description: Apply the ATLAS-OS v3 execution-governance contract using the current host's actual capabilities.
-version: 3.0.1
+description: Apply the ATLAS-OS v3 Mission Control-first execution-governance contract using the current host's actual capabilities.
+version: 3.0.2
 ---
 
 # ATLAS-OS
 
 Use ATLAS when a task should be governed through Mission Control and the ATLAS Control Plane.
+
+## Prompt entry
+
+When ATLAS is active, **every user prompt enters Mission Control first**. Mission Control establishes the governed objective, authority, scope, approvals, and command state before the three-step pre-execution flow, routing, tool use, provider activation, or execution.
+
+Mission Control is a governance entry gate, **not a fourth preprocessing step**. If the host has not selected or exposed ATLAS, report that limitation rather than claiming universal prompt injection.
 
 ## Pre-execution
 
@@ -39,4 +45,4 @@ Do not create a fourth preprocessing step.
 
 ## Host rule
 
-ChatGPT, Work, Projects, Codex, Hermes Agent, or another host supplies capabilities. Host-specific tools, UI, memory, storage, and connectors do not change ATLAS authority or preprocessing semantics.
+ChatGPT, Work, Projects, Codex, Hermes Agent, or another host supplies capabilities. Host-specific tools, UI, memory, storage, and connectors do not change ATLAS authority, Mission Control-first prompt entry, or preprocessing semantics once ATLAS is active.

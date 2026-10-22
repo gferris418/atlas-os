@@ -1,9 +1,16 @@
 id: atlas.mission-control
-version: 3.0.0
+version: 3.0.2
 status: active
 normative: true
 contract:
   owner: USER
+  prompt_entry:
+    scope: EVERY_ATLAS_GOVERNED_PROMPT
+    order: FIRST
+    before_pre_execution_flow: true
+    no_tool_or_provider_before_entry: true
+    role: governance_entry_gate_not_preprocessing_step
+    host_boundary: Applies whenever ATLAS is active or selected by the host; ATLAS cannot force a host to inject or select it universally.
   responsibilities:
     - set_objective
     - approve_or_reject_consequential_actions

@@ -235,7 +235,7 @@ def validate(root: Path) -> list[str]:
         return [f"cannot parse root machine contract: {exc}"]
 
     version = manifest.get("product", {}).get("version")
-    if version != "3.0.1":
+    if version != "3.0.2":
         errors.append(f"unexpected product version: {version}")
     if ai.get("product_version") != version:
         errors.append("atlas-ai product_version does not match atlas-os")
@@ -271,9 +271,31 @@ def validate(root: Path) -> list[str]:
 
     _validate_classification(root, errors)
 
+    mission_control = _load(root / "spec/mission-control.yaml")["contract"]
+    prompt_entry = mission_control.get("prompt_entry", {})
+    if (
+        prompt_entry.get("scope") != "EVERY_ATLAS_GOVERNED_PROMPT"
+        or prompt_entry.get("order") != "FIRST"
+        or prompt_entry.get("before_pre_execution_flow") is not True
+        or prompt_entry.get("no_tool_or_provider_before_entry") is not True
+    ):
+        errors.append("Mission Control must be the first gate for every ATLAS-governed prompt")
+    if prompt_entry.get("role") != "governance_entry_gate_not_preprocessing_step":
+        errors.append("Mission Control prompt entry must remain outside the three-step preprocessing flow")
+
     core = _load(root / "spec/core.yaml")["contract"]
     if core.get("pre_execution_flow") != ["UNDERSTAND_AND_NORMALIZE", "MINIMAL_DOMAIN_FRAMING", "ROUTE"]:
         errors.append("core pre_execution_flow must contain exactly the canonical three steps")
+
+    chatgpt_bootstrap = _load(root / "integrations/chatgpt-bootstrap.yaml")
+    if chatgpt_bootstrap.get("bootstrap", {}).get("prompt_entry") != "MISSION_CONTROL_FIRST":
+        errors.append("ChatGPT bootstrap must enter Mission Control first when ATLAS is active")
+    if chatgpt_bootstrap.get("bootstrap", {}).get("prompt_entry_scope") != "every_user_prompt_while_atlas_active":
+        errors.append("ChatGPT bootstrap must apply Mission Control entry to every prompt while ATLAS is active")
+    if chatgpt_bootstrap.get("guarantees", {}).get("mission_control_first_when_atlas_active") is not True:
+        errors.append("ChatGPT bootstrap must guarantee Mission Control-first behavior while ATLAS is active")
+    if chatgpt_bootstrap.get("guarantees", {}).get("universal_prompt_injection") is not False:
+        errors.append("ChatGPT bootstrap must not claim universal host prompt injection")
 
     routing = _load(root / "spec/routing.yaml")["contract"]
     if routing.get("atlas_owns_next_step") is not True or routing.get("provider_return_target") != "ATLAS":
