@@ -12,6 +12,7 @@ class CleanArchitectureContractTests(unittest.TestCase):
     def test_active_spec_surface_is_small_and_canonical(self) -> None:
         expected = {
             "approvals.yaml",
+            "chat-event-persistence.yaml",
             "context.yaml",
             "control-plane.yaml",
             "core.yaml",
@@ -19,7 +20,9 @@ class CleanArchitectureContractTests(unittest.TestCase):
             "execution.yaml",
             "mission-control.yaml",
             "observability.yaml",
+            "performance-telemetry.yaml",
             "persistence.yaml",
+            "quality-governance.yaml",
             "routing.yaml",
             "verification.yaml",
         }
