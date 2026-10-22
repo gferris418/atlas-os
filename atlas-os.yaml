@@ -2,7 +2,7 @@ schema_version: 3
 product:
   id: atlas-os
   name: ATLAS OS
-  version: 3.0.0
+  version: 3.0.1
   release_channel: stable
   status: RELEASED
   license: MIT
@@ -30,9 +30,14 @@ registries:
 integrations:
   - integrations/argus.yaml
   - integrations/chatgpt.yaml
+  - integrations/chatgpt-bootstrap.yaml
   - integrations/hermes-agent.yaml
   - integrations/generic-host.yaml
   - integrations/access-asia.yaml
+plugin:
+  manifest: plugin.json
+  skills_root: skills
+  primary_skill: skills/atlas-os/SKILL.md
 runtime:
   package: atlas_runtime
   command: python -m atlas_runtime
