@@ -4,7 +4,7 @@
   "title": "ATLAS startup dashboard",
   "type": "object",
   "additionalProperties": false,
-  "required": ["system", "surface", "plan_id", "timestamp", "duration_ms", "input_summary", "processing_summary", "output_summary", "goal", "task", "playbook", "frameworks", "sop", "output_profile", "plan_status", "clarification_status", "objective", "progress", "progress_visual", "active_stage", "active_unit", "completed_units", "total_units", "blocker_or_approval", "library", "quality_gate", "performance_mode"],
+  "required": ["system", "surface", "plan_id", "timestamp", "duration_ms", "input_summary", "processing_summary", "output_summary", "goal", "task", "playbook", "frameworks", "sop", "output_profile", "plan_status", "clarification_status", "objective", "progress", "progress_visual", "active_stage", "active_unit", "completed_units", "total_units", "blocker_or_approval", "library", "quality_gate", "performance_mode", "capability_plan"],
   "properties": {
     "system": {"const": "ATLAS"},
     "surface": {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"},
@@ -47,6 +47,23 @@
         "collection_types": {"type": "array", "items": {"enum": ["TARGET_PROFILE", "ENTITY_DOSSIER", "PRODUCT_CAPABILITY", "BUYER_REQUIREMENT", "PROCUREMENT_DISCOVERY", "PROCUREMENT_PLAN", "PROJECT_PIPELINE", "FUNDING_BUDGET", "SUPPLIER_LANDSCAPE", "COMPETITOR_LANDSCAPE", "STAKEHOLDER_NETWORK", "INSTALLED_BASE", "MARKET_LANDSCAPE", "OPPORTUNITY_DISCOVERY", "MONITORING"]}, "uniqueItems": true},
         "collection_depth": {"type": ["string", "null"], "enum": ["C0_IDENTITY", "C1_PROFILE", "C2_DOSSIER", "C3_OPPORTUNITY", "C4_MONITOR", null]},
         "collection_rationale_code": {"type": "string", "minLength": 1}
+      }
+    },
+    "capability_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kernel", "routed", "specialist", "collection_mode", "collection_types", "task_classes", "reasons"],
+      "properties": {
+        "kernel": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "routed": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "specialist": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "collection_mode": {"enum": ["NONE", "ATLAS_DIRECT", "ARGUS_COLLECTION", "HYBRID"]},
+        "collection_types": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "task_classes": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "reasons": {
+          "type": "object",
+          "additionalProperties": {"type": "array", "items": {"type": "string"}}
+        }
       }
     },
     "evidence_health": {"enum": ["GREEN", "AMBER", "RED", "UNKNOWN"]},
