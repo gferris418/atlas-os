@@ -17,7 +17,7 @@ argus_compatibility:
   repository: gferris418/argus-intelligence
   contract_path: contracts/atlas/current-integration.yaml
   release_impact_path: contracts/atlas/plugin-release-impact.yaml
-  compatible_commit: abc3d0da3afd7361bd6962fc20515e2dee882519
+  compatible_commit: c262b774d03543b7209d9512d802c4fa4e197c36
   contract_version: 1.0.0
 impact:
   release_required:
