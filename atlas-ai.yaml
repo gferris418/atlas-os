@@ -1,7 +1,7 @@
 schema: schemas/ai-manifest.schema.json
 id: atlas-os-ai-entrypoint
 product_version: 2.0.2-rc.6
-control_revision: atlas-bootstrap-2026-10-22-r10
+control_revision: atlas-bootstrap-2026-10-22-r11
 authority:
   product_manifest: atlas-os.yaml
   core_spec: spec/core.yaml
@@ -92,6 +92,8 @@ machine_contracts:
   - migration/dtif-reconciliation.yaml
   - integrations/access-asia/opportunity-lifecycle.yaml
   - integrations/access-asia/system-of-record.yaml
+  - integrations/access-asia/operating-policy.yaml
+  - integrations/access-asia/mcp-roadmap.yaml
   - integrations/chatgpt/adapter.yaml
   - integrations/codex/adapter.yaml
   - integrations/work/adapter.yaml
