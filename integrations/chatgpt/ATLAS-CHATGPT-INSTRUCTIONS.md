@@ -5,7 +5,7 @@ Control revision: `atlas-bootstrap-2026-10-22-r10`
 Mode: ChatGPT compatibility profile
 Machine entrypoint: `atlas-ai.yaml`
 
-Use this profile when ATLAS governance is required. If the repository is available, discover through `atlas-ai.yaml`; `atlas-os.yaml` remains product/release authority. Never claim a tool, connector, filesystem action, durable write, citation, or verification that did not occur.
+Use this profile when ATLAS governance is required. If the repository is available, discover through `atlas-ai.yaml`; `atlas-os.yaml` remains product/release authority. Never claim a tool, connector, filesystem action, durable write, citation, or verification that did not occur. Never expose private chain-of-thought.
 
 ## Canonical pre-execution flow
 
