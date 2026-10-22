@@ -53,6 +53,45 @@ class QualityTierTests(unittest.TestCase):
         self.assertEqual("Q4", determine_required_quality_tier(strategic, requested_floor="Q1"))
         self.assertEqual("Q5", determine_required_quality_tier(strategic, requested_floor="Q5"))
 
+    def test_decision_consequence_and_irreversibility_can_raise_tier_without_keyword_match(self) -> None:
+        self.assertEqual(
+            "Q4",
+            determine_required_quality_tier(
+                "Assess option A.",
+                quality_context={"decision_consequence": "high"},
+            ),
+        )
+        self.assertEqual(
+            "Q5",
+            determine_required_quality_tier(
+                "Assess option A.",
+                quality_context={"reversibility": "irreversible"},
+            ),
+        )
+
+    def test_uncertainty_evidence_condition_and_risk_can_raise_assurance_floor(self) -> None:
+        self.assertEqual(
+            "Q3",
+            determine_required_quality_tier(
+                "Assess the available information.",
+                quality_context={"uncertainty": "high"},
+            ),
+        )
+        self.assertEqual(
+            "Q3",
+            determine_required_quality_tier(
+                "Assess the available information.",
+                quality_context={"evidence_condition": "conflicted"},
+            ),
+        )
+        self.assertEqual(
+            "Q3",
+            determine_required_quality_tier(
+                "Assess the available information.",
+                quality_context={"risk_flags": ["defense_or_dual_use"]},
+            ),
+        )
+
     def test_minimal_domain_framing_carries_quality_without_adding_preprocessing_step(self) -> None:
         framing = minimal_domain_framing(
             "Should Access Asia pursue this programme and which supplier should we approach?"
@@ -75,6 +114,16 @@ class QualityTierTests(unittest.TestCase):
         self.assertEqual(PRE_EXECUTION_FLOW, result.pre_execution_flow)
         self.assertEqual("MISSION_CONTROL", result.execution_trace[0])
 
+    def test_runtime_quality_context_is_applied_inside_minimal_domain_framing(self) -> None:
+        result = execute(
+            ExecutionEnvelope(
+                objective="Assess option A.",
+                context={"quality_context": {"decision_consequence": "high"}},
+            )
+        )
+        self.assertEqual("Q4", result.domain_framing["required_quality_tier"])
+        self.assertEqual(PRE_EXECUTION_FLOW, result.pre_execution_flow)
+
 
 class QualityGateTests(unittest.TestCase):
     def _passing_ledger(self, tier: str) -> dict[str, object]:
@@ -87,6 +136,11 @@ class QualityGateTests(unittest.TestCase):
 
     def test_gate_passes_only_when_tier_and_mandatory_requirements_are_satisfied(self) -> None:
         gate = evaluate_quality_gate("Q4", self._passing_ledger("Q4"))
+        self.assertEqual("PASS", gate["status"])
+        self.assertEqual([], gate["blocking_reasons"])
+
+    def test_higher_achieved_tier_satisfies_lower_tier_requirements(self) -> None:
+        gate = evaluate_quality_gate("Q4", self._passing_ledger("Q5"))
         self.assertEqual("PASS", gate["status"])
         self.assertEqual([], gate["blocking_reasons"])
 
