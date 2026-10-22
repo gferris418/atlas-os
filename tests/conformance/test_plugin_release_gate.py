@@ -9,6 +9,15 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 POLICY = ROOT / ".github" / "plugin-release-policy.yaml"
 TOOL = ROOT / "tools" / "plugin_release_gate.py"
+WORKFLOW = ROOT / ".github" / "workflows" / "plugin-release-gate.yml"
+
+
+def load_gate_module():
+    spec = importlib.util.spec_from_file_location("plugin_release_gate", TOOL)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
 
 
 class PluginReleaseGateContract(unittest.TestCase):
@@ -28,10 +37,7 @@ class PluginReleaseGateContract(unittest.TestCase):
 
     def test_classifier_requires_release_for_chatgpt_and_argus_boundary_changes(self):
         self.assertTrue(TOOL.is_file(), "missing plugin release classifier")
-        spec = importlib.util.spec_from_file_location("plugin_release_gate", TOOL)
-        module = importlib.util.module_from_spec(spec)
-        assert spec.loader is not None
-        spec.loader.exec_module(module)
+        module = load_gate_module()
         policy = yaml.safe_load(POLICY.read_text(encoding="utf-8"))
 
         self.assertTrue(module.classify_paths(["skills/atlas-os/SKILL.md"], policy)["release_required"])
@@ -40,10 +46,7 @@ class PluginReleaseGateContract(unittest.TestCase):
 
     def test_metadata_is_traceable_to_atlas_and_argus_commits(self):
         self.assertTrue(TOOL.is_file(), "missing plugin release classifier")
-        spec = importlib.util.spec_from_file_location("plugin_release_gate", TOOL)
-        module = importlib.util.module_from_spec(spec)
-        assert spec.loader is not None
-        spec.loader.exec_module(module)
+        module = load_gate_module()
         policy = yaml.safe_load(POLICY.read_text(encoding="utf-8"))
 
         metadata = module.build_metadata(
@@ -64,6 +67,23 @@ class PluginReleaseGateContract(unittest.TestCase):
             output.write_text(json.dumps(metadata), encoding="utf-8")
             loaded = json.loads(output.read_text(encoding="utf-8"))
             self.assertEqual(metadata, loaded)
+
+    def test_missing_changed_path_file_fails_closed(self):
+        module = load_gate_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            missing = Path(tmp) / "missing.txt"
+            with self.assertRaises(FileNotFoundError):
+                module._read_changed_paths(missing)
+
+    def test_workflow_builds_exact_recorded_revision_after_validation(self):
+        text = WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("ref: ${{ github.event.pull_request.head.sha || github.sha }}", text)
+        self.assertIn("name: Validate release revision", text)
+        self.assertIn("python -m unittest discover -s tests/unit -v", text)
+        self.assertIn("python -m unittest discover -s tests/conformance -v", text)
+        self.assertIn("python -m unittest discover -s tests/integration -v", text)
+        self.assertIn("python tools/validate.py .", text)
+        self.assertLess(text.index("name: Validate release revision"), text.index("name: Classify plugin impact and prepare release bundle"))
 
 
 if __name__ == "__main__":
