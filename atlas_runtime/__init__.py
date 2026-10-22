@@ -1,4 +1,4 @@
-"""Reference implementation of ATLAS-OS v2 governance invariants."""
+"""Reference implementation of ATLAS-OS governance invariants."""
 
 from .runtime import (
     ApprovalRequired,
@@ -41,10 +41,10 @@ from .handoff import (
     verify_domain_handoff_receipt,
 )
 from .lease import prepare_execution_lease, verify_execution_lease
-from .routing import build_routing_preview, route_capability, route_domain_method
+from .routing import route_capability, route_domain_method
 from .triage import triage_request
 from .capabilities import KERNEL_CAPABILITIES, plan_canonical_capabilities
-from .engine import ExecutionEnvelope, ExecutionResult, execute
+from .orchestration import ExecutionEnvelope, ExecutionResult, build_routing_preview, execute
 from .adapters import LibraryStorage, SurfaceAdapter, get_surface_adapter
 from .persistence import FileSystemLibraryAdapter
 
