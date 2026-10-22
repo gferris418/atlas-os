@@ -91,6 +91,7 @@ machine_contracts:
   - migration/MIG-037.yaml
   - migration/dtif-reconciliation.yaml
   - integrations/access-asia/opportunity-lifecycle.yaml
+  - integrations/access-asia/system-of-record.yaml
   - integrations/chatgpt/adapter.yaml
   - integrations/codex/adapter.yaml
   - integrations/work/adapter.yaml
