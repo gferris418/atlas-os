@@ -26,6 +26,9 @@ EXPECTED_SCHEMAS = {
     "schemas/classification-entry.schema.json",
     "schemas/classification-crosswalk.schema.json",
 }
+LIFECYCLES = {"DISCOVERED", "CANDIDATE", "VERIFIED", "ACTIVE", "SUPERSEDED", "ARCHIVED"}
+EVIDENCE_STATUSES = {"CONFIRMED", "PROBABLE", "POSSIBLE", "DISPUTED", "UNVERIFIED", "STALE"}
+CROSSWALK_RELATIONSHIPS = {"EXACT", "CLOSE", "BROADER", "NARROWER", "RELATED", "CANDIDATE"}
 
 
 class ClassificationRegistryConformanceTests(unittest.TestCase):
@@ -67,6 +70,86 @@ class ClassificationRegistryConformanceTests(unittest.TestCase):
         for authority in authorities:
             self.assertTrue(authority["official_name"].strip())
             self.assertTrue(authority["source_url"].startswith("https://"))
+
+    def test_catalogue_update_sources_and_crosswalk_files_exist(self) -> None:
+        expected = [
+            CLASSIFICATION / "standards.yaml",
+            CLASSIFICATION / "update-sources.yaml",
+            CLASSIFICATION / "crosswalks.yaml",
+        ]
+        missing = [str(path.relative_to(ROOT)) for path in expected if not path.is_file()]
+        self.assertEqual([], missing)
+
+    def test_standards_have_unique_ids_versions_and_valid_references(self) -> None:
+        path = CLASSIFICATION / "standards.yaml"
+        if not path.is_file():
+            self.fail("classification standards catalogue is missing")
+
+        standards = yaml.safe_load(path.read_text(encoding="utf-8"))["standards"]
+        family_ids = {
+            entry["id"]
+            for entry in yaml.safe_load((CLASSIFICATION / "families.yaml").read_text(encoding="utf-8"))["families"]
+        }
+        authority_ids = {
+            entry["id"]
+            for entry in yaml.safe_load((CLASSIFICATION / "authorities.yaml").read_text(encoding="utf-8"))["authorities"]
+        }
+
+        standard_ids = [standard["standard_id"] for standard in standards]
+        self.assertEqual(len(standard_ids), len(set(standard_ids)))
+
+        version_ids: list[str] = []
+        versions_by_id: dict[str, dict] = {}
+        for standard in standards:
+            self.assertIn(standard["family_id"], family_ids)
+            self.assertIn(standard["authority_id"], authority_ids)
+            self.assertTrue(standard["official_name"].strip())
+            self.assertTrue(standard["abbreviation"].strip())
+            self.assertTrue(standard["jurisdiction"].strip())
+            for version in standard["versions"]:
+                version_id = version["version_id"]
+                version_ids.append(version_id)
+                versions_by_id[version_id] = version
+                self.assertIn(version["lifecycle"], LIFECYCLES)
+                self.assertIn(version["evidence_status"], EVIDENCE_STATUSES)
+                self.assertTrue(version["source_url"].startswith("https://"))
+                if version["lifecycle"] == "ACTIVE":
+                    self.assertEqual("CONFIRMED", version["evidence_status"])
+                if version["dataset_storage"] == "FULL_DATASET":
+                    self.assertEqual("PERMITTED", version["redistribution_status"])
+
+        self.assertEqual(len(version_ids), len(set(version_ids)))
+        for version in versions_by_id.values():
+            supersedes = version.get("supersedes_version_id")
+            if supersedes:
+                self.assertIn(supersedes, versions_by_id)
+                self.assertNotEqual(version["version_id"], supersedes)
+
+    def test_update_sources_are_unique_and_authoritative(self) -> None:
+        path = CLASSIFICATION / "update-sources.yaml"
+        if not path.is_file():
+            self.fail("classification update-source registry is missing")
+        sources = yaml.safe_load(path.read_text(encoding="utf-8"))["update_sources"]
+        ids = [source["id"] for source in sources]
+        self.assertEqual(len(ids), len(set(ids)))
+        for source in sources:
+            self.assertTrue(source["url"].startswith("https://"))
+            self.assertEqual("AUTHORITATIVE", source["source_class"])
+
+    def test_crosswalk_relationships_are_explicit_and_directional(self) -> None:
+        path = CLASSIFICATION / "crosswalks.yaml"
+        if not path.is_file():
+            self.fail("classification crosswalk registry is missing")
+        payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+        self.assertTrue(payload["directional"])
+        self.assertTrue(payload["candidate_is_not_canonical_equivalence"])
+        ids: list[str] = []
+        for crosswalk in payload["crosswalks"]:
+            ids.append(crosswalk["crosswalk_id"])
+            self.assertIn(crosswalk["relationship"], CROSSWALK_RELATIONSHIPS)
+            self.assertIn(crosswalk["evidence_status"], EVIDENCE_STATUSES)
+            self.assertTrue(crosswalk["source_url"].startswith("https://"))
+        self.assertEqual(len(ids), len(set(ids)))
 
 
 if __name__ == "__main__":
