@@ -5,7 +5,8 @@ status: active
 normative: true
 contract:
   purpose: Transfer ATLAS-owned whole normalized semantic context, classification context and framework/best-practice context to a specialist domain method without semantic drift, loss, or silent reclassification.
-  placement: The handoff is an interoperability seam inside ROUTING/EXECUTION; it does not add a new execution-spine stage.
+  pre_execution_flow: [UNDERSTAND_AND_NORMALIZE, MINIMAL_DOMAIN_FRAMING, ROUTE]
+  placement: The handoff occurs only after ROUTE selects ARGUS_COLLECTION or HYBRID. It is an interoperability seam inside routing/execution and does not add a fourth preprocessing step.
   producer: ATLAS OS
   consumer: Any authorized specialist domain method.
   input_authority:
@@ -20,6 +21,7 @@ contract:
   rules:
     - A substantive specialist-domain execution must receive a schema-valid domain-context handoff before consuming ATLAS domain context.
     - The handoff must copy or deterministically derive the current task semantic_context and copy domain_classification and domain_alignment snapshots without semantic mutation.
+    - The handoff contains only the minimal sufficient context produced by MINIMAL_DOMAIN_FRAMING plus required integrity/control metadata.
     - Whole normalized context must precede decomposed classification context in the handoff contract.
     - The producer must include source_task_id, source_plan_id, source_work_unit_id, handoff_id, contract_version, consumer, created_at, activation_expires_at, semantic_context, unresolved_material, risk_flags, and payload_sha256.
     - activation_expires_at is exactly 24 hours after created_at and controls only first activation/replay eligibility; it must not be reused as an execution or result-validity deadline after activation succeeds.
