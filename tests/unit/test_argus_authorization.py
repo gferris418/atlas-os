@@ -48,11 +48,13 @@ class ArgusAuthorizationTests(unittest.TestCase):
             routing_approval_status="APPROVED",
             routing_preview_digest=digest,
             argus_approval_status="APPROVED",
+            argus_approval_digest=digest,
         ))
 
         contract = result.routing_preview["activation_contract"]
         self.assertEqual(digest, result.routing_preview["digest"])
         self.assertEqual("APPROVED", contract["argus"]["authorization"]["status"])
+        self.assertEqual(digest, contract["argus"]["authorization"]["bound_preview_digest"])
         self.assertEqual("AUTHORIZED", contract["argus"]["activation"]["status"])
         self.assertNotIn("ARGUS_EXPLICIT_APPROVAL_REQUIRED", contract["blockers"])
         self.assertTrue(any(
@@ -60,6 +62,25 @@ class ArgusAuthorizationTests(unittest.TestCase):
             and decision["status"] == "ROUTED"
             for decision in result.routing_decisions
         ))
+
+    def test_stale_argus_authorization_digest_fails_closed(self) -> None:
+        initial = execute(self._envelope())
+        digest = initial.routing_preview["digest"]
+
+        result = execute(self._envelope(
+            routing_approval_status="APPROVED",
+            routing_preview_digest=digest,
+            argus_approval_status="APPROVED",
+            argus_approval_digest="sha256:stale",
+        ))
+
+        contract = result.routing_preview["activation_contract"]
+        self.assertEqual("STALE", contract["argus"]["authorization"]["status"])
+        self.assertEqual("sha256:stale", contract["argus"]["authorization"]["bound_preview_digest"])
+        self.assertEqual("NOT_AUTHORIZED", contract["argus"]["activation"]["status"])
+        self.assertIn("ARGUS_APPROVAL_DIGEST_MISMATCH", contract["blockers"])
+        self.assertEqual("AWAITING_APPROVAL", result.state)
+        self.assertEqual([], list(result.routing_decisions))
 
     def test_non_argus_work_does_not_require_argus_authorization(self) -> None:
         result = execute(ExecutionEnvelope(
@@ -85,10 +106,12 @@ class ArgusAuthorizationTests(unittest.TestCase):
             routing_approval_status="APPROVED",
             routing_preview_digest=digest,
             argus_approval_status="REJECTED",
+            argus_approval_digest=digest,
         ))
 
         contract = result.routing_preview["activation_contract"]
         self.assertEqual("REJECTED", contract["argus"]["authorization"]["status"])
+        self.assertEqual(digest, contract["argus"]["authorization"]["bound_preview_digest"])
         self.assertEqual("NOT_AUTHORIZED", contract["argus"]["activation"]["status"])
         self.assertEqual("BLOCKED", result.state)
         self.assertEqual([], list(result.routing_decisions))
