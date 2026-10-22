@@ -33,8 +33,8 @@ class SemanticNormalizationContractTests(unittest.TestCase):
         self.assertIn("prohibited_inferences", contract["output_sections"])
 
     def test_generic_context_separates_sector_industry_product_and_capability(self):
-        spec = yaml.safe_load(SEMANTIC.read_text(encoding="utf-8"))
-        facets = spec["semantic_facets"]
+        contract = yaml.safe_load(SEMANTIC.read_text(encoding="utf-8"))["contract"]
+        facets = contract["semantic_facets"]
         for facet in (
             "domain",
             "jurisdiction",
@@ -49,13 +49,13 @@ class SemanticNormalizationContractTests(unittest.TestCase):
         ):
             self.assertIn(facet, facets)
         self.assertEqual("separate", facets["buyer_or_end_user_sector"]["relationship_to_supply_side_sector"])
-        self.assertTrue(spec["semantic_invariants"]["sector_is_not_industry"])
-        self.assertTrue(spec["semantic_invariants"]["industry_is_not_product"])
-        self.assertTrue(spec["semantic_invariants"]["product_is_not_capability"])
+        self.assertTrue(contract["semantic_invariants"]["sector_is_not_industry"])
+        self.assertTrue(contract["semantic_invariants"]["industry_is_not_product"])
+        self.assertTrue(contract["semantic_invariants"]["product_is_not_capability"])
 
     def test_classification_stack_is_multi_axial_and_contextual(self):
-        spec = yaml.safe_load(SEMANTIC.read_text(encoding="utf-8"))
-        stack = spec["classification_context"]
+        contract = yaml.safe_load(SEMANTIC.read_text(encoding="utf-8"))["contract"]
+        stack = contract["classification_context"]
         for key in (
             "international_activity",
             "national_activity",
@@ -74,12 +74,12 @@ class SemanticNormalizationContractTests(unittest.TestCase):
         self.assertEqual("taxonomy.unspsc", stack["procurement_global"])
         self.assertEqual("taxonomy.wco-hs", stack["customs_trade"])
         self.assertEqual("taxonomy.nato-codification-system", stack["defense_logistics"])
-        self.assertTrue(spec["classification_rules"]["unresolved_codes_must_not_be_guessed"])
-        self.assertTrue(spec["classification_rules"]["cross_scheme_equivalence_must_not_be_assumed"])
+        self.assertTrue(contract["classification_rules"]["unresolved_codes_must_not_be_guessed"])
+        self.assertTrue(contract["classification_rules"]["cross_scheme_equivalence_must_not_be_assumed"])
 
     def test_best_practice_lenses_are_generic_and_non_binding(self):
-        spec = yaml.safe_load(SEMANTIC.read_text(encoding="utf-8"))
-        lenses = spec["international_best_practice_lenses"]
+        contract = yaml.safe_load(SEMANTIC.read_text(encoding="utf-8"))["contract"]
+        lenses = contract["international_best_practice_lenses"]
         for lens in (
             "requirements_and_use_case",
             "lifecycle_and_total_cost",
@@ -94,9 +94,9 @@ class SemanticNormalizationContractTests(unittest.TestCase):
             "configuration_and_change_management",
         ):
             self.assertIn(lens, lenses)
-        self.assertTrue(spec["best_practice_rules"]["context_lens_not_requirement"])
-        self.assertTrue(spec["best_practice_rules"]["applicability_must_be_assessed"])
-        self.assertTrue(spec["best_practice_rules"]["current_official_sources_preferred"])
+        self.assertTrue(contract["best_practice_rules"]["context_lens_not_requirement"])
+        self.assertTrue(contract["best_practice_rules"]["applicability_must_be_assessed"])
+        self.assertTrue(contract["best_practice_rules"]["current_official_sources_preferred"])
 
     def test_existing_specs_delegate_to_semantic_normalization(self):
         domain_context = DOMAIN_CONTEXT.read_text(encoding="utf-8")
