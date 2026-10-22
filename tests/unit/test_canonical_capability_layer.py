@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml
 
-from atlas_runtime import plan_canonical_capabilities
+from atlas_runtime import ExecutionEnvelope, execute, plan_canonical_capabilities
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -136,6 +136,18 @@ class CanonicalCapabilityLayerTests(unittest.TestCase):
         self.assertIn("atlas.deep-research", plan["routed"])
         self.assertIn("atlas.procurement-intelligence", plan["routed"])
         self.assertIn("argus.collection", plan["specialist"])
+
+    def test_live_execution_projects_the_canonical_capability_plan(self) -> None:
+        result = execute(ExecutionEnvelope(
+            objective="Bangladesh Bank foreign exchange policy",
+            plan_id="plan-economic-policy",
+            task_id="TASK-ECONOMIC-POLICY",
+            work_units=[{"id": "analyze", "status": "PENDING", "dependencies": []}],
+            clarification_status="RESOLVED",
+        ))
+        self.assertIn("atlas.economic-policy-intelligence", result.capability_plan["routed"])
+        self.assertNotIn("argus.collection", result.capability_plan["specialist"])
+        self.assertEqual(result.capability_plan, result.dashboard["capability_plan"])
 
 
 if __name__ == "__main__":
