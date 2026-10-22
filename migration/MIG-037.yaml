@@ -66,4 +66,4 @@ evidence:
     result: PASS
     limitations: Repository publication proves the provider-neutral rc.7/r11 control and ARGUS v3 routing contract only. It does not prove that external hosts independently resolved or applied it; MIG-029 remains open.
 owner: atlas-maintainers
-notes: Stable v2.0.2 promotion remains blocked. rc.7/r11 is the current proof target; cross-surface propagation remains blocked on MIG-029. Generic AI-host portability remains governed by the same provider-neutral core even though independent release proof is explicitly required for ChatGPT, Codex, Work, and Hermes Agent.
+notes: Stable v2.0.2 promotion remains blocked. rc.7/r11 is the current proof target; cross-surface propagation remains blocked on MIG-029. generic AI-host portability remains governed by the same provider-neutral core even though independent release proof is explicitly required for ChatGPT, Codex, Work, and Hermes Agent.
