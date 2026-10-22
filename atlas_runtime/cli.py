@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Sequence, TextIO
 
 from .models import ExecutionEnvelope
+from .render import render_fast_text
 from .runtime import execute
 
 
@@ -48,13 +49,5 @@ def main(argv: Sequence[str] | None = None, *, stdin: TextIO = sys.stdin, stdout
     if args.format == "json":
         print(json.dumps(result.to_dict(), sort_keys=True, separators=(",", ":")), file=stdout)
     else:
-        dashboard = result.dashboard
-        print(
-            f"ATLAS/{dashboard['host']} {dashboard['progress']}% | {result.state} | "
-            f"{result.route.mechanism} | Next authority {result.next_step_authority}",
-            file=stdout,
-        )
-        if dashboard["blocker_or_approval"]:
-            print(f"Approval: {dashboard['blocker_or_approval']}", file=stdout)
-        print(f"Next: {dashboard['next_action']}", file=stdout)
+        print(render_fast_text(result), file=stdout)
     return 0
