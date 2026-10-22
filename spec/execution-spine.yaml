@@ -12,7 +12,7 @@ contract:
   layers:
     - id: 0
       name: INTENT_AND_TARGET_INTERPRETATION
-      purpose: Implements UNDERSTAND_AND_NORMALIZE by reading the entire available context as one semantic unit and preserving meaning, intent, actors, targets, relationships, constraints, jurisdiction and critical literals.
+      purpose: Implements UNDERSTAND_AND_NORMALIZE by reading the whole context as one semantic unit and preserving meaning, intent, actors, targets, relationships, constraints, jurisdiction and critical literals.
     - id: 1
       name: CONDITIONAL_DOMAIN_CONTEXT
       purpose: Implements MINIMAL_DOMAIN_FRAMING by resolving only material high-confidence domain, sector, industry, product/service, capability, classification, standards and best-practice context needed for routing or downstream work.
@@ -57,7 +57,7 @@ contract:
   semantic_normalization: spec/semantic-normalization.yaml governs UNDERSTAND_AND_NORMALIZE and MINIMAL_DOMAIN_FRAMING before ROUTE.
   collection_gate: ARGUS_COLLECTION and HYBRID route to ARGUS; NONE and ATLAS_DIRECT route to normal ATLAS execution.
   taxonomy_gate: Classification is multi-axial, minimal and conditional. Classification completeness is not a prerequisite for routing when semantic meaning is clear.
-  semantic_handoff_gate: Material ambiguity in the whole-context meaning may block specialist activation; unresolved downstream facts do not.
+  semantic_handoff_gate: Material ambiguity in the whole context meaning may block specialist activation; unresolved downstream facts do not.
   capability_gate: Availability is not admission. Providers must satisfy capability-admission, permission, provenance, dependency, conflict and fallback controls before routing.
   routing_preview_gate: Provider invocation requires the digest-bound preview and applicable approval state; changed proposals require a new preview.
   visibility: One ATLAS plan and execution spine governs all visible state. ARGUS does not create a competing spine.
