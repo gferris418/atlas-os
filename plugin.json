@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "atlas-os",
-  "version": "3.0.2",
-  "description": "ATLAS-OS Mission Control-first execution governance for routing, approvals, verification, provider return, and ARGUS intelligence collection handoff.",
+  "version": "3.0.3",
+  "description": "ATLAS-OS Mission Control-first execution governance with Q0-Q5 quality tiers, evidence gates, FAST_TEXT status rendering, verified persistence, routing, approvals, provider return, and ARGUS intelligence collection handoff.",
   "author": {
     "name": "Access Asia"
   },
@@ -12,8 +12,10 @@
     "atlas-os",
     "mission-control",
     "execution-governance",
+    "quality-governance",
     "routing",
     "verification",
+    "persistence",
     "argus",
     "access-asia"
   ]
