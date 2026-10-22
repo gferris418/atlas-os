@@ -49,6 +49,23 @@
         "collection_rationale_code": {"type": "string", "minLength": 1}
       }
     },
+    "capability_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kernel", "routed", "specialist", "collection_mode", "collection_types", "task_classes", "reasons"],
+      "properties": {
+        "kernel": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "routed": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "specialist": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "collection_mode": {"enum": ["NONE", "ATLAS_DIRECT", "ARGUS_COLLECTION", "HYBRID"]},
+        "collection_types": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "task_classes": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "reasons": {
+          "type": "object",
+          "additionalProperties": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
     "evidence_health": {"enum": ["GREEN", "AMBER", "RED", "UNKNOWN"]},
     "highest_risk": {"type": ["string", "null"]},
     "blocker_or_approval": {"type": "string"},

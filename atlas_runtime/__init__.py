@@ -43,6 +43,7 @@ from .handoff import (
 from .lease import prepare_execution_lease, verify_execution_lease
 from .routing import build_routing_preview, route_capability, route_domain_method
 from .triage import triage_request
+from .capabilities import KERNEL_CAPABILITIES, plan_canonical_capabilities
 from .engine import ExecutionEnvelope, ExecutionResult, execute
 from .adapters import LibraryStorage, SurfaceAdapter, get_surface_adapter
 from .persistence import FileSystemLibraryAdapter
@@ -55,6 +56,7 @@ __all__ = [
     "ExecutionContext",
     "ExecutionEnvelope",
     "ExecutionResult",
+    "KERNEL_CAPABILITIES",
     "LibraryStorage",
     "PersistenceReceipt",
     "SurfaceAdapter",
@@ -76,6 +78,7 @@ __all__ = [
     "execute",
     "get_surface_adapter",
     "normalize_intent",
+    "plan_canonical_capabilities",
     "prepare_domain_context_handoff",
     "prepare_execution_lease",
     "prepare_library_record",

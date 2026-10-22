@@ -32,9 +32,9 @@ class CollectionArchitectureTests(unittest.TestCase):
     def test_argus_is_commit_pinned_collection_provider(self) -> None:
         registry = yaml.safe_load((ROOT / "registries/domain-methods.yaml").read_text(encoding="utf-8"))
         argus = registry["items"][0]
-        self.assertEqual("2.2.0-rc.1", argus["version"])
+        self.assertEqual("2.2.0-rc.2", argus["version"])
         self.assertIn("intelligence_collection", argus["capabilities"])
-        self.assertEqual("ba97ace36832cd464351a2078ef3c4d7ff89c8bf", argus["source_commit"])
+        self.assertEqual("be5fcaf48d84e14e147288e05f3fe90bc96744ac", argus["source_commit"])
         self.assertEqual("3.0.0", argus["contract_version"])
         self.assertEqual("sha256:5b082a12c6f0b469cba274a0e43e29032e349e3d377cf6d12ffa58762e8cb307", argus["contract_sha256"])
 
@@ -48,12 +48,15 @@ class CollectionArchitectureTests(unittest.TestCase):
         registry = yaml.safe_load((ROOT / "registries/taxonomies.yaml").read_text(encoding="utf-8"))
         versions = {item["id"]: str(item["version"]) for item in registry["items"]}
         self.assertEqual("Rev. 5", versions["taxonomy.un-isic"])
+        self.assertEqual("2020", versions["taxonomy.bd-bsic"])
         self.assertEqual("Rev. 2.1", versions["taxonomy.eu-nace"])
         self.assertEqual("2022", versions["taxonomy.naics"])
         self.assertEqual("3.0", versions["taxonomy.un-cpc"])
+        self.assertEqual("2011", versions["taxonomy.bd-bcpc"])
         self.assertEqual("2.2", versions["taxonomy.eu-cpa"])
         self.assertEqual("2008", versions["taxonomy.eu-cpv"])
         self.assertEqual("2022", versions["taxonomy.wco-hs"])
+        self.assertEqual("FY 2026-2027", versions["taxonomy.bd-customs-tariff"])
 
 
 if __name__ == "__main__":

@@ -4,8 +4,8 @@ ATLAS-OS is a **model-agnostic execution-governance architecture for AI agents**
 
 It is **not a desktop operating system** and does not replace the host model, conversation engine, browser, tool runtime, or device OS.
 
-**Current candidate:** `v2.0.2-rc.5`  
-**Control revision:** `atlas-bootstrap-2026-10-22-r9`  
+**Current candidate:** `v2.0.2-rc.6`  
+**Control revision:** `atlas-bootstrap-2026-10-22-r10`  
 **Target stable:** `v2.0.2`  
 **Information classification:** Internal  
 **License:** [MIT](LICENSE)  
@@ -23,9 +23,10 @@ Human / Event
        -> ATLAS_DIRECT
        -> ARGUS_COLLECTION -> ARGUS bounded collection -> evidence package
        -> HYBRID           -> ARGUS collection + ATLAS substantive work
+  -> Canonical Capability Planning
   -> Domain Context Services
   -> Data Plane
-  -> Assurance / Verification
+  -> Evidence Governance / Assurance / Verification
   -> Output / Persistence
   -> Observability
   -> Dashboard
@@ -37,8 +38,34 @@ Human supervisory command: objectives, approvals, rejection, pause/resume/abort,
 ### Control Plane
 Authoritative machine governance: policy, permissions, collection-mode decision, plans/work units, routing, approvals, execution leases, lifecycle state, external-state reconciliation and persistence authorization.
 
+### Canonical capability layer
+ATLAS exposes ten canonical capabilities. They are **capabilities, not ten independent agents**, and provider implementations cannot redefine their semantics.
+
+| Capability | Class | Owner |
+| --- | --- | --- |
+| `atlas.deep-research` | ROUTED | ATLAS |
+| `atlas.evidence-governance` | KERNEL | ATLAS |
+| `argus.collection` | SPECIALIST | ARGUS under ATLAS |
+| `atlas.procurement-intelligence` | HYBRID | ATLAS |
+| `atlas.execution-governance` | KERNEL | ATLAS |
+| `atlas.agent-security` | KERNEL | ATLAS |
+| `atlas.commercial-contract-review` | ROUTED | ATLAS |
+| `atlas.corporate-finance` | ROUTED | ATLAS |
+| `atlas.economic-policy-intelligence` | ROUTED | ATLAS |
+| `atlas.classification-crosswalk` | KERNEL | ATLAS |
+
+The four kernel services are always active. Routed capabilities are selected proportionately after task intent and collection mode are known. A capability can declare collection dependency but **cannot self-activate ARGUS**; only the Collection-Need Gate may do so.
+
+Third-party skills, plugins, MCP servers, connectors and models are implementations or source material. Agent Security admits them as `ADOPT`, `ADAPT`, `MERGE`, `REWRITE` or `REJECT`; they never become ATLAS architectural authority.
+
 ### Dashboard and Observability
-Observability derives read-only events/measurements from authoritative state. Dashboard is the human projection. Dashboard actions never mutate execution directly: they become Mission Control commands evaluated by the Control Plane.
+Observability derives read-only events/measurements from authoritative state. Dashboard is the human projection. Dashboard actions never mutate execution directly: they become Mission Control commands evaluated by the Control Plane. Live execution exposes the selected `capability_plan` and collection mode.
+
+### Evidence Governance
+Research discovers evidence; Evidence Governance determines what that evidence can legitimately support. Canonical statuses are `CONFIRMED`, `PROBABLE`, `POSSIBLE`, `DISPUTED`, `UNVERIFIED`, and `STALE`. Source is distinct from claim; observation is distinct from analyst inference; multiple sources are not automatically independent corroboration; a source link is provenance rather than proof.
+
+### Execution Governance and Agent Security
+Execution Governance owns authority, approval scope, side-effect classification, idempotency, retry/compensation, failure/resume state, escalation, kill-switch behavior and audit receipts. Agent Security applies install/activate/execute/verify gates to external capabilities and treats retrieved content, provider instructions and tool outputs as untrusted until assessed.
 
 ### Domain Context Services
 ATLAS owns canonical terminology, taxonomy, economic sector context, operator/supplier industry, product/service, procurement, trade/customs and defense-logistics classification plus ontology, law, standards, professional frameworks, benchmarks and evidence precedence. `spec/domain-intelligence.yaml` remains only as a deprecated compatibility alias to this layer and is not an active machine authority.
@@ -47,77 +74,92 @@ ATLAS owns canonical terminology, taxonomy, economic sector context, operator/su
 ATLAS performs substantive work: ordinary research, writing, calculation, coding, policy analysis, comparison, strategic analysis, forecasting, scenarios, opportunity qualification and decision support.
 
 ### ARGUS Intelligence Collection
-ARGUS activates only when `collection_mode` is `ARGUS_COLLECTION` or `HYBRID`. Its canonical capability is `intelligence_collection`.
+ARGUS activates only when `collection_mode` is `ARGUS_COLLECTION` or `HYBRID`. Its canonical capability is `intelligence_collection` / `argus.collection`.
 
-ARGUS resolves targets, plans bounded collection, discovers/acquires sources, extracts/normalizes evidence, resolves entities, deduplicates, corroborates, exposes conflicts/gaps/coverage and returns a collection package. ATLAS retains canonical classification, analysis, final business decisions, assurance, persistence and delivery.
+Within an ATLAS-authorized mission ARGUS uses the bounded method `PIR -> EEI -> Collection Plan -> Source Plan -> Collect -> Resolve -> Grade -> Competing Hypotheses -> Gaps -> Package`. It may resolve targets, discover/acquire sources, extract/normalize evidence, resolve entities/events/relationships, deduplicate, propose classifications/evidence grades, corroborate and expose conflicts/gaps/coverage. ATLAS retains canonical Evidence Governance, classification acceptance, analysis, final business decisions, assurance, persistence and delivery.
 
 ## Collection-Need Gate
 
 Task intent and collection mechanism are independent.
 
-| Request | ATLAS task | Collection mode | ARGUS |
+| Request | ATLAS capability/task | Collection mode | ARGUS |
 | --- | --- | --- | --- |
-| Bangladesh Bank foreign exchange policy | research/analysis | ATLAS_DIRECT | No |
-| ST Engineering | research | ARGUS_COLLECTION | Yes |
-| Coastal patrol vessel for Bangladesh Coast Guard | research/opportunity context | ARGUS_COLLECTION | Yes |
-| Seed cum cleaner for BADC | research/opportunity context | ARGUS_COLLECTION | Yes |
-| Annual procurement plan of Bangladesh Navy | research | ARGUS_COLLECTION | Yes |
-| Explain Bangladesh Navy procurement regulations | analysis | ATLAS_DIRECT | No |
-| Forecast likely Navy procurements over 24 months | analysis/forecast | HYBRID | Yes, collection only |
+| Bangladesh Bank foreign exchange policy | economic-policy-intelligence | ATLAS_DIRECT | No |
+| ST Engineering | target collection | ARGUS_COLLECTION | Yes |
+| Coastal patrol vessel for Bangladesh Coast Guard | procurement-intelligence | ARGUS_COLLECTION | Yes |
+| Seed cum cleaner for BADC | procurement-intelligence | ARGUS_COLLECTION | Yes |
+| Annual procurement plan of Bangladesh Navy | procurement-intelligence | ARGUS_COLLECTION | Yes |
+| Explain Bangladesh Navy procurement regulations | policy/procurement analysis | ATLAS_DIRECT | No |
+| Forecast likely Navy procurements over 24 months | procurement-intelligence / forecast | HYBRID | Yes, collection only |
 | Compare ST Engineering vs L3Harris for Bangladesh opportunities | analysis/decision | HYBRID | Yes, collection only |
+| Review attached commercial agreement and propose redlines | commercial-contract-review | NONE | No |
+| Calculate commission margin and FX exposure from supplied figures | corporate-finance | NONE | No |
 
 `GENERAL_SEARCH`, `GENERAL_TASK` and `INTELLIGENCE` remain runtime compatibility route labels. They no longer define ARGUS semantically; `collection_mode` does.
 
-## Economic taxonomy and international classification
+## Economic taxonomy and classification crosswalk
 
 ATLAS uses a multi-axial model and never collapses unlike concepts:
 
-`DOMAIN != SECTOR != INDUSTRY != PRODUCT != CAPABILITY != PROCUREMENT CATEGORY != HS CODE`
+`DOMAIN != SECTOR != INDUSTRY != ECONOMIC ACTIVITY != PRODUCT != CAPABILITY != PROCUREMENT CATEGORY != TRADE CLASSIFICATION != COMPLIANCE`
 
 Core governed schemes include:
 - ISO 704 / ISO 1087 terminology principles;
 - ISO 25964 and W3C SKOS vocabulary interoperability;
 - ISO/IEC 11179 metadata/provenance concepts;
 - ISO 3166 jurisdiction codes;
-- UN ISIC Rev. 5 for economic activity;
+- UN ISIC Rev. 5 for international economic activity;
+- Bangladesh BSIC 2020 for national economic activity;
 - NACE Rev. 2.1 for EU economic activity;
 - NAICS 2022 for North American industry/activity;
-- UN CPC 3.0 for goods/services;
+- UN CPC 3.0 for international goods/services;
+- Bangladesh BCPC 2011 for national products/services;
 - CPA 2.2 for EU products/services;
 - UNSPSC and CPV 2008 for procurement contexts;
-- WCO HS 2022 for customs/trade;
+- WCO HS 2022 for international customs/trade;
+- Bangladesh Customs Operative Tariff FY 2026-27 for current Bangladesh customs contexts;
 - NATO Codification System when defense logistics is materially applicable.
 
-Crosswalks must be explicit (`EXACT`, `CLOSE`, `BROADER`, `NARROWER`, `RELATED`) with scheme, edition, provenance and confidence. Classification never proves compliance, procurement eligibility or legal status.
+Crosswalks are explicit (`EXACT`, `CLOSE`, `BROADER`, `NARROWER`, `RELATED`) with source/target scheme edition, code, label, basis, provenance, verification and confidence. Classification never proves compliance, procurement eligibility or legal status.
 
 ## Execution spine
 
 1. preserve raw input/context;
 2. interpret intent and targets;
 3. decide collection mode;
-4. resolve material Domain Context Services;
-5. plan capabilities/providers/approvals;
-6. execute ATLAS work and any authorized ARGUS collection work unit;
-7. assure/verify;
-8. output and persist through authorized receipts;
-9. project operational state through Observability/Dashboard.
+4. select the canonical capability plan;
+5. resolve material Domain Context Services and classification crosswalks;
+6. establish plan/providers/approvals;
+7. execute ATLAS work and any authorized ARGUS collection work unit;
+8. apply Evidence Governance and independent assurance/verification;
+9. output and persist through authorized receipts;
+10. project operational state through Observability/Dashboard.
 
 ## Machine-readable authority
 
-AI systems begin at `atlas-ai.yaml`; `atlas-os.yaml` remains product/release authority. Key active contracts:
+AI systems begin at `atlas-ai.yaml`; `atlas-os.yaml` remains product/release authority. Key active contracts include:
 - `spec/mission-control.yaml`
 - `spec/control-plane.yaml`
 - `spec/request-triage.yaml`
 - `spec/collection-routing.yaml`
+- `spec/capability-layer.yaml`
+- `spec/evidence-governance.yaml`
+- `spec/execution-governance.yaml`
+- `spec/agent-security.yaml`
+- `spec/classification-crosswalk.yaml`
+- `spec/domain-capabilities.yaml`
 - `spec/domain-context-services.yaml`
 - `spec/execution-spine.yaml`
 - `spec/observability.yaml`
 - `spec/dashboard.yaml`
+- `registries/canonical-capabilities.yaml`
 - `registries/domain-methods.yaml`
 - `registries/taxonomies.yaml`
 
 The active ARGUS contract is immutable and commit-pinned in `registries/domain-methods.yaml`.
 
+See `docs/architecture/capability-layer.md` for the capability boundary and `docs/architecture/atlas-argus-collection-boundary.md` for the ATLAS/ARGUS seam.
+
 ## Release state
 
-Stable `v2.0.2` remains blocked by external-proof controls `MIG-029` and `MIG-037`. Repository-local conformance does not substitute for independent host evidence. Candidate `v2.0.2-rc.5` / `r9` resets the external proof target to the collection-need architecture; prior rc.4/r8 evidence remains historical only.
+Stable `v2.0.2` remains blocked by external-proof controls `MIG-029` and `MIG-037`. Repository-local conformance does not substitute for independent host evidence. Candidate `v2.0.2-rc.6` / `atlas-bootstrap-2026-10-22-r10` resets the external proof target to the canonical capability layer while preserving the rc.5/r9 Collection-Need/ARGUS evidence as historical only.

@@ -1,8 +1,8 @@
 schema: schemas/release-verification.schema.json
 id: verification.codex
 surface: codex
-product_version: 2.0.2-rc.5
-control_revision: atlas-bootstrap-2026-10-22-r9
+product_version: 2.0.2-rc.6
+control_revision: atlas-bootstrap-2026-10-22-r10
 status: READY_FOR_EXTERNAL_PROOF
 fresh_session_required: true
 independent_evidence_required: true
@@ -15,8 +15,8 @@ checks:
     kind: inspection
     input: Resolve atlas-ai.yaml, atlas-os.yaml, and the Codex adapter in documented discovery order.
     assertions:
-      - {id: AST-01, property: product_version, operator: equals, expected: 2.0.2-rc.5}
-      - {id: AST-02, property: control_revision, operator: equals, expected: atlas-bootstrap-2026-10-22-r9}
+      - {id: AST-01, property: product_version, operator: equals, expected: 2.0.2-rc.6}
+      - {id: AST-02, property: control_revision, operator: equals, expected: atlas-bootstrap-2026-10-22-r10}
       - {id: AST-03, property: product_authority, operator: equals, expected: atlas-os.yaml}
     required_evidence: [session_id, timestamp, source_commit, resolved_authority]
     controls: [MIG-037]
@@ -34,6 +34,7 @@ checks:
     assertions:
       - {id: AST-01, property: collection_mode, operator: equals, expected: ATLAS_DIRECT}
       - {id: AST-02, property: specialist, operator: absent, expected: true}
+      - {id: AST-03, property: capability_plan, operator: contains, expected: atlas.economic-policy-intelligence}
     required_evidence: [session_id, timestamp, response]
     controls: [MIG-037]
   - id: CHK-04
@@ -42,6 +43,7 @@ checks:
     assertions:
       - {id: AST-01, property: collection_mode, operator: equals, expected: ARGUS_COLLECTION}
       - {id: AST-02, property: specialist, operator: equals, expected: ARGUS}
+      - {id: AST-03, property: capability_plan, operator: contains, expected: argus.collection}
     required_evidence: [session_id, timestamp, response]
     controls: [MIG-037]
   - id: CHK-05
@@ -50,9 +52,19 @@ checks:
     assertions:
       - {id: AST-01, property: collection_mode, operator: equals, expected: ARGUS_COLLECTION}
       - {id: AST-02, property: collection_type, operator: contains, expected: PROCUREMENT_PLAN}
+      - {id: AST-03, property: capability_plan, operator: contains, expected: atlas.procurement-intelligence}
     required_evidence: [session_id, timestamp, response]
     controls: [MIG-037]
   - id: CHK-06
+    kind: prompt
+    input: Review the attached commercial agreement and propose redlines.
+    assertions:
+      - {id: AST-01, property: collection_mode, operator: equals, expected: NONE}
+      - {id: AST-02, property: capability_plan, operator: contains, expected: atlas.commercial-contract-review}
+      - {id: AST-03, property: specialist, operator: absent, expected: true}
+    required_evidence: [session_id, timestamp, response]
+    controls: [MIG-037]
+  - id: CHK-07
     kind: prompt
     input: Compare ST Engineering and L3Harris for Bangladesh opportunities
     assertions:

@@ -2,7 +2,7 @@ schema: schemas/registry.schema.json
 registry:
   id: registry.taxonomies
   type: taxonomy
-  version: 2
+  version: 3
   status: active
 items:
   - id: taxonomy.iso-704
@@ -117,6 +117,20 @@ items:
     version_policy: explicitly-pinned
     classification_scope: economic-activity
     applicability: Primary international activity classification; classify each actor's activity separately.
+  - id: taxonomy.bd-bsic
+    name: Bangladesh Standard Industrial Classification
+    description: Bangladesh Bureau of Statistics national classification of economic activities.
+    status: active
+    authority: official-primary
+    version: "2020"
+    source: https://bbs.gov.bd/pages/static-pages/6922de09933eb65569e17bb3
+    issuer: Bangladesh Bureau of Statistics
+    official_source: https://bbs.gov.bd/pages/static-pages/6922de09933eb65569e17bb3
+    domains: [industry-classification, economic-activity, bangladesh]
+    jurisdictions: [bd]
+    version_policy: explicitly-pinned
+    classification_scope: economic-activity
+    applicability: Apply for Bangladesh national industry/economic-activity classification; preserve correspondence to ISIC as an explicit mapping rather than assumed equivalence.
   - id: taxonomy.eu-nace
     name: NACE Revision 2.1
     description: European Union statistical classification of economic activities, used for European statistics from 2025 onward.
@@ -159,6 +173,20 @@ items:
     version_policy: explicitly-pinned
     classification_scope: products-services
     applicability: Primary international product/service classification; verify code scope before assignment.
+  - id: taxonomy.bd-bcpc
+    name: Bangladesh Central Product Classification
+    description: Bangladesh Bureau of Statistics national product classification.
+    status: active
+    authority: official-primary
+    version: "2011"
+    source: https://eservice.bbs.gov.bd/free-publication-data
+    issuer: Bangladesh Bureau of Statistics
+    official_source: https://eservice.bbs.gov.bd/free-publication-data
+    domains: [product-classification, services-classification, bangladesh]
+    jurisdictions: [bd]
+    version_policy: explicitly-pinned
+    classification_scope: products-services
+    applicability: Apply for Bangladesh national product/service classification; preserve correspondence to CPC through explicit verified mappings.
   - id: taxonomy.eu-cpa
     name: CPA Version 2.2
     description: European Union statistical classification of products by activity, applicable from reference year 2025 onward.
@@ -215,6 +243,20 @@ items:
     version_policy: explicitly-pinned
     classification_scope: customs
     applicability: Apply only when customs/import/export context is material; do not use future HS 2028 codes before effective date.
+  - id: taxonomy.bd-customs-tariff
+    name: Bangladesh Customs Operative Tariff
+    description: National tariff and HS implementation published by Bangladesh Customs for the current fiscal year.
+    status: active
+    authority: official-primary
+    version: FY 2026-2027
+    source: https://customs.gov.bd/index.jsf
+    issuer: Bangladesh Customs / National Board of Revenue
+    official_source: https://customs.gov.bd/index.jsf
+    domains: [customs, trade, product-classification, bangladesh]
+    jurisdictions: [bd]
+    version_policy: explicitly-pinned
+    classification_scope: customs
+    applicability: Apply to Bangladesh customs/import/export contexts for transactions governed by FY 2026-27 tariff rules; classify historical transactions under the tariff edition effective at the transaction date.
   - id: taxonomy.nato-codification-system
     name: NATO Codification System
     description: Standardized identification and classification system for defense supply items.
