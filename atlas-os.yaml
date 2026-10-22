@@ -2,13 +2,14 @@ schema_version: 3
 product:
   id: atlas-os
   name: ATLAS OS
-  version: 3.0.1
+  version: 3.0.2
   release_channel: stable
   status: RELEASED
   license: MIT
 authority:
   ai_manifest: atlas-ai.yaml
   governance: governance.yaml
+  mission_control: spec/mission-control.yaml
   core: spec/core.yaml
   routing: spec/routing.yaml
 specifications:
