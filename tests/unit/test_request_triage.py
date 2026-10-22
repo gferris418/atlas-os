@@ -148,14 +148,19 @@ class RequestTriageTests(unittest.TestCase):
             timezone_name="Asia/Dhaka",
         ))
         contract = result.routing_preview["activation_contract"]
-        self.assertEqual("1.0", contract["version"])
+        self.assertEqual("2.0", contract["version"])
         self.assertEqual("READY_FOR_APPROVAL", contract["state"])
         self.assertEqual("ARGUS_COLLECTION", contract["collection_mode"])
+        self.assertEqual("ARGUS_COLLECTION", contract["route"]["collection_mode"])
         self.assertTrue(contract["argus_activation_required"])
+        self.assertTrue(contract["argus"]["required"])
+        self.assertEqual("PENDING", contract["argus"]["authorization"]["status"])
+        self.assertEqual("NOT_AUTHORIZED", contract["argus"]["activation"]["status"])
         self.assertEqual("COLLECTION-ACTIVATION-CONTRACT", contract["collection_mission_id"])
+        self.assertEqual("COLLECTION-ACTIVATION-CONTRACT", contract["argus"]["mission"]["id"])
         self.assertIn("domain-method.argus-intelligence", contract["provider_sequence"])
         self.assertIn("domain-method.argus-intelligence", contract["handoff_provider_ids"])
-        self.assertEqual([], contract["blockers"])
+        self.assertEqual(["ARGUS_EXPLICIT_APPROVAL_REQUIRED"], contract["blockers"])
 
     def test_activation_contract_keeps_argus_required_when_provider_is_missing(self) -> None:
         preview = atlas_runtime.build_routing_preview(
@@ -180,6 +185,7 @@ class RequestTriageTests(unittest.TestCase):
         )
         contract = preview["activation_contract"]
         self.assertTrue(contract["argus_activation_required"])
+        self.assertTrue(contract["argus"]["required"])
         self.assertEqual("BLOCKED", contract["state"])
         self.assertIn(
             "requirement:intelligence_collection:NO_ADMITTED_PROVIDER",
@@ -258,6 +264,8 @@ class RequestTriageTests(unittest.TestCase):
         self.assertEqual("READY_FOR_APPROVAL", contract["state"])
         self.assertEqual("NONE", contract["collection_mode"])
         self.assertFalse(contract["argus_activation_required"])
+        self.assertFalse(contract["argus"]["required"])
+        self.assertEqual("NOT_REQUIRED", contract["argus"]["authorization"]["status"])
         self.assertIsNone(contract["collection_mission_id"])
         self.assertTrue(contract["provider_sequence"])
         self.assertEqual([], contract["handoff_provider_ids"])
@@ -288,6 +296,8 @@ class RequestTriageTests(unittest.TestCase):
         self.assertEqual("NOT_REQUIRED", contract["state"])
         self.assertEqual("NONE", contract["collection_mode"])
         self.assertFalse(contract["argus_activation_required"])
+        self.assertFalse(contract["argus"]["required"])
+        self.assertEqual("NOT_REQUIRED", contract["argus"]["authorization"]["status"])
         self.assertIsNone(contract["collection_mission_id"])
         self.assertEqual([], contract["provider_sequence"])
         self.assertEqual([], contract["handoff_provider_ids"])
