@@ -1,0 +1,35 @@
+schema: schemas/spec.schema.json
+id: spec.evidence-governance
+title: Evidence governance
+status: active
+normative: true
+contract:
+  purpose: Govern what supplied, researched or collected evidence can legitimately support before ATLAS analysis, decision or consequential action.
+  schema: schemas/evidence-governance.schema.json
+  canonical_statuses: [CONFIRMED, PROBABLE, POSSIBLE, DISPUTED, UNVERIFIED, STALE]
+  distinctions:
+    - A source is not a claim.
+    - A claim is not a verified claim.
+    - Multiple sources are not independent corroboration unless source lineage is independent.
+    - Analyst inference is not an observed fact.
+    - Confidence is not calibrated probability unless the forecasting contract explicitly defines it as such.
+    - A source link is provenance evidence, not proof of the linked claim.
+  required_flow:
+    - preserve source identity and provenance
+    - capture the observation separately from analyst inference
+    - assess source authority and temporal relevance
+    - identify corroborating and contradicting evidence
+    - assign canonical evidence status proportionate to the evidence
+    - expose limitations and unresolved contradictions
+    - prevent stale evidence from silently becoming current evidence
+  ownership:
+    research_or_argus: May discover sources, extract observations and propose grades.
+    atlas: Owns canonical claim status, contradiction handling and the evidence basis for final conclusions.
+  consequential_rule: Decision-grade findings require traceable evidence, contradiction review and independent verification proportionate to risk.
+  completion_rule: Unverified or disputed material may be reported with its status but cannot be represented as confirmed fact.
+invariants: [INV-005, INV-006, INV-016]
+references:
+  - spec/evidence.yaml
+  - spec/verification.yaml
+  - schemas/evidence-governance.schema.json
+  - spec/capability-layer.yaml
