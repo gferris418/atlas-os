@@ -30,6 +30,24 @@ contract:
       Preserve the whole meaning, but emit only the minimal sufficient context needed to maintain
       semantic fidelity or materially improve downstream classification, routing, or decisions.
       Skip decorative, repetitive, speculative, or low-value enrichment.
+  pre_execution_flow:
+    canonical_summary: Understand + Normalize -> Minimal Domain Framing -> Route
+    minimal_sufficient_context: true
+    no_pre_route_research_loop: true
+    unresolved_downstream_context_is_non_blocking: true
+    normal_semantic_blocker: meaning_ambiguity
+    steps:
+      - id: UNDERSTAND_AND_NORMALIZE
+        purpose: Read the whole available context first, preserve intent and critical literals, and normalize only supported spelling, grammar, terminology, and canonical naming without adding facts.
+      - id: MINIMAL_DOMAIN_FRAMING
+        purpose: Add only material, high-confidence domain, jurisdiction, entity, sector, industry, product/service, capability, classification, standards, and best-practice context needed for correct routing or downstream work.
+      - id: ROUTE
+        purpose: Decide collection_mode and hand the minimal context either to ARGUS for structured intelligence collection or to normal ATLAS execution.
+    routing_targets:
+      ARGUS_COLLECTION: ARGUS
+      HYBRID: ARGUS
+      ATLAS_DIRECT: ATLAS_EXECUTION
+      NONE: ATLAS_EXECUTION
   whole_context_rule: >-
     Read the complete available context as one semantic unit before decomposing it. Establish the
     overall meaning, intent, requested outcome, actors, relationships, constraints, qualifiers,
