@@ -1,0 +1,36 @@
+schema: schemas/spec.schema.json
+id: spec.task-lifecycle
+title: Canonical ATLAS task lifecycle
+status: active
+normative: true
+contract:
+  purpose: Define portable task-state semantics independent of host UI, model or provider implementation.
+  states:
+    CREATED: Task identity exists; substantive processing has not started.
+    NORMALIZING: UNDERSTAND_AND_NORMALIZE is active.
+    FRAMING: MINIMAL_DOMAIN_FRAMING is active.
+    ROUTING: ROUTE or downstream provider-routing preparation is active.
+    AWAITING_APPROVAL: Execution is ready for a required human authorization decision.
+    COLLECTING: Authorized evidence acquisition or ARGUS collection is active.
+    ANALYZING: ATLAS substantive analysis/decision work is active.
+    VERIFYING: Assurance, evidence reconciliation, testing or result verification is active.
+    PERSISTING: Authorized durable output/state persistence is active.
+    COMPLETED: Required execution, verification and delivery are complete.
+    PAUSED: Human or control-plane pause prevents further dependent execution without invalidating task state.
+    BLOCKED: A non-pause gate prevents dependent execution.
+    ABORTED: Task execution was intentionally terminated.
+  initial_state: CREATED
+  terminal_states: [COMPLETED, ABORTED]
+  authorization_state: AWAITING_APPROVAL is used when work is otherwise ready but explicit human approval is required, including ARGUS authorization.
+  argus_transition: ARGUS_COLLECTION or HYBRID may transition toward COLLECTING only after explicit user authorization and all other routing/handoff gates are satisfied.
+  state_authority: The Control Plane owns lifecycle transitions. Dashboard and host adapters project state but do not mutate it directly.
+  transition_record: Every material transition records task identity, prior state, next state, trigger, actor/authority, relevant digest/revision and result.
+  compatibility_rule: Lower-level runtime implementations may expose READY, PARTIAL or legacy stage labels internally, but portable host-facing orchestration should map them to these canonical lifecycle semantics.
+  resume_rule: Resume from PAUSED or persisted state only after reconciling current external/control state and revalidating stale approvals, digests, leases and permissions.
+invariants: [INV-003, INV-009, INV-011, INV-020]
+references:
+  - spec/control-plane.yaml
+  - spec/mission-control.yaml
+  - spec/execution-spine.yaml
+  - spec/approvals.yaml
+  - spec/dashboard.yaml
