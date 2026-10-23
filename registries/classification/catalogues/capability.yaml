@@ -14,5 +14,143 @@ hierarchy_levels:
   - SUBCAPABILITY
 redistribution_status: PERMITTED
 dataset_storage: FULL_DATASET
-items: []
-notes: Functional outcomes and solution capabilities used for requirements and supplier matching.
+items:
+  - &defaults
+    atlas_classification_id: CAP-MARITIME-SURVEILLANCE
+    serial: "01"
+    family_id: CAPABILITY
+    preferred_label: "Maritime Surveillance"
+    definition: "Observe and maintain situational awareness of maritime activity."
+    source_standard_id: STD-ATLAS-CAPABILITY
+    source_version_id: VER-ATLAS-CAPABILITY-1.0.0
+    source_url: https://github.com/gferris418/atlas-os
+    lifecycle: ACTIVE
+    evidence_status: CONFIRMED
+    redistribution_status: PERMITTED
+  - <<: *defaults
+    atlas_classification_id: CAP-VESSEL-DETECTION
+    serial: "01.01"
+    preferred_label: "Vessel Detection"
+    definition: "Detect the presence of vessels and other relevant maritime objects."
+    parent_id: CAP-MARITIME-SURVEILLANCE
+  - <<: *defaults
+    atlas_classification_id: CAP-VESSEL-IDENTIFICATION
+    serial: "01.02"
+    preferred_label: "Vessel Identification"
+    definition: "Determine or corroborate vessel identity using cooperative and non-cooperative information."
+    parent_id: CAP-MARITIME-SURVEILLANCE
+  - <<: *defaults
+    atlas_classification_id: CAP-VESSEL-TRACKING
+    serial: "01.03"
+    preferred_label: "Vessel Tracking"
+    definition: "Maintain tracks, movement histories, and predicted vessel positions."
+    parent_id: CAP-MARITIME-SURVEILLANCE
+  - <<: *defaults
+    atlas_classification_id: CAP-MARITIME-DOMAIN-AWARENESS
+    serial: "01.04"
+    preferred_label: "Maritime Domain Awareness"
+    definition: "Fuse maritime information into a coherent operational picture for awareness and decision support."
+    parent_id: CAP-MARITIME-SURVEILLANCE
+  - <<: *defaults
+    atlas_classification_id: CAP-COMMAND-CONTROL
+    serial: "02"
+    preferred_label: "Command & Control"
+    definition: "Plan, direct, coordinate, monitor, and control operations and resources."
+  - <<: *defaults
+    atlas_classification_id: CAP-COMMUNICATIONS
+    serial: "03"
+    preferred_label: Communications
+    definition: "Exchange voice, data, imagery, video, and machine information between users and systems."
+  - <<: *defaults
+    atlas_classification_id: CAP-PORT-OPERATIONS
+    serial: "04"
+    preferred_label: "Port Operations"
+    definition: "Manage and optimise vessel, berth, terminal, yard, and port-operational activity."
+  - <<: *defaults
+    atlas_classification_id: CAP-PORT-AUTOMATION
+    serial: "04.01"
+    preferred_label: "Port Automation"
+    definition: "Automate port and terminal workflows, equipment, controls, and operational decisions."
+    parent_id: CAP-PORT-OPERATIONS
+  - <<: *defaults
+    atlas_classification_id: CAP-VESSEL-TRAFFIC-MANAGEMENT
+    serial: "04.02"
+    preferred_label: "Vessel Traffic Management"
+    definition: "Monitor, coordinate, and manage vessel traffic and navigational safety in defined waters."
+    parent_id: CAP-PORT-OPERATIONS
+  - <<: *defaults
+    atlas_classification_id: CAP-ENERGY-SYSTEMS
+    serial: "05"
+    preferred_label: "Energy Systems"
+    definition: "Produce, distribute, balance, convert, store, and manage energy."
+  - <<: *defaults
+    atlas_classification_id: CAP-RENEWABLE-POWER
+    serial: "05.01"
+    preferred_label: "Renewable Power"
+    definition: "Generate and integrate electricity from renewable-energy sources."
+    parent_id: CAP-ENERGY-SYSTEMS
+  - <<: *defaults
+    atlas_classification_id: CAP-GRID-STABILITY
+    serial: "05.02"
+    preferred_label: "Grid Stability"
+    definition: "Maintain power-system frequency, voltage, reliability, resilience, and balance."
+    parent_id: CAP-ENERGY-SYSTEMS
+  - <<: *defaults
+    atlas_classification_id: CAP-ENERGY-STORAGE
+    serial: "05.03"
+    preferred_label: "Energy Storage"
+    definition: "Store energy and dispatch it when required for operational, reliability, or economic purposes."
+    parent_id: CAP-ENERGY-SYSTEMS
+  - <<: *defaults
+    atlas_classification_id: CAP-CIVIL-INFRASTRUCTURE
+    serial: "06"
+    preferred_label: "Civil Infrastructure"
+    definition: "Design, construct, protect, monitor, and maintain engineered infrastructure."
+  - <<: *defaults
+    atlas_classification_id: CAP-BRIDGE-ENGINEERING
+    serial: "06.01"
+    preferred_label: "Bridge Engineering"
+    definition: "Design, protect, construct, rehabilitate, and manage bridge assets."
+    parent_id: CAP-CIVIL-INFRASTRUCTURE
+  - <<: *defaults
+    atlas_classification_id: CAP-STRUCTURAL-MONITORING
+    serial: "06.02"
+    preferred_label: "Structural Monitoring"
+    definition: "Measure structural condition, behaviour, deterioration, loading, and performance."
+    parent_id: CAP-CIVIL-INFRASTRUCTURE
+  - <<: *defaults
+    atlas_classification_id: CAP-SIMULATION-TRAINING
+    serial: "07"
+    preferred_label: "Simulation & Training"
+    definition: "Reproduce environments, systems, operations, or missions for training, rehearsal, analysis, and assessment."
+  - <<: *defaults
+    atlas_classification_id: CAP-NAVIGATION-PNT
+    serial: "08"
+    preferred_label: "Navigation & PNT"
+    definition: "Determine position, navigation state, timing, route, and movement guidance."
+  - <<: *defaults
+    atlas_classification_id: CAP-CYBERSECURITY
+    serial: "09"
+    preferred_label: Cybersecurity
+    definition: "Prevent, detect, respond to, and recover from cyber threats while protecting digital assets."
+  - <<: *defaults
+    atlas_classification_id: CAP-ASSET-LOGISTICS
+    serial: "10"
+    preferred_label: "Asset & Logistics Management"
+    definition: "Plan, track, maintain, supply, move, and sustain assets, inventory, and logistics resources."
+  - <<: *defaults
+    atlas_classification_id: CAP-AUTOMATION-CONTROL
+    serial: "11"
+    preferred_label: "Automation & Control"
+    definition: "Sense, control, optimise, and automate equipment, processes, and operational systems."
+  - <<: *defaults
+    atlas_classification_id: CAP-SENSING-MONITORING
+    serial: "12"
+    preferred_label: "Sensing & Monitoring"
+    definition: "Observe, measure, detect, and report physical or environmental conditions."
+  - <<: *defaults
+    atlas_classification_id: CAP-DATA-FUSION
+    serial: "13"
+    preferred_label: "Data Fusion & Decision Support"
+    definition: "Combine heterogeneous information to improve situational understanding, prediction, and decisions."
+notes: "ATLAS functional-capability vocabulary used for requirement decomposition, supplier matching, and solution composition."
