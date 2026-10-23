@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 import re
-from typing import Any
+from typing import Any, Mapping
 
 
 _ALLOWED_PROTOCOLS = {"native", "mcp", "plugin", "api", "database", "filesystem"}
@@ -109,10 +109,33 @@ class BindingRegistry:
         return self.bindings.get(capability_id, ())
 
 
+def resolve_provider(
+    capability_id: str,
+    bindings: BindingRegistry,
+    *,
+    manifests: Mapping[str, ProviderManifest],
+    admission: Mapping[str, AdmissionReceipt],
+) -> str | None:
+    """Select the first bound provider that is admitted and declares the capability."""
+    usable_states = {AdmissionState.CERTIFIED, AdmissionState.ACTIVE, AdmissionState.DEGRADED}
+    for provider_id in bindings.candidates(capability_id):
+        manifest = manifests.get(provider_id)
+        receipt = admission.get(provider_id)
+        if manifest is None or receipt is None:
+            continue
+        if receipt.provider_id != provider_id or receipt.state not in usable_states:
+            continue
+        if manifest.provider_id != provider_id or not manifest.provides(capability_id):
+            continue
+        return provider_id
+    return None
+
+
 __all__ = [
     "AdmissionReceipt",
     "AdmissionState",
     "BindingRegistry",
     "ProviderManifest",
     "admit_provider",
+    "resolve_provider",
 ]
