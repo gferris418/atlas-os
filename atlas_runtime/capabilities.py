@@ -7,7 +7,7 @@ import json
 import secrets
 from collections.abc import Callable
 from threading import Lock
-from typing import Any
+from typing import Any, Protocol
 
 from .contract import EXECUTION_CONTRACT
 
@@ -20,7 +20,17 @@ class CapabilityReplayError(CapabilityError):
     pass
 
 
+class ReplayGuard(Protocol):
+    def consume(self, jti: str, exp: int, now: int) -> bool: ...
+
+
 class InMemoryReplayGuard:
+    """Process-local replay protection for tests and single-process deployments.
+
+    Distributed remote deployments should provide a shared replay guard implementing
+    the same consume(jti, exp, now) interface.
+    """
+
     def __init__(self) -> None:
         self._seen: dict[str, int] = {}
         self._lock = Lock()
@@ -97,7 +107,9 @@ def issue_remote_capability(
     claims = {
         "v": policy["version"],
         "iss": policy["issuer"],
+        "sub": policy["subject"],
         "aud": policy["audience"],
+        "capability": policy["capability"],
         "scope": policy["scope"],
         "task_id": task_id,
         "intent_hash": _intent_hash(intent),
@@ -118,7 +130,7 @@ def verify_remote_capability(
     *,
     task_id: str,
     intent: str,
-    replay_guard: InMemoryReplayGuard,
+    replay_guard: ReplayGuard,
     now: int,
 ) -> dict[str, Any]:
     if not isinstance(token, str):
@@ -128,8 +140,8 @@ def verify_remote_capability(
         raise CapabilityError("capability must have exactly three segments")
     if not callable(secret_resolver):
         raise CapabilityError("secret_resolver must be callable")
-    if not isinstance(replay_guard, InMemoryReplayGuard):
-        raise CapabilityError("replay_guard must be an InMemoryReplayGuard")
+    if not callable(getattr(replay_guard, "consume", None)):
+        raise CapabilityError("replay_guard must provide consume(jti, exp, now)")
     if isinstance(now, bool) or not isinstance(now, int) or now < 0:
         raise CapabilityError("now must be a non-negative integer timestamp")
 
@@ -158,13 +170,18 @@ def verify_remote_capability(
     if not hmac.compare_digest(expected, supplied):
         raise CapabilityError("capability signature mismatch")
 
-    required = {"v", "iss", "aud", "scope", "task_id", "intent_hash", "iat", "exp", "jti"}
+    required = {
+        "v", "iss", "sub", "aud", "capability", "scope", "task_id",
+        "intent_hash", "iat", "exp", "jti",
+    }
     if not required.issubset(claims):
         raise CapabilityError("capability is missing required claims")
     if claims["v"] != policy["version"]:
         raise CapabilityError("unsupported capability version")
     if claims["iss"] != policy["issuer"] or claims["aud"] != policy["audience"]:
         raise CapabilityError("capability issuer or audience mismatch")
+    if claims["sub"] != policy["subject"] or claims["capability"] != policy["capability"]:
+        raise CapabilityError("capability subject or capability mismatch")
     if claims["scope"] != policy["scope"]:
         raise CapabilityError("capability scope mismatch")
     if claims["task_id"] != task_id:
@@ -179,7 +196,8 @@ def verify_remote_capability(
     max_ttl = int(policy["max_ttl_seconds"])
     if expires_at <= issued_at or expires_at - issued_at > max_ttl:
         raise CapabilityError("capability lifetime exceeds policy")
-    if now < issued_at - 30:
+    max_skew = int(policy["max_clock_skew_seconds"])
+    if now < issued_at - max_skew:
         raise CapabilityError("capability is not yet valid")
     if now > expires_at:
         raise CapabilityError("capability has expired")
@@ -196,6 +214,7 @@ __all__ = [
     "CapabilityError",
     "CapabilityReplayError",
     "InMemoryReplayGuard",
+    "ReplayGuard",
     "issue_remote_capability",
     "verify_remote_capability",
 ]
