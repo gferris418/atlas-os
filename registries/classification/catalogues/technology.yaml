@@ -14,5 +14,282 @@ hierarchy_levels:
   - SUBTECHNOLOGY
 redistribution_status: PERMITTED
 dataset_storage: FULL_DATASET
-items: []
-notes: Governed technology vocabulary for methods, platforms, systems and enabling technologies.
+items:
+  - &defaults
+    atlas_classification_id: TECH-AI
+    serial: "01"
+    family_id: TECHNOLOGY
+    preferred_label: "Artificial Intelligence"
+    definition: "Computational methods that perform tasks associated with perception, prediction, language, reasoning, generation, or autonomous decision support."
+    source_standard_id: STD-ATLAS-TECHNOLOGY
+    source_version_id: VER-ATLAS-TECHNOLOGY-1.0.0
+    source_url: https://github.com/gferris418/atlas-os
+    lifecycle: ACTIVE
+    evidence_status: CONFIRMED
+    redistribution_status: PERMITTED
+  - <<: *defaults
+    atlas_classification_id: TECH-AI-ML
+    serial: "01.01"
+    preferred_label: "Machine Learning"
+    definition: "Statistical and computational methods that learn predictive or decision functions from data."
+    parent_id: TECH-AI
+  - <<: *defaults
+    atlas_classification_id: TECH-AI-COMPUTER-VISION
+    serial: "01.02"
+    preferred_label: "Computer Vision"
+    definition: "Machine interpretation and analysis of images and video."
+    parent_id: TECH-AI
+  - <<: *defaults
+    atlas_classification_id: TECH-AI-NLP
+    serial: "01.03"
+    preferred_label: "Natural Language Processing"
+    definition: "Machine processing, understanding, and generation of human language."
+    parent_id: TECH-AI
+  - <<: *defaults
+    atlas_classification_id: TECH-AI-GENERATIVE
+    serial: "01.04"
+    preferred_label: "Generative AI"
+    definition: "Models that generate text, images, audio, software, data, or other content."
+    parent_id: TECH-AI
+  - <<: *defaults
+    atlas_classification_id: TECH-AI-AUTONOMY
+    serial: "01.05"
+    preferred_label: "Autonomous Systems"
+    definition: "AI-enabled perception, planning, decision, and control supporting autonomous behaviour."
+    parent_id: TECH-AI
+  - <<: *defaults
+    atlas_classification_id: TECH-SENSING
+    serial: "02"
+    preferred_label: Sensing
+    definition: "Technologies that detect, measure, or characterise physical objects, signals, and environments."
+  - <<: *defaults
+    atlas_classification_id: TECH-RADAR
+    serial: "02.01"
+    preferred_label: Radar
+    definition: "Radio-frequency sensing using transmitted and reflected electromagnetic energy."
+    parent_id: TECH-SENSING
+  - <<: *defaults
+    atlas_classification_id: TECH-EO-IR
+    serial: "02.02"
+    preferred_label: "Electro-Optical / Infrared"
+    definition: "Visible, near-infrared, infrared, and thermal imaging and sensing."
+    parent_id: TECH-SENSING
+  - <<: *defaults
+    atlas_classification_id: TECH-LIDAR
+    serial: "02.03"
+    preferred_label: LiDAR
+    definition: "Laser-based ranging and three-dimensional sensing."
+    parent_id: TECH-SENSING
+  - <<: *defaults
+    atlas_classification_id: TECH-SONAR
+    serial: "02.04"
+    preferred_label: Sonar
+    definition: "Acoustic detection, ranging, imaging, and classification in water."
+    parent_id: TECH-SENSING
+  - <<: *defaults
+    atlas_classification_id: TECH-ACOUSTIC
+    serial: "02.05"
+    preferred_label: "Acoustic Sensors"
+    definition: "Sensors that detect, measure, or analyse sound and vibration."
+    parent_id: TECH-SENSING
+  - <<: *defaults
+    atlas_classification_id: TECH-ENV-SENSORS
+    serial: "02.06"
+    preferred_label: "Environmental Sensors"
+    definition: "Sensors for air, water, weather, emissions, radiation, and other environmental parameters."
+    parent_id: TECH-SENSING
+  - <<: *defaults
+    atlas_classification_id: TECH-PNT
+    serial: "03"
+    preferred_label: "Positioning, Navigation & Timing"
+    definition: "Technologies used to establish position, navigation state, velocity, orientation, and precise time."
+  - <<: *defaults
+    atlas_classification_id: TECH-GNSS
+    serial: "03.01"
+    preferred_label: GNSS
+    definition: "Global navigation satellite system receivers, augmentation, and associated positioning technology."
+    parent_id: TECH-PNT
+  - <<: *defaults
+    atlas_classification_id: TECH-INS
+    serial: "03.02"
+    preferred_label: "Inertial Navigation"
+    definition: "Navigation using inertial measurement and estimation without continuous external positioning."
+    parent_id: TECH-PNT
+  - <<: *defaults
+    atlas_classification_id: TECH-TIMING
+    serial: "03.03"
+    preferred_label: "Precision Timing"
+    definition: "Clock, synchronisation, time-transfer, and timing-distribution technologies."
+    parent_id: TECH-PNT
+  - <<: *defaults
+    atlas_classification_id: TECH-COMMUNICATIONS
+    serial: "04"
+    preferred_label: Communications
+    definition: "Technologies enabling wired, wireless, optical, radio, satellite, and digital information exchange."
+  - <<: *defaults
+    atlas_classification_id: TECH-RF
+    serial: "04.01"
+    preferred_label: "Radio Frequency Communications"
+    definition: "Wireless communications using radio-frequency electromagnetic spectrum."
+    parent_id: TECH-COMMUNICATIONS
+  - <<: *defaults
+    atlas_classification_id: TECH-SATCOM
+    serial: "04.02"
+    preferred_label: "Satellite Communications"
+    definition: "Communications through space-based relay and satellite networks."
+    parent_id: TECH-COMMUNICATIONS
+  - <<: *defaults
+    atlas_classification_id: TECH-5G
+    serial: "04.03"
+    preferred_label: 5G
+    definition: "Fifth-generation mobile network and private-5G technologies."
+    parent_id: TECH-COMMUNICATIONS
+  - <<: *defaults
+    atlas_classification_id: TECH-TACTICAL-DATA-LINK
+    serial: "04.04"
+    preferred_label: "Tactical Data Link"
+    definition: "Structured operational data exchange between tactical platforms, sensors, and command nodes."
+    parent_id: TECH-COMMUNICATIONS
+  - <<: *defaults
+    atlas_classification_id: TECH-OPTICAL-COMMS
+    serial: "04.05"
+    preferred_label: "Optical Communications"
+    definition: "Free-space or guided optical transmission of information."
+    parent_id: TECH-COMMUNICATIONS
+  - <<: *defaults
+    atlas_classification_id: TECH-PROPULSION
+    serial: "05"
+    preferred_label: Propulsion
+    definition: "Technologies that generate and transmit propulsive power for vessels, vehicles, and platforms."
+  - <<: *defaults
+    atlas_classification_id: TECH-DIESEL-PROPULSION
+    serial: "05.01"
+    preferred_label: "Diesel Propulsion"
+    definition: "Propulsion systems using compression-ignition diesel engines."
+    parent_id: TECH-PROPULSION
+  - <<: *defaults
+    atlas_classification_id: TECH-GAS-TURBINE
+    serial: "05.02"
+    preferred_label: "Gas Turbine Propulsion"
+    definition: "Propulsion or power systems using gas turbines."
+    parent_id: TECH-PROPULSION
+  - <<: *defaults
+    atlas_classification_id: TECH-ELECTRIC-PROPULSION
+    serial: "05.03"
+    preferred_label: "Electric Propulsion"
+    definition: "Propulsion using electric motors supplied by electrical-energy sources."
+    parent_id: TECH-PROPULSION
+  - <<: *defaults
+    atlas_classification_id: TECH-HYBRID-PROPULSION
+    serial: "05.04"
+    preferred_label: "Hybrid Propulsion"
+    definition: "Propulsion combining two or more power or energy-source architectures."
+    parent_id: TECH-PROPULSION
+  - <<: *defaults
+    atlas_classification_id: TECH-ALT-FUEL-PROPULSION
+    serial: "05.05"
+    preferred_label: "Alternative-Fuel Propulsion"
+    definition: "Propulsion using low-carbon or alternative fuels such as methanol, ammonia, hydrogen, or sustainable fuels."
+    parent_id: TECH-PROPULSION
+  - <<: *defaults
+    atlas_classification_id: TECH-SIMULATION
+    serial: "06"
+    preferred_label: Simulation
+    definition: "Technologies that model systems, environments, processes, or missions for training, design, prediction, or analysis."
+  - <<: *defaults
+    atlas_classification_id: TECH-DIGITAL-TWIN
+    serial: "06.01"
+    preferred_label: "Digital Twin"
+    definition: "Continuously or periodically updated digital representation of a physical asset, system, or process."
+    parent_id: TECH-SIMULATION
+  - <<: *defaults
+    atlas_classification_id: TECH-TRAINING-SIM
+    serial: "06.02"
+    preferred_label: "Training Simulation"
+    definition: "Synthetic environments and simulators designed primarily for human training and assessment."
+    parent_id: TECH-SIMULATION
+  - <<: *defaults
+    atlas_classification_id: TECH-MISSION-SIM
+    serial: "06.03"
+    preferred_label: "Mission Simulation"
+    definition: "Simulation of operational missions, scenarios, adversaries, and mission systems."
+    parent_id: TECH-SIMULATION
+  - <<: *defaults
+    atlas_classification_id: TECH-ENGINEERING-SIM
+    serial: "06.04"
+    preferred_label: "Engineering Simulation"
+    definition: "Numerical or model-based simulation for design, performance, safety, and engineering analysis."
+    parent_id: TECH-SIMULATION
+  - <<: *defaults
+    atlas_classification_id: TECH-CYBERSECURITY
+    serial: "07"
+    preferred_label: "Cybersecurity Technology"
+    definition: "Technologies for identity, protection, detection, response, cryptography, resilience, and security operations."
+  - <<: *defaults
+    atlas_classification_id: TECH-IOT
+    serial: "08"
+    preferred_label: "Internet of Things"
+    definition: "Connected sensors, devices, gateways, platforms, and machine-to-machine systems."
+  - <<: *defaults
+    atlas_classification_id: TECH-ROBOTICS
+    serial: "09"
+    preferred_label: Robotics
+    definition: "Programmable machines combining sensing, actuation, control, and autonomy to perform physical tasks."
+  - <<: *defaults
+    atlas_classification_id: TECH-CLOUD-EDGE
+    serial: "10"
+    preferred_label: "Cloud & Edge Computing"
+    definition: "Distributed compute, storage, platform, and application execution across cloud and edge environments."
+  - <<: *defaults
+    atlas_classification_id: TECH-CLOUD
+    serial: "10.01"
+    preferred_label: "Cloud Computing"
+    definition: "Elastic, network-accessible compute, storage, platform, and application services."
+    parent_id: TECH-CLOUD-EDGE
+  - <<: *defaults
+    atlas_classification_id: TECH-EDGE
+    serial: "10.02"
+    preferred_label: "Edge Computing"
+    definition: "Computation and data processing located close to sensors, devices, users, or operational assets."
+    parent_id: TECH-CLOUD-EDGE
+  - <<: *defaults
+    atlas_classification_id: TECH-BATTERY
+    serial: "11"
+    preferred_label: "Battery & Electrochemical Storage"
+    definition: "Electrochemical energy-storage technologies, cells, packs, battery management, and associated systems."
+  - <<: *defaults
+    atlas_classification_id: TECH-HYDROGEN
+    serial: "12"
+    preferred_label: "Hydrogen Technology"
+    definition: "Hydrogen production, storage, transport, conversion, fuel-cell, and hydrogen-use technologies."
+  - <<: *defaults
+    atlas_classification_id: TECH-DLT
+    serial: "13"
+    preferred_label: "Distributed Ledger Technology"
+    definition: "Distributed consensus, ledger, blockchain, and related cryptographic transaction technologies."
+  - <<: *defaults
+    atlas_classification_id: TECH-QUANTUM
+    serial: "14"
+    preferred_label: "Quantum Technology"
+    definition: "Quantum computing, sensing, communications, timing, and enabling quantum technologies."
+  - <<: *defaults
+    atlas_classification_id: TECH-AUTOMATION
+    serial: "15"
+    preferred_label: "Automation & Industrial Control"
+    definition: "Programmable control, PLC, SCADA, DCS, instrumentation, process automation, and industrial control technology."
+  - <<: *defaults
+    atlas_classification_id: TECH-DATA-ANALYTICS
+    serial: "16"
+    preferred_label: "Data & Analytics Technology"
+    definition: "Data integration, databases, analytics, streaming, decision intelligence, and large-scale data processing."
+  - <<: *defaults
+    atlas_classification_id: TECH-GIS
+    serial: "17"
+    preferred_label: "Geospatial & GIS Technology"
+    definition: "Geographic information systems, spatial databases, mapping, geospatial analytics, and geospatial services."
+  - <<: *defaults
+    atlas_classification_id: TECH-ENERGY-STORAGE-NONBATTERY
+    serial: "18"
+    preferred_label: "Non-Battery Energy Storage"
+    definition: "Mechanical, thermal, gravitational, compressed-air, flywheel, and other non-electrochemical energy storage."
+notes: "ATLAS technology vocabulary. External ISO, IEC, IEEE, industry, and domain vocabularies may be cross-referenced without collapsing technology into product or industry identity."
