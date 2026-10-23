@@ -40,6 +40,35 @@ class InteroperabilityTests(unittest.TestCase):
         self.assertTrue(receipt.checks["schema"])
         self.assertTrue(receipt.checks["provenance"])
 
+    def test_schema_invalid_manifest_is_rejected_before_admission(self) -> None:
+        invalid_manifests = [
+            {
+                "provider_id": "example.provider",
+                "protocol": "unsupported",
+                "provides": ["document.read"],
+                "permissions": {"read": "automatic"},
+                "evidence": {"provenance": True},
+            },
+            {
+                "provider_id": "example.provider",
+                "protocol": "mcp",
+                "provides": ["document.read"],
+                "permissions": {"read": "sometimes"},
+                "evidence": {"provenance": True},
+            },
+            {
+                "provider_id": "example.provider",
+                "protocol": "mcp",
+                "provides": ["document.read"],
+                "permissions": {"read": "automatic"},
+                "evidence": {"provenance": "false"},
+            },
+        ]
+        for payload in invalid_manifests:
+            with self.subTest(payload=payload):
+                with self.assertRaises(ValueError):
+                    ProviderManifest.from_dict(payload)
+
     def test_missing_permissions_is_rejected(self) -> None:
         with self.assertRaisesRegex(ValueError, "permissions"):
             ProviderManifest.from_dict(
