@@ -13,5 +13,132 @@ hierarchy_levels:
   - SUBINDUSTRY
 redistribution_status: PERMITTED
 dataset_storage: FULL_DATASET
-items: []
-notes: Canonical producer/supplier ecosystem vocabulary; mappings to ISIC, NACE and NAICS are explicit crosswalks rather than implicit equivalence.
+items:
+  - &defaults
+    atlas_classification_id: INDUSTRY-SHIPBUILDING
+    serial: "01"
+    family_id: INDUSTRY
+    preferred_label: Shipbuilding
+    definition: "Design, construction, refit, and repair of ships, boats, and floating structures."
+    source_standard_id: STD-ATLAS-INDUSTRY
+    source_version_id: VER-ATLAS-INDUSTRY-1.0.0
+    source_url: https://github.com/gferris418/atlas-os
+    lifecycle: ACTIVE
+    evidence_status: CONFIRMED
+    redistribution_status: PERMITTED
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-MARINE-EQUIPMENT
+    serial: "02"
+    preferred_label: "Marine Equipment Manufacturing"
+    definition: "Manufacture and integration of marine propulsion, navigation, automation, electrical, safety, and mission equipment."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-DEFENCE-ELECTRONICS
+    serial: "03"
+    preferred_label: "Defence Electronics"
+    definition: "Manufacture and integration of electronic systems for defence, security, sensing, communications, and mission applications."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-TELECOM-EQUIPMENT
+    serial: "04"
+    preferred_label: "Telecommunications Equipment"
+    definition: "Manufacture and supply of fixed, mobile, radio, satellite, and network communications equipment."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-ENGINEERING-CONSULTING
+    serial: "05"
+    preferred_label: "Engineering & Technical Consulting"
+    definition: "Engineering design, advisory, technical consultancy, project engineering, and specialist professional services."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-SOFTWARE
+    serial: "06"
+    preferred_label: "Software & Digital Systems"
+    definition: "Development, supply, integration, and support of software and digital systems."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-CYBERSECURITY-SERVICES
+    serial: "07"
+    preferred_label: "Cybersecurity Services"
+    definition: "Security engineering, managed security, assurance, monitoring, incident response, and cyber consulting."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-BATTERY-MANUFACTURING
+    serial: "08"
+    preferred_label: "Battery Manufacturing"
+    definition: "Manufacture of cells, batteries, battery packs, and associated battery-management systems."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-BRIDGE-COMPONENTS
+    serial: "09"
+    preferred_label: "Bridge Components & Structural Systems"
+    definition: "Manufacture and supply of bridge bearings, expansion joints, seismic devices, monitoring equipment, and structural components."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-AEROSPACE
+    serial: "10"
+    preferred_label: "Aerospace & Aviation Equipment"
+    definition: "Manufacture, integration, maintenance, and support of aircraft, aviation systems, and aerospace equipment."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-RAIL-EQUIPMENT
+    serial: "11"
+    preferred_label: "Railway Equipment"
+    definition: "Manufacture and supply of rolling stock, signalling, electrification, track, and railway systems."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-POWER-EQUIPMENT
+    serial: "12"
+    preferred_label: "Power & Grid Equipment"
+    definition: "Manufacture and supply of generation, transmission, distribution, protection, automation, and power-conversion equipment."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-MEDICAL-DEVICES
+    serial: "13"
+    preferred_label: "Medical Device Manufacturing"
+    definition: "Manufacture and supply of clinical, diagnostic, monitoring, laboratory, and therapeutic devices."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-WATER-TREATMENT
+    serial: "14"
+    preferred_label: "Water & Wastewater Technology"
+    definition: "Manufacture, engineering, integration, and operation of water and wastewater treatment systems."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-INDUSTRIAL-AUTOMATION
+    serial: "15"
+    preferred_label: "Industrial Automation & Control"
+    definition: "Manufacture and integration of automation, control, instrumentation, and industrial digital systems."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-CONSTRUCTION-ENGINEERING
+    serial: "16"
+    preferred_label: "Construction & Civil Engineering"
+    definition: "Construction, civil engineering, infrastructure delivery, and associated contracting services."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-OIL-GAS-EQUIPMENT
+    serial: "17"
+    preferred_label: "Oil & Gas Equipment"
+    definition: "Manufacture and supply of equipment and engineered systems for upstream, midstream, downstream, and refining operations."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-LOGISTICS
+    serial: "18"
+    preferred_label: "Logistics & Supply Chain Services"
+    definition: "Freight forwarding, warehousing, transport coordination, customs support, and supply-chain services."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-RENEWABLE-ENERGY
+    serial: "19"
+    preferred_label: "Renewable Energy Equipment"
+    definition: "Manufacture and integration of solar, wind, hydro, and other renewable-energy equipment and systems."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-SENSOR-INSTRUMENTATION
+    serial: "20"
+    preferred_label: "Sensors & Instrumentation"
+    definition: "Manufacture and integration of sensing, measurement, instrumentation, and monitoring systems."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-DATA-CENTRE
+    serial: "21"
+    preferred_label: "Data Centre & Compute Infrastructure"
+    definition: "Supply and integration of data-centre, compute, storage, cooling, power, and associated infrastructure."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-PORT-EQUIPMENT
+    serial: "22"
+    preferred_label: "Port & Cargo Handling Equipment"
+    definition: "Manufacture and supply of cranes, handling systems, terminal equipment, and port automation hardware."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-AUTOMOTIVE
+    serial: "23"
+    preferred_label: "Automotive & Mobility Equipment"
+    definition: "Manufacture and integration of road vehicles, mobility equipment, and associated systems."
+  - <<: *defaults
+    atlas_classification_id: INDUSTRY-TRAINING-SIMULATION
+    serial: "24"
+    preferred_label: "Training & Simulation Systems"
+    definition: "Development and integration of simulators, synthetic environments, training systems, and related services."
+notes: "ATLAS producer/supplier ecosystem vocabulary. Statistical mappings to ISIC, NACE, and NAICS are explicit and evidence-backed."
