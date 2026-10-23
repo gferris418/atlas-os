@@ -26,6 +26,7 @@ impact:
       - plugin.json
       - skills/atlas-os/SKILL.md
       - .agents/skills/atlas-os/SKILL.md
+      - contracts/atlas-argus-execution-v2.json
       - integrations/chatgpt.yaml
       - integrations/chatgpt-bootstrap.yaml
       - integrations/argus.yaml
