@@ -24,6 +24,10 @@ EXPECTED_REGISTRIES = {"capabilities.yaml", "providers.yaml", "surfaces.yaml"}
 EXPECTED_CLASSIFICATION_REGISTRIES = {
     "families.yaml", "authorities.yaml", "standards.yaml", "update-sources.yaml", "crosswalks.yaml",
 }
+EXPECTED_CLASSIFICATION_CATALOGUES = {
+    "economic-activity.yaml", "industry.yaml", "product.yaml", "sector.yaml", "domain.yaml",
+    "capability.yaml", "technology.yaml",
+}
 EXPECTED_INTEGRATIONS = {
     "access-asia.yaml", "argus.yaml", "chatgpt-bootstrap.yaml", "chatgpt.yaml",
     "generic-host.yaml", "hermes-agent.yaml",
@@ -47,6 +51,7 @@ REDISTRIBUTION_STATUSES = {"PERMITTED", "RESTRICTED", "UNKNOWN", "NOT_APPLICABLE
 DATASET_STORAGE_MODES = {"NONE", "METADATA_ONLY", "PERMITTED_EXTRACT", "FULL_DATASET"}
 CLASSIFICATION_STATUSES = {"DRAFT", "ADOPTED", "OPERATIONAL", "RETIRED"}
 PUBLICATION_STATUSES = {"PUBLISHED", "FORTHCOMING", "NOT_APPLICABLE", "UNKNOWN"}
+SOURCE_MODES = {"ATLAS_OWNED", "REMOTE_AUTHORITATIVE", "METADATA_ONLY"}
 
 
 def _load(path: Path):
@@ -62,11 +67,121 @@ def _names(root: Path, directory: str, suffixes: tuple[str, ...]) -> set[str]:
     return {path.name for path in base.iterdir() if path.is_file() and path.suffix in suffixes}
 
 
+def _validate_catalogues(
+    base: Path,
+    family_ids: set[str],
+    authority_set: set[str],
+    standard_id_set: set[str],
+    versions: dict[str, dict],
+    version_owner: dict[str, str],
+    errors: list[str],
+) -> None:
+    catalogue_dir = base / "catalogues"
+    actual = _names(base.parent.parent, "registries/classification/catalogues", (".yaml",))
+    if actual != EXPECTED_CLASSIFICATION_CATALOGUES:
+        errors.append(
+            "registries/classification/catalogues surface drift: "
+            f"{sorted(actual)} != {sorted(EXPECTED_CLASSIFICATION_CATALOGUES)}"
+        )
+        return
+
+    catalogue_ids: set[str] = set()
+    for filename in sorted(EXPECTED_CLASSIFICATION_CATALOGUES):
+        path = catalogue_dir / filename
+        payload = _load(path)
+        catalogue_id = payload.get("catalogue_id")
+        if not catalogue_id or catalogue_id in catalogue_ids:
+            errors.append(f"duplicate or missing classification catalogue ID: {catalogue_id}")
+            continue
+        catalogue_ids.add(catalogue_id)
+
+        family_id = payload.get("family_id")
+        if family_id not in family_ids:
+            errors.append(f"unknown classification catalogue family: {catalogue_id}")
+        authority_id = payload.get("authority_id")
+        if authority_id not in authority_set:
+            errors.append(f"unknown classification catalogue authority: {catalogue_id}")
+        if not str(payload.get("owner", "")).strip():
+            errors.append(f"classification catalogue owner is required: {catalogue_id}")
+        if payload.get("source_mode") not in SOURCE_MODES:
+            errors.append(f"invalid classification catalogue source mode: {catalogue_id}")
+        if payload.get("lifecycle") not in LIFECYCLES:
+            errors.append(f"invalid classification catalogue lifecycle: {catalogue_id}")
+        if payload.get("redistribution_status") not in REDISTRIBUTION_STATUSES:
+            errors.append(f"invalid classification catalogue redistribution status: {catalogue_id}")
+        if payload.get("dataset_storage") not in DATASET_STORAGE_MODES:
+            errors.append(f"invalid classification catalogue storage mode: {catalogue_id}")
+        if payload.get("dataset_storage") == "FULL_DATASET" and payload.get("redistribution_status") != "PERMITTED":
+            errors.append(f"classification catalogue FULL_DATASET requires PERMITTED redistribution: {catalogue_id}")
+        source_standard = payload.get("source_standard_id")
+        source_version = payload.get("source_version_id")
+        if source_standard not in standard_id_set:
+            errors.append(f"classification catalogue references unknown source standard: {catalogue_id}")
+        if source_version not in versions:
+            errors.append(f"classification catalogue references unknown source version: {catalogue_id}")
+        elif version_owner[source_version] != source_standard:
+            errors.append(f"classification catalogue source version does not belong to source standard: {catalogue_id}")
+        if not str(payload.get("source_url", "")).startswith("https://"):
+            errors.append(f"classification catalogue lacks provenance URL: {catalogue_id}")
+        if payload.get("source_mode") == "ATLAS_OWNED":
+            if payload.get("owner") != "ATLAS" or authority_id != "ATLAS":
+                errors.append(f"ATLAS-owned catalogue must use ATLAS authority: {catalogue_id}")
+            if payload.get("redistribution_status") != "PERMITTED":
+                errors.append(f"ATLAS-owned catalogue must be redistributable: {catalogue_id}")
+
+        items = payload.get("items", [])
+        item_ids = [item.get("atlas_classification_id") for item in items]
+        seen: set[str] = set()
+        for item_id in item_ids:
+            if not item_id or item_id in seen:
+                errors.append(f"duplicate classification item ID in {catalogue_id}: {item_id}")
+            if item_id:
+                seen.add(item_id)
+        item_by_id = {item.get("atlas_classification_id"): item for item in items if item.get("atlas_classification_id")}
+        for item_id, item in item_by_id.items():
+            if item.get("family_id") != family_id:
+                errors.append(f"classification item family mismatch in {catalogue_id}: {item_id}")
+            item_standard = item.get("source_standard_id")
+            item_version = item.get("source_version_id")
+            if item_standard not in standard_id_set:
+                errors.append(f"classification item references unknown source standard in {catalogue_id}: {item_id}")
+            if item_version not in versions:
+                errors.append(f"classification item references unknown source version in {catalogue_id}: {item_id}")
+            elif version_owner[item_version] != item_standard:
+                errors.append(f"classification item source version mismatch in {catalogue_id}: {item_id}")
+            item_authority = item.get("authority_id")
+            if item_authority is not None and item_authority not in authority_set:
+                errors.append(f"classification item references unknown authority in {catalogue_id}: {item_id}")
+            parent_id = item.get("parent_id")
+            if parent_id is not None and parent_id not in item_by_id:
+                errors.append(f"unknown classification parent in {catalogue_id}: {parent_id}")
+
+        visiting: set[str] = set()
+        visited: set[str] = set()
+
+        def visit(item_id: str) -> None:
+            if item_id in visited:
+                return
+            if item_id in visiting:
+                errors.append(f"classification parent cycle in {catalogue_id}: {item_id}")
+                return
+            visiting.add(item_id)
+            parent_id = item_by_id[item_id].get("parent_id")
+            if parent_id in item_by_id:
+                visit(parent_id)
+            visiting.remove(item_id)
+            visited.add(item_id)
+
+        for item_id in item_by_id:
+            visit(item_id)
+
+
 def _validate_classification(root: Path, errors: list[str]) -> None:
     base = root / "registries" / "classification"
     families = _load(base / "families.yaml").get("families", [])
     family_ids = [entry.get("id") for entry in families]
-    if set(family_ids) != APPROVED_FAMILIES or len(family_ids) != len(set(family_ids)):
+    family_set = set(family_ids)
+    if family_set != APPROVED_FAMILIES or len(family_ids) != len(family_set):
         errors.append("classification families must exactly match the approved unique family set")
 
     authorities = _load(base / "authorities.yaml").get("authorities", [])
@@ -182,6 +297,8 @@ def _validate_classification(root: Path, errors: list[str]) -> None:
                 errors.append(f"crosswalk target version does not belong to target standard: {crosswalk_id}")
         if crosswalk.get("relationship") == "CANDIDATE" and crosswalk.get("evidence_status") == "CONFIRMED":
             errors.append(f"CANDIDATE crosswalk cannot be treated as confirmed equivalence: {crosswalk_id}")
+
+    _validate_catalogues(base, family_set, authority_set, standard_id_set, versions, version_owner, errors)
 
 
 def validate(root: Path) -> list[str]:
