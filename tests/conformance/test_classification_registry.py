@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import shutil
 import tempfile
 import unittest
@@ -19,6 +20,7 @@ EXPECTED_FAMILIES = {
     "ECONOMIC_ACTIVITY",
     "PRODUCT",
     "CAPABILITY",
+    "TECHNOLOGY",
     "PROCUREMENT_CATEGORY",
     "TRADE_CLASSIFICATION",
     "OCCUPATION",
@@ -29,6 +31,8 @@ EXPECTED_SCHEMAS = {
     "schemas/classification-standard.schema.json",
     "schemas/classification-entry.schema.json",
     "schemas/classification-crosswalk.schema.json",
+    "schemas/classification-catalogue.schema.json",
+    "schemas/classification-indicator.schema.json",
 }
 LIFECYCLES = {"DISCOVERED", "CANDIDATE", "VERIFIED", "ACTIVE", "SUPERSEDED", "ARCHIVED"}
 EVIDENCE_STATUSES = {"CONFIRMED", "PROBABLE", "POSSIBLE", "DISPUTED", "UNVERIFIED", "STALE"}
@@ -41,6 +45,8 @@ class ClassificationRegistryConformanceTests(unittest.TestCase):
             ROOT / "schemas" / "classification-standard.schema.json",
             ROOT / "schemas" / "classification-entry.schema.json",
             ROOT / "schemas" / "classification-crosswalk.schema.json",
+            ROOT / "schemas" / "classification-catalogue.schema.json",
+            ROOT / "schemas" / "classification-indicator.schema.json",
             CLASSIFICATION / "families.yaml",
             CLASSIFICATION / "authorities.yaml",
         ]
@@ -130,6 +136,36 @@ class ClassificationRegistryConformanceTests(unittest.TestCase):
             if supersedes:
                 self.assertIn(supersedes, versions_by_id)
                 self.assertNotEqual(version["version_id"], supersedes)
+
+    def test_current_un_classifications_separate_operational_and_publication_status(self) -> None:
+        standards = yaml.safe_load((CLASSIFICATION / "standards.yaml").read_text(encoding="utf-8"))["standards"]
+        versions = {
+            version["version_id"]: version
+            for standard in standards
+            for version in standard["versions"]
+        }
+        for version_id in ("VER-UN-ISIC-REV5", "VER-UN-CPC-3.0"):
+            version = versions[version_id]
+            self.assertEqual("OPERATIONAL", version["classification_status"])
+            self.assertEqual("FORTHCOMING", version["publication_status"])
+
+    def test_classification_entry_schema_requires_canonical_identity_and_provenance(self) -> None:
+        schema = json.loads((ROOT / "schemas" / "classification-entry.schema.json").read_text(encoding="utf-8"))
+        required = set(schema["required"])
+        self.assertTrue(
+            {
+                "atlas_classification_id",
+                "family_id",
+                "preferred_label",
+                "definition",
+                "source_standard_id",
+                "source_version_id",
+                "source_url",
+                "lifecycle",
+                "evidence_status",
+                "redistribution_status",
+            }.issubset(required)
+        )
 
     def test_update_sources_are_unique_and_authoritative(self) -> None:
         path = CLASSIFICATION / "update-sources.yaml"
