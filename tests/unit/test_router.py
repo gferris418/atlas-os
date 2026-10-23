@@ -46,6 +46,18 @@ class RouterTests(unittest.TestCase):
         approved = choose_route("Send this proposal to the client.", approvals=(EXTERNAL_ACTION_APPROVAL,))
         self.assertEqual("APPROVED", approved.approval_status)
 
+    def test_repository_mutations_are_external_action_gated(self) -> None:
+        objectives = (
+            "Close all PRs and issues immediately.",
+            "Merge pull request 42.",
+            "Reopen issue 17.",
+        )
+        for objective in objectives:
+            with self.subTest(objective=objective):
+                route = choose_route(objective)
+                self.assertEqual("EXTERNAL_ACTION", route.mechanism)
+                self.assertEqual("PENDING", route.approval_status)
+
 
 if __name__ == "__main__":
     unittest.main()

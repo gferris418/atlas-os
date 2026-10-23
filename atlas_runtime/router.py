@@ -14,6 +14,9 @@ PRE_EXECUTION_FLOW = (
 
 ARGUS_APPROVAL = "ARGUS_ACTIVATION"
 EXTERNAL_ACTION_APPROVAL = "EXTERNAL_ACTION"
+_REPOSITORY_MUTATION = re.compile(
+    r"\b(?:close|merge|reopen)\s+(?:all\s+)?(?:prs?|pull requests?|issues?)\b"
+)
 
 
 def normalize_objective(text: str) -> str:
@@ -48,7 +51,10 @@ def choose_route(objective: str, approvals: tuple[str, ...] = ()) -> RouteDecisi
     text = normalize_objective(objective)
     lower = text.lower()
 
-    if _contains_any(lower, ("send this", "send the", "publish", "purchase", "buy ", "delete ", "remove access", "change permission")):
+    if _contains_any(
+        lower,
+        ("send this", "send the", "publish", "purchase", "buy ", "delete ", "remove access", "change permission"),
+    ) or _REPOSITORY_MUTATION.search(lower):
         required, status = _approval(EXTERNAL_ACTION_APPROVAL, approvals)
         return RouteDecision(
             "EXTERNAL_ACTION", "external_action", "host.external-action", required, status,

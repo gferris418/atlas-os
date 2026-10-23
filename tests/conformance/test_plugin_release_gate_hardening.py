@@ -9,7 +9,7 @@ from pathlib import Path
 
 import yaml
 
-from tools.plugin_release_gate import classify_paths, load_policy, validate_argus_checkout
+from tools.plugin_release_gate import classify_paths, load_policy, validate_argus_checkout, write_bundle
 
 ROOT = Path(__file__).resolve().parents[2]
 POLICY_PATH = ROOT / ".github" / "plugin-release-policy.yaml"
@@ -17,6 +17,42 @@ WORKFLOW_PATH = ROOT / ".github" / "workflows" / "plugin-release-gate.yml"
 
 
 class PluginReleaseGateHardeningTests(unittest.TestCase):
+    def test_bundle_preserves_unrelated_output_files(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "repo"
+            output = Path(tmp) / "output"
+            root.mkdir()
+            output.mkdir()
+            (root / "plugin.json").write_text("{}", encoding="utf-8")
+            sentinel = output / "keep.txt"
+            sentinel.write_text("keep", encoding="utf-8")
+
+            policy = {
+                "bundle": {
+                    "paths": ["plugin.json"],
+                    "metadata_file": "plugin-release-metadata.json",
+                }
+            }
+            write_bundle(root, policy, {"release_required": True}, output)
+
+            self.assertEqual("keep", sentinel.read_text(encoding="utf-8"))
+
+    def test_bundle_rejects_paths_outside_repository(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "repo"
+            output = Path(tmp) / "output"
+            root.mkdir()
+            (root.parent / "outside.txt").write_text("outside", encoding="utf-8")
+            policy = {
+                "bundle": {
+                    "paths": ["../outside.txt"],
+                    "metadata_file": "plugin-release-metadata.json",
+                }
+            }
+
+            with self.assertRaises(ValueError):
+                write_bundle(root, policy, {"release_required": True}, output)
+
     def test_policy_and_gate_workflow_changes_require_review(self) -> None:
         policy = load_policy(POLICY_PATH)
         for path in (

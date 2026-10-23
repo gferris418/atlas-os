@@ -185,22 +185,56 @@ def build_metadata(
     }
 
 
+def _safe_bundle_source(root: Path, relative: object) -> tuple[Path, Path]:
+    if not isinstance(relative, str) or not relative.strip():
+        raise ValueError("bundle paths must be non-empty relative paths")
+    candidate = Path(relative)
+    if candidate.is_absolute() or ".." in candidate.parts:
+        raise ValueError(f"bundle path escapes repository: {relative}")
+    root = root.resolve()
+    source = (root / candidate).resolve()
+    if not source.is_relative_to(root) or source == root or (root / candidate).is_symlink():
+        raise ValueError(f"bundle path escapes repository: {relative}")
+    return source, candidate
+
+
+def _safe_output_relative(relative: object, *, label: str) -> Path:
+    if not isinstance(relative, str) or not relative.strip():
+        raise ValueError(f"{label} must be a non-empty relative path")
+    candidate = Path(relative)
+    if candidate.is_absolute() or ".." in candidate.parts:
+        raise ValueError(f"{label} must stay inside the bundle directory")
+    return candidate
+
+
 def write_bundle(root: Path, policy: dict, metadata: dict, output_dir: Path) -> Path:
+    root = root.resolve()
+    output_dir = output_dir.resolve()
     bundle_root = output_dir / "plugin"
-    if output_dir.exists():
-        shutil.rmtree(output_dir)
+    if output_dir.exists() and not output_dir.is_dir():
+        raise ValueError(f"bundle output is not a directory: {output_dir}")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    if bundle_root.is_symlink():
+        bundle_root.unlink()
+    elif bundle_root.exists():
+        shutil.rmtree(bundle_root)
     bundle_root.mkdir(parents=True, exist_ok=True)
 
     for relative in policy["bundle"]["paths"]:
-        source = root / relative
+        source, destination_relative = _safe_bundle_source(root, relative)
         if not source.is_file():
             raise FileNotFoundError(f"bundle path missing: {relative}")
-        destination = bundle_root / relative
+        destination = bundle_root / destination_relative
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, destination)
 
-    metadata_name = policy["bundle"].get("metadata_file", "plugin-release-metadata.json")
-    (output_dir / metadata_name).write_text(
+    metadata_name = _safe_output_relative(
+        policy["bundle"].get("metadata_file", "plugin-release-metadata.json"),
+        label="bundle metadata path",
+    )
+    metadata_path = output_dir / metadata_name
+    metadata_path.parent.mkdir(parents=True, exist_ok=True)
+    metadata_path.write_text(
         json.dumps(metadata, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
