@@ -1,7 +1,10 @@
 id: atlas.classification.authorities
-version: 1
+version: 2
 status: active
 authorities:
+  - id: ATLAS
+    official_name: ATLAS Classification Authority
+    source_url: https://github.com/gferris418/atlas-os
   - id: UNSD
     official_name: United Nations Statistics Division
     source_url: https://unstats.un.org/unsd/classifications/
