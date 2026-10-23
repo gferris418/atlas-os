@@ -1,4 +1,5 @@
 version: 3.0.0
+canonical_execution_contract: contracts/atlas-argus-execution-v2.json
 items:
   - id: host.native
     capability: direct_answer
