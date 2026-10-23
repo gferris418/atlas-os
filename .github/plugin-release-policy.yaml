@@ -45,6 +45,8 @@ impact:
     exact:
       - atlas-os.yaml
       - atlas-ai.yaml
+      - .github/plugin-release-policy.yaml
+      - .github/workflows/plugin-release-gate.yml
   normally_no_release:
     prefixes:
       - docs/

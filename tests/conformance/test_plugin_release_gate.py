@@ -9,6 +9,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 POLICY = ROOT / ".github" / "plugin-release-policy.yaml"
 TOOL = ROOT / "tools" / "plugin_release_gate.py"
+ARGUS_VERIFIER = ROOT / "tools" / "verify_argus_compatibility.py"
 WORKFLOW = ROOT / ".github" / "workflows" / "plugin-release-gate.yml"
 CURRENT_ARGUS_COMMIT = "0454024624eafe704d740ca2fc6fd1cc3dba0bfd"
 CURRENT_ARGUS_CONTRACT_VERSION = "1.0.1"
@@ -52,6 +53,28 @@ class PluginReleaseGateContract(unittest.TestCase):
         self.assertTrue(module.classify_paths(["integrations/argus.yaml"], policy)["release_required"])
         self.assertFalse(module.classify_paths(["docs/examples.md"], policy)["release_required"])
 
+    def test_release_control_changes_require_review_without_forcing_plugin_release(self):
+        module = load_gate_module()
+        policy = yaml.safe_load(POLICY.read_text(encoding="utf-8"))
+
+        result = module.classify_paths(
+            [
+                ".github/plugin-release-policy.yaml",
+                ".github/workflows/plugin-release-gate.yml",
+            ],
+            policy,
+        )
+
+        self.assertFalse(result["release_required"])
+        self.assertTrue(result["review_required"])
+        self.assertEqual(
+            [
+                ".github/plugin-release-policy.yaml",
+                ".github/workflows/plugin-release-gate.yml",
+            ],
+            result["review_matches"],
+        )
+
     def test_metadata_is_traceable_to_atlas_and_argus_commits(self):
         self.assertTrue(TOOL.is_file(), "missing plugin release classifier")
         module = load_gate_module()
@@ -92,6 +115,24 @@ class PluginReleaseGateContract(unittest.TestCase):
         self.assertIn("python -m unittest discover -s tests/integration -v", text)
         self.assertIn("python tools/validate.py .", text)
         self.assertLess(text.index("name: Validate release revision"), text.index("name: Classify plugin impact and prepare release bundle"))
+
+    def test_workflow_checks_out_and_verifies_the_pinned_argus_revision(self):
+        self.assertTrue(ARGUS_VERIFIER.is_file(), "missing ARGUS compatibility verifier")
+        text = WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("name: Read ARGUS compatibility pin", text)
+        self.assertIn("name: Checkout compatible ARGUS", text)
+        self.assertIn("python tools/verify_argus_compatibility.py", text)
+
+        workflow = yaml.safe_load(text)
+        self.assertIn("argus-compatibility", workflow["jobs"])
+        compatibility_steps = workflow["jobs"]["argus-compatibility"]["steps"]
+        release_steps = workflow["jobs"]["plugin-release-gate"]["steps"]
+        self.assertIn("Checkout compatible ARGUS", [step.get("name") for step in compatibility_steps])
+        self.assertNotIn("Checkout compatible ARGUS", [step.get("name") for step in release_steps])
+        self.assertFalse(
+            any(step.get("with", {}).get("cache") for step in compatibility_steps),
+            "untrusted compatibility checkout must not share a dependency cache",
+        )
 
 
 if __name__ == "__main__":
