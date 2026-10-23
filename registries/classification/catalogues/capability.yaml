@@ -1,0 +1,18 @@
+catalogue_id: CAT-ATLAS-CAPABILITY
+version: 1.0.0
+family_id: CAPABILITY
+owner: ATLAS
+authority_id: ATLAS
+lifecycle: ACTIVE
+source_mode: ATLAS_OWNED
+source_standard_id: STD-ATLAS-CAPABILITY
+source_version_id: VER-ATLAS-CAPABILITY-1.0.0
+source_url: https://github.com/gferris418/atlas-os
+hierarchy_levels:
+  - CAPABILITY_DOMAIN
+  - CAPABILITY
+  - SUBCAPABILITY
+redistribution_status: PERMITTED
+dataset_storage: FULL_DATASET
+items: []
+notes: Functional outcomes and solution capabilities used for requirements and supplier matching.
