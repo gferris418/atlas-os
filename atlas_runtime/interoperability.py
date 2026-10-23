@@ -2,7 +2,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
+import re
 from typing import Any
+
+
+_ALLOWED_PROTOCOLS = {"native", "mcp", "plugin", "api", "database", "filesystem"}
+_ALLOWED_PERMISSION_VALUES = {"automatic", "approval_required", "forbidden"}
+_CAPABILITY_ID = re.compile(r"^[a-z][a-z0-9_-]*(\.[a-z][a-z0-9_-]*)+$")
 
 
 class AdmissionState(str, Enum):
@@ -29,26 +35,33 @@ class ProviderManifest:
         provides = value.get("provides")
         if not isinstance(provider_id, str) or not provider_id.strip():
             raise ValueError("provider_id must be a non-empty string")
-        if not isinstance(protocol, str) or not protocol.strip():
-            raise ValueError("protocol must be a non-empty string")
+        if protocol not in _ALLOWED_PROTOCOLS:
+            raise ValueError("protocol is not supported")
         if not isinstance(provides, list) or not provides or not all(
-            isinstance(item, str) and item.strip() for item in provides
+            isinstance(item, str) and _CAPABILITY_ID.fullmatch(item) for item in provides
         ):
-            raise ValueError("provides must contain at least one capability id")
+            raise ValueError("provides must contain valid capability ids")
         if "permissions" not in value:
             raise ValueError("permissions is required")
         if "evidence" not in value:
             raise ValueError("evidence is required")
         permissions = value["permissions"]
         evidence = value["evidence"]
-        if not isinstance(permissions, dict) or not isinstance(evidence, dict):
-            raise ValueError("permissions and evidence must be objects")
+        if not isinstance(permissions, dict) or not all(
+            isinstance(key, str) and item in _ALLOWED_PERMISSION_VALUES
+            for key, item in permissions.items()
+        ):
+            raise ValueError("permissions must use allowed values")
+        if not isinstance(evidence, dict) or "provenance" not in evidence:
+            raise ValueError("evidence.provenance is required")
+        if not all(isinstance(item, bool) for item in evidence.values()):
+            raise ValueError("evidence values must be booleans")
         return cls(
             provider_id=provider_id,
             protocol=protocol,
             capabilities=tuple(dict.fromkeys(provides)),
             permissions=dict(permissions),
-            evidence={key: bool(item) for key, item in evidence.items()},
+            evidence=dict(evidence),
         )
 
     def provides(self, capability_id: str) -> bool:
@@ -64,10 +77,10 @@ class AdmissionReceipt:
 
 def admit_provider(manifest: ProviderManifest) -> AdmissionReceipt:
     checks = {
-        "schema": bool(manifest.provider_id and manifest.protocol and manifest.capabilities),
-        "capability_map": all("." in item for item in manifest.capabilities),
-        "permissions": isinstance(manifest.permissions, dict),
-        "provenance": bool(manifest.evidence.get("provenance")),
+        "schema": True,
+        "capability_map": all(_CAPABILITY_ID.fullmatch(item) is not None for item in manifest.capabilities),
+        "permissions": all(item in _ALLOWED_PERMISSION_VALUES for item in manifest.permissions.values()),
+        "provenance": manifest.evidence.get("provenance") is True,
     }
     state = AdmissionState.CERTIFIED if all(checks.values()) else AdmissionState.VALIDATED
     return AdmissionReceipt(manifest.provider_id, state, checks)
