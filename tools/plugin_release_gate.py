@@ -16,6 +16,28 @@ def load_policy(path: Path) -> dict:
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
+def load_canonical_argus_contract(atlas_root: Path) -> dict:
+    path = Path(atlas_root) / "contracts" / "atlas-argus-execution-v2.json"
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if payload.get("contract_id") != "ATLAS_ARGUS_EXECUTION" or payload.get("status") != "CURRENT":
+        raise ValueError("canonical ATLAS ARGUS execution contract is not CURRENT")
+    prompt = payload.get("prompt_entry", {})
+    route = payload.get("route_mechanisms", {}).get("ARGUS", {})
+    approval = payload.get("approval", {})
+    return {
+        "prompt_entry": prompt.get("value"),
+        "prompt_entry_scope": prompt.get("scope"),
+        "capability": route.get("capability"),
+        "provider": route.get("provider"),
+        "approval_key": approval.get("key"),
+        "activation_authority": payload.get("activation_authority"),
+        "next_step_authority": payload.get("next_step_authority"),
+        "provider_return_target": payload.get("provider_return_target"),
+        "explicit_user_approval_required": approval.get("explicit_user_approval_required"),
+        "pre_execution_flow": payload.get("pre_execution_flow"),
+    }
+
+
 def _matches_exact_or_prefix(path: str, rules: dict) -> bool:
     exact = set(rules.get("exact", []))
     prefixes = tuple(rules.get("prefixes", []))
@@ -57,12 +79,7 @@ def _git_head(root: Path) -> str:
 
 
 def validate_argus_checkout(argus_root: Path, policy: dict, *, atlas_root: Path | None = None) -> dict:
-    """Validate the actual pinned ARGUS checkout against the ATLAS release policy.
-
-    This is deliberately stronger than copying configured commit/version strings into
-    release metadata: the checked-out Git HEAD and contract files must independently
-    match the policy and the ATLAS plugin release being validated.
-    """
+    """Validate the actual pinned ARGUS checkout against the ATLAS release policy."""
     argus_root = Path(argus_root).resolve()
     atlas_root = Path(atlas_root or Path.cwd()).resolve()
     compatibility = policy.get("argus_compatibility", {})
@@ -102,18 +119,7 @@ def validate_argus_checkout(argus_root: Path, policy: dict, *, atlas_root: Path 
         )
 
     contract = descriptor.get("contract", {})
-    required_contract = {
-        "prompt_entry": "MISSION_CONTROL_FIRST",
-        "prompt_entry_scope": "every_user_prompt_while_atlas_active",
-        "capability": "intelligence_collection",
-        "provider": "argus",
-        "approval_key": "ARGUS_ACTIVATION",
-        "activation_authority": "ATLAS",
-        "next_step_authority": "ATLAS",
-        "provider_return_target": "ATLAS",
-        "explicit_user_approval_required": True,
-        "pre_execution_flow": ["UNDERSTAND_AND_NORMALIZE", "MINIMAL_DOMAIN_FRAMING", "ROUTE"],
-    }
+    required_contract = load_canonical_argus_contract(atlas_root)
     for key, expected in required_contract.items():
         if contract.get(key) != expected:
             raise ValueError(f"pinned ARGUS contract invariant mismatch for {key}")
