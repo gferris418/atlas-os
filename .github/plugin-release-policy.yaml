@@ -45,6 +45,8 @@ impact:
     exact:
       - atlas-os.yaml
       - atlas-ai.yaml
+      - .github/plugin-release-policy.yaml
+      - .github/workflows/plugin-release-gate.yml
   normally_no_release:
     prefixes:
       - docs/
@@ -66,5 +68,8 @@ bundle:
 validation:
   required_checks:
     - validate
+  require_pinned_argus_checkout: true
+  require_argus_contract_version_match: true
+  require_atlas_version_match_in_argus_contract: true
   require_argus_contract_tests_for_boundary_change: true
   require_cross_repo_e2e_for_argus_boundary_change: true
