@@ -12,6 +12,7 @@ class CleanArchitectureContractTests(unittest.TestCase):
     def test_active_spec_surface_is_small_and_canonical(self) -> None:
         expected = {
             "approvals.yaml",
+            "canonical-execution-graph.yaml",
             "context.yaml",
             "control-plane.yaml",
             "core.yaml",
@@ -75,7 +76,7 @@ class CleanArchitectureContractTests(unittest.TestCase):
         allowed = {
             "README.md", "SUMMARY.md", "architecture.md", "framework.md", "playbook.md", "sop.md",
             "capabilities-routing.md", "evidence-verification.md", "argus-interface.md", "host-integration.md",
-            "implementation-guide.md", "examples.md", "classification-standards.md",
+            "implementation-guide.md", "examples.md", "classification-standards.md", "canonical-execution-graph.md",
         }
         self.assertEqual(allowed, {path.name for path in (ROOT / "docs").iterdir() if path.is_file()})
 

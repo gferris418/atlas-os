@@ -1,0 +1,113 @@
+schema_version: 1
+id: atlas.canonical-execution-graph
+version: 1.0.0
+status: CANDIDATE
+normative: true
+purpose: >-
+  Define the generic ATLAS control-plane contract for predeclared, versioned,
+  hierarchically numbered execution graphs. The graph is an integrity mechanism:
+  models execute declared nodes; they do not invent canonical workflow structure at runtime.
+
+identity:
+  stable_id: permanent semantic identity of a workflow node
+  serial: human-readable canonical process position within one workflow version
+  workflow_version: version of the manifest whose structure is being executed
+  rule: stable_id and serial are separate; renumbering never changes semantic identity.
+
+numbering:
+  hierarchical: required
+  every_substantive_node_numbered: true
+  sibling_sequence_contiguous_from_one: true
+  parent_serial_prefix_required: true
+  duplicate_serials: prohibited
+  missing_serials: structural_failure
+  unknown_serials: structural_failure
+  silent_omission: prohibited
+
+node_kinds:
+  - REQUIRED
+  - CONDITIONAL
+  - OPTIONAL
+
+runtime_statuses:
+  - PENDING
+  - ACTIVE
+  - COMPLETE
+  - BLOCKED
+  - FAILED
+  - NOT_APPLICABLE
+  - SKIPPED_WITH_AUTHORITY
+  - SUPERSEDED
+
+resolved_dependency_statuses:
+  - COMPLETE
+  - NOT_APPLICABLE
+  - SKIPPED_WITH_AUTHORITY
+  - SUPERSEDED
+
+integrity:
+  preflight:
+    - workflow_identity_valid
+    - workflow_version_valid
+    - stable_ids_unique
+    - serials_unique
+    - sibling_serials_contiguous
+    - parent_child_alignment_valid
+    - dependencies_resolve
+    - dependency_graph_acyclic
+  runtime:
+    - current_node_declared
+    - dependencies_resolved_before_completion
+    - no_silent_step_deletion
+    - no_runtime_canonical_step_invention
+  postflight:
+    - reconcile_expected_vs_observed_nodes
+    - detect_missing_nodes
+    - detect_unknown_nodes
+    - detect_duplicate_nodes
+    - detect_serial_mismatches
+
+unknowns:
+  rule: >-
+    A research or analysis node may complete with UNKNOWN, NOT_OBSERVED,
+    INSUFFICIENT_EVIDENCE or CONFLICTING_EVIDENCE when its output schema permits it.
+    Completion means the declared work was performed; it does not require fabricating an answer.
+
+manifest_fingerprint:
+  algorithm: SHA-256
+  deterministic: true
+  includes:
+    - workflow_id
+    - version
+    - stable_id
+    - serial
+    - title
+    - parent_id
+    - dependencies
+    - node_kind
+  purpose: detect manifest drift and identify the exact canonical graph used for an execution.
+
+authority:
+  graph_engine_owner: ATLAS_OS
+  playbook_manifest_owner: declaring_playbook
+  canonical_extension_policy: >-
+    Runtime executors may request an extension but may not create a new canonical node.
+    New canonical nodes require a versioned manifest change under ATLAS governance.
+
+separation_of_concerns:
+  atlas_owns:
+    - graph_validation
+    - structural_integrity
+    - dependency_integrity
+    - execution_reconciliation
+    - manifest_fingerprinting
+  playbooks_own:
+    - domain_node_definitions
+    - domain_dependencies
+    - domain_evidence_requirements
+    - domain_output_semantics
+  prohibited_in_atlas_core:
+    - access_asia_bid_state_machine
+    - access_asia_project_delivery_state_machine
+    - access_asia_invoice_payment_state_machine
+    - domain_specific_business_transaction_authority
