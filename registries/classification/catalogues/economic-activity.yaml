@@ -1,0 +1,19 @@
+catalogue_id: CAT-UN-ISIC-REV5
+version: 1.0.0
+family_id: ECONOMIC_ACTIVITY
+owner: UNSD
+authority_id: UNSD
+lifecycle: ACTIVE
+source_mode: REMOTE_AUTHORITATIVE
+source_standard_id: STD-UN-ISIC
+source_version_id: VER-UN-ISIC-REV5
+source_url: https://unstats.un.org/unsd/classifications/Econ/Download/In%20Text/ISIC_Rev_5_english_structure.csv
+hierarchy_levels:
+  - SECTION
+  - DIVISION
+  - GROUP
+  - CLASS
+redistribution_status: UNKNOWN
+dataset_storage: METADATA_ONLY
+items: []
+notes: Full current structure remains authoritative at UNSD until ATLAS records explicit redistribution permission.
