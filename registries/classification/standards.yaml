@@ -1,11 +1,96 @@
 id: atlas.classification.standards
-version: 2
+version: 3
 status: active
 rules:
   historical_versions_preserved: true
   candidate_discovery_is_not_canonical: true
   classification_does_not_prove_eligibility: true
 standards:
+  - standard_id: STD-ATLAS-SECTOR
+    official_name: ATLAS Sector and Subsector Classification
+    abbreviation: ATLAS-SECTOR
+    family_id: SECTOR
+    authority_id: ATLAS
+    jurisdiction: ATLAS governed global analytical use
+    versions:
+      - version_id: VER-ATLAS-SECTOR-1.0.0
+        official_version: 1.0.0
+        classification_status: OPERATIONAL
+        publication_status: NOT_APPLICABLE
+        hierarchy_available: true
+        source_url: https://github.com/gferris418/atlas-os
+        lifecycle: ACTIVE
+        evidence_status: CONFIRMED
+        redistribution_status: PERMITTED
+        dataset_storage: FULL_DATASET
+  - standard_id: STD-ATLAS-INDUSTRY
+    official_name: ATLAS Industry Classification
+    abbreviation: ATLAS-INDUSTRY
+    family_id: INDUSTRY
+    authority_id: ATLAS
+    jurisdiction: ATLAS governed global analytical use
+    versions:
+      - version_id: VER-ATLAS-INDUSTRY-1.0.0
+        official_version: 1.0.0
+        classification_status: OPERATIONAL
+        publication_status: NOT_APPLICABLE
+        hierarchy_available: true
+        source_url: https://github.com/gferris418/atlas-os
+        lifecycle: ACTIVE
+        evidence_status: CONFIRMED
+        redistribution_status: PERMITTED
+        dataset_storage: FULL_DATASET
+  - standard_id: STD-ATLAS-DOMAIN
+    official_name: ATLAS Domain Classification
+    abbreviation: ATLAS-DOMAIN
+    family_id: DOMAIN
+    authority_id: ATLAS
+    jurisdiction: ATLAS governed global analytical use
+    versions:
+      - version_id: VER-ATLAS-DOMAIN-1.0.0
+        official_version: 1.0.0
+        classification_status: OPERATIONAL
+        publication_status: NOT_APPLICABLE
+        hierarchy_available: true
+        source_url: https://github.com/gferris418/atlas-os
+        lifecycle: ACTIVE
+        evidence_status: CONFIRMED
+        redistribution_status: PERMITTED
+        dataset_storage: FULL_DATASET
+  - standard_id: STD-ATLAS-CAPABILITY
+    official_name: ATLAS Capability Classification
+    abbreviation: ATLAS-CAPABILITY
+    family_id: CAPABILITY
+    authority_id: ATLAS
+    jurisdiction: ATLAS governed global analytical use
+    versions:
+      - version_id: VER-ATLAS-CAPABILITY-1.0.0
+        official_version: 1.0.0
+        classification_status: OPERATIONAL
+        publication_status: NOT_APPLICABLE
+        hierarchy_available: true
+        source_url: https://github.com/gferris418/atlas-os
+        lifecycle: ACTIVE
+        evidence_status: CONFIRMED
+        redistribution_status: PERMITTED
+        dataset_storage: FULL_DATASET
+  - standard_id: STD-ATLAS-TECHNOLOGY
+    official_name: ATLAS Technology Classification
+    abbreviation: ATLAS-TECHNOLOGY
+    family_id: TECHNOLOGY
+    authority_id: ATLAS
+    jurisdiction: ATLAS governed global analytical use
+    versions:
+      - version_id: VER-ATLAS-TECHNOLOGY-1.0.0
+        official_version: 1.0.0
+        classification_status: OPERATIONAL
+        publication_status: NOT_APPLICABLE
+        hierarchy_available: true
+        source_url: https://github.com/gferris418/atlas-os
+        lifecycle: ACTIVE
+        evidence_status: CONFIRMED
+        redistribution_status: PERMITTED
+        dataset_storage: FULL_DATASET
   - standard_id: STD-UN-ISIC
     official_name: International Standard Industrial Classification of All Economic Activities
     abbreviation: ISIC
