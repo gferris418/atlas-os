@@ -13,5 +13,390 @@ hierarchy_levels:
   - SUBSECTOR
 redistribution_status: PERMITTED
 dataset_storage: FULL_DATASET
-items: []
-notes: Analytical government and market sector vocabulary with explicit external mappings.
+items:
+  - &defaults
+    atlas_classification_id: SECTOR-DEFENCE-SECURITY
+    serial: "01"
+    family_id: SECTOR
+    preferred_label: "Defence & Security"
+    definition: "Government and commercial activity concerned with national defence, public safety, and security capabilities."
+    source_standard_id: STD-ATLAS-SECTOR
+    source_version_id: VER-ATLAS-SECTOR-1.0.0
+    source_url: https://github.com/gferris418/atlas-os
+    lifecycle: ACTIVE
+    evidence_status: CONFIRMED
+    redistribution_status: PERMITTED
+  - <<: *defaults
+    atlas_classification_id: SECTOR-DEFENCE-MARITIME-SECURITY
+    serial: "01.01"
+    preferred_label: "Maritime Security"
+    definition: "Defence and security activity focused on maritime borders, waters, ports, and sea lines of communication."
+    parent_id: SECTOR-DEFENCE-SECURITY
+  - <<: *defaults
+    atlas_classification_id: SECTOR-DEFENCE-BORDER-HOMELAND
+    serial: "01.02"
+    preferred_label: "Border & Homeland Security"
+    definition: "Security activity focused on borders, critical national functions, civil protection, and homeland resilience."
+    parent_id: SECTOR-DEFENCE-SECURITY
+  - <<: *defaults
+    atlas_classification_id: SECTOR-DEFENCE-AIR
+    serial: "01.03"
+    preferred_label: "Air Defence"
+    definition: "Defence activity focused on airspace surveillance, air defence, and associated systems."
+    parent_id: SECTOR-DEFENCE-SECURITY
+  - <<: *defaults
+    atlas_classification_id: SECTOR-DEFENCE-LAND
+    serial: "01.04"
+    preferred_label: "Land Systems"
+    definition: "Defence activity focused on land forces, vehicles, weapons, sensors, and support systems."
+    parent_id: SECTOR-DEFENCE-SECURITY
+  - <<: *defaults
+    atlas_classification_id: SECTOR-DEFENCE-CYBER
+    serial: "01.05"
+    preferred_label: "Cyber Defence"
+    definition: "Defence activity focused on protecting military and national-security digital systems."
+    parent_id: SECTOR-DEFENCE-SECURITY
+  - <<: *defaults
+    atlas_classification_id: SECTOR-MARITIME
+    serial: "02"
+    preferred_label: Maritime
+    definition: "Economic and government activity associated with vessels, marine systems, ports, and maritime operations."
+  - <<: *defaults
+    atlas_classification_id: SECTOR-MARITIME-SHIPBUILDING
+    serial: "02.01"
+    preferred_label: "Shipbuilding & Vessel Construction"
+    definition: "Design, construction, refit, and lifecycle support of vessels and floating structures."
+    parent_id: SECTOR-MARITIME
+  - <<: *defaults
+    atlas_classification_id: SECTOR-MARITIME-MARINE-SYSTEMS
+    serial: "02.02"
+    preferred_label: "Marine Systems & Equipment"
+    definition: "Marine propulsion, navigation, automation, safety, electrical, and mission equipment."
+    parent_id: SECTOR-MARITIME
+  - <<: *defaults
+    atlas_classification_id: SECTOR-MARITIME-PORTS
+    serial: "02.03"
+    preferred_label: "Ports & Harbours"
+    definition: "Port, harbour, terminal, navigation-channel, and associated marine infrastructure activity."
+    parent_id: SECTOR-MARITIME
+  - <<: *defaults
+    atlas_classification_id: SECTOR-MARITIME-TRANSPORT
+    serial: "02.04"
+    preferred_label: "Maritime Transport"
+    definition: "Sea and inland-water transport of passengers and freight."
+    parent_id: SECTOR-MARITIME
+  - <<: *defaults
+    atlas_classification_id: SECTOR-MARITIME-OFFSHORE
+    serial: "02.05"
+    preferred_label: "Offshore & Coastal"
+    definition: "Offshore, coastal, and near-shore infrastructure and operational activity."
+    parent_id: SECTOR-MARITIME
+  - <<: *defaults
+    atlas_classification_id: SECTOR-TRANSPORT
+    serial: "03"
+    preferred_label: Transport
+    definition: "Movement of people and goods and the infrastructure and systems that enable mobility."
+  - <<: *defaults
+    atlas_classification_id: SECTOR-TRANSPORT-ROAD
+    serial: "03.01"
+    preferred_label: "Road Transport"
+    definition: "Road mobility, highways, vehicles, road safety, and traffic management."
+    parent_id: SECTOR-TRANSPORT
+  - <<: *defaults
+    atlas_classification_id: SECTOR-TRANSPORT-RAIL
+    serial: "03.02"
+    preferred_label: "Rail Transport"
+    definition: "Railways, rolling stock, signalling, stations, and rail operations."
+    parent_id: SECTOR-TRANSPORT
+  - <<: *defaults
+    atlas_classification_id: SECTOR-TRANSPORT-AVIATION
+    serial: "03.03"
+    preferred_label: Aviation
+    definition: "Air transport, airports, air-navigation services, and aviation systems."
+    parent_id: SECTOR-TRANSPORT
+  - <<: *defaults
+    atlas_classification_id: SECTOR-TRANSPORT-URBAN
+    serial: "03.04"
+    preferred_label: "Urban Transit"
+    definition: "Urban public transport including metro, bus rapid transit, and multimodal systems."
+    parent_id: SECTOR-TRANSPORT
+  - <<: *defaults
+    atlas_classification_id: SECTOR-TRANSPORT-LOGISTICS
+    serial: "03.05"
+    preferred_label: "Logistics & Freight"
+    definition: "Freight, warehousing, supply-chain, cargo handling, and logistics services."
+    parent_id: SECTOR-TRANSPORT
+  - <<: *defaults
+    atlas_classification_id: SECTOR-ENERGY
+    serial: "04"
+    preferred_label: Energy
+    definition: "Production, conversion, transmission, distribution, storage, and use of energy."
+  - <<: *defaults
+    atlas_classification_id: SECTOR-ENERGY-GENERATION
+    serial: "04.01"
+    preferred_label: "Power Generation"
+    definition: "Generation of electricity from conventional and renewable sources."
+    parent_id: SECTOR-ENERGY
+  - <<: *defaults
+    atlas_classification_id: SECTOR-ENERGY-TRANSMISSION
+    serial: "04.02"
+    preferred_label: "Power Transmission"
+    definition: "High-voltage transmission and bulk-power network activity."
+    parent_id: SECTOR-ENERGY
+  - <<: *defaults
+    atlas_classification_id: SECTOR-ENERGY-DISTRIBUTION
+    serial: "04.03"
+    preferred_label: "Power Distribution"
+    definition: "Distribution networks, substations, metering, and electricity delivery."
+    parent_id: SECTOR-ENERGY
+  - <<: *defaults
+    atlas_classification_id: SECTOR-ENERGY-RENEWABLE
+    serial: "04.04"
+    preferred_label: "Renewable Energy"
+    definition: "Solar, wind, hydro, geothermal, biomass, and other renewable-energy activity."
+    parent_id: SECTOR-ENERGY
+  - <<: *defaults
+    atlas_classification_id: SECTOR-ENERGY-OIL-GAS
+    serial: "04.05"
+    preferred_label: "Oil & Gas"
+    definition: "Upstream, midstream, downstream, refining, storage, and distribution of hydrocarbons."
+    parent_id: SECTOR-ENERGY
+  - <<: *defaults
+    atlas_classification_id: SECTOR-ENERGY-STORAGE
+    serial: "04.06"
+    preferred_label: "Energy Storage"
+    definition: "Electrical, chemical, mechanical, thermal, and other energy-storage systems."
+    parent_id: SECTOR-ENERGY
+  - <<: *defaults
+    atlas_classification_id: SECTOR-INFRASTRUCTURE
+    serial: "05"
+    preferred_label: Infrastructure
+    definition: "Civil and public infrastructure used to support economic and social activity."
+  - <<: *defaults
+    atlas_classification_id: SECTOR-INFRA-BRIDGES
+    serial: "05.01"
+    preferred_label: "Bridges & Structures"
+    definition: "Bridges, structural systems, bearings, joints, seismic protection, and structural monitoring."
+    parent_id: SECTOR-INFRASTRUCTURE
+  - <<: *defaults
+    atlas_classification_id: SECTOR-INFRA-ROADS
+    serial: "05.02"
+    preferred_label: "Road Infrastructure"
+    definition: "Roads, highways, interchanges, tunnels, and related civil works."
+    parent_id: SECTOR-INFRASTRUCTURE
+  - <<: *defaults
+    atlas_classification_id: SECTOR-INFRA-BUILDINGS
+    serial: "05.03"
+    preferred_label: "Buildings & Facilities"
+    definition: "Public, commercial, institutional, and industrial buildings and facilities."
+    parent_id: SECTOR-INFRASTRUCTURE
+  - <<: *defaults
+    atlas_classification_id: SECTOR-INFRA-WATER
+    serial: "05.04"
+    preferred_label: "Water Infrastructure"
+    definition: "Water-supply, drainage, wastewater, flood-control, and hydraulic infrastructure."
+    parent_id: SECTOR-INFRASTRUCTURE
+  - <<: *defaults
+    atlas_classification_id: SECTOR-INFRA-PORT
+    serial: "05.05"
+    preferred_label: "Port Infrastructure"
+    definition: "Breakwaters, jetties, terminals, dredging, and marine civil infrastructure."
+    parent_id: SECTOR-INFRASTRUCTURE
+  - <<: *defaults
+    atlas_classification_id: SECTOR-ICT-TELECOM
+    serial: "06"
+    preferred_label: "ICT & Telecommunications"
+    definition: "Digital communications, computing, software, data, and network infrastructure."
+  - <<: *defaults
+    atlas_classification_id: SECTOR-ICT-TELECOMS
+    serial: "06.01"
+    preferred_label: Telecommunications
+    definition: "Fixed, mobile, satellite, radio, and broadband communications services and networks."
+    parent_id: SECTOR-ICT-TELECOM
+  - <<: *defaults
+    atlas_classification_id: SECTOR-ICT-DIGITAL-INFRA
+    serial: "06.02"
+    preferred_label: "Digital Infrastructure"
+    definition: "Core digital platforms, connectivity infrastructure, cloud, and shared digital services."
+    parent_id: SECTOR-ICT-TELECOM
+  - <<: *defaults
+    atlas_classification_id: SECTOR-ICT-DATA-CENTRES
+    serial: "06.03"
+    preferred_label: "Data Centres"
+    definition: "Data-centre facilities, compute infrastructure, storage, and associated services."
+    parent_id: SECTOR-ICT-TELECOM
+  - <<: *defaults
+    atlas_classification_id: SECTOR-ICT-SOFTWARE
+    serial: "06.04"
+    preferred_label: "Software & IT Services"
+    definition: "Software products, systems integration, managed services, and IT consulting."
+    parent_id: SECTOR-ICT-TELECOM
+  - <<: *defaults
+    atlas_classification_id: SECTOR-HEALTHCARE
+    serial: "07"
+    preferred_label: Healthcare
+    definition: "Health services, clinical systems, medical technology, and supporting health infrastructure."
+  - <<: *defaults
+    atlas_classification_id: SECTOR-HEALTH-SERVICES
+    serial: "07.01"
+    preferred_label: "Health Services"
+    definition: "Hospitals, clinics, diagnostics, treatment, emergency care, and public-health services."
+    parent_id: SECTOR-HEALTHCARE
+  - <<: *defaults
+    atlas_classification_id: SECTOR-HEALTH-MEDICAL-DEVICES
+    serial: "07.02"
+    preferred_label: "Medical Devices"
+    definition: "Medical equipment, devices, diagnostics, monitoring, and associated technology."
+    parent_id: SECTOR-HEALTHCARE
+  - <<: *defaults
+    atlas_classification_id: SECTOR-HEALTH-PHARMA
+    serial: "07.03"
+    preferred_label: Pharmaceuticals
+    definition: "Medicines, vaccines, pharmaceutical manufacturing, distribution, and related services."
+    parent_id: SECTOR-HEALTHCARE
+  - <<: *defaults
+    atlas_classification_id: SECTOR-HEALTH-IT
+    serial: "07.04"
+    preferred_label: "Health IT"
+    definition: "Digital health, hospital information systems, telemedicine, and health data systems."
+    parent_id: SECTOR-HEALTHCARE
+  - <<: *defaults
+    atlas_classification_id: SECTOR-WATER-ENVIRONMENT
+    serial: "08"
+    preferred_label: "Water & Environment"
+    definition: "Water services, environmental protection, waste management, and environmental resilience."
+  - <<: *defaults
+    atlas_classification_id: SECTOR-WATER-SUPPLY
+    serial: "08.01"
+    preferred_label: "Water Supply"
+    definition: "Raw-water abstraction, treatment, transmission, and distribution."
+    parent_id: SECTOR-WATER-ENVIRONMENT
+  - <<: *defaults
+    atlas_classification_id: SECTOR-WATER-WASTEWATER
+    serial: "08.02"
+    preferred_label: "Wastewater & Sanitation"
+    definition: "Wastewater collection, treatment, reuse, sanitation, and sludge management."
+    parent_id: SECTOR-WATER-ENVIRONMENT
+  - <<: *defaults
+    atlas_classification_id: SECTOR-ENV-MONITORING
+    serial: "08.03"
+    preferred_label: "Environmental Monitoring"
+    definition: "Air, water, soil, climate, and ecosystem measurement and monitoring."
+    parent_id: SECTOR-WATER-ENVIRONMENT
+  - <<: *defaults
+    atlas_classification_id: SECTOR-ENV-WASTE
+    serial: "08.04"
+    preferred_label: "Waste Management"
+    definition: "Solid waste collection, treatment, recycling, recovery, and disposal."
+    parent_id: SECTOR-WATER-ENVIRONMENT
+  - <<: *defaults
+    atlas_classification_id: SECTOR-AGRICULTURE
+    serial: "09"
+    preferred_label: "Agriculture, Fisheries & Food"
+    definition: "Primary agricultural production, fisheries, food systems, and associated technologies."
+  - <<: *defaults
+    atlas_classification_id: SECTOR-AGRI-CROP
+    serial: "09.01"
+    preferred_label: "Crop Production"
+    definition: "Cultivation, crop inputs, irrigation, harvesting, and crop systems."
+    parent_id: SECTOR-AGRICULTURE
+  - <<: *defaults
+    atlas_classification_id: SECTOR-AGRI-LIVESTOCK
+    serial: "09.02"
+    preferred_label: Livestock
+    definition: "Animal production, veterinary support, feed, and livestock systems."
+    parent_id: SECTOR-AGRICULTURE
+  - <<: *defaults
+    atlas_classification_id: SECTOR-AGRI-FISHERIES
+    serial: "09.03"
+    preferred_label: "Fisheries & Aquaculture"
+    definition: "Capture fisheries, aquaculture, hatcheries, and fisheries infrastructure."
+    parent_id: SECTOR-AGRICULTURE
+  - <<: *defaults
+    atlas_classification_id: SECTOR-AGRI-TECH
+    serial: "09.04"
+    preferred_label: "Agricultural Technology"
+    definition: "Digital, mechanical, biological, and automation technologies for agriculture."
+    parent_id: SECTOR-AGRICULTURE
+  - <<: *defaults
+    atlas_classification_id: SECTOR-EDUCATION
+    serial: "10"
+    preferred_label: "Education & Skills"
+    definition: "Education, training, skills development, research learning environments, and educational technology."
+  - <<: *defaults
+    atlas_classification_id: SECTOR-EDU-GENERAL
+    serial: "10.01"
+    preferred_label: "General Education"
+    definition: "Primary and secondary education and supporting services."
+    parent_id: SECTOR-EDUCATION
+  - <<: *defaults
+    atlas_classification_id: SECTOR-EDU-TVET
+    serial: "10.02"
+    preferred_label: "Technical & Vocational Education"
+    definition: "Technical, vocational, skills, and workforce-development education."
+    parent_id: SECTOR-EDUCATION
+  - <<: *defaults
+    atlas_classification_id: SECTOR-EDU-HIGHER
+    serial: "10.03"
+    preferred_label: "Higher Education"
+    definition: "Universities, colleges, research-oriented learning, and tertiary education."
+    parent_id: SECTOR-EDUCATION
+  - <<: *defaults
+    atlas_classification_id: SECTOR-EDU-PROFESSIONAL
+    serial: "10.04"
+    preferred_label: "Professional Training"
+    definition: "Professional, specialist, simulator-based, and continuing training."
+    parent_id: SECTOR-EDUCATION
+  - <<: *defaults
+    atlas_classification_id: SECTOR-FINANCIAL-SERVICES
+    serial: "11"
+    preferred_label: "Financial Services"
+    definition: "Banking, insurance, capital, payments, and digital financial services."
+  - <<: *defaults
+    atlas_classification_id: SECTOR-FIN-BANKING
+    serial: "11.01"
+    preferred_label: Banking
+    definition: "Deposit-taking, lending, treasury, and banking services."
+    parent_id: SECTOR-FINANCIAL-SERVICES
+  - <<: *defaults
+    atlas_classification_id: SECTOR-FIN-INSURANCE
+    serial: "11.02"
+    preferred_label: Insurance
+    definition: "Life, general, reinsurance, and risk-transfer services."
+    parent_id: SECTOR-FINANCIAL-SERVICES
+  - <<: *defaults
+    atlas_classification_id: SECTOR-FIN-FINTECH
+    serial: "11.03"
+    preferred_label: "Fintech & Payments"
+    definition: "Digital payments, financial technology, payment infrastructure, and digital finance."
+    parent_id: SECTOR-FINANCIAL-SERVICES
+  - <<: *defaults
+    atlas_classification_id: SECTOR-PUBLIC-ADMINISTRATION
+    serial: "12"
+    preferred_label: "Public Administration & Governance"
+    definition: "Government administration, public institutions, public-service delivery, and governance systems."
+  - <<: *defaults
+    atlas_classification_id: SECTOR-PUBLIC-CENTRAL
+    serial: "12.01"
+    preferred_label: "Central Government"
+    definition: "National ministries, departments, agencies, and central public administration."
+    parent_id: SECTOR-PUBLIC-ADMINISTRATION
+  - <<: *defaults
+    atlas_classification_id: SECTOR-PUBLIC-LOCAL
+    serial: "12.02"
+    preferred_label: "Local Government"
+    definition: "Subnational, municipal, city, district, and local public administration."
+    parent_id: SECTOR-PUBLIC-ADMINISTRATION
+  - <<: *defaults
+    atlas_classification_id: SECTOR-PUBLIC-DIGITAL
+    serial: "12.03"
+    preferred_label: "Digital Government"
+    definition: "Government digital platforms, e-services, interoperability, and public-sector digital transformation."
+    parent_id: SECTOR-PUBLIC-ADMINISTRATION
+  - <<: *defaults
+    atlas_classification_id: SECTOR-PUBLIC-SAFETY
+    serial: "12.04"
+    preferred_label: "Public Safety Administration"
+    definition: "Civil protection, emergency management, policing administration, and public-safety coordination."
+    parent_id: SECTOR-PUBLIC-ADMINISTRATION
+notes: "Canonical ATLAS analytical sector taxonomy; external World Bank, ADB, government, and statistical mappings are represented by explicit crosswalks."
