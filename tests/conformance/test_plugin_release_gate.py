@@ -10,8 +10,8 @@ ROOT = Path(__file__).resolve().parents[2]
 POLICY = ROOT / ".github" / "plugin-release-policy.yaml"
 TOOL = ROOT / "tools" / "plugin_release_gate.py"
 WORKFLOW = ROOT / ".github" / "workflows" / "plugin-release-gate.yml"
-CURRENT_ARGUS_COMMIT = "0454024624eafe704d740ca2fc6fd1cc3dba0bfd"
-CURRENT_ARGUS_CONTRACT_VERSION = "1.0.1"
+CURRENT_ARGUS_COMMIT = "8df6c7e5abe3192479659d5bd0aa63fed38da841"
+CURRENT_ARGUS_CONTRACT_VERSION = "2.0.0"
 
 
 def load_gate_module():
