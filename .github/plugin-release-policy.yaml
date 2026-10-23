@@ -1,4 +1,4 @@
-version: 1.0.0
+version: 1.1.0
 plugin:
   name: atlas-os
   canonical_repository: gferris418/atlas-os
@@ -14,11 +14,20 @@ publication:
     GitHub prepares and validates a release bundle. Publication to ChatGPT is a guarded
     Plugin Creator update against the existing plugin identity, using the current release
     ID as the update guard; GitHub Actions never publishes the plugin automatically.
+synchronization:
+  event_type: chatgpt_plugin_sync_required
+  request_file: plugin-sync-request.json
+  hash_algorithm: sha256
+  wrapper_paths:
+    - plugin.json
+    - skills/atlas-os/SKILL.md
+  artifact_only_publication_input: true
+  publication_receipt_required: true
 argus_compatibility:
   repository: gferris418/argus-intelligence
   contract_path: contracts/atlas/current-integration.yaml
   release_impact_path: contracts/atlas/plugin-release-impact.yaml
-  compatible_commit: 8df6c7e5abe3192479659d5bd0aa63fed38da841
+  compatible_commit: ee881b92c629917894a33e4bc4e18c9655473420
   contract_version: 2.0.0
 impact:
   release_required:
