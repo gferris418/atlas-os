@@ -16,6 +16,9 @@ items:
     mechanism: DEEP_RESEARCH
     authority: host
     approval: NOT_REQUIRED
+  # Compatibility execution handle for the ARGUS composite 360° BI playbook.
+  # It is not the underlying search/MCP/plugin/database provider; those are
+  # selected and authorized separately under ATLAS capability policy.
   - id: argus
     capability: intelligence_collection
     mechanism: ARGUS
