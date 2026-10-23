@@ -5,6 +5,7 @@ import argparse
 import json
 from pathlib import Path
 import shutil
+import subprocess
 import sys
 import zipfile
 
@@ -43,6 +44,104 @@ def classify_paths(changed_paths: list[str], policy: dict) -> dict:
     }
 
 
+def _git_head(root: Path) -> str:
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"],
+            cwd=root,
+            text=True,
+            stderr=subprocess.STDOUT,
+        ).strip()
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise ValueError(f"ARGUS checkout is not a readable Git worktree: {root}") from exc
+
+
+def validate_argus_checkout(argus_root: Path, policy: dict, *, atlas_root: Path | None = None) -> dict:
+    """Validate the actual pinned ARGUS checkout against the ATLAS release policy.
+
+    This is deliberately stronger than copying configured commit/version strings into
+    release metadata: the checked-out Git HEAD and contract files must independently
+    match the policy and the ATLAS plugin release being validated.
+    """
+    argus_root = Path(argus_root).resolve()
+    atlas_root = Path(atlas_root or Path.cwd()).resolve()
+    compatibility = policy.get("argus_compatibility", {})
+
+    expected_commit = compatibility.get("compatible_commit")
+    if not isinstance(expected_commit, str) or len(expected_commit) != 40:
+        raise ValueError("policy must pin a 40-character ARGUS compatible_commit")
+    actual_commit = _git_head(argus_root)
+    if actual_commit != expected_commit:
+        raise ValueError(f"ARGUS checkout HEAD mismatch: {actual_commit} != {expected_commit}")
+
+    contract_relative = compatibility.get("contract_path")
+    if not isinstance(contract_relative, str) or not contract_relative:
+        raise ValueError("policy must declare argus_compatibility.contract_path")
+    contract_path = argus_root / contract_relative
+    if not contract_path.is_file():
+        raise FileNotFoundError(f"pinned ARGUS contract missing: {contract_relative}")
+    descriptor = yaml.safe_load(contract_path.read_text(encoding="utf-8"))
+
+    expected_contract_version = compatibility.get("contract_version")
+    actual_contract_version = descriptor.get("version")
+    if actual_contract_version != expected_contract_version:
+        raise ValueError(
+            f"ARGUS contract version mismatch: {actual_contract_version} != {expected_contract_version}"
+        )
+    if descriptor.get("status") != "CURRENT":
+        raise ValueError("pinned ARGUS integration contract must have status CURRENT")
+
+    plugin_manifest = json.loads((atlas_root / policy["plugin"]["manifest"]).read_text(encoding="utf-8"))
+    atlas_descriptor = descriptor.get("atlas", {})
+    if atlas_descriptor.get("repository") != policy["plugin"]["canonical_repository"]:
+        raise ValueError("ARGUS contract references a different ATLAS repository")
+    if atlas_descriptor.get("version") != plugin_manifest.get("version"):
+        raise ValueError(
+            "ARGUS contract ATLAS version does not match the plugin release version: "
+            f"{atlas_descriptor.get('version')} != {plugin_manifest.get('version')}"
+        )
+
+    contract = descriptor.get("contract", {})
+    required_contract = {
+        "prompt_entry": "MISSION_CONTROL_FIRST",
+        "prompt_entry_scope": "every_user_prompt_while_atlas_active",
+        "capability": "intelligence_collection",
+        "provider": "argus",
+        "approval_key": "ARGUS_ACTIVATION",
+        "activation_authority": "ATLAS",
+        "next_step_authority": "ATLAS",
+        "provider_return_target": "ATLAS",
+        "explicit_user_approval_required": True,
+        "pre_execution_flow": ["UNDERSTAND_AND_NORMALIZE", "MINIMAL_DOMAIN_FRAMING", "ROUTE"],
+    }
+    for key, expected in required_contract.items():
+        if contract.get(key) != expected:
+            raise ValueError(f"pinned ARGUS contract invariant mismatch for {key}")
+
+    expected_impact_relative = compatibility.get("release_impact_path")
+    actual_impact_relative = contract.get("plugin_release_impact")
+    if actual_impact_relative != expected_impact_relative:
+        raise ValueError("ARGUS integration contract does not reference the release-impact contract pinned by policy")
+    impact_path = argus_root / expected_impact_relative
+    if not impact_path.is_file():
+        raise FileNotFoundError(f"pinned ARGUS release-impact contract missing: {expected_impact_relative}")
+    impact = yaml.safe_load(impact_path.read_text(encoding="utf-8"))
+    if impact.get("status") != "CURRENT":
+        raise ValueError("pinned ARGUS release-impact contract must have status CURRENT")
+    boundary = impact.get("boundary_changes", {})
+    if boundary.get("plugin_review_required") is not True or boundary.get("atlas_release_decision_required") is not True:
+        raise ValueError("ARGUS release-impact contract must require ATLAS review and release decision for boundary changes")
+
+    return {
+        "commit": actual_commit,
+        "contract_version": actual_contract_version,
+        "atlas_version": atlas_descriptor.get("version"),
+        "contract_path": contract_relative,
+        "release_impact_path": expected_impact_relative,
+        "validated": True,
+    }
+
+
 def build_metadata(
     *,
     policy: dict,
@@ -50,6 +149,7 @@ def build_metadata(
     atlas_commit: str,
     argus_commit: str | None = None,
     argus_contract_version: str | None = None,
+    argus_contract_validated: bool = False,
 ) -> dict:
     classification = classify_paths(changed_paths, policy)
     argus = policy.get("argus_compatibility", {})
@@ -80,6 +180,7 @@ def build_metadata(
             "atlas_commit": atlas_commit,
             "argus_compatible_commit": compatible_commit,
             "argus_contract_version": contract_version,
+            "argus_contract_validated": bool(argus_contract_validated),
         },
     }
 
@@ -125,6 +226,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--atlas-commit", required=True)
     parser.add_argument("--argus-commit")
     parser.add_argument("--argus-contract-version")
+    parser.add_argument("--argus-root")
     parser.add_argument("--metadata-output", default="plugin-release-metadata.json")
     parser.add_argument("--bundle-dir")
     args = parser.parse_args(argv)
@@ -132,12 +234,18 @@ def main(argv: list[str] | None = None) -> int:
     root = Path.cwd()
     policy = load_policy(root / args.policy)
     changed_paths = _read_changed_paths(Path(args.changed_path_file))
+
+    validation: dict | None = None
+    if args.argus_root:
+        validation = validate_argus_checkout(Path(args.argus_root), policy, atlas_root=root)
+
     metadata = build_metadata(
         policy=policy,
         changed_paths=changed_paths,
         atlas_commit=args.atlas_commit,
-        argus_commit=args.argus_commit,
-        argus_contract_version=args.argus_contract_version,
+        argus_commit=validation["commit"] if validation else args.argus_commit,
+        argus_contract_version=validation["contract_version"] if validation else args.argus_contract_version,
+        argus_contract_validated=bool(validation),
     )
 
     Path(args.metadata_output).write_text(
