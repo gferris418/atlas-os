@@ -1,0 +1,20 @@
+catalogue_id: CAT-UN-CPC-3.0
+version: 1.0.0
+family_id: PRODUCT
+owner: UNSD
+authority_id: UNSD
+lifecycle: ACTIVE
+source_mode: REMOTE_AUTHORITATIVE
+source_standard_id: STD-UN-CPC
+source_version_id: VER-UN-CPC-3.0
+source_url: https://unstats.un.org/unsd/classifications/Econ/Download/In%20Text/CPC_Ver_3.0_Structure_30Jun2025.csv
+hierarchy_levels:
+  - SECTION
+  - DIVISION
+  - GROUP
+  - CLASS
+  - SUBCLASS
+redistribution_status: UNKNOWN
+dataset_storage: METADATA_ONLY
+items: []
+notes: CPC is the primary global product/service backbone; complete source data stays authoritative at UNSD until redistribution permission is governed.
