@@ -1,5 +1,5 @@
 id: atlas.classification.standards
-version: 1
+version: 2
 status: active
 rules:
   historical_versions_preserved: true
@@ -25,6 +25,8 @@ standards:
         official_version: Rev. 5
         publication_date: '2024'
         supersedes_version_id: VER-UN-ISIC-REV4
+        classification_status: OPERATIONAL
+        publication_status: FORTHCOMING
         hierarchy_available: true
         source_url: https://unstats.un.org/unsd/classifications/Econ/ISIC.cshtml
         lifecycle: ACTIVE
@@ -50,6 +52,8 @@ standards:
         official_version: Version 3.0
         publication_date: '2025'
         supersedes_version_id: VER-UN-CPC-2.1
+        classification_status: OPERATIONAL
+        publication_status: FORTHCOMING
         hierarchy_available: true
         source_url: https://unstats.un.org/unsd/classifications/Econ/CPC.cshtml
         lifecycle: ACTIVE
