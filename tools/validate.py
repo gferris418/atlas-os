@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import argparse
+from collections import Counter, defaultdict
 import json
 from pathlib import Path
+import re
 import sys
 
 import yaml
@@ -52,6 +54,7 @@ DATASET_STORAGE_MODES = {"NONE", "METADATA_ONLY", "PERMITTED_EXTRACT", "FULL_DAT
 CLASSIFICATION_STATUSES = {"DRAFT", "ADOPTED", "OPERATIONAL", "RETIRED"}
 PUBLICATION_STATUSES = {"PUBLISHED", "FORTHCOMING", "NOT_APPLICABLE", "UNKNOWN"}
 SOURCE_MODES = {"ATLAS_OWNED", "REMOTE_AUTHORITATIVE", "METADATA_ONLY"}
+SERIAL_RE = re.compile(r"^[0-9]{2}(?:\.[0-9]{2})*$")
 
 
 def _load(path: Path):
@@ -65,6 +68,39 @@ def _names(root: Path, directory: str, suffixes: tuple[str, ...]) -> set[str]:
     if not base.is_dir():
         return set()
     return {path.name for path in base.iterdir() if path.is_file() and path.suffix in suffixes}
+
+
+def _validate_serials(catalogue_id: str, item_by_id: dict[str, dict], errors: list[str]) -> None:
+    serial_counts = Counter(item.get("serial") for item in item_by_id.values())
+    for serial, count in sorted(serial_counts.items(), key=lambda pair: str(pair[0])):
+        if serial is None or not isinstance(serial, str) or not SERIAL_RE.fullmatch(serial):
+            errors.append(f"invalid classification serial in {catalogue_id}: {serial}")
+        elif count > 1:
+            errors.append(f"duplicate classification serial in {catalogue_id}: {serial}")
+
+    children: dict[str | None, list[dict]] = defaultdict(list)
+    for item_id, item in item_by_id.items():
+        parent_id = item.get("parent_id")
+        children[parent_id].append(item)
+        if parent_id in item_by_id:
+            parent_serial = item_by_id[parent_id].get("serial")
+            serial = item.get("serial")
+            if (
+                isinstance(parent_serial, str)
+                and isinstance(serial, str)
+                and not serial.startswith(parent_serial + ".")
+            ):
+                errors.append(f"classification serial is not parent-aligned in {catalogue_id}: {item_id}")
+
+    for parent_id, siblings in children.items():
+        valid_serials = [item.get("serial") for item in siblings]
+        if not all(isinstance(serial, str) and SERIAL_RE.fullmatch(serial) for serial in valid_serials):
+            continue
+        suffixes = sorted(int(serial.rsplit(".", 1)[-1]) for serial in valid_serials)
+        expected = list(range(1, len(suffixes) + 1))
+        if suffixes != expected:
+            parent_label = parent_id or "ROOT"
+            errors.append(f"non-contiguous classification serials in {catalogue_id} under {parent_label}")
 
 
 def _validate_catalogues(
@@ -87,8 +123,7 @@ def _validate_catalogues(
 
     catalogue_ids: set[str] = set()
     for filename in sorted(EXPECTED_CLASSIFICATION_CATALOGUES):
-        path = catalogue_dir / filename
-        payload = _load(path)
+        payload = _load(catalogue_dir / filename)
         catalogue_id = payload.get("catalogue_id")
         if not catalogue_id or catalogue_id in catalogue_ids:
             errors.append(f"duplicate or missing classification catalogue ID: {catalogue_id}")
@@ -113,6 +148,7 @@ def _validate_catalogues(
             errors.append(f"invalid classification catalogue storage mode: {catalogue_id}")
         if payload.get("dataset_storage") == "FULL_DATASET" and payload.get("redistribution_status") != "PERMITTED":
             errors.append(f"classification catalogue FULL_DATASET requires PERMITTED redistribution: {catalogue_id}")
+
         source_standard = payload.get("source_standard_id")
         source_version = payload.get("source_version_id")
         if source_standard not in standard_id_set:
@@ -137,7 +173,11 @@ def _validate_catalogues(
                 errors.append(f"duplicate classification item ID in {catalogue_id}: {item_id}")
             if item_id:
                 seen.add(item_id)
-        item_by_id = {item.get("atlas_classification_id"): item for item in items if item.get("atlas_classification_id")}
+        item_by_id = {
+            item.get("atlas_classification_id"): item
+            for item in items
+            if item.get("atlas_classification_id")
+        }
         for item_id, item in item_by_id.items():
             if item.get("family_id") != family_id:
                 errors.append(f"classification item family mismatch in {catalogue_id}: {item_id}")
@@ -155,6 +195,8 @@ def _validate_catalogues(
             parent_id = item.get("parent_id")
             if parent_id is not None and parent_id not in item_by_id:
                 errors.append(f"unknown classification parent in {catalogue_id}: {parent_id}")
+
+        _validate_serials(catalogue_id, item_by_id, errors)
 
         visiting: set[str] = set()
         visited: set[str] = set()
@@ -329,7 +371,6 @@ def validate(root: Path) -> list[str]:
             errors.append(f"banned active content exists: {relative}")
 
     _validate_classification(root, errors)
-
     return errors
 
 
