@@ -3,16 +3,10 @@ from __future__ import annotations
 import re
 from typing import Any, Iterable
 
+from .contract import ARGUS_APPROVAL, ARGUS_ROUTE_CONTRACTS, PRE_EXECUTION_FLOW
 from .models import RouteDecision
 
 
-PRE_EXECUTION_FLOW = (
-    "UNDERSTAND_AND_NORMALIZE",
-    "MINIMAL_DOMAIN_FRAMING",
-    "ROUTE",
-)
-
-ARGUS_APPROVAL = "ARGUS_ACTIVATION"
 EXTERNAL_ACTION_APPROVAL = "EXTERNAL_ACTION"
 _REPOSITORY_MUTATION = re.compile(
     r"\b(?:close|merge|reopen)\s+(?:all\s+)?(?:prs?|pull requests?|issues?)\b"
@@ -77,8 +71,9 @@ def choose_route(objective: str, approvals: tuple[str, ...] = ()) -> RouteDecisi
         lower, ("opportunit", "procurement", "supplier", "competitor", "market")
     ):
         required, status = _approval(ARGUS_APPROVAL, approvals)
+        capability, provider = ARGUS_ROUTE_CONTRACTS["MULTI_CAPABILITY"]
         return RouteDecision(
-            "MULTI_CAPABILITY", "intelligence_collection+analysis", "argus+atlas", required, status,
+            "MULTI_CAPABILITY", capability, provider, required, status,
             "Structured collection is needed, but ATLAS retains the comparison, forecast, scenario, or decision work.",
         )
 
@@ -89,8 +84,9 @@ def choose_route(objective: str, approvals: tuple[str, ...] = ()) -> RouteDecisi
     )
     if _contains_any(lower, argus_signals):
         required, status = _approval(ARGUS_APPROVAL, approvals)
+        capability, provider = ARGUS_ROUTE_CONTRACTS["ARGUS"]
         return RouteDecision(
-            "ARGUS", "intelligence_collection", "argus", required, status,
+            "ARGUS", capability, provider, required, status,
             "The request requires bounded structured intelligence collection rather than a simple lookup.",
         )
 
