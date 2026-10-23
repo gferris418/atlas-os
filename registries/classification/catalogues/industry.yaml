@@ -1,0 +1,17 @@
+catalogue_id: CAT-ATLAS-INDUSTRY
+version: 1.0.0
+family_id: INDUSTRY
+owner: ATLAS
+authority_id: ATLAS
+lifecycle: ACTIVE
+source_mode: ATLAS_OWNED
+source_standard_id: STD-ATLAS-INDUSTRY
+source_version_id: VER-ATLAS-INDUSTRY-1.0.0
+source_url: https://github.com/gferris418/atlas-os
+hierarchy_levels:
+  - INDUSTRY
+  - SUBINDUSTRY
+redistribution_status: PERMITTED
+dataset_storage: FULL_DATASET
+items: []
+notes: Canonical producer/supplier ecosystem vocabulary; mappings to ISIC, NACE and NAICS are explicit crosswalks rather than implicit equivalence.
