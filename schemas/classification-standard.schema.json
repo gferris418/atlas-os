@@ -26,6 +26,8 @@
           "effective_date": {"type": ["string", "null"]},
           "superseded_date": {"type": ["string", "null"]},
           "supersedes_version_id": {"type": ["string", "null"]},
+          "classification_status": {"enum": ["DRAFT", "ADOPTED", "OPERATIONAL", "RETIRED"]},
+          "publication_status": {"enum": ["PUBLISHED", "FORTHCOMING", "NOT_APPLICABLE", "UNKNOWN"]},
           "hierarchy_available": {"type": "boolean"},
           "source_url": {"type": "string", "pattern": "^https://"},
           "lifecycle": {"enum": ["DISCOVERED", "CANDIDATE", "VERIFIED", "ACTIVE", "SUPERSEDED", "ARCHIVED"]},
