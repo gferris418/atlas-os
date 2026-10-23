@@ -4,20 +4,54 @@
   "title": "ATLAS Classification Entry",
   "type": "object",
   "additionalProperties": false,
-  "required": ["standard_id", "version_id", "code", "label", "evidence_status", "source_url"],
+  "required": [
+    "atlas_classification_id",
+    "family_id",
+    "preferred_label",
+    "definition",
+    "source_standard_id",
+    "source_version_id",
+    "source_url",
+    "lifecycle",
+    "evidence_status",
+    "redistribution_status"
+  ],
   "properties": {
-    "standard_id": {"type": "string", "minLength": 1},
-    "version_id": {"type": "string", "minLength": 1},
-    "code": {"type": "string", "minLength": 1},
-    "label": {"type": "string", "minLength": 1},
-    "parent_code": {"type": ["string", "null"]},
+    "atlas_classification_id": {"type": "string", "minLength": 1, "pattern": "^[A-Z0-9][A-Z0-9._:-]*$"},
+    "family_id": {"type": "string", "minLength": 1},
+    "preferred_label": {"type": "string", "minLength": 1},
+    "short_label": {"type": ["string", "null"]},
+    "definition": {"type": "string", "minLength": 1},
+    "source_standard_id": {"type": "string", "minLength": 1},
+    "source_version_id": {"type": "string", "minLength": 1},
+    "source_code": {"type": ["string", "null"]},
+    "source_label": {"type": ["string", "null"]},
     "level": {"type": ["string", "integer", "null"]},
-    "source_url": {"type": "string", "pattern": "^https://"},
-    "evidence_status": {
-      "enum": ["CONFIRMED", "PROBABLE", "POSSIBLE", "DISPUTED", "UNVERIFIED", "STALE"]
+    "parent_id": {"type": ["string", "null"]},
+    "hierarchy_path": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
     },
+    "jurisdiction": {"type": ["string", "null"]},
+    "authority_id": {"type": ["string", "null"]},
+    "source_url": {"type": "string", "pattern": "^https://"},
     "effective_from": {"type": ["string", "null"]},
     "effective_to": {"type": ["string", "null"]},
+    "lifecycle": {"enum": ["DISCOVERED", "CANDIDATE", "VERIFIED", "ACTIVE", "SUPERSEDED", "ARCHIVED"]},
+    "evidence_status": {"enum": ["CONFIRMED", "PROBABLE", "POSSIBLE", "DISPUTED", "UNVERIFIED", "STALE"]},
+    "aliases": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "keywords": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "redistribution_status": {"enum": ["PERMITTED", "RESTRICTED", "UNKNOWN", "NOT_APPLICABLE"]},
+    "last_verified_at": {"type": ["string", "null"]},
     "notes": {"type": "string"}
   }
 }
