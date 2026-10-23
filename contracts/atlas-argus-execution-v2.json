@@ -1,0 +1,28 @@
+{
+  "contract_id": "ATLAS_ARGUS_EXECUTION",
+  "version": "2.0.0",
+  "status": "CURRENT",
+  "authority": {"system": "ATLAS", "repository": "gferris418/atlas-os"},
+  "prompt_entry": {"value": "MISSION_CONTROL_FIRST", "scope": "every_user_prompt_while_atlas_active"},
+  "pre_execution_flow": ["UNDERSTAND_AND_NORMALIZE", "MINIMAL_DOMAIN_FRAMING", "ROUTE"],
+  "route_mechanisms": {
+    "ARGUS": {"capability": "intelligence_collection", "provider": "argus"},
+    "MULTI_CAPABILITY": {"capability": "intelligence_collection+analysis", "provider": "argus+atlas"}
+  },
+  "approval": {"key": "ARGUS_ACTIVATION", "explicit_user_approval_required": true, "plain_approval_scope": "local_in_process_only"},
+  "activation_authority": "ATLAS",
+  "next_step_authority": "ATLAS",
+  "provider_return_target": "ATLAS",
+  "remote_capability": {
+    "version": 2,
+    "algorithm": "HMAC-SHA256",
+    "issuer": "ATLAS",
+    "subject": "argus",
+    "audience": "ARGUS",
+    "capability": "intelligence_collection",
+    "scope": "intelligence_collection:execute",
+    "one_time": true,
+    "max_ttl_seconds": 300,
+    "max_clock_skew_seconds": 30
+  }
+}

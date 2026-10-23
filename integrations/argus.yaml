@@ -1,6 +1,7 @@
 id: integration.argus
 version: 3.0.0
 status: active
+canonical_execution_contract: contracts/atlas-argus-execution-v2.json
 role: bounded_intelligence_collection_provider
 capability: intelligence_collection
 activation_authority: ATLAS

@@ -3,6 +3,7 @@ product_version: 3.0.2
 product_manifest: atlas-os.yaml
 mission_control_contract: spec/mission-control.yaml
 core_contract: spec/core.yaml
+execution_contract: contracts/atlas-argus-execution-v2.json
 routing_contract: spec/routing.yaml
 discovery_order:
   - atlas-ai.yaml
@@ -10,6 +11,7 @@ discovery_order:
   - governance.yaml
   - plugin.json
   - skills/atlas-os/SKILL.md
+  - contracts/atlas-argus-execution-v2.json
   - spec/mission-control.yaml
   - spec/core.yaml
   - spec/control-plane.yaml
