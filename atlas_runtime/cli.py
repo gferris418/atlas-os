@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any, Sequence, TextIO
 
@@ -28,13 +29,25 @@ def _read(path: str, stdin: TextIO) -> dict[str, Any]:
 def _envelope(value: dict[str, Any]) -> ExecutionEnvelope:
     if "objective" not in value:
         raise ValueError("missing required field: objective")
+    approvals = value.get("approvals", [])
+    if not isinstance(approvals, list) or any(
+        not isinstance(approval, str) or not approval.strip()
+        for approval in approvals
+    ):
+        raise ValueError("approvals must be an array of non-empty strings")
+    context = value.get("context", {})
+    if not isinstance(context, Mapping):
+        raise ValueError("context must be an object")
+    provider_result = value.get("provider_result")
+    if provider_result is not None and not isinstance(provider_result, Mapping):
+        raise ValueError("provider_result must be an object or null")
     return ExecutionEnvelope(
         objective=value["objective"],
         task_id=value.get("task_id"),
         host=value.get("host", "generic-host"),
-        context=value.get("context", {}),
-        approvals=tuple(value.get("approvals", ())),
-        provider_result=value.get("provider_result"),
+        context=context,
+        approvals=tuple(approvals),
+        provider_result=provider_result,
     )
 
 

@@ -29,6 +29,28 @@ class CliTests(unittest.TestCase):
         self.assertEqual(2, code)
         self.assertIn("missing required field: objective", stderr.getvalue())
 
+    def test_malformed_optional_fields_fail_cleanly(self) -> None:
+        invalid_payloads = (
+            {"objective": "Build a dossier.", "approvals": None},
+            {"objective": "Build a dossier.", "approvals": "ARGUS_ACTIVATION"},
+            {"objective": "Build a dossier.", "context": []},
+            {"objective": "Build a dossier.", "provider_result": "returned"},
+        )
+
+        for payload in invalid_payloads:
+            with self.subTest(payload=payload):
+                stdout = io.StringIO()
+                stderr = io.StringIO()
+                code = main(
+                    ["--format", "json"],
+                    stdin=io.StringIO(json.dumps(payload)),
+                    stdout=stdout,
+                    stderr=stderr,
+                )
+                self.assertEqual(2, code)
+                self.assertEqual("", stdout.getvalue())
+                self.assertIn("ATLAS error:", stderr.getvalue())
+
 
 if __name__ == "__main__":
     unittest.main()
