@@ -1,5 +1,5 @@
 id: atlas.classification.families
-version: 1
+version: 2
 status: active
 families:
   - id: DOMAIN
@@ -14,6 +14,8 @@ families:
     definition: Classification of goods or services as outputs or transaction objects.
   - id: CAPABILITY
     definition: Functional or solution capability used for supplier and requirement matching.
+  - id: TECHNOLOGY
+    definition: Governed technology vocabulary describing technical methods, platforms, systems, and enabling technologies; not a product or industry code.
   - id: PROCUREMENT_CATEGORY
     definition: Procurement-oriented grouping of works, goods, services, or categories.
   - id: TRADE_CLASSIFICATION
