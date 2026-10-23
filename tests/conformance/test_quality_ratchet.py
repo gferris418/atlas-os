@@ -27,7 +27,7 @@ class QualityRatchetContractTests(unittest.TestCase):
         self.assertIn("python -m mypy atlas_runtime", workflow)
         self.assertIn("name: Runtime coverage ratchet", workflow)
         self.assertIn("--source=atlas_runtime", workflow)
-        self.assertIn("--fail-under=75", workflow)
+        self.assertIn("--fail-under=80", workflow)
 
 
 if __name__ == "__main__":
