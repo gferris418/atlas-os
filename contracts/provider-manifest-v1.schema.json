@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os/contracts/provider-manifest-v1.schema.json",
+  "title": "ATLAS Provider Manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["provider_id", "protocol", "provides", "permissions", "evidence"],
+  "properties": {
+    "provider_id": {"type": "string", "minLength": 1},
+    "protocol": {"type": "string", "enum": ["native", "mcp", "plugin", "api", "database", "filesystem"]},
+    "provides": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[a-z][a-z0-9_-]*(\\.[a-z][a-z0-9_-]*)+$"}
+    },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": {"enum": ["automatic", "approval_required", "forbidden"]}
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["provenance"],
+      "properties": {
+        "citations": {"type": "boolean"},
+        "provenance": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "health": {
+      "type": "object",
+      "properties": {"discoverable": {"type": "boolean"}},
+      "additionalProperties": true
+    },
+    "classification": {
+      "type": "object",
+      "additionalProperties": {"enum": ["allowed", "forbidden", "approval_required"]}
+    }
+  }
+}
