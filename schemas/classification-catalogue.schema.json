@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas-os/schemas/classification-catalogue.schema.json",
+  "title": "ATLAS Classification Catalogue",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["catalogue_id", "version", "family_id", "owner", "lifecycle", "source_mode", "redistribution_status", "items"],
+  "properties": {
+    "catalogue_id": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "minLength": 1},
+    "family_id": {"type": "string", "minLength": 1},
+    "owner": {"type": "string", "minLength": 1},
+    "authority_id": {"type": ["string", "null"]},
+    "lifecycle": {"enum": ["DISCOVERED", "CANDIDATE", "VERIFIED", "ACTIVE", "SUPERSEDED", "ARCHIVED"]},
+    "source_mode": {"enum": ["ATLAS_OWNED", "REMOTE_AUTHORITATIVE", "METADATA_ONLY"]},
+    "source_standard_id": {"type": ["string", "null"]},
+    "source_version_id": {"type": ["string", "null"]},
+    "source_url": {"type": ["string", "null"], "pattern": "^https://"},
+    "hierarchy_levels": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "redistribution_status": {"enum": ["PERMITTED", "RESTRICTED", "UNKNOWN", "NOT_APPLICABLE"]},
+    "dataset_storage": {"enum": ["NONE", "METADATA_ONLY", "PERMITTED_EXTRACT", "FULL_DATASET"]},
+    "items": {
+      "type": "array",
+      "items": {"$ref": "classification-entry.schema.json"}
+    },
+    "notes": {"type": "string"}
+  }
+}
