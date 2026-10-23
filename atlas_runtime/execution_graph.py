@@ -24,12 +24,21 @@ class NodeStatus(str, Enum):
     SUPERSEDED = "SUPERSEDED"
 
 
+class Criticality(str, Enum):
+    CRITICAL = "CRITICAL"
+    MAJOR = "MAJOR"
+    MINOR = "MINOR"
+    INFORMATIONAL = "INFORMATIONAL"
+
+
 _RESOLVED_DEPENDENCY_STATUSES = {
     NodeStatus.COMPLETE,
     NodeStatus.NOT_APPLICABLE,
     NodeStatus.SKIPPED_WITH_AUTHORITY,
     NodeStatus.SUPERSEDED,
 }
+
+_ALL_NODE_STATUSES = tuple(NodeStatus)
 
 
 @dataclass(frozen=True)
@@ -40,6 +49,13 @@ class ExecutionNode:
     parent_id: str | None = None
     dependencies: tuple[str, ...] = ()
     kind: NodeKind = NodeKind.REQUIRED
+    criticality: Criticality | None = None
+    owner: str | None = None
+    condition: str | None = None
+    input_schema_ref: str | None = None
+    output_schema_ref: str | None = None
+    evidence_requirement: str | None = None
+    allowed_statuses: tuple[NodeStatus, ...] = _ALL_NODE_STATUSES
 
     def __post_init__(self) -> None:
         if not self.stable_id.strip():
@@ -50,6 +66,32 @@ class ExecutionNode:
             raise ValueError("title must be non-empty")
         if any(not dependency.strip() for dependency in self.dependencies):
             raise ValueError("dependencies must contain non-empty stable IDs")
+        if self.owner is not None and not self.owner.strip():
+            raise ValueError("owner must be non-empty when declared")
+        for field_name, value in (
+            ("condition", self.condition),
+            ("input_schema_ref", self.input_schema_ref),
+            ("output_schema_ref", self.output_schema_ref),
+            ("evidence_requirement", self.evidence_requirement),
+        ):
+            if value is not None and not value.strip():
+                raise ValueError(f"{field_name} must be non-empty when declared")
+        if not self.allowed_statuses:
+            raise ValueError("allowed_statuses must contain at least one status")
+        if len(set(self.allowed_statuses)) != len(self.allowed_statuses):
+            raise ValueError("allowed_statuses must not contain duplicates")
+        if NodeStatus.PENDING not in self.allowed_statuses:
+            raise ValueError("allowed_statuses must include PENDING")
+        if self.kind is NodeKind.REQUIRED and NodeStatus.NOT_APPLICABLE in self.allowed_statuses:
+            object.__setattr__(
+                self,
+                "allowed_statuses",
+                tuple(
+                    status
+                    for status in self.allowed_statuses
+                    if status is not NodeStatus.NOT_APPLICABLE
+                ),
+            )
 
 
 @dataclass(frozen=True)
@@ -84,6 +126,10 @@ class ExecutionState:
 
     def set_status(self, stable_id: str, status: NodeStatus) -> None:
         node = self._graph.node(stable_id)
+        if status not in node.allowed_statuses:
+            raise ValueError(
+                f"status {status.value} is not allowed for {stable_id}"
+            )
         if status in _RESOLVED_DEPENDENCY_STATUSES:
             unresolved = tuple(
                 dependency
@@ -136,7 +182,9 @@ class ExecutionGraph:
 
         missing_ids = tuple(sorted(canonical_ids - observed_set))
         unknown_ids = tuple(sorted(observed_set - canonical_ids))
-        duplicate_ids = tuple(sorted(stable_id for stable_id, count in counts.items() if count > 1))
+        duplicate_ids = tuple(
+            sorted(stable_id for stable_id, count in counts.items() if count > 1)
+        )
         serial_mismatches = tuple(
             sorted(
                 stable_id
@@ -244,6 +292,17 @@ class ExecutionGraph:
                     "parent_id": node.parent_id,
                     "dependencies": list(node.dependencies),
                     "kind": node.kind.value,
+                    "criticality": (
+                        node.criticality.value if node.criticality is not None else None
+                    ),
+                    "owner": node.owner,
+                    "condition": node.condition,
+                    "input_schema_ref": node.input_schema_ref,
+                    "output_schema_ref": node.output_schema_ref,
+                    "evidence_requirement": node.evidence_requirement,
+                    "allowed_statuses": [
+                        status.value for status in node.allowed_statuses
+                    ],
                 }
                 for node in sorted(self.nodes, key=lambda item: item.serial)
             ],
@@ -255,6 +314,7 @@ class ExecutionGraph:
 
 
 __all__ = [
+    "Criticality",
     "ExecutionGraph",
     "ExecutionNode",
     "ExecutionObservation",
