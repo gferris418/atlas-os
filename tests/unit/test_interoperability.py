@@ -7,6 +7,7 @@ from atlas_runtime.interoperability import (
     BindingRegistry,
     ProviderManifest,
     admit_provider,
+    resolve_provider,
 )
 
 
@@ -93,6 +94,57 @@ class InteroperabilityTests(unittest.TestCase):
             ("microsoft.sharepoint", "host.files"),
             registry.candidates("document.read"),
         )
+
+    def test_resolver_uses_first_certified_provider_that_really_provides_capability(self) -> None:
+        bindings = BindingRegistry.from_dict(
+            {"supplier.search": {"primary": "bad.primary", "fallbacks": ["argus"]}}
+        )
+        bad = ProviderManifest.from_dict(
+            {
+                "provider_id": "bad.primary",
+                "protocol": "mcp",
+                "provides": ["company.resolve"],
+                "permissions": {"read": "automatic"},
+                "evidence": {"provenance": True},
+            }
+        )
+        argus = ProviderManifest.from_dict(
+            {
+                "provider_id": "argus",
+                "protocol": "native",
+                "provides": ["supplier.search"],
+                "permissions": {"read": "automatic"},
+                "evidence": {"provenance": True},
+            }
+        )
+        selected = resolve_provider(
+            "supplier.search",
+            bindings,
+            manifests={"bad.primary": bad, "argus": argus},
+            admission={"bad.primary": admit_provider(bad), "argus": admit_provider(argus)},
+        )
+        self.assertEqual("argus", selected)
+
+    def test_resolver_rejects_unadmitted_provider_and_returns_none_without_valid_fallback(self) -> None:
+        bindings = BindingRegistry.from_dict(
+            {"tender.search": {"primary": "discovered.only", "fallbacks": []}}
+        )
+        manifest = ProviderManifest.from_dict(
+            {
+                "provider_id": "discovered.only",
+                "protocol": "mcp",
+                "provides": ["tender.search"],
+                "permissions": {"read": "automatic"},
+                "evidence": {"provenance": True},
+            }
+        )
+        selected = resolve_provider(
+            "tender.search",
+            bindings,
+            manifests={"discovered.only": manifest},
+            admission={},
+        )
+        self.assertIsNone(selected)
 
 
 if __name__ == "__main__":
