@@ -17,9 +17,12 @@
     "version": 2,
     "algorithm": "HMAC-SHA256",
     "issuer": "ATLAS",
+    "subject": "argus",
     "audience": "ARGUS",
+    "capability": "intelligence_collection",
     "scope": "intelligence_collection:execute",
     "one_time": true,
-    "max_ttl_seconds": 300
+    "max_ttl_seconds": 300,
+    "max_clock_skew_seconds": 30
   }
 }
