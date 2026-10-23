@@ -16,6 +16,16 @@ ATLAS routes by required capability, not by brand or tool name.
 | `EXTERNAL_ACTION` | sending, publishing, buying, changing external state |
 | `MULTI_CAPABILITY` | task requires an explicit sequence or combination of capabilities |
 
+## Capability interoperability
+
+The canonical `registries/capabilities.yaml` contains both coarse ATLAS execution classes and provider-neutral fine-grained capability IDs. Fine-grained IDs describe what a workflow needs, for example `document.read`, `repository.write`, `tender.search`, or `company.resolve`; provider brands do not belong in capability IDs.
+
+The same canonical registry contains preferred provider bindings and ordered fallbacks. Bindings are policy only: runtime availability, provider admission state, approval boundaries, data classification, and the canonical ATLAS execution contract remain authoritative.
+
+External providers may describe their capabilities with `contracts/provider-manifest-v1.schema.json`. The runtime interoperability layer validates provider identity, protocol, capability declarations, permissions, and provenance support. Provider lifecycle states are `DISCOVERED`, `VALIDATED`, `CERTIFIED`, `ACTIVE`, `DEGRADED`, and `DISABLED`.
+
+Specialist systems such as ARGUS declare capability requirements. They do not select or authorize general external providers; ATLAS retains provider selection, approvals, and every next-step decision after provider return.
+
 ## Direct search versus ARGUS
 
 Use direct search/research when the task is primarily factual retrieval or analysis. Use ARGUS when ATLAS needs structured collection across targets, sources, identities, relationships, chronology, evidence gaps, or ongoing monitoring.
