@@ -1,0 +1,10 @@
+source_descriptor_id: SRC-US-NAICS-2022
+standard_id: STD-US-NAICS
+version_id: VER-US-NAICS-2022
+authority_id: US_CENSUS
+official_url: https://www.census.gov/naics/
+retrieval_mode: REMOTE_AUTHORITATIVE
+redistribution_status: UNKNOWN
+dataset_storage: METADATA_ONLY
+last_verified_at: '2026-10-23'
+independently_verified: false
