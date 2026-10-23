@@ -102,7 +102,10 @@ class CapabilityV2Tests(unittest.TestCase):
             ttl_seconds=60,
             nonce="nonce-3",
         )
-        resolver = lambda _key_id: SECRET
+
+        def resolver(_key_id: str) -> bytes:
+            return SECRET
+
         with self.assertRaises(CapabilityError):
             verify_remote_capability(
                 token,
