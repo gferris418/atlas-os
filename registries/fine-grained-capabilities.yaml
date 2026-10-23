@@ -1,0 +1,58 @@
+version: 1.0.0
+parent_registry: registries/capabilities.yaml
+rule: Fine-grained capabilities describe task requirements; provider brands must not appear in capability IDs.
+items:
+  - id: web.search
+    parent: direct_search
+  - id: document.search
+    parent: connected_source
+  - id: document.read
+    parent: connected_source
+  - id: document.write
+    parent: connected_source
+    consequential: true
+  - id: email.search
+    parent: connected_source
+  - id: email.send
+    parent: external_action
+    consequential: true
+  - id: calendar.read
+    parent: connected_source
+  - id: repository.read
+    parent: connected_source
+  - id: repository.write
+    parent: external_action
+    consequential: true
+  - id: database.query
+    parent: connected_source
+  - id: database.write
+    parent: external_action
+    consequential: true
+  - id: tender.search
+    parent: intelligence_collection
+  - id: tender.retrieve
+    parent: intelligence_collection
+  - id: government_project.search
+    parent: intelligence_collection
+  - id: policy.search
+    parent: intelligence_collection
+  - id: budget.search
+    parent: intelligence_collection
+  - id: company.resolve
+    parent: intelligence_collection
+  - id: supplier.search
+    parent: intelligence_collection
+  - id: oem.search
+    parent: intelligence_collection
+  - id: stakeholder.resolve
+    parent: intelligence_collection
+  - id: entity.enrich
+    parent: intelligence_collection
+  - id: document.extract
+    parent: specialist_execution
+  - id: evidence.verify
+    parent: evidence_verification
+  - id: monitoring.watch
+    parent: intelligence_collection
+  - id: artifact.persist
+    parent: persistence
