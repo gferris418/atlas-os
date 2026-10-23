@@ -1,0 +1,10 @@
+source_descriptor_id: SRC-EU-CPV-2008
+standard_id: STD-EU-CPV
+version_id: VER-EU-CPV-2008
+authority_id: EUROPEAN_COMMISSION
+official_url: https://single-market-economy.ec.europa.eu/single-market/public-procurement/digital-procurement/e-procurement/cpv_en
+retrieval_mode: REMOTE_AUTHORITATIVE
+redistribution_status: UNKNOWN
+dataset_storage: METADATA_ONLY
+last_verified_at: '2026-10-23'
+independently_verified: false
