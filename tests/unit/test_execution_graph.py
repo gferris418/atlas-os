@@ -3,6 +3,7 @@ from __future__ import annotations
 import unittest
 
 from atlas_runtime.execution_graph import (
+    Criticality,
     ExecutionGraph,
     ExecutionNode,
     ExecutionObservation,
@@ -164,6 +165,92 @@ class ExecutionGraphTests(unittest.TestCase):
 
         self.assertEqual(NodeStatus.NOT_APPLICABLE, state.status("ARGUS-DEVELOPMENT-PARTNER"))
         self.assertEqual(NodeStatus.COMPLETE, state.status("ARGUS-FUNDING-ASSESSMENT"))
+
+    def test_node_governance_metadata_is_retained_and_fingerprinted(self) -> None:
+        node = ExecutionNode(
+            "ARGUS-GRADE-EVIDENCE",
+            "01",
+            "Grade evidence",
+            owner="ARGUS",
+            criticality=Criticality.CRITICAL,
+            condition="evidence_collected",
+            input_schema_ref="schemas/evidence-input.json",
+            output_schema_ref="schemas/evidence-grade.json",
+            evidence_requirement="At least one authoritative source",
+            allowed_statuses=(
+                NodeStatus.PENDING,
+                NodeStatus.ACTIVE,
+                NodeStatus.COMPLETE,
+                NodeStatus.BLOCKED,
+                NodeStatus.FAILED,
+            ),
+        )
+        graph = ExecutionGraph(
+            workflow_id="ARGUS-360-BI",
+            version="1.1.0",
+            nodes=(node,),
+        )
+        changed = ExecutionGraph(
+            workflow_id="ARGUS-360-BI",
+            version="1.1.0",
+            nodes=(
+                ExecutionNode(
+                    "ARGUS-GRADE-EVIDENCE",
+                    "01",
+                    "Grade evidence",
+                    owner="ARGUS",
+                    criticality=Criticality.MAJOR,
+                    condition="evidence_collected",
+                    input_schema_ref="schemas/evidence-input.json",
+                    output_schema_ref="schemas/evidence-grade.json",
+                    evidence_requirement="At least one authoritative source",
+                    allowed_statuses=node.allowed_statuses,
+                ),
+            ),
+        )
+
+        self.assertEqual("ARGUS", graph.node("ARGUS-GRADE-EVIDENCE").owner)
+        self.assertEqual(Criticality.CRITICAL, graph.node("ARGUS-GRADE-EVIDENCE").criticality)
+        self.assertNotEqual(graph.fingerprint, changed.fingerprint)
+
+    def test_runtime_rejects_status_not_allowed_by_node_contract(self) -> None:
+        graph = ExecutionGraph(
+            workflow_id="ATLAS-DECISION",
+            version="1.0.0",
+            nodes=(
+                ExecutionNode(
+                    "ATLAS-DECISION-GATE",
+                    "01",
+                    "Decision gate",
+                    owner="ATLAS_OS",
+                    allowed_statuses=(
+                        NodeStatus.PENDING,
+                        NodeStatus.ACTIVE,
+                        NodeStatus.COMPLETE,
+                        NodeStatus.BLOCKED,
+                    ),
+                ),
+            ),
+        )
+        state = graph.new_state("MSN-003")
+
+        with self.assertRaisesRegex(ValueError, "status FAILED is not allowed"):
+            state.set_status("ATLAS-DECISION-GATE", NodeStatus.FAILED)
+
+    def test_required_metadata_can_be_enforced_at_graph_construction(self) -> None:
+        with self.assertRaisesRegex(ValueError, "owner must be non-empty"):
+            ExecutionGraph(
+                workflow_id="ATLAS-DECISION",
+                version="1.0.0",
+                nodes=(
+                    ExecutionNode(
+                        "ATLAS-DECISION-GATE",
+                        "01",
+                        "Decision gate",
+                        owner="",
+                    ),
+                ),
+            )
 
     def test_reconciliation_detects_missing_unknown_duplicate_and_serial_mismatch(self) -> None:
         graph = ExecutionGraph(

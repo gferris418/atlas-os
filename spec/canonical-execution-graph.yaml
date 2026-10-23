@@ -1,6 +1,6 @@
 schema_version: 1
 id: atlas.canonical-execution-graph
-version: 1.0.0
+version: 1.1.0
 status: CANDIDATE
 normative: true
 purpose: >-
@@ -23,6 +23,29 @@ numbering:
   missing_serials: structural_failure
   unknown_serials: structural_failure
   silent_omission: prohibited
+
+node_contract:
+  required_fields:
+    - stable_id
+    - serial
+    - title
+    - kind
+  governed_metadata:
+    - criticality
+    - owner
+    - condition
+    - input_schema_ref
+    - output_schema_ref
+    - evidence_requirement
+    - allowed_statuses
+  criticality_levels:
+    - CRITICAL
+    - MAJOR
+    - MINOR
+    - INFORMATIONAL
+  rule: >-
+    Governance metadata is part of the canonical node definition and therefore part of the
+    manifest fingerprint when declared. Runtime state transitions must respect allowed_statuses.
 
 node_kinds:
   - REQUIRED
@@ -55,9 +78,11 @@ integrity:
     - parent_child_alignment_valid
     - dependencies_resolve
     - dependency_graph_acyclic
+    - declared_governance_metadata_valid
   runtime:
     - current_node_declared
     - dependencies_resolved_before_completion
+    - requested_status_allowed_by_node_contract
     - no_silent_step_deletion
     - no_runtime_canonical_step_invention
   postflight:
@@ -85,6 +110,13 @@ manifest_fingerprint:
     - parent_id
     - dependencies
     - node_kind
+    - criticality
+    - owner
+    - condition
+    - input_schema_ref
+    - output_schema_ref
+    - evidence_requirement
+    - allowed_statuses
   purpose: detect manifest drift and identify the exact canonical graph used for an execution.
 
 authority:
@@ -99,6 +131,8 @@ separation_of_concerns:
     - graph_validation
     - structural_integrity
     - dependency_integrity
+    - governance_metadata_validation
+    - allowed_status_enforcement
     - execution_reconciliation
     - manifest_fingerprinting
   playbooks_own:
