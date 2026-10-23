@@ -8,7 +8,7 @@ ATLAS-OS is a portable operating framework for governed AI work. It sits between
 
 > **When ATLAS is active, every user prompt enters Mission Control first. ATLAS governs. Providers execute bounded capabilities. Every provider returns to ATLAS. The user retains authority over consequential actions.**
 
-ARGUS is the provider for structured `intelligence_collection`; it is not a peer operating system and cannot self-activate or choose the next ATLAS step.
+ARGUS is the ATLAS-governed **360° Business Intelligence playbook** exposed through the `intelligence_collection` mechanism. It is not a peer operating system and it is not the underlying search/MCP/plugin/database provider. ATLAS selects and authorizes the actual capabilities and providers used for an ARGUS mission; ARGUS applies the intelligence doctrine inside the approved mission and returns its package to ATLAS.
 
 ## Runtime
 
@@ -28,7 +28,7 @@ User / Event
          -> Code execution
          -> External action
          -> Multi-capability
-    -> Provider result returns to ATLAS
+    -> Provider / playbook result returns to ATLAS
     -> Reassess / verify / reroute
     -> Deliver / persist
 ```
@@ -52,15 +52,17 @@ atlas-os/
 ├── governance.yaml          # authority and change rules
 ├── plugin.json              # portable plugin manifest
 ├── skills/                  # packaged host skills
-├── spec/                    # 11 durable normative contracts
-├── schemas/                 # 9 public interchange/reference schemas
+├── spec/                    # durable normative contracts
+├── schemas/                 # public interchange/reference schemas
 ├── registries/              # capabilities, providers, surfaces, classifications
 ├── integrations/            # ARGUS, hosts, deployment profiles
-├── atlas_runtime/           # compact reference runtime
+├── atlas_runtime/           # compact framework reference runtime
 ├── tests/                   # unit, conformance, integration
 ├── tools/validate.py        # repository contract validator
 └── docs/                    # GitBook-ready human documentation
 ```
+
+Business-domain state machines such as bid preparation, project delivery, milestone acceptance, invoicing, payments, and accounting do not belong in `atlas_runtime`. ATLAS governs the permissions, routing, approvals, evidence acceptance, persistence authorization, and external actions around those processes; deployment systems and domain playbooks hold the domain semantics.
 
 Historical release diaries, migration logs, completed plans, compatibility aliases, generated libraries, and superseded registries are intentionally not active repository content. Git history and GitHub Releases provide history.
 
