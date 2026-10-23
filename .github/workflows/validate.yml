@@ -48,6 +48,6 @@ jobs:
       - name: Integration tests
         run: python -m coverage run --append --source=atlas_runtime -m unittest discover -s tests/integration -v
       - name: Runtime coverage ratchet
-        run: python -m coverage report --show-missing --fail-under=75
+        run: python -m coverage report --show-missing --fail-under=80
       - name: Repository contract
         run: python tools/validate.py .
