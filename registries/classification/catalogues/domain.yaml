@@ -13,5 +13,248 @@ hierarchy_levels:
   - SUBDOMAIN
 redistribution_status: PERMITTED
 dataset_storage: FULL_DATASET
-items: []
-notes: Functional knowledge and operating domains kept separate from industries and products.
+items:
+  - &defaults
+    atlas_classification_id: DOMAIN-MARITIME
+    serial: "01"
+    family_id: DOMAIN
+    preferred_label: Maritime
+    definition: "Functional domain covering navigation, vessel systems, maritime operations, safety, and maritime situational awareness."
+    source_standard_id: STD-ATLAS-DOMAIN
+    source_version_id: VER-ATLAS-DOMAIN-1.0.0
+    source_url: https://github.com/gferris418/atlas-os
+    lifecycle: ACTIVE
+    evidence_status: CONFIRMED
+    redistribution_status: PERMITTED
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-MARITIME-NAVIGATION
+    serial: "01.01"
+    preferred_label: Navigation
+    definition: "Navigation, route planning, positioning, bridge, and navigational-safety functions."
+    parent_id: DOMAIN-MARITIME
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-MARITIME-SURVEILLANCE
+    serial: "01.02"
+    preferred_label: "Maritime Surveillance"
+    definition: "Detection, identification, tracking, and awareness of maritime activity."
+    parent_id: DOMAIN-MARITIME
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-MARITIME-VESSEL-SYSTEMS
+    serial: "01.03"
+    preferred_label: "Vessel Systems"
+    definition: "Integrated vessel propulsion, power, automation, bridge, safety, and mission systems."
+    parent_id: DOMAIN-MARITIME
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-C4ISR
+    serial: "02"
+    preferred_label: C4ISR
+    definition: "Command, control, communications, computers, intelligence, surveillance, and reconnaissance functions."
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-C4ISR-C2
+    serial: "02.01"
+    preferred_label: "Command & Control"
+    definition: "Command, coordination, decision support, operational-picture, and control functions."
+    parent_id: DOMAIN-C4ISR
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-C4ISR-COMMS
+    serial: "02.02"
+    preferred_label: Communications
+    definition: "Operational, tactical, strategic, and data communications functions."
+    parent_id: DOMAIN-C4ISR
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-C4ISR-ISR
+    serial: "02.03"
+    preferred_label: "Intelligence, Surveillance & Reconnaissance"
+    definition: "Collection, processing, exploitation, and dissemination of intelligence and surveillance information."
+    parent_id: DOMAIN-C4ISR
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-PORTS
+    serial: "03"
+    preferred_label: "Ports & Terminal Operations"
+    definition: "Functional domain covering port operations, vessel traffic, terminal management, and cargo movement."
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-PORTS-AUTOMATION
+    serial: "03.01"
+    preferred_label: "Port Automation"
+    definition: "Automation and digital control of port and terminal operations."
+    parent_id: DOMAIN-PORTS
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-PORTS-VTS
+    serial: "03.02"
+    preferred_label: "Vessel Traffic Services"
+    definition: "Monitoring, coordination, information, and management of vessel traffic in port and coastal waters."
+    parent_id: DOMAIN-PORTS
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-PORTS-TERMINAL
+    serial: "03.03"
+    preferred_label: "Terminal Operations"
+    definition: "Berth, yard, gate, cargo, equipment, and terminal operational functions."
+    parent_id: DOMAIN-PORTS
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-ENERGY
+    serial: "04"
+    preferred_label: "Energy Systems"
+    definition: "Functional domain covering generation, grids, storage, conversion, and energy management."
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-ENERGY-GENERATION
+    serial: "04.01"
+    preferred_label: Generation
+    definition: "Electricity and useful-energy generation functions."
+    parent_id: DOMAIN-ENERGY
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-ENERGY-GRID
+    serial: "04.02"
+    preferred_label: "Grid Systems"
+    definition: "Transmission, distribution, protection, automation, balancing, and power-quality functions."
+    parent_id: DOMAIN-ENERGY
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-ENERGY-STORAGE
+    serial: "04.03"
+    preferred_label: "Energy Storage"
+    definition: "Storage, buffering, dispatch, and management of electrical and other energy."
+    parent_id: DOMAIN-ENERGY
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-CIVIL-INFRASTRUCTURE
+    serial: "05"
+    preferred_label: "Civil Infrastructure"
+    definition: "Functional domain covering engineered structures and civil infrastructure lifecycle."
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-CIVIL-BRIDGE
+    serial: "05.01"
+    preferred_label: "Bridge Engineering"
+    definition: "Design, protection, construction, rehabilitation, and lifecycle management of bridges."
+    parent_id: DOMAIN-CIVIL-INFRASTRUCTURE
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-CIVIL-SHM
+    serial: "05.02"
+    preferred_label: "Structural Health Monitoring"
+    definition: "Measurement, condition assessment, diagnostics, and lifecycle monitoring of structures."
+    parent_id: DOMAIN-CIVIL-INFRASTRUCTURE
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-CIVIL-SEISMIC
+    serial: "05.03"
+    preferred_label: "Seismic Protection"
+    definition: "Seismic isolation, damping, restraint, resilience, and earthquake-protection functions."
+    parent_id: DOMAIN-CIVIL-INFRASTRUCTURE
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-CIVIL-GEOTECH
+    serial: "05.04"
+    preferred_label: "Geotechnical Engineering"
+    definition: "Ground, foundation, slope, soil, and geotechnical engineering functions."
+    parent_id: DOMAIN-CIVIL-INFRASTRUCTURE
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-ICT-DIGITAL
+    serial: "06"
+    preferred_label: "ICT & Digital"
+    definition: "Functional domain covering digital infrastructure, information systems, computing, data, and enterprise technology."
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-ICT-CLOUD-DATA
+    serial: "06.01"
+    preferred_label: "Cloud & Data Infrastructure"
+    definition: "Cloud, compute, storage, platform, and data-centre functions."
+    parent_id: DOMAIN-ICT-DIGITAL
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-ICT-DATA-ANALYTICS
+    serial: "06.02"
+    preferred_label: "Data & Analytics"
+    definition: "Data engineering, integration, analytics, decision intelligence, and information products."
+    parent_id: DOMAIN-ICT-DIGITAL
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-ICT-ENTERPRISE
+    serial: "06.03"
+    preferred_label: "Enterprise IT"
+    definition: "Enterprise applications, collaboration, identity, integration, and IT-service functions."
+    parent_id: DOMAIN-ICT-DIGITAL
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-SECURITY
+    serial: "07"
+    preferred_label: Security
+    definition: "Functional domain covering physical, border, cyber, and protective-security outcomes."
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-SECURITY-BORDER
+    serial: "07.01"
+    preferred_label: "Border Security"
+    definition: "Detection, screening, surveillance, identification, and enforcement at land, air, and maritime borders."
+    parent_id: DOMAIN-SECURITY
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-SECURITY-PHYSICAL
+    serial: "07.02"
+    preferred_label: "Physical Security"
+    definition: "Protection of facilities, people, assets, and critical infrastructure."
+    parent_id: DOMAIN-SECURITY
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-SECURITY-CYBER
+    serial: "07.03"
+    preferred_label: Cybersecurity
+    definition: "Protection, detection, response, resilience, identity, and assurance for digital systems."
+    parent_id: DOMAIN-SECURITY
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-HEALTHCARE
+    serial: "08"
+    preferred_label: "Healthcare Technology"
+    definition: "Functional domain covering clinical technology, diagnostics, medical systems, and health information."
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-HEALTH-DIAGNOSTICS
+    serial: "08.01"
+    preferred_label: Diagnostics
+    definition: "Clinical testing, imaging, laboratory, and diagnostic functions."
+    parent_id: DOMAIN-HEALTHCARE
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-HEALTH-MEDTECH
+    serial: "08.02"
+    preferred_label: "Medical Technology"
+    definition: "Medical devices, treatment systems, monitoring, and clinical technology."
+    parent_id: DOMAIN-HEALTHCARE
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-HEALTH-INFO
+    serial: "08.03"
+    preferred_label: "Health Information Systems"
+    definition: "Electronic health records, hospital systems, telehealth, and health-data functions."
+    parent_id: DOMAIN-HEALTHCARE
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-TRANSPORT-MOBILITY
+    serial: "09"
+    preferred_label: "Transport & Mobility"
+    definition: "Functional domain covering movement, traffic, signalling, fleet, and mobility-system operations."
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-TRANSPORT-TRAFFIC
+    serial: "09.01"
+    preferred_label: "Traffic Management"
+    definition: "Road and urban traffic monitoring, control, optimisation, and traveller information."
+    parent_id: DOMAIN-TRANSPORT-MOBILITY
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-TRANSPORT-RAIL
+    serial: "09.02"
+    preferred_label: "Rail Systems"
+    definition: "Rail signalling, train control, rolling-stock systems, and rail operations."
+    parent_id: DOMAIN-TRANSPORT-MOBILITY
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-TRANSPORT-AVIATION
+    serial: "09.03"
+    preferred_label: "Aviation Systems"
+    definition: "Airport, air-navigation, airfield, surveillance, and aviation operational systems."
+    parent_id: DOMAIN-TRANSPORT-MOBILITY
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-WATER-ENVIRONMENT
+    serial: "10"
+    preferred_label: "Water & Environmental Systems"
+    definition: "Functional domain covering water treatment, sanitation, monitoring, and environmental systems."
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-WATER-TREATMENT
+    serial: "10.01"
+    preferred_label: "Water Treatment"
+    definition: "Treatment, quality control, process automation, and distribution support for water."
+    parent_id: DOMAIN-WATER-ENVIRONMENT
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-WATER-WASTEWATER
+    serial: "10.02"
+    preferred_label: Wastewater
+    definition: "Collection, treatment, reuse, monitoring, and process control for wastewater."
+    parent_id: DOMAIN-WATER-ENVIRONMENT
+  - <<: *defaults
+    atlas_classification_id: DOMAIN-ENV-MONITORING
+    serial: "10.03"
+    preferred_label: "Environmental Monitoring"
+    definition: "Measurement and analysis of environmental conditions and emissions."
+    parent_id: DOMAIN-WATER-ENVIRONMENT
+notes: "ATLAS functional-domain vocabulary. Domains describe areas of operation or knowledge rather than economic activity or product identity."
