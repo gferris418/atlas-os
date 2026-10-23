@@ -3,6 +3,7 @@
 * [ATLAS OS](README.md)
 * [Architecture](architecture.md)
 * [Framework](framework.md)
+* [Canonical Execution Graph](canonical-execution-graph.md)
 * [Playbook](playbook.md)
 * [Standard Operating Procedure](sop.md)
 * [Capabilities and Routing](capabilities-routing.md)
