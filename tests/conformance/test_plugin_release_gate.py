@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 POLICY = ROOT / ".github" / "plugin-release-policy.yaml"
 TOOL = ROOT / "tools" / "plugin_release_gate.py"
 WORKFLOW = ROOT / ".github" / "workflows" / "plugin-release-gate.yml"
-CURRENT_ARGUS_COMMIT = "8df6c7e5abe3192479659d5bd0aa63fed38da841"
+CURRENT_ARGUS_COMMIT = "ee881b92c629917894a33e4bc4e18c9655473420"
 CURRENT_ARGUS_CONTRACT_VERSION = "2.0.0"
 
 
@@ -26,7 +26,7 @@ class PluginReleaseGateContract(unittest.TestCase):
     def test_policy_declares_guarded_manual_publication_and_bundle(self):
         self.assertTrue(POLICY.is_file(), "missing plugin release policy")
         policy = yaml.safe_load(POLICY.read_text(encoding="utf-8"))
-        self.assertEqual("1.0.0", policy["version"])
+        self.assertEqual("1.1.0", policy["version"])
         self.assertEqual("atlas-os", policy["plugin"]["name"])
         self.assertEqual("gferris418/atlas-os", policy["plugin"]["canonical_repository"])
         self.assertFalse(policy["publication"]["automatic"])
@@ -36,6 +36,14 @@ class PluginReleaseGateContract(unittest.TestCase):
         self.assertIn("skills/atlas-os/SKILL.md", policy["bundle"]["paths"])
         self.assertIn("integrations/chatgpt-bootstrap.yaml", policy["bundle"]["paths"])
         self.assertIn("integrations/argus.yaml", policy["bundle"]["paths"])
+
+        sync = policy["synchronization"]
+        self.assertEqual("chatgpt_plugin_sync_required", sync["event_type"])
+        self.assertEqual("plugin-sync-request.json", sync["request_file"])
+        self.assertEqual("sha256", sync["hash_algorithm"])
+        self.assertEqual(["plugin.json", "skills/atlas-os/SKILL.md"], sync["wrapper_paths"])
+        self.assertTrue(sync["artifact_only_publication_input"])
+        self.assertTrue(sync["publication_receipt_required"])
 
     def test_policy_tracks_current_argus_compatibility_contract(self):
         policy = yaml.safe_load(POLICY.read_text(encoding="utf-8"))
@@ -92,6 +100,15 @@ class PluginReleaseGateContract(unittest.TestCase):
         self.assertIn("python -m unittest discover -s tests/integration -v", text)
         self.assertIn("python tools/validate.py .", text)
         self.assertLess(text.index("name: Validate release revision"), text.index("name: Classify plugin impact and prepare release bundle"))
+
+    def test_workflow_emits_hashed_event_driven_sync_handoff(self):
+        text = WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("name: Build synchronization request", text)
+        self.assertIn("hashlib.sha256", text)
+        self.assertIn("plugin-sync-request.json", text)
+        self.assertIn("chatgpt_plugin_sync_required", text)
+        self.assertIn("name: Emit repository synchronization event", text)
+        self.assertIn("needs.plugin-release-gate.outputs.release_required == 'true'", text)
 
 
 if __name__ == "__main__":
