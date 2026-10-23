@@ -1,0 +1,17 @@
+source_descriptor_id: SRC-UN-ISIC-REV5
+standard_id: STD-UN-ISIC
+version_id: VER-UN-ISIC-REV5
+authority_id: UNSD
+official_url: https://unstats.un.org/unsd/classifications/Econ/ISIC.cshtml
+retrieval_mode: REMOTE_AUTHORITATIVE
+redistribution_status: UNKNOWN
+dataset_storage: METADATA_ONLY
+last_verified_at: '2026-10-23'
+independently_verified: true
+sha256: fc408f57bd3a4f33c35a4f384ec0010283dd72774892c8d48ae1330a8caeb57f
+expected_counts:
+  sections: 22
+  divisions: 87
+  groups: 258
+  classes: 463
+  total_nodes: 830
