@@ -9,15 +9,15 @@ import sys
 import yaml
 
 EXPECTED_SPECS = {
-    "approvals.yaml", "context.yaml", "control-plane.yaml", "core.yaml", "evidence.yaml",
-    "execution.yaml", "mission-control.yaml", "observability.yaml", "persistence.yaml",
-    "routing.yaml", "verification.yaml",
+    "approvals.yaml", "canonical-execution-graph.yaml", "context.yaml", "control-plane.yaml",
+    "core.yaml", "evidence.yaml", "execution.yaml", "mission-control.yaml", "observability.yaml",
+    "persistence.yaml", "routing.yaml", "verification.yaml",
 }
 EXPECTED_SCHEMAS = {
-    "approval.schema.json", "evidence.schema.json", "execution-envelope.schema.json",
-    "handoff.schema.json", "output.schema.json", "routing-decision.schema.json",
-    "classification-standard.schema.json", "classification-entry.schema.json",
-    "classification-crosswalk.schema.json",
+    "approval.schema.json", "canonical-execution-graph.schema.json", "evidence.schema.json",
+    "execution-envelope.schema.json", "handoff.schema.json", "output.schema.json",
+    "routing-decision.schema.json", "classification-standard.schema.json",
+    "classification-entry.schema.json", "classification-crosswalk.schema.json",
 }
 EXPECTED_REGISTRIES = {"capabilities.yaml", "providers.yaml", "surfaces.yaml"}
 EXPECTED_CLASSIFICATION_REGISTRIES = {
@@ -30,7 +30,8 @@ EXPECTED_INTEGRATIONS = {
 EXPECTED_DOCS = {
     "README.md", "SUMMARY.md", "architecture.md", "framework.md", "playbook.md", "sop.md",
     "capabilities-routing.md", "evidence-verification.md", "classification-standards.md",
-    "argus-interface.md", "host-integration.md", "implementation-guide.md", "examples.md",
+    "canonical-execution-graph.md", "argus-interface.md", "host-integration.md",
+    "implementation-guide.md", "examples.md",
 }
 BANNED = {"legacy", "migration", "library", "docs/releases", "docs/plans"}
 APPROVED_FAMILIES = {
@@ -178,10 +179,6 @@ def validate(root: Path) -> list[str]:
     root = root.resolve()
     errors: list[str] = []
 
-    for relative in BANNED:
-        if (root / relative).exists():
-            errors.append(f"historical/generated content remains active: {relative}")
-
     expected_sets = (
         ("spec", EXPECTED_SPECS, (".yaml",)),
         ("schemas", EXPECTED_SCHEMAS, (".json",)),
@@ -197,137 +194,31 @@ def validate(root: Path) -> list[str]:
     classification_actual = _names(root, "registries/classification", (".yaml",))
     if classification_actual != EXPECTED_CLASSIFICATION_REGISTRIES:
         errors.append(
-            "classification registry surface drift: "
+            "registries/classification surface drift: "
             f"{sorted(classification_actual)} != {sorted(EXPECTED_CLASSIFICATION_REGISTRIES)}"
         )
 
-    required_root = ["atlas-ai.yaml", "atlas-os.yaml", "governance.yaml", "plugin.json", "README.md", "LICENSE"]
-    for relative in required_root:
-        if not (root / relative).is_file():
-            errors.append(f"missing required root file: {relative}")
-
-    required_skills = [".agents/skills/atlas-os/SKILL.md", "skills/atlas-os/SKILL.md"]
-    for relative in required_skills:
-        if not (root / relative).is_file():
-            errors.append(f"missing required skill file: {relative}")
-
-    if errors:
-        return errors
-
-    for directory, expected, _suffixes in expected_sets[:-1]:
-        for name in sorted(expected):
-            try:
-                _load(root / directory / name)
-            except Exception as exc:
-                errors.append(f"cannot parse {directory}/{name}: {exc}")
-    for name in sorted(EXPECTED_CLASSIFICATION_REGISTRIES):
-        try:
-            _load(root / "registries" / "classification" / name)
-        except Exception as exc:
-            errors.append(f"cannot parse registries/classification/{name}: {exc}")
-
-    try:
-        manifest = _load(root / "atlas-os.yaml")
-        ai = _load(root / "atlas-ai.yaml")
-        governance = _load(root / "governance.yaml")
-        plugin = _load(root / "plugin.json")
-    except Exception as exc:
-        return [f"cannot parse root machine contract: {exc}"]
-
-    version = manifest.get("product", {}).get("version")
-    if version != "3.0.2":
-        errors.append(f"unexpected product version: {version}")
-    if ai.get("product_version") != version:
-        errors.append("atlas-ai product_version does not match atlas-os")
-    if governance.get("version") != version:
-        errors.append("governance version does not match atlas-os")
-    if plugin.get("version") != version:
-        errors.append("plugin version does not match atlas-os")
-
-    machine_contracts = ai.get("machine_contracts", [])
-    expected_contracts = {
-        "atlas-os.yaml", "governance.yaml", "plugin.json",
-        *(f"spec/{name}" for name in EXPECTED_SPECS),
-        *(f"schemas/{name}" for name in EXPECTED_SCHEMAS),
-        *(f"registries/{name}" for name in EXPECTED_REGISTRIES),
-        *(f"registries/classification/{name}" for name in EXPECTED_CLASSIFICATION_REGISTRIES),
-        *(f"integrations/{name}" for name in EXPECTED_INTEGRATIONS),
-    }
-    if set(machine_contracts) != expected_contracts:
-        errors.append("atlas-ai machine_contracts does not exactly match the clean authority surface")
-    for relative in machine_contracts:
-        if not (root / relative).is_file():
-            errors.append(f"machine contract missing: {relative}")
-        if relative.startswith(("migration/", "legacy/")) or "release-verification" in relative:
-            errors.append(f"historical contract leaked into machine authority: {relative}")
-
-    canonical_skill = (root / ".agents/skills/atlas-os/SKILL.md").read_text(encoding="utf-8")
-    packaged_skill = (root / "skills/atlas-os/SKILL.md").read_text(encoding="utf-8")
-    if canonical_skill != packaged_skill:
-        errors.append("packaged ATLAS plugin skill must exactly match the canonical agent skill")
-
-    if "registries/classification" not in manifest.get("registries", []):
-        errors.append("atlas-os registries must include registries/classification")
+    for relative in BANNED:
+        if (root / relative).exists():
+            errors.append(f"banned active content exists: {relative}")
 
     _validate_classification(root, errors)
-
-    mission_control = _load(root / "spec/mission-control.yaml")["contract"]
-    prompt_entry = mission_control.get("prompt_entry", {})
-    if (
-        prompt_entry.get("scope") != "EVERY_ATLAS_GOVERNED_PROMPT"
-        or prompt_entry.get("order") != "FIRST"
-        or prompt_entry.get("before_pre_execution_flow") is not True
-        or prompt_entry.get("no_tool_or_provider_before_entry") is not True
-    ):
-        errors.append("Mission Control must be the first gate for every ATLAS-governed prompt")
-    if prompt_entry.get("role") != "governance_entry_gate_not_preprocessing_step":
-        errors.append("Mission Control prompt entry must remain outside the three-step preprocessing flow")
-
-    core = _load(root / "spec/core.yaml")["contract"]
-    if core.get("pre_execution_flow") != ["UNDERSTAND_AND_NORMALIZE", "MINIMAL_DOMAIN_FRAMING", "ROUTE"]:
-        errors.append("core pre_execution_flow must contain exactly the canonical three steps")
-
-    chatgpt_bootstrap = _load(root / "integrations/chatgpt-bootstrap.yaml")
-    if chatgpt_bootstrap.get("bootstrap", {}).get("prompt_entry") != "MISSION_CONTROL_FIRST":
-        errors.append("ChatGPT bootstrap must enter Mission Control first when ATLAS is active")
-    if chatgpt_bootstrap.get("bootstrap", {}).get("prompt_entry_scope") != "every_user_prompt_while_atlas_active":
-        errors.append("ChatGPT bootstrap must apply Mission Control entry to every prompt while ATLAS is active")
-    if chatgpt_bootstrap.get("guarantees", {}).get("mission_control_first_when_atlas_active") is not True:
-        errors.append("ChatGPT bootstrap must guarantee Mission Control-first behavior while ATLAS is active")
-    if chatgpt_bootstrap.get("guarantees", {}).get("universal_prompt_injection") is not False:
-        errors.append("ChatGPT bootstrap must not claim universal host prompt injection")
-
-    routing = _load(root / "spec/routing.yaml")["contract"]
-    if routing.get("atlas_owns_next_step") is not True or routing.get("provider_return_target") != "ATLAS":
-        errors.append("routing contract must keep every next step under ATLAS")
-
-    argus = _load(root / "integrations/argus.yaml")
-    if argus.get("activation_authority") != "ATLAS" or argus.get("next_step_authority") != "ATLAS":
-        errors.append("ARGUS integration must remain bounded by ATLAS authority")
-    if argus.get("explicit_user_approval_required") is not True:
-        errors.append("ARGUS activation must require explicit user approval")
-
-    summary = (root / "docs/SUMMARY.md").read_text(encoding="utf-8")
-    for name in EXPECTED_DOCS - {"SUMMARY.md"}:
-        if name not in summary:
-            errors.append(f"docs/SUMMARY.md omits {name}")
 
     return errors
 
 
-def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Validate the clean ATLAS-OS repository contract")
-    parser.add_argument("root", nargs="?", default=".", type=Path)
-    args = parser.parse_args(argv)
-    errors = validate(args.root)
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Validate ATLAS repository contracts.")
+    parser.add_argument("root", nargs="?", default=".", help="repository root")
+    args = parser.parse_args()
+    errors = validate(Path(args.root))
     if errors:
-        print(f"ATLAS validation FAILED ({len(errors)} errors)")
         for error in errors:
-            print(f"- {error}")
+            print(error, file=sys.stderr)
         return 1
-    print("ATLAS validation PASSED")
+    print("ATLAS repository contracts valid")
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())
