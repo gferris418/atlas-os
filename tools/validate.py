@@ -18,6 +18,7 @@ EXPECTED_SCHEMAS = {
     "execution-envelope.schema.json", "handoff.schema.json", "output.schema.json",
     "routing-decision.schema.json", "classification-standard.schema.json",
     "classification-entry.schema.json", "classification-crosswalk.schema.json",
+    "classification-catalogue.schema.json", "classification-indicator.schema.json",
 }
 EXPECTED_REGISTRIES = {"capabilities.yaml", "providers.yaml", "surfaces.yaml"}
 EXPECTED_CLASSIFICATION_REGISTRIES = {
@@ -35,7 +36,7 @@ EXPECTED_DOCS = {
 }
 BANNED = {"legacy", "migration", "library", "docs/releases", "docs/plans"}
 APPROVED_FAMILIES = {
-    "DOMAIN", "SECTOR", "INDUSTRY", "ECONOMIC_ACTIVITY", "PRODUCT", "CAPABILITY",
+    "DOMAIN", "SECTOR", "INDUSTRY", "ECONOMIC_ACTIVITY", "PRODUCT", "CAPABILITY", "TECHNOLOGY",
     "PROCUREMENT_CATEGORY", "TRADE_CLASSIFICATION", "OCCUPATION", "GEOGRAPHY",
     "COMPLIANCE_REGULATORY",
 }
@@ -44,6 +45,8 @@ EVIDENCE_STATUSES = {"CONFIRMED", "PROBABLE", "POSSIBLE", "DISPUTED", "UNVERIFIE
 RELATIONSHIPS = {"EXACT", "CLOSE", "BROADER", "NARROWER", "RELATED", "CANDIDATE"}
 REDISTRIBUTION_STATUSES = {"PERMITTED", "RESTRICTED", "UNKNOWN", "NOT_APPLICABLE"}
 DATASET_STORAGE_MODES = {"NONE", "METADATA_ONLY", "PERMITTED_EXTRACT", "FULL_DATASET"}
+CLASSIFICATION_STATUSES = {"DRAFT", "ADOPTED", "OPERATIONAL", "RETIRED"}
+PUBLICATION_STATUSES = {"PUBLISHED", "FORTHCOMING", "NOT_APPLICABLE", "UNKNOWN"}
 
 
 def _load(path: Path):
@@ -114,6 +117,12 @@ def _validate_classification(root: Path, errors: list[str]) -> None:
                 errors.append(f"invalid redistribution status: {version_id}")
             if version.get("dataset_storage") not in DATASET_STORAGE_MODES:
                 errors.append(f"invalid dataset storage mode: {version_id}")
+            classification_status = version.get("classification_status")
+            if classification_status is not None and classification_status not in CLASSIFICATION_STATUSES:
+                errors.append(f"invalid classification status: {version_id}")
+            publication_status = version.get("publication_status")
+            if publication_status is not None and publication_status not in PUBLICATION_STATUSES:
+                errors.append(f"invalid publication status: {version_id}")
             if version.get("lifecycle") == "ACTIVE" and version.get("evidence_status") != "CONFIRMED":
                 errors.append(f"ACTIVE classification version must be CONFIRMED: {version_id}")
             if version.get("dataset_storage") == "FULL_DATASET" and version.get("redistribution_status") != "PERMITTED":
