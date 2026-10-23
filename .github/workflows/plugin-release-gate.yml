@@ -54,6 +54,46 @@ jobs:
           git diff --name-only "$BASE" "$HEAD" > changed-paths.txt
           echo "Changed paths:"
           cat changed-paths.txt
+      - name: Resolve pinned ARGUS revision
+        id: argus_pin
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          import yaml
+
+          policy = yaml.safe_load(Path('.github/plugin-release-policy.yaml').read_text(encoding='utf-8'))
+          argus = policy['argus_compatibility']
+          if argus['repository'] != 'gferris418/argus-intelligence':
+              raise SystemExit('unexpected ARGUS repository in plugin release policy')
+          commit = argus['compatible_commit']
+          if not isinstance(commit, str) or len(commit) != 40:
+              raise SystemExit('plugin release policy must pin a 40-character ARGUS commit')
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as handle:
+              handle.write(f"commit={commit}\n")
+          PY
+      - name: Checkout pinned ARGUS contract
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          repository: gferris418/argus-intelligence
+          ref: ${{ steps.argus_pin.outputs.commit }}
+          path: .argus-contract
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Validate pinned ARGUS contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          from tools.plugin_release_gate import load_policy, validate_argus_checkout
+
+          policy = load_policy(Path('.github/plugin-release-policy.yaml'))
+          result = validate_argus_checkout(Path('.argus-contract'), policy, atlas_root=Path('.'))
+          print(f"Validated ARGUS {result['commit']} contract {result['contract_version']} against ATLAS {result['atlas_version']}")
+          PY
       - name: Validate release revision
         shell: bash
         run: |
@@ -72,6 +112,7 @@ jobs:
           python tools/plugin_release_gate.py \
             --changed-path-file changed-paths.txt \
             --atlas-commit "${{ github.event.pull_request.head.sha || github.sha }}" \
+            --argus-root .argus-contract \
             --metadata-output plugin-release-metadata.json \
             --bundle-dir dist/plugin-release \
             | tee plugin-release-result.json
@@ -97,6 +138,7 @@ jobs:
           print(f"- ATLAS commit: `{p['source']['atlas_commit']}`")
           print(f"- ARGUS compatible commit: `{p['source']['argus_compatible_commit']}`")
           print(f"- ARGUS contract version: `{p['source']['argus_contract_version']}`")
+          print(f"- ARGUS contract independently validated: `{p['source']['argus_contract_validated']}`")
           if p['impact']['release_matches']:
               print("- Release-driving paths: " + ", ".join(f"`{x}`" for x in p['impact']['release_matches']))
           if p['impact']['review_matches']:
