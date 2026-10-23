@@ -1,0 +1,18 @@
+catalogue_id: CAT-ATLAS-TECHNOLOGY
+version: 1.0.0
+family_id: TECHNOLOGY
+owner: ATLAS
+authority_id: ATLAS
+lifecycle: ACTIVE
+source_mode: ATLAS_OWNED
+source_standard_id: STD-ATLAS-TECHNOLOGY
+source_version_id: VER-ATLAS-TECHNOLOGY-1.0.0
+source_url: https://github.com/gferris418/atlas-os
+hierarchy_levels:
+  - TECHNOLOGY_DOMAIN
+  - TECHNOLOGY
+  - SUBTECHNOLOGY
+redistribution_status: PERMITTED
+dataset_storage: FULL_DATASET
+items: []
+notes: Governed technology vocabulary for methods, platforms, systems and enabling technologies.
