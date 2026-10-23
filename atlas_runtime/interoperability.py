@@ -35,8 +35,12 @@ class ProviderManifest:
             isinstance(item, str) and item.strip() for item in provides
         ):
             raise ValueError("provides must contain at least one capability id")
-        permissions = value.get("permissions", {})
-        evidence = value.get("evidence", {})
+        if "permissions" not in value:
+            raise ValueError("permissions is required")
+        if "evidence" not in value:
+            raise ValueError("evidence is required")
+        permissions = value["permissions"]
+        evidence = value["evidence"]
         if not isinstance(permissions, dict) or not isinstance(evidence, dict):
             raise ValueError("permissions and evidence must be objects")
         return cls(
