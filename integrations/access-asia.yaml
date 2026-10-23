@@ -1,18 +1,19 @@
 id: integration.access-asia
-version: 3.1.0
+version: 3.2.0
 status: active
 role: deployment_profile
 scope: Access Asia storage and system-of-record routing. This profile is not ATLAS core architecture.
 authority:
-  atlas_github: execution_and_governance
-  argus_github: ARGUS schemas, identity rules, commercial-data rules, migrations, methods, tests, and versioned release baselines
-  sharepoint: documents, working files, and the SharePoint-hosted operational database
-  sharepoint_sqlite: canonical_commercial_graph_and_argus_current_state
+  atlas_github: governance_orchestration_approval_and_action_authorization
+  argus_github: ARGUS 360-business-intelligence schemas, identity rules, commercial-data rules, migrations, methods, tests, and versioned release baselines
+  sharepoint: documents, working files, and the SharePoint-hosted ARGUS business-intelligence database
+  sharepoint_sqlite: canonical_business_intelligence_commercial_fact_graph_and_argus_current_state
   hubspot: crm_relationship_engagement_and_contactability
 argus_operational_store:
   format: SQLite
   logical_path: General/Business Intelligence/30_OPERATIONS/ARGUS_Master_Registry.sqlite
-  writer_authority: ATLAS
+  write_authorization: ATLAS
+  domain_transaction_authority: false
   concurrent_writers: prohibited
   open_in_place_over_sharepoint_sync: prohibited
   canonical_graph_rule: enter_once_identify_once_relate_once_derive_views
@@ -68,6 +69,14 @@ persistence_routing:
   CLASSIFICATION_CROSSWALK: ATLAS_GITHUB
   CLASSIFICATION_UPDATE_SOURCE: ATLAS_GITHUB
   CLASSIFICATION_DATASET_METADATA: ATLAS_GITHUB
+domain_execution_boundary:
+  bid_submission_execution: external_business_action
+  project_delivery_and_acceptance_execution: external_business_process
+  invoice_and_payment_execution: external_finance_process
+  accounting_ledger_authority: deployment_specific_not_declared_here
+  atlas_role: govern_route_approve_authorize_verify_and_persist
+  argus_role: collect_analyze_reconcile_monitor_and_record_provenance_backed_business_intelligence_facts
+  rule: ATLAS core does not host Access Asia bid project finance or accounting state machines
 reporting:
   model: DERIVED_VIEWS
   department_master_databases: false
