@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import hashlib
 
+from .contract import PRE_EXECUTION_FLOW
 from .models import ExecutionEnvelope, ExecutionResult
-from .router import PRE_EXECUTION_FLOW, choose_route, minimal_domain_framing, normalize_objective
+from .router import choose_route, minimal_domain_framing, normalize_objective
 
 
 def enter_mission_control(envelope: ExecutionEnvelope) -> str:
