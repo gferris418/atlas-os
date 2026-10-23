@@ -2,6 +2,7 @@ id: atlas.execution
 version: 3.0.0
 status: active
 normative: true
+canonical_execution_contract: contracts/atlas-argus-execution-v2.json
 contract:
   atomicity: Execute one bounded work unit at a time unless the Control Plane explicitly authorizes safe parallel work.
   host_neutral: true
