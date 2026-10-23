@@ -1,0 +1,13 @@
+source_descriptor_id: SRC-UN-CPC-3.0
+standard_id: STD-UN-CPC
+version_id: VER-UN-CPC-3.0
+authority_id: UNSD
+official_url: https://unstats.un.org/unsd/classifications/Econ/CPC.cshtml
+retrieval_mode: REMOTE_AUTHORITATIVE
+redistribution_status: UNKNOWN
+dataset_storage: METADATA_ONLY
+last_verified_at: '2026-10-23'
+independently_verified: true
+sha256: 5cd2c1c4890dd6be16af48e9bb940fed48efff9865f39ff15edaa921da25fb7c
+expected_counts:
+  total_nodes: 4586
