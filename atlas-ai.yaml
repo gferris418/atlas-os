@@ -52,6 +52,8 @@ machine_contracts:
   - schemas/classification-standard.schema.json
   - schemas/classification-entry.schema.json
   - schemas/classification-crosswalk.schema.json
+  - schemas/classification-catalogue.schema.json
+  - schemas/classification-indicator.schema.json
   - registries/capabilities.yaml
   - registries/providers.yaml
   - registries/surfaces.yaml
@@ -76,6 +78,7 @@ human_guidance:
   - docs/capabilities-routing.md
   - docs/evidence-verification.md
   - docs/classification-standards.md
+  - docs/canonical-execution-graph.md
   - docs/argus-interface.md
   - docs/host-integration.md
   - docs/implementation-guide.md
