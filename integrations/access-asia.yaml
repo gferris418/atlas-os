@@ -7,7 +7,7 @@ authority:
   atlas_github: governance_orchestration_approval_and_action_authorization
   argus_github: ARGUS 360-business-intelligence schemas, identity rules, commercial-data rules, migrations, methods, tests, and versioned release baselines
   sharepoint: documents, working files, and the SharePoint-hosted ARGUS business-intelligence database
-  sharepoint_sqlite: canonical_business_intelligence_commercial_fact_graph_and_argus_current_state
+  sharepoint_sqlite: canonical_commercial_graph_and_argus_current_state
   hubspot: crm_relationship_engagement_and_contactability
 argus_operational_store:
   format: SQLite
