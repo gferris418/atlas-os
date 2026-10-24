@@ -36,6 +36,17 @@ Do not create a fourth preprocessing step.
 - Persist only with authorization and a verifiable durable-write receipt.
 - Report unavailable capabilities rather than implying execution occurred.
 
+## Governance specialist routing
+
+ATLAS may use narrow progressive-disclosure governance skills after Mission Control and the exact three-step pre-execution flow. These skills reference existing canonical contracts; they do not create new authority, approval paths, or control planes. The `atlas-os` root remains the Mission Control router and next-step authority.
+
+- `atlas-action-governance` — apply `spec/approvals.yaml` and `spec/routing.yaml` when a consequential external action or approval boundary must be evaluated.
+- `atlas-provider-handoff` — apply `integrations/argus.yaml` and `contracts/atlas-argus-execution-v2.json` for admitted-provider activation, bounded handoff, correlation, and provider return.
+- `atlas-persistence` — apply `spec/persistence.yaml` and `integrations/access-asia.yaml` for storage routing, canonical-copy rules, authorization, and durable-write receipts.
+- `atlas-verification` — apply `spec/verification.yaml` before accepting provider success, external side effects, persisted outputs, or overall completion.
+
+Use only the specialist relevant to the current governance question. Every specialist result returns to `atlas-os` before ATLAS routes, acts, persists, verifies, or delivers the next step.
+
 ## Canonical persistence
 
 `spec/persistence.yaml` is the vendor-neutral ATLAS persistence authority model. `integrations/access-asia.yaml` is the canonical Access Asia deployment profile that binds that model to the organization's actual systems of record and SharePoint roots.
