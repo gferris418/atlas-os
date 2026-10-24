@@ -39,10 +39,12 @@ impact:
       - integrations/chatgpt.yaml
       - integrations/chatgpt-bootstrap.yaml
       - integrations/argus.yaml
+      - integrations/access-asia.yaml
       - spec/core.yaml
       - spec/routing.yaml
       - spec/approvals.yaml
       - spec/verification.yaml
+      - spec/persistence.yaml
       - governance.yaml
   review_required:
     prefixes:
@@ -73,6 +75,8 @@ bundle:
     - integrations/chatgpt.yaml
     - integrations/chatgpt-bootstrap.yaml
     - integrations/argus.yaml
+    - spec/persistence.yaml
+    - integrations/access-asia.yaml
   metadata_file: plugin-release-metadata.json
   artifact_name: atlas-os-chatgpt-plugin-release
 validation:
