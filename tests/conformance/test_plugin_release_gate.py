@@ -36,6 +36,8 @@ class PluginReleaseGateContract(unittest.TestCase):
         self.assertIn("skills/atlas-os/SKILL.md", policy["bundle"]["paths"])
         self.assertIn("integrations/chatgpt-bootstrap.yaml", policy["bundle"]["paths"])
         self.assertIn("integrations/argus.yaml", policy["bundle"]["paths"])
+        self.assertIn("spec/persistence.yaml", policy["bundle"]["paths"])
+        self.assertIn("integrations/access-asia.yaml", policy["bundle"]["paths"])
 
         sync = policy["synchronization"]
         self.assertEqual("chatgpt_plugin_sync_required", sync["event_type"])
@@ -51,13 +53,15 @@ class PluginReleaseGateContract(unittest.TestCase):
         self.assertEqual(CURRENT_ARGUS_COMMIT, argus["compatible_commit"])
         self.assertEqual(CURRENT_ARGUS_CONTRACT_VERSION, argus["contract_version"])
 
-    def test_classifier_requires_release_for_chatgpt_and_argus_boundary_changes(self):
+    def test_classifier_requires_release_for_chatgpt_argus_and_persistence_boundary_changes(self):
         self.assertTrue(TOOL.is_file(), "missing plugin release classifier")
         module = load_gate_module()
         policy = yaml.safe_load(POLICY.read_text(encoding="utf-8"))
 
         self.assertTrue(module.classify_paths(["skills/atlas-os/SKILL.md"], policy)["release_required"])
         self.assertTrue(module.classify_paths(["integrations/argus.yaml"], policy)["release_required"])
+        self.assertTrue(module.classify_paths(["spec/persistence.yaml"], policy)["release_required"])
+        self.assertTrue(module.classify_paths(["integrations/access-asia.yaml"], policy)["release_required"])
         self.assertFalse(module.classify_paths(["docs/examples.md"], policy)["release_required"])
 
     def test_metadata_is_traceable_to_atlas_and_argus_commits(self):
