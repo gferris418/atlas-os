@@ -16,6 +16,14 @@ def load_policy(path: Path) -> dict:
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
+def load_atlas_core_version(atlas_root: Path) -> str:
+    descriptor = yaml.safe_load((Path(atlas_root) / "atlas-os.yaml").read_text(encoding="utf-8"))
+    version = descriptor.get("product", {}).get("version")
+    if not isinstance(version, str) or not version:
+        raise ValueError("atlas-os.yaml must declare product.version")
+    return version
+
+
 def load_canonical_argus_contract(atlas_root: Path) -> dict:
     path = Path(atlas_root) / "contracts" / "atlas-argus-execution-v2.json"
     payload = json.loads(path.read_text(encoding="utf-8"))
@@ -109,13 +117,15 @@ def validate_argus_checkout(argus_root: Path, policy: dict, *, atlas_root: Path 
         raise ValueError("pinned ARGUS integration contract must have status CURRENT")
 
     plugin_manifest = json.loads((atlas_root / policy["plugin"]["manifest"]).read_text(encoding="utf-8"))
+    plugin_version = plugin_manifest.get("version")
+    atlas_core_version = load_atlas_core_version(atlas_root)
     atlas_descriptor = descriptor.get("atlas", {})
     if atlas_descriptor.get("repository") != policy["plugin"]["canonical_repository"]:
         raise ValueError("ARGUS contract references a different ATLAS repository")
-    if atlas_descriptor.get("version") != plugin_manifest.get("version"):
+    if atlas_descriptor.get("version") != atlas_core_version:
         raise ValueError(
-            "ARGUS contract ATLAS version does not match the plugin release version: "
-            f"{atlas_descriptor.get('version')} != {plugin_manifest.get('version')}"
+            "ARGUS contract ATLAS version does not match the ATLAS core version: "
+            f"{atlas_descriptor.get('version')} != {atlas_core_version}"
         )
 
     contract = descriptor.get("contract", {})
@@ -141,7 +151,8 @@ def validate_argus_checkout(argus_root: Path, policy: dict, *, atlas_root: Path 
     return {
         "commit": actual_commit,
         "contract_version": actual_contract_version,
-        "atlas_version": atlas_descriptor.get("version"),
+        "atlas_version": atlas_core_version,
+        "plugin_version": plugin_version,
         "contract_path": contract_relative,
         "release_impact_path": expected_impact_relative,
         "validated": True,
