@@ -21,19 +21,27 @@ synchronization:
   wrapper_paths:
     - plugin.json
     - skills/atlas-os/SKILL.md
+    - skills/atlas-action-governance/SKILL.md
+    - skills/atlas-provider-handoff/SKILL.md
+    - skills/atlas-persistence/SKILL.md
+    - skills/atlas-verification/SKILL.md
   artifact_only_publication_input: true
   publication_receipt_required: true
 argus_compatibility:
   repository: gferris418/argus-intelligence
   contract_path: contracts/atlas/current-integration.yaml
   release_impact_path: contracts/atlas/plugin-release-impact.yaml
-  compatible_commit: 74d59a59958a31d9892b7d9aba4b0f5e1a3a403b
+  compatible_commit: 0a78e94b1dd2d6d2783a1d1145a70217b022b79b
   contract_version: 2.0.0
 impact:
   release_required:
     exact:
       - plugin.json
       - skills/atlas-os/SKILL.md
+      - skills/atlas-action-governance/SKILL.md
+      - skills/atlas-provider-handoff/SKILL.md
+      - skills/atlas-persistence/SKILL.md
+      - skills/atlas-verification/SKILL.md
       - .agents/skills/atlas-os/SKILL.md
       - contracts/atlas-argus-execution-v2.json
       - integrations/chatgpt.yaml
@@ -72,6 +80,10 @@ bundle:
   paths:
     - plugin.json
     - skills/atlas-os/SKILL.md
+    - skills/atlas-action-governance/SKILL.md
+    - skills/atlas-provider-handoff/SKILL.md
+    - skills/atlas-persistence/SKILL.md
+    - skills/atlas-verification/SKILL.md
     - integrations/chatgpt.yaml
     - integrations/chatgpt-bootstrap.yaml
     - integrations/argus.yaml
