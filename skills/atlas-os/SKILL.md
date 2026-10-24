@@ -36,13 +36,29 @@ Do not create a fourth preprocessing step.
 - Persist only with authorization and a verifiable durable-write receipt.
 - Report unavailable capabilities rather than implying execution occurred.
 
+## Canonical persistence
+
+`spec/persistence.yaml` is the canonical ATLAS persistence contract. The user has standing authorization for normal, non-destructive persistence inside the two governed SharePoint roots defined there; in-scope writes do not require repeated approval.
+
+- Route everyday chats, discussions, generic outputs, reusable notes, and non-intelligence artifacts to `General/Chats`.
+- Route ARGUS missions and all intelligence-related chats, source files, findings, provenance, analyses, validation artifacts, monitoring outputs, and reusable intelligence deliverables to `General/Business Intelligence` and then to the respective ARGUS taxonomy folder.
+- Use future-reusable output formats appropriate to the artifact: Markdown for narrative records, YAML/JSON for machine context, CSV/XLSX for structured data, DOCX/PDF for formal documents, PPTX for presentations, and native format for source files where material.
+- Keep one canonical copy. Cross-reference the canonical SharePoint item when another record or conversation needs it rather than duplicating the same canonical content across roots.
+- Preserve material source files and provenance needed for verification or future reuse.
+- Persistence is complete only after a verifiable durable-write receipt identifies the saved SharePoint target.
+- If the required SharePoint or storage capability is unavailable, or a write cannot be verified, report `PERSISTENCE_PENDING`, preserve or return the unsaved artifact and intended target, and never imply that persistence succeeded.
+- Writes outside the governed roots, destructive changes, moves outside the governed taxonomy, and sharing or permission changes remain consequential external actions and require explicit scoped approval.
+
+This standing persistence authorization does not change ARGUS activation requirements or any other ATLAS approval gate.
+
 ## ChatGPT bootstrap
 
 - On ChatGPT, Work, or Projects, treat `gferris418/atlas-os` on `main` as the canonical ATLAS contract when current repository state materially affects routing or correctness and live GitHub access is available.
+- Read `spec/persistence.yaml` when persistence, storage routing, or durable artifact handling is material to the task.
 - Treat `/AI Frameworks/ATLAS-ARGUS` as a bootstrap/cache layer, not as a replacement for current GitHub authority.
 - Resolve ARGUS integration against `gferris418/argus-intelligence` when structured intelligence collection is selected; preserve the explicit approval gate and return control to ATLAS.
 - Skill availability is relevance-triggered by the host. Do not claim universal prompt injection or execution of capabilities that the active surface has not exposed.
 
 ## Host rule
 
-ChatGPT, Work, Projects, Codex, Hermes Agent, or another host supplies capabilities. Host-specific tools, UI, memory, storage, and connectors do not change ATLAS authority, Mission Control-first prompt entry, or preprocessing semantics once ATLAS is active.
+ChatGPT, Work, Projects, Codex, Hermes Agent, or another host supplies capabilities. Host-specific tools, UI, memory, storage, and connectors do not change ATLAS authority, Mission Control-first prompt entry, preprocessing semantics, or canonical persistence routing once ATLAS is active.
