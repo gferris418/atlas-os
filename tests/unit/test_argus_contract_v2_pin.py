@@ -6,7 +6,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
-ARGUS_COMMIT = "74d59a59958a31d9892b7d9aba4b0f5e1a3a403b"
+ARGUS_COMMIT = "0a78e94b1dd2d6d2783a1d1145a70217b022b79b"
 
 
 class ArgusContractV2PinTests(unittest.TestCase):
