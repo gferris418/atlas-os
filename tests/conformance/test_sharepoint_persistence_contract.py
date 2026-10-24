@@ -8,6 +8,8 @@ SKILL = ROOT / "skills" / "atlas-os" / "SKILL.md"
 CORE = ROOT / "spec" / "persistence.yaml"
 PROFILE = ROOT / "integrations" / "access-asia.yaml"
 
+# SharePoint target bindings belong to the Access Asia deployment profile, not ATLAS core.
+
 
 class SharePointPersistenceContractTests(unittest.TestCase):
     def test_access_asia_profile_routes_atlas_and_argus_outputs(self):
