@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "atlas-os",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "ATLAS-OS Mission Control-first execution governance for routing, approvals, verification, provider return, and ARGUS intelligence collection handoff.",
   "author": {
     "name": "Access Asia"
