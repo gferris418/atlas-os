@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 POLICY = ROOT / ".github" / "plugin-release-policy.yaml"
 TOOL = ROOT / "tools" / "plugin_release_gate.py"
 WORKFLOW = ROOT / ".github" / "workflows" / "plugin-release-gate.yml"
-CURRENT_ARGUS_COMMIT = "250dc38f0415a71d72536beff3c8426878b10fa3"
+CURRENT_ARGUS_COMMIT = "74d59a59958a31d9892b7d9aba4b0f5e1a3a403b"
 CURRENT_ARGUS_CONTRACT_VERSION = "2.0.0"
 
 
