@@ -27,7 +27,7 @@ argus_compatibility:
   repository: gferris418/argus-intelligence
   contract_path: contracts/atlas/current-integration.yaml
   release_impact_path: contracts/atlas/plugin-release-impact.yaml
-  compatible_commit: 860c640c2bc1a695ec0c378a747636eea953a82e
+  compatible_commit: 250dc38f0415a71d72536beff3c8426878b10fa3
   contract_version: 2.0.0
 impact:
   release_required:
@@ -39,10 +39,12 @@ impact:
       - integrations/chatgpt.yaml
       - integrations/chatgpt-bootstrap.yaml
       - integrations/argus.yaml
+      - integrations/access-asia.yaml
       - spec/core.yaml
       - spec/routing.yaml
       - spec/approvals.yaml
       - spec/verification.yaml
+      - spec/persistence.yaml
       - governance.yaml
   review_required:
     prefixes:
@@ -73,6 +75,8 @@ bundle:
     - integrations/chatgpt.yaml
     - integrations/chatgpt-bootstrap.yaml
     - integrations/argus.yaml
+    - spec/persistence.yaml
+    - integrations/access-asia.yaml
   metadata_file: plugin-release-metadata.json
   artifact_name: atlas-os-chatgpt-plugin-release
 validation:
