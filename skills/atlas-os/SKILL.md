@@ -38,7 +38,9 @@ Do not create a fourth preprocessing step.
 
 ## Canonical persistence
 
-`spec/persistence.yaml` is the canonical ATLAS persistence contract. The user has standing authorization for normal, non-destructive persistence inside the two governed SharePoint roots defined there; in-scope writes do not require repeated approval.
+`spec/persistence.yaml` is the vendor-neutral ATLAS persistence authority model. `integrations/access-asia.yaml` is the canonical Access Asia deployment profile that binds that model to the organization's actual systems of record and SharePoint roots.
+
+The user has standing authorization for normal, non-destructive persistence inside the two governed SharePoint roots in the Access Asia deployment profile; in-scope writes do not require repeated approval.
 
 - Route everyday chats, discussions, generic outputs, reusable notes, and non-intelligence artifacts to `General/Chats`.
 - Route ARGUS missions and all intelligence-related chats, source files, findings, provenance, analyses, validation artifacts, monitoring outputs, and reusable intelligence deliverables to `General/Business Intelligence` and then to the respective ARGUS taxonomy folder.
@@ -54,7 +56,7 @@ This standing persistence authorization does not change ARGUS activation require
 ## ChatGPT bootstrap
 
 - On ChatGPT, Work, or Projects, treat `gferris418/atlas-os` on `main` as the canonical ATLAS contract when current repository state materially affects routing or correctness and live GitHub access is available.
-- Read `spec/persistence.yaml` when persistence, storage routing, or durable artifact handling is material to the task.
+- Read `spec/persistence.yaml` and `integrations/access-asia.yaml` when persistence, storage routing, or durable artifact handling is material to the task.
 - Treat `/AI Frameworks/ATLAS-ARGUS` as a bootstrap/cache layer, not as a replacement for current GitHub authority.
 - Resolve ARGUS integration against `gferris418/argus-intelligence` when structured intelligence collection is selected; preserve the explicit approval gate and return control to ATLAS.
 - Skill availability is relevance-triggered by the host. Do not claim universal prompt injection or execution of capabilities that the active surface has not exposed.
