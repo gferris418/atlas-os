@@ -5,18 +5,22 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 SKILL = ROOT / "skills" / "atlas-os" / "SKILL.md"
-CONTRACT = ROOT / "spec" / "persistence.yaml"
+CORE = ROOT / "spec" / "persistence.yaml"
+PROFILE = ROOT / "integrations" / "access-asia.yaml"
 
 
 class SharePointPersistenceContractTests(unittest.TestCase):
-    def test_canonical_contract_routes_atlas_and_argus_outputs(self):
-        self.assertTrue(CONTRACT.is_file(), "missing canonical persistence contract")
-        document = yaml.safe_load(CONTRACT.read_text(encoding="utf-8"))
-        contract = document["contract"]
-        sharepoint = contract["canonical_sharepoint"]
+    def test_access_asia_profile_routes_atlas_and_argus_outputs(self):
+        self.assertTrue(CORE.is_file(), "missing core persistence contract")
+        core = yaml.safe_load(CORE.read_text(encoding="utf-8"))
+        self.assertEqual("ATLAS_CONTROL_PLANE", core["contract"]["owner"])
+        self.assertNotIn("SHAREPOINT", str(core).upper())
 
-        self.assertEqual("3.0.0", document["version"])
-        self.assertEqual("ATLAS_CONTROL_PLANE", contract["owner"])
+        self.assertTrue(PROFILE.is_file(), "missing Access Asia deployment profile")
+        profile = yaml.safe_load(PROFILE.read_text(encoding="utf-8"))
+        sharepoint = profile["canonical_sharepoint"]
+
+        self.assertEqual("deployment_profile", profile["role"])
         self.assertEqual("accessasiaccl.sharepoint.com", sharepoint["hostname"])
         self.assertEqual("/sites/accessasia", sharepoint["site_path"])
         self.assertEqual("General/Chats", sharepoint["roots"]["atlas_generic"]["path"])
@@ -33,6 +37,7 @@ class SharePointPersistenceContractTests(unittest.TestCase):
     def test_skill_bootstraps_and_enforces_persistence_contract(self):
         text = SKILL.read_text(encoding="utf-8")
         self.assertIn("spec/persistence.yaml", text)
+        self.assertIn("integrations/access-asia.yaml", text)
         self.assertIn("General/Chats", text)
         self.assertIn("General/Business Intelligence", text)
         self.assertIn("PERSISTENCE_PENDING", text)
