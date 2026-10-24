@@ -21,7 +21,7 @@ class ChatGPTPluginBootstrapContract(unittest.TestCase):
             manifest["$schema"],
         )
         self.assertEqual("atlas-os", manifest["name"])
-        self.assertEqual("3.0.2", manifest["version"])
+        self.assertEqual("3.0.3", manifest["version"])
         self.assertIn("execution governance", manifest["description"].lower())
         self.assertIn("mission control", manifest["description"].lower())
         self.assertTrue(PACKAGED_SKILL.is_file())

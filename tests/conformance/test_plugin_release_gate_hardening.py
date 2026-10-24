@@ -71,9 +71,10 @@ class PluginReleaseGateHardeningTests(unittest.TestCase):
         self.assertIn("ref: ${{ steps.argus_pin.outputs.commit }}", workflow)
         self.assertIn("--argus-root .argus-contract", workflow)
 
-    def test_argus_checkout_validation_binds_git_head_contract_and_atlas_release(self) -> None:
+    def test_argus_checkout_validation_binds_git_head_contract_and_atlas_core_version(self) -> None:
         base_policy = load_policy(POLICY_PATH)
-        atlas_version = json.loads((ROOT / "plugin.json").read_text(encoding="utf-8"))["version"]
+        atlas_core_version = yaml.safe_load((ROOT / "atlas-os.yaml").read_text(encoding="utf-8"))["product"]["version"]
+        plugin_package_version = json.loads((ROOT / "plugin.json").read_text(encoding="utf-8"))["version"]
 
         with tempfile.TemporaryDirectory() as tmp:
             argus_root = Path(tmp)
@@ -84,7 +85,7 @@ class PluginReleaseGateHardeningTests(unittest.TestCase):
                 "status": "CURRENT",
                 "atlas": {
                     "repository": base_policy["plugin"]["canonical_repository"],
-                    "version": atlas_version,
+                    "version": atlas_core_version,
                     "commit": "release-commit-is-validated-by-ARGUS-contract-tests",
                 },
                 "contract": {
@@ -138,7 +139,8 @@ class PluginReleaseGateHardeningTests(unittest.TestCase):
                 base_policy["argus_compatibility"]["contract_version"],
                 validated["contract_version"],
             )
-            self.assertEqual(atlas_version, validated["atlas_version"])
+            self.assertEqual(atlas_core_version, validated["atlas_version"])
+            self.assertEqual(plugin_package_version, validated["plugin_version"])
 
             wrong_policy = copy.deepcopy(policy)
             wrong_policy["argus_compatibility"]["compatible_commit"] = "0" * 40
