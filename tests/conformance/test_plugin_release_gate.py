@@ -10,8 +10,16 @@ ROOT = Path(__file__).resolve().parents[2]
 POLICY = ROOT / ".github" / "plugin-release-policy.yaml"
 TOOL = ROOT / "tools" / "plugin_release_gate.py"
 WORKFLOW = ROOT / ".github" / "workflows" / "plugin-release-gate.yml"
-CURRENT_ARGUS_COMMIT = "74d59a59958a31d9892b7d9aba4b0f5e1a3a403b"
+CURRENT_ARGUS_COMMIT = "0a78e94b1dd2d6d2783a1d1145a70217b022b79b"
 CURRENT_ARGUS_CONTRACT_VERSION = "2.0.0"
+CURRENT_WRAPPER_PATHS = [
+    "plugin.json",
+    "skills/atlas-os/SKILL.md",
+    "skills/atlas-action-governance/SKILL.md",
+    "skills/atlas-provider-handoff/SKILL.md",
+    "skills/atlas-persistence/SKILL.md",
+    "skills/atlas-verification/SKILL.md",
+]
 
 
 def load_gate_module():
@@ -32,8 +40,8 @@ class PluginReleaseGateContract(unittest.TestCase):
         self.assertFalse(policy["publication"]["automatic"])
         self.assertEqual("plugin_creator_guarded_update", policy["publication"]["mechanism"])
         self.assertTrue(policy["publication"]["preserve_plugin_identity"])
-        self.assertIn("plugin.json", policy["bundle"]["paths"])
-        self.assertIn("skills/atlas-os/SKILL.md", policy["bundle"]["paths"])
+        for path in CURRENT_WRAPPER_PATHS:
+            self.assertIn(path, policy["bundle"]["paths"])
         self.assertIn("integrations/chatgpt-bootstrap.yaml", policy["bundle"]["paths"])
         self.assertIn("integrations/argus.yaml", policy["bundle"]["paths"])
         self.assertIn("spec/persistence.yaml", policy["bundle"]["paths"])
@@ -43,7 +51,7 @@ class PluginReleaseGateContract(unittest.TestCase):
         self.assertEqual("chatgpt_plugin_sync_required", sync["event_type"])
         self.assertEqual("plugin-sync-request.json", sync["request_file"])
         self.assertEqual("sha256", sync["hash_algorithm"])
-        self.assertEqual(["plugin.json", "skills/atlas-os/SKILL.md"], sync["wrapper_paths"])
+        self.assertEqual(CURRENT_WRAPPER_PATHS, sync["wrapper_paths"])
         self.assertTrue(sync["artifact_only_publication_input"])
         self.assertTrue(sync["publication_receipt_required"])
 
